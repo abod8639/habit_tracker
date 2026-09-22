@@ -15,7 +15,7 @@ void main() {
 
       expect(map['name'], 'Test Habit');
       expect(map['isCompleted'], true);
-      expect(map['created_at'], isNotNull);
+      expect(map['createdAt'], isNotNull);
       expect(map['id'], '1');
     });
 
