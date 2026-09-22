@@ -348,9 +348,9 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
-  Future<Either<Failure, void>> incrementDayCount() async {
+  Future<Either<Failure, void>> incrementDayCount([int amount = 1]) async {
     try {
-      await localDataSource.incrementDayCount();
+      await localDataSource.incrementDayCount(amount);
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -358,9 +358,9 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
-  Future<Either<Failure, void>> saveHabitCompletionToHistory(String habitName, bool isCompleted, DateTime date) async {
+  Future<Either<Failure, void>> saveHabitCompletionToHistory(String habitIdOrName, bool isCompleted, DateTime date, {String? habitName}) async {
     try {
-      await localDataSource.saveHabitCompletionToHistory(habitName, isCompleted, date);
+      await localDataSource.saveHabitCompletionToHistory(habitIdOrName, isCompleted, date, habitName: habitName);
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
