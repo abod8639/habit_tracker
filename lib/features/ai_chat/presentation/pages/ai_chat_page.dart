@@ -465,7 +465,7 @@ class _TypingDotsState extends State<_TypingDots>
       children: List.generate(3, (i) {
         return AnimatedBuilder(
           animation: _ctrl,
-          builder: (_, __) {
+          builder: (_, _) {
             final t = (_ctrl.value + i * 0.2) % 1.0;
             final bounce = math.sin(t * math.pi);
             return Container(
