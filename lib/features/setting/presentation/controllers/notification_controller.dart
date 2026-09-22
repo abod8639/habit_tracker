@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/services/notification_service.dart';
+import 'package:habit_tracker/core/services/fcm_service.dart';
 import '../../domain/usecases/is_notification_enabled_usecase.dart';
 import '../../domain/usecases/set_notification_enabled_usecase.dart';
 import '../../domain/usecases/get_notification_time_usecase.dart';
@@ -12,10 +13,16 @@ class NotificationController extends GetxController {
   final GetNotificationTimeUseCase _getNotificationTimeUseCase = Get.find();
   final SetNotificationTimeUseCase _setNotificationTimeUseCase = Get.find();
   
-  final NotificationService _notificationService = NotificationService();
+  NotificationService get _notificationService =>
+      Get.isRegistered<NotificationService>()
+          ? Get.find<NotificationService>()
+          : NotificationService();
 
   var isNotificationEnabled = false.obs;
   var notificationTime = Rxn<TimeOfDay>();
+
+  String? get fcmToken =>
+      Get.isRegistered<FcmService>() ? FcmService.to.fcmToken.value : null;
 
   @override
   void onInit() {
@@ -34,6 +41,21 @@ class NotificationController extends GetxController {
     timeResult.fold(
       (failure) => debugPrint('Error loading notification time: ${failure.message}'),
       (time) => notificationTime.value = time,
+    );
+
+    if (isNotificationEnabled.value && notificationTime.value != null) {
+      await _scheduleNotification(notificationTime.value!);
+    }
+  }
+
+  Future<void> sendTestNotification() async {
+    await _notificationService.requestPermissions();
+    await _notificationService.showTestNotification();
+    Get.snackbar(
+      'Notification Test',
+      'Test notification sent! Check your notification bar.',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 3),
     );
   }
 
