@@ -7,8 +7,8 @@ import 'package:habit_tracker/core/utils/restart_widget.dart';
 Future<void> clearAppDataAndRestart(BuildContext context) async {
   bool? shouldClear = await _showConfirmationDialog(context);
 
-  if (shouldClear != true) {
-    return; // User cancelled
+  if (shouldClear != true || !context.mounted) {
+    return; // User cancelled or context unmounted
   }
 
   try {
@@ -23,9 +23,11 @@ Future<void> clearAppDataAndRestart(BuildContext context) async {
     }
 
     result.fold(
-      (failure) => _showErrorSnackBar(context, failure.message),
+      (failure) {
+        if (context.mounted) _showErrorSnackBar(context, failure.message);
+      },
       (_) async {
-        _showSuccessSnackBar(context);
+        if (context.mounted) _showSuccessSnackBar(context);
         await Future.delayed(const Duration(milliseconds: 1000));
         if (context.mounted) {
           RestartWidget.restartApp(context);
@@ -36,7 +38,9 @@ Future<void> clearAppDataAndRestart(BuildContext context) async {
     if (context.mounted && Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     }
-    _showErrorSnackBar(context, e.toString());
+    if (context.mounted) {
+      _showErrorSnackBar(context, e.toString());
+    }
   }
 }
 
