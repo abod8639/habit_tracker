@@ -25,9 +25,12 @@ class NotificationService {
 
     tz.initializeTimeZones();
     try {
-      final timeZoneName = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(timeZoneName.toString()));
+      final timeZoneInfo = await FlutterTimezone.getLocalTimezone();
+      final identifier = timeZoneInfo.identifier;
+      tz.setLocalLocation(tz.getLocation(identifier));
+      debugPrint('NotificationService: Timezone initialized to $identifier');
     } catch (e) {
+      debugPrint('NotificationService: Error getting timezone: $e');
       try {
         tz.setLocalLocation(tz.getLocation('UTC'));
       } catch (_) {}
@@ -182,13 +185,29 @@ class NotificationService {
     );
   }
 
+  Future<void> _ensureTimezoneInitialized() async {
+    if (tz.local.name == 'UTC' || tz.local.name == 'Etc/UTC') {
+      try {
+        final timeZoneInfo = await FlutterTimezone.getLocalTimezone();
+        final identifier = timeZoneInfo.identifier;
+        tz.setLocalLocation(tz.getLocation(identifier));
+        debugPrint('NotificationService: Refreshed timezone to $identifier');
+      } catch (e) {
+        debugPrint('NotificationService: Could not refresh timezone: $e');
+      }
+    }
+  }
+
   Future<void> scheduleDailyNotification({
     required int id,
     required String title,
     required String body,
     required TimeOfDay time,
   }) async {
+    await _ensureTimezoneInitialized();
     final scheduledDate = _nextInstanceOfTime(time.hour, time.minute);
+    debugPrint('NotificationService: Scheduling alarm for $scheduledDate (tz: ${tz.local.name})');
+
     const notificationDetails = fln.NotificationDetails(
       android: fln.AndroidNotificationDetails(
         'daily_reminder_channel',
@@ -197,6 +216,8 @@ class NotificationService {
         importance: fln.Importance.max,
         priority: fln.Priority.high,
         icon: '@mipmap/ic_launcher',
+        playSound: true,
+        enableVibration: true,
       ),
       iOS: fln.DarwinNotificationDetails(
         presentAlert: true,

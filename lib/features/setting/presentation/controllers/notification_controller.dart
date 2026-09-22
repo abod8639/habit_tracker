@@ -106,7 +106,7 @@ class NotificationController extends GetxController {
   Future<void> _scheduleNotification(TimeOfDay time) async {
     await _notificationService.cancelAllNotifications();
     await _notificationService.scheduleDailyNotification(
-      id: 0,
+      id: 100,
       title: 'Habit Tracker',
       body: 'Time to check your habits!',
       time: time,

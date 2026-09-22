@@ -7,7 +7,13 @@ Future<void> myShowTimePicker(
   NotificationController controller,
   BuildContext context,
 ) async {
-  if (!controller.isNotificationEnabled.value || !context.mounted) return;
+  if (!context.mounted) return;
+
+  if (!controller.isNotificationEnabled.value) {
+    await controller.toggleNotification(true);
+  }
+
+  if (!context.mounted) return;
 
   final TimeOfDay? picked = await showTimePicker(
     context: context,
@@ -19,9 +25,11 @@ Future<void> myShowTimePicker(
     await controller.setNotificationTime(picked);
     Get.snackbar(
       S.current.success,
-      'Reminder set for $formattedTime',
+      Get.locale?.languageCode == 'ar'
+          ? 'تم تعيين التذكير في $formattedTime'
+          : 'Reminder set for $formattedTime',
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
     );
   }
 }
