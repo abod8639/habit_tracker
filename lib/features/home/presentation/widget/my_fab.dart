@@ -60,7 +60,11 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
             }
           },
           splashColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(size: 25, color: Colors.black87, Icons.add),
+          child: Icon(
+            size: 25,
+            color: Theme.of(context).colorScheme.onPrimary,
+            Icons.add,
+          ),
         ),
       ),
     );
