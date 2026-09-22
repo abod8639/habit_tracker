@@ -3,8 +3,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:habit_tracker/generated/l10n.dart';
+import 'package:get/get.dart';
 import 'package:habit_tracker/features/categorys/domain/entities/category_entity.dart';
 import 'package:habit_tracker/features/categorys/domain/entities/plan_suggestion.dart';
+import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 
 // ── CUSTOM GEMINI EXCEPTIONS ──────────────────────────────────────────────────
 abstract class GeminiException implements Exception {
@@ -42,27 +44,58 @@ class GeminiUnknownException extends GeminiException {
 // ── GEMINI SERVICE ────────────────────────────────────────────────────────────
 class GeminiService {
   GenerativeModel? _modelInstance;
+  String? _lastApiKey;
 
   static const String modelName = 'gemini-2.5-flash-lite';
 
   static String get _apiKey {
+    // 1. Check custom user-defined API key first
+    try {
+      if (Get.isRegistered<SettingsStorage>()) {
+        final customKey = Get.find<SettingsStorage>().customGeminiApiKey;
+        if (customKey != null && customKey.trim().isNotEmpty) {
+          return customKey.trim();
+        }
+      }
+    } catch (_) {}
+
+    // 2. Fallback to compile-time environment variable
     const envKey = String.fromEnvironment('GEMINI_API_KEY');
     if (envKey.isNotEmpty) return envKey;
+
+    // 3. Fallback to .env file
     if (dotenv.isInitialized) {
       return dotenv.env['GEMINI_API_KEY'] ?? '';
     }
     return '';
   }
 
+  /// Whether a custom user-defined API key is currently active
+  static bool get hasCustomApiKey {
+    try {
+      if (Get.isRegistered<SettingsStorage>()) {
+        final customKey = Get.find<SettingsStorage>().customGeminiApiKey;
+        return customKey != null && customKey.trim().isNotEmpty;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  /// Returns the current active API key (or empty string)
+  static String get currentApiKey => _apiKey;
+
   /// Lazy getter for standard GenerativeModel instance
   GenerativeModel get _model {
-    if (_modelInstance != null) return _modelInstance!;
-
     final apiKey = _apiKey;
     if (apiKey.isEmpty) {
       throw ApiKeyMissingException();
     }
 
+    if (_modelInstance != null && _lastApiKey == apiKey) {
+      return _modelInstance!;
+    }
+
+    _lastApiKey = apiKey;
     _modelInstance = GenerativeModel(
       model: modelName,
       apiKey: apiKey,
