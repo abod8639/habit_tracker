@@ -28,6 +28,8 @@ formatter:
 analyzer:
   exclude:
     - build/**
+    - lib/generated/**
+    - "**/*.g.dart"
     - android/**
     - ios/**
     - web/**
