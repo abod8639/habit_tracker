@@ -20,12 +20,11 @@ class AiSettingsController extends GetxController {
   final RxBool isCustom = false.obs;
   final RxBool obscureText = true.obs;
   final RxBool isLoading = false.obs;
-  late final TextEditingController keyInputController;
+  final TextEditingController keyInputController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
-    keyInputController = TextEditingController();
     loadApiKey();
   }
 
@@ -37,6 +36,19 @@ class AiSettingsController extends GetxController {
 
   void toggleObscure() {
     obscureText.value = !obscureText.value;
+  }
+
+  void _showNotification(String title, String message, {Color? color}) {
+    if (Get.context != null) {
+      Get.snackbar(
+        title,
+        message,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: (color ?? Colors.teal).withValues(alpha: 0.85),
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+      );
+    }
   }
 
   Future<void> loadApiKey() async {
@@ -64,13 +76,10 @@ class AiSettingsController extends GetxController {
   Future<bool> saveApiKey(String rawKey) async {
     final trimmedKey = rawKey.trim();
     if (trimmedKey.isEmpty) {
-      Get.snackbar(
+      _showNotification(
         S.current.aiApiKeyTitle,
         S.current.invalidApiKeyFormat,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent.withValues(alpha: 0.8),
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
+        color: Colors.redAccent,
       );
       return false;
     }
@@ -81,13 +90,10 @@ class AiSettingsController extends GetxController {
 
     return result.fold(
       (failure) {
-        Get.snackbar(
+        _showNotification(
           S.current.aiApiKeyTitle,
           failure.message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.redAccent.withValues(alpha: 0.8),
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
+          color: Colors.redAccent,
         );
         return false;
       },
@@ -95,13 +101,10 @@ class AiSettingsController extends GetxController {
         customApiKey.value = trimmedKey;
         isCustom.value = true;
         keyInputController.text = trimmedKey;
-        Get.snackbar(
+        _showNotification(
           S.current.aiApiKeyTitle,
           S.current.apiKeySavedSuccess,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withValues(alpha: 0.8),
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
+          color: Colors.green,
         );
         return true;
       },
@@ -115,26 +118,20 @@ class AiSettingsController extends GetxController {
 
     result.fold(
       (failure) {
-        Get.snackbar(
+        _showNotification(
           S.current.aiApiKeyTitle,
           failure.message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.redAccent.withValues(alpha: 0.8),
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
+          color: Colors.redAccent,
         );
       },
       (_) {
         customApiKey.value = '';
         isCustom.value = false;
         keyInputController.text = '';
-        Get.snackbar(
+        _showNotification(
           S.current.aiApiKeyTitle,
           S.current.apiKeyClearedSuccess,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange.withValues(alpha: 0.8),
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
+          color: Colors.orange,
         );
       },
     );
