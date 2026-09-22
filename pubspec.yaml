@@ -28,7 +28,7 @@ dependencies:
   icons_launcher: ^3.0.1
   intl: ^0.20.2
   internet_connection_checker: ^3.0.1
-  home_widget: ^0.9.0
+  home_widget: ^0.10.0
   flutter_launcher_icons: ^0.14.4
   flutter_local_notifications: ^22.0.0
   timezone: ^0.11.0
@@ -43,7 +43,7 @@ dependencies:
   dartz: ^0.10.1
   path_provider: ^2.1.5
   flutter_timezone: ^5.0.2
-  firebase_ai: ^3.12.2
+  firebase_ai: ^4.0.0
   firebase_analytics: ^12.4.2
 
 dev_dependencies:
