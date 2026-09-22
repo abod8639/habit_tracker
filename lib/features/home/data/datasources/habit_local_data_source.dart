@@ -43,8 +43,10 @@ class HabitLocalDataSource {
     await historyBox.put(today, habits);
 
     for (var habit in habits) {
-      final String historyKey = "${habit.name}_$today";
-      await historyBox.put(historyKey, habit.isCompleted);
+      final String idKey = "${habit.id}_$today";
+      final String nameKey = "${habit.name}_$today";
+      await historyBox.put(idKey, habit.isCompleted);
+      await historyBox.put(nameKey, habit.isCompleted);
     }
   }
 
@@ -215,16 +217,18 @@ class HabitLocalDataSource {
     await _myBox.put(HabitStorage.lastResetDateKey, date.toIso8601String());
   }
 
-  Future<void> incrementDayCount() async {
+  Future<void> incrementDayCount([int amount = 1]) async {
     int currentCount = _myBox.get(HabitStorage.dayCountKey) ?? 1;
-    await _myBox.put(HabitStorage.dayCountKey, currentCount + 1);
+    await _myBox.put(HabitStorage.dayCountKey, currentCount + amount);
   }
 
-  Future<void> saveHabitCompletionToHistory(String habitName, bool isCompleted, DateTime date) async {
+  Future<void> saveHabitCompletionToHistory(String habitIdOrName, bool isCompleted, DateTime date, {String? habitName}) async {
     final dateStr = convertDateTimeToString(date);
     final historyBox = await _openMonthlyBox(dateStr);
-    final historyKey = "${habitName}_$dateStr";
-    await historyBox.put(historyKey, isCompleted);
+    await historyBox.put("${habitIdOrName}_$dateStr", isCompleted);
+    if (habitName != null && habitName != habitIdOrName) {
+      await historyBox.put("${habitName}_$dateStr", isCompleted);
+    }
   }
 
   Future<Map<String, Map<DateTime, bool>>> getHabitHistoryMap(int days) async {
@@ -232,7 +236,7 @@ class HabitLocalDataSource {
     final now = DateTime.now();
     final habits = loadHabits();
     
-    // Create map for each habit
+    // Create map for each habit keyed by name for display compatibility
     for (var habit in habits) {
       historyMap[habit.name] = {};
     }
@@ -246,8 +250,9 @@ class HabitLocalDataSource {
       final historyBox = await _openMonthlyBox(dateStr);
       
       for (var habit in habits) {
-        final historyKey = "${habit.name}_$dateStr";
-        final bool? isCompleted = historyBox.get(historyKey);
+        final idKey = "${habit.id}_$dateStr";
+        final nameKey = "${habit.name}_$dateStr";
+        final bool? isCompleted = historyBox.get(idKey) ?? historyBox.get(nameKey);
         
         if (isCompleted != null) {
           historyMap[habit.name]![normalizedDate] = isCompleted;
