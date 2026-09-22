@@ -32,11 +32,20 @@ class MessageLookup extends MessageLookupByLibrary {
         "account": MessageLookupByLibrary.simpleMessage("Account"),
         "add": MessageLookupByLibrary.simpleMessage("Add"),
         "addNewHabit": MessageLookupByLibrary.simpleMessage("Add new Habit..."),
+        "aiApiKeySubtitle": MessageLookupByLibrary.simpleMessage(
+            "Custom Gemini API key for AI features"),
+        "aiApiKeyTitle": MessageLookupByLibrary.simpleMessage("AI API Key"),
         "aiCoach": MessageLookupByLibrary.simpleMessage("AI Coach"),
         "aiGreeting": MessageLookupByLibrary.simpleMessage(
             "I\'m here to support you in your journey towards your goals."),
         "alreadyHaveAccount":
             MessageLookupByLibrary.simpleMessage("Already have an account?"),
+        "apiKeyClearedSuccess": MessageLookupByLibrary.simpleMessage(
+            "Custom API key removed. Using default key."),
+        "apiKeyHint": MessageLookupByLibrary.simpleMessage(
+            "Paste your Gemini API key (AIza...)"),
+        "apiKeySavedSuccess":
+            MessageLookupByLibrary.simpleMessage("API key saved successfully"),
         "appVersionAndInformation":
             MessageLookupByLibrary.simpleMessage("This app made by dexter "),
         "appearance": MessageLookupByLibrary.simpleMessage("Appearance"),
@@ -71,6 +80,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "changeAppTheme":
             MessageLookupByLibrary.simpleMessage("Change app theme and color"),
         "clearAllData": MessageLookupByLibrary.simpleMessage("Clear All Data"),
+        "clearChatConfirm": MessageLookupByLibrary.simpleMessage(
+            "Are you sure you want to clear the conversation?"),
+        "clearChatTitle": MessageLookupByLibrary.simpleMessage("Clear Chat"),
         "cloudSync": MessageLookupByLibrary.simpleMessage("Cloud Sync"),
         "comingSoon": MessageLookupByLibrary.simpleMessage("Coming Soon"),
         "completed": MessageLookupByLibrary.simpleMessage("Completed"),
@@ -82,20 +94,29 @@ class MessageLookup extends MessageLookupByLibrary {
         "confirmPasswordRequired": MessageLookupByLibrary.simpleMessage(
             "Please confirm your password"),
         "createAccount": MessageLookupByLibrary.simpleMessage("Create Account"),
+        "customApiKeyActive":
+            MessageLookupByLibrary.simpleMessage("Custom key active"),
+        "customApiKeyDialogDesc": MessageLookupByLibrary.simpleMessage(
+            "You can provide your own Gemini API key to use for AI features instead of the default key."),
+        "customApiKeyDialogTitle":
+            MessageLookupByLibrary.simpleMessage("Gemini API Key"),
         "dailyReminder": MessageLookupByLibrary.simpleMessage("Daily Reminder"),
         "daysAgo": m0,
+        "defaultApiKeyActive":
+            MessageLookupByLibrary.simpleMessage("Default system key active"),
         "defaultHabits1": MessageLookupByLibrary.simpleMessage("Click here"),
         "defaultHabits2":
             MessageLookupByLibrary.simpleMessage("<== Swipe left to edit"),
         "defaultHabits3":
             MessageLookupByLibrary.simpleMessage("Swipe right to delete ==>"),
+        "delete": MessageLookupByLibrary.simpleMessage("Delete"),
         "deleteAllHabitsAndSettings": MessageLookupByLibrary.simpleMessage(
             "Delete all habits and settings"),
         "deleteHabit": MessageLookupByLibrary.simpleMessage("Delete Habit"),
         "dontHaveAccount":
             MessageLookupByLibrary.simpleMessage("Don\'t have an account?"),
         "drawer": MessageLookupByLibrary.simpleMessage(""),
-        "drawerReat": MessageLookupByLibrary.simpleMessage("Rate"),
+        "drawerReat": MessageLookupByLibrary.simpleMessage("Statistics"),
         "drawerSetting": MessageLookupByLibrary.simpleMessage("Setting"),
         "drawerTheme": MessageLookupByLibrary.simpleMessage("Theme Color"),
         "editThisHabit":
@@ -110,6 +131,14 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Export your habit data"),
         "forgotPassword":
             MessageLookupByLibrary.simpleMessage("Forgot Password?"),
+        "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
+            "Invalid Gemini API key configuration."),
+        "geminiQuotaExceeded": MessageLookupByLibrary.simpleMessage(
+            "API rate limit exceeded. Please try again in a moment."),
+        "geminiServerError":
+            MessageLookupByLibrary.simpleMessage("Gemini server error."),
+        "getKeyInfo": MessageLookupByLibrary.simpleMessage(
+            "Get a free API key from Google AI Studio"),
         "hambitstate": MessageLookupByLibrary.simpleMessage("Habit State"),
         "hoursAgo": m1,
         "importPreviouslyExportedData": MessageLookupByLibrary.simpleMessage(
@@ -117,11 +146,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "incomplete": MessageLookupByLibrary.simpleMessage("Incomplete"),
         "initialGreeting": MessageLookupByLibrary.simpleMessage(
             "Hello. Please introduce yourself briefly as my AI coach and comment on my habit progress today."),
+        "invalidApiKeyFormat": MessageLookupByLibrary.simpleMessage(
+            "Please enter a valid API key"),
         "isEmpty":
             MessageLookupByLibrary.simpleMessage("No habits tracked yet"),
         "joinUs": MessageLookupByLibrary.simpleMessage("Join Us"),
         "justNow": MessageLookupByLibrary.simpleMessage("Just now"),
-        "lan": MessageLookupByLibrary.simpleMessage("Languig"),
+        "lan": MessageLookupByLibrary.simpleMessage("Language"),
         "lastSync": MessageLookupByLibrary.simpleMessage("Last sync"),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "loginRequired":
@@ -152,6 +183,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Please enter your password"),
         "passwordTooShort": MessageLookupByLibrary.simpleMessage(
             "Password must be at least 6 characters"),
+        "paste": MessageLookupByLibrary.simpleMessage("Paste"),
         "pending": MessageLookupByLibrary.simpleMessage("Pending"),
         "pieChartIsEmpty":
             MessageLookupByLibrary.simpleMessage("No habits to display"),
@@ -164,10 +196,13 @@ class MessageLookup extends MessageLookupByLibrary {
             "Password reset link sent to your email"),
         "resetPasswordTitle":
             MessageLookupByLibrary.simpleMessage("Reset Password"),
+        "resetToDefault":
+            MessageLookupByLibrary.simpleMessage("Reset to Default"),
         "restoreData": MessageLookupByLibrary.simpleMessage("Restore Data"),
         "restoreFeatureWillBeAvailableInFutureUpdates":
             MessageLookupByLibrary.simpleMessage(
                 "Restore feature will be available in future updates"),
+        "save": MessageLookupByLibrary.simpleMessage("Save"),
         "scanImage": MessageLookupByLibrary.simpleMessage("Scan Image"),
         "sendResetLink":
             MessageLookupByLibrary.simpleMessage("Send Reset Link"),
@@ -188,6 +223,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "syncNow": MessageLookupByLibrary.simpleMessage("Sync Now"),
         "syncSuccess": MessageLookupByLibrary.simpleMessage("Sync successful"),
         "syncing": MessageLookupByLibrary.simpleMessage("Syncing..."),
+        "tapToEdit": MessageLookupByLibrary.simpleMessage("Tap to configure"),
         "theFieldCantBeEmpty": MessageLookupByLibrary.simpleMessage(
             "The field can\'t be empty :)"),
         "themepage": MessageLookupByLibrary.simpleMessage("Custom Theme"),
@@ -201,19 +237,9 @@ class MessageLookup extends MessageLookupByLibrary {
             "Not enough data to display trends"),
         "typeMessage":
             MessageLookupByLibrary.simpleMessage("Type a message..."),
-        "user": MessageLookupByLibrary.simpleMessage("User"),
-        "weekly": MessageLookupByLibrary.simpleMessage("weekly Progress"),
-        "clearChatTitle": MessageLookupByLibrary.simpleMessage("Clear Chat"),
-        "clearChatConfirm": MessageLookupByLibrary.simpleMessage(
-            "Are you sure you want to clear the conversation?"),
-        "delete": MessageLookupByLibrary.simpleMessage("Delete"),
-        "geminiQuotaExceeded": MessageLookupByLibrary.simpleMessage(
-            "API rate limit exceeded. Please try again in a moment."),
-        "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
-            "Invalid Gemini API key configuration."),
-        "geminiServerError":
-            MessageLookupByLibrary.simpleMessage("Gemini server error."),
         "unexpectedError": MessageLookupByLibrary.simpleMessage(
-            "An unexpected error occurred.")
+            "An unexpected error occurred."),
+        "user": MessageLookupByLibrary.simpleMessage("User"),
+        "weekly": MessageLookupByLibrary.simpleMessage("weekly Progress")
       };
 }

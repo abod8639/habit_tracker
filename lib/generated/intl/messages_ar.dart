@@ -33,11 +33,21 @@ class MessageLookup extends MessageLookupByLibrary {
         "add": MessageLookupByLibrary.simpleMessage("إضافة"),
         "addNewHabit":
             MessageLookupByLibrary.simpleMessage("إضافة عادة جديدة..."),
+        "aiApiKeySubtitle": MessageLookupByLibrary.simpleMessage(
+            "مفتاح Gemini مخصص لميزات الذكاء الاصطناعي"),
+        "aiApiKeyTitle":
+            MessageLookupByLibrary.simpleMessage("مفتاح الذكاء الاصطناعي"),
         "aiCoach": MessageLookupByLibrary.simpleMessage("المدرب الذكي"),
         "aiGreeting": MessageLookupByLibrary.simpleMessage(
             "أنا هنا لدعمك في رحلتك نحو أهدافك."),
         "alreadyHaveAccount":
             MessageLookupByLibrary.simpleMessage("لديك حساب بالفعل؟"),
+        "apiKeyClearedSuccess": MessageLookupByLibrary.simpleMessage(
+            "تمت إزالة المفتاح المخصص والعودة للمفتاح الافتراضي."),
+        "apiKeyHint": MessageLookupByLibrary.simpleMessage(
+            "الصق مفتاح Gemini الخاص بك (AIza...)"),
+        "apiKeySavedSuccess":
+            MessageLookupByLibrary.simpleMessage("تم حفظ مفتاح API بنجاح"),
         "appVersionAndInformation":
             MessageLookupByLibrary.simpleMessage("هذا التطبيق من تطوير دكستر"),
         "appearance": MessageLookupByLibrary.simpleMessage("المظهر"),
@@ -73,6 +83,9 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("تغيير ثيم ولون التطبيق"),
         "clearAllData":
             MessageLookupByLibrary.simpleMessage("مسح جميع البيانات"),
+        "clearChatConfirm": MessageLookupByLibrary.simpleMessage(
+            "هل أنت متأكد من مسح المحادثة بالكامل؟"),
+        "clearChatTitle": MessageLookupByLibrary.simpleMessage("مسح المحادثة"),
         "cloudSync": MessageLookupByLibrary.simpleMessage("المزامنة السحابية"),
         "comingSoon": MessageLookupByLibrary.simpleMessage("قريباً"),
         "completed": MessageLookupByLibrary.simpleMessage("مكتمل"),
@@ -84,13 +97,22 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("يرجى تأكيد كلمة المرور"),
         "createAccount":
             MessageLookupByLibrary.simpleMessage("إنشاء حساب جديد"),
+        "customApiKeyActive":
+            MessageLookupByLibrary.simpleMessage("المفتاح المخصص مفعّل"),
+        "customApiKeyDialogDesc": MessageLookupByLibrary.simpleMessage(
+            "يمكنك إدخال مفتاح API الخاص بك من Google Gemini لاستخدامه بدل المفتاح الافتراضي."),
+        "customApiKeyDialogTitle":
+            MessageLookupByLibrary.simpleMessage("مفتاح Gemini API"),
         "dailyReminder": MessageLookupByLibrary.simpleMessage("التذكير اليومي"),
         "daysAgo": m0,
+        "defaultApiKeyActive":
+            MessageLookupByLibrary.simpleMessage("المفتاح الافتراضي نشط"),
         "defaultHabits1": MessageLookupByLibrary.simpleMessage("انقر هنا"),
         "defaultHabits2":
             MessageLookupByLibrary.simpleMessage("<== اسحب لليسار للتعديل"),
         "defaultHabits3":
             MessageLookupByLibrary.simpleMessage("اسحب لليمين للحذف ==>"),
+        "delete": MessageLookupByLibrary.simpleMessage("حذف"),
         "deleteAllHabitsAndSettings":
             MessageLookupByLibrary.simpleMessage("حذف جميع العادات والإعدادات"),
         "deleteHabit": MessageLookupByLibrary.simpleMessage("حذف العادة"),
@@ -112,6 +134,14 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("تصدير بيانات العادات"),
         "forgotPassword":
             MessageLookupByLibrary.simpleMessage("نسيت كلمة المرور؟"),
+        "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
+            "خطأ في إعدادات مفتاح API الخاص بـ Gemini."),
+        "geminiQuotaExceeded": MessageLookupByLibrary.simpleMessage(
+            "تم تجاوز حد الطلبات المسموح به. يرجى المحاولة بعد قليل."),
+        "geminiServerError":
+            MessageLookupByLibrary.simpleMessage("حدث خطأ في خادم Gemini."),
+        "getKeyInfo": MessageLookupByLibrary.simpleMessage(
+            "احصل على مفتاح مجاني من Google AI Studio"),
         "hambitstate": MessageLookupByLibrary.simpleMessage("حالة العادة"),
         "hoursAgo": m1,
         "importPreviouslyExportedData": MessageLookupByLibrary.simpleMessage(
@@ -119,6 +149,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "incomplete": MessageLookupByLibrary.simpleMessage("غير مكتمل"),
         "initialGreeting": MessageLookupByLibrary.simpleMessage(
             "مرحبا. يرجى التعريف بنفسك باختصار كمدرب ذكاء اصطناعي خاص بي والتعليق على تقدم عاداتي اليوم."),
+        "invalidApiKeyFormat":
+            MessageLookupByLibrary.simpleMessage("يرجى إدخال مفتاح API صالح"),
         "isEmpty":
             MessageLookupByLibrary.simpleMessage("لا توجد عادات مسجلة بعد"),
         "joinUs": MessageLookupByLibrary.simpleMessage("انضم إلينا"),
@@ -155,6 +187,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("يرجى إدخال كلمة المرور"),
         "passwordTooShort": MessageLookupByLibrary.simpleMessage(
             "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+        "paste": MessageLookupByLibrary.simpleMessage("لصق"),
         "pending": MessageLookupByLibrary.simpleMessage("قيد الانتظار"),
         "pieChartIsEmpty":
             MessageLookupByLibrary.simpleMessage("لا توجد عادات لعرضها"),
@@ -168,10 +201,13 @@ class MessageLookup extends MessageLookupByLibrary {
             "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني"),
         "resetPasswordTitle":
             MessageLookupByLibrary.simpleMessage("إعادة تعيين كلمة المرور"),
+        "resetToDefault":
+            MessageLookupByLibrary.simpleMessage("استعادة المفتاح الافتراضي"),
         "restoreData": MessageLookupByLibrary.simpleMessage("استعادة البيانات"),
         "restoreFeatureWillBeAvailableInFutureUpdates":
             MessageLookupByLibrary.simpleMessage(
                 "ستتوفر ميزة الاستعادة في التحديثات القادمة"),
+        "save": MessageLookupByLibrary.simpleMessage("حفظ"),
         "scanImage": MessageLookupByLibrary.simpleMessage("مسح الصورة"),
         "sendResetLink":
             MessageLookupByLibrary.simpleMessage("إرسال رابط إعادة التعيين"),
@@ -193,6 +229,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "syncSuccess":
             MessageLookupByLibrary.simpleMessage("تمت المزامنة بنجاح"),
         "syncing": MessageLookupByLibrary.simpleMessage("جاري المزامنة..."),
+        "tapToEdit": MessageLookupByLibrary.simpleMessage("اضغط للإعداد"),
         "theFieldCantBeEmpty":
             MessageLookupByLibrary.simpleMessage("لا يمكن ترك الحقل فارغاً"),
         "themepage": MessageLookupByLibrary.simpleMessage("تخصيص الثيم"),
@@ -205,19 +242,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "trendChartIsEmpty": MessageLookupByLibrary.simpleMessage(
             "بيانات غير كافية لعرض الإحصائيات"),
         "typeMessage": MessageLookupByLibrary.simpleMessage("اكتب رسالة..."),
-        "user": MessageLookupByLibrary.simpleMessage("مستخدم"),
-        "weekly": MessageLookupByLibrary.simpleMessage("تقدم الأسبوعي"),
-        "clearChatTitle": MessageLookupByLibrary.simpleMessage("مسح المحادثة"),
-        "clearChatConfirm": MessageLookupByLibrary.simpleMessage(
-            "هل أنت متأكد من مسح المحادثة بالكامل؟"),
-        "delete": MessageLookupByLibrary.simpleMessage("حذف"),
-        "geminiQuotaExceeded": MessageLookupByLibrary.simpleMessage(
-            "تم تجاوز حد الطلبات المسموح به. يرجى المحاولة بعد قليل."),
-        "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
-            "خطأ في إعدادات مفتاح API الخاص بـ Gemini."),
-        "geminiServerError":
-            MessageLookupByLibrary.simpleMessage("حدث خطأ في خادم Gemini."),
         "unexpectedError":
-            MessageLookupByLibrary.simpleMessage("حدث خطأ غير متوقع.")
+            MessageLookupByLibrary.simpleMessage("حدث خطأ غير متوقع."),
+        "user": MessageLookupByLibrary.simpleMessage("مستخدم"),
+        "weekly": MessageLookupByLibrary.simpleMessage("تقدم الأسبوعي")
       };
 }

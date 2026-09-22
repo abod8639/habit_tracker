@@ -157,6 +157,21 @@
   "geminiQuotaExceeded": "API rate limit exceeded. Please try again in a moment.",
   "geminiApiKeyError": "Invalid Gemini API key configuration.",
   "geminiServerError": "Gemini server error.",
-  "unexpectedError": "An unexpected error occurred."
+  "unexpectedError": "An unexpected error occurred.",
+  "aiApiKeyTitle": "AI API Key",
+  "aiApiKeySubtitle": "Custom Gemini API key for AI features",
+  "customApiKeyActive": "Custom key active",
+  "defaultApiKeyActive": "Default system key active",
+  "customApiKeyDialogTitle": "Gemini API Key",
+  "customApiKeyDialogDesc": "You can provide your own Gemini API key to use for AI features instead of the default key.",
+  "apiKeyHint": "Paste your Gemini API key (AIza...)",
+  "resetToDefault": "Reset to Default",
+  "apiKeySavedSuccess": "API key saved successfully",
+  "apiKeyClearedSuccess": "Custom API key removed. Using default key.",
+  "invalidApiKeyFormat": "Please enter a valid API key",
+  "getKeyInfo": "Get a free API key from Google AI Studio",
+  "tapToEdit": "Tap to configure",
+  "save": "Save",
+  "paste": "Paste"
 }
 

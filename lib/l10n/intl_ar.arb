@@ -132,5 +132,20 @@
   "geminiQuotaExceeded": "تم تجاوز حد الطلبات المسموح به. يرجى المحاولة بعد قليل.",
   "geminiApiKeyError": "خطأ في إعدادات مفتاح API الخاص بـ Gemini.",
   "geminiServerError": "حدث خطأ في خادم Gemini.",
-  "unexpectedError": "حدث خطأ غير متوقع."
+  "unexpectedError": "حدث خطأ غير متوقع.",
+  "aiApiKeyTitle": "مفتاح الذكاء الاصطناعي",
+  "aiApiKeySubtitle": "مفتاح Gemini مخصص لميزات الذكاء الاصطناعي",
+  "customApiKeyActive": "المفتاح المخصص مفعّل",
+  "defaultApiKeyActive": "المفتاح الافتراضي نشط",
+  "customApiKeyDialogTitle": "مفتاح Gemini API",
+  "customApiKeyDialogDesc": "يمكنك إدخال مفتاح API الخاص بك من Google Gemini لاستخدامه بدل المفتاح الافتراضي.",
+  "apiKeyHint": "الصق مفتاح Gemini الخاص بك (AIza...)",
+  "resetToDefault": "استعادة المفتاح الافتراضي",
+  "apiKeySavedSuccess": "تم حفظ مفتاح API بنجاح",
+  "apiKeyClearedSuccess": "تمت إزالة المفتاح المخصص والعودة للمفتاح الافتراضي.",
+  "invalidApiKeyFormat": "يرجى إدخال مفتاح API صالح",
+  "getKeyInfo": "احصل على مفتاح مجاني من Google AI Studio",
+  "tapToEdit": "اضغط للإعداد",
+  "save": "حفظ",
+  "paste": "لصق"
 }
