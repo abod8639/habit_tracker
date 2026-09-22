@@ -212,8 +212,8 @@ Widget buildBarChart() {
                         );
                       }).toList(),
                     ),
-                    swapAnimationDuration: const Duration(milliseconds: 450),
-                    swapAnimationCurve: Curves.easeInOutCubic,
+                    duration: const Duration(milliseconds: 450),
+                    curve: Curves.easeInOutCubic,
                   ),
                 ),
                 const SizedBox(height: 16),
