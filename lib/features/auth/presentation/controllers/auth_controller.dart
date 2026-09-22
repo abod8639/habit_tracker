@@ -8,6 +8,7 @@ import '../../domain/usecases/sign_out_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/get_auth_state_usecase.dart';
 import '../../domain/usecases/set_skip_login_usecase.dart';
+import '../pages/login_page.dart';
 
 class AuthController extends GetxController {
   // Use Cases
@@ -44,7 +45,7 @@ class AuthController extends GetxController {
 
       final result = await _signInWithEmailUseCase(email, password);
 
-      return result.fold(
+      final isSuccess = result.fold<bool>(
         (failure) {
           isLoading.value = false;
           errorMessage.value = failure.message;
@@ -54,8 +55,9 @@ class AuthController extends GetxController {
         (user) {
           isLoading.value = false;
           return true;
-        }
+        },
       );
+      return isSuccess;
     } catch (e) {
       isLoading.value = false;
       _showError(e.toString());
@@ -75,7 +77,7 @@ class AuthController extends GetxController {
 
       final result = await _signUpWithEmailUseCase(email, password, displayName);
 
-      return result.fold(
+      final isSuccess = result.fold<bool>(
         (failure) {
           isLoading.value = false;
           errorMessage.value = failure.message;
@@ -85,8 +87,9 @@ class AuthController extends GetxController {
         (user) {
           isLoading.value = false;
           return true;
-        }
+        },
       );
+      return isSuccess;
     } catch (e) {
       isLoading.value = false;
       _showError(e.toString());
@@ -102,7 +105,7 @@ class AuthController extends GetxController {
 
       final result = await _signInWithGoogleUseCase();
 
-      return result.fold(
+      final isSuccess = result.fold<bool>(
         (failure) {
           isLoading.value = false;
           errorMessage.value = failure.message;
@@ -112,8 +115,9 @@ class AuthController extends GetxController {
         (user) {
           isLoading.value = false;
           return user != null;
-        }
+        },
       );
+      return isSuccess;
     } catch (e) {
       isLoading.value = false;
       _showError(e.toString());
@@ -137,6 +141,7 @@ class AuthController extends GetxController {
       );
       
       isLoading.value = false;
+      Get.offAll(() => const LoginPage());
     } catch (e) {
       isLoading.value = false;
       _showError(e.toString());
@@ -151,7 +156,7 @@ class AuthController extends GetxController {
 
       final result = await _resetPasswordUseCase(email);
 
-      return result.fold(
+      final isSuccess = result.fold<bool>(
         (failure) {
           isLoading.value = false;
           _showError(failure.message);
@@ -161,8 +166,9 @@ class AuthController extends GetxController {
           isLoading.value = false;
           Get.snackbar(S.current.success, S.current.resetPasswordSuccess, snackPosition: SnackPosition.BOTTOM);
           return true;
-        }
+        },
       );
+      return isSuccess;
     } catch (e) {
       isLoading.value = false;
       _showError(e.toString());
