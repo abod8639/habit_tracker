@@ -16,6 +16,10 @@ abstract class SettingLocalDataSource {
 
   DateTime? getLastSyncTime();
   
+  String? getCustomGeminiApiKey();
+  Future<void> saveCustomGeminiApiKey(String? key);
+  Future<void> clearCustomGeminiApiKey();
+
   Future<void> clearAllData();
 }
 
@@ -65,6 +69,25 @@ class SettingLocalDataSourceImpl implements SettingLocalDataSource {
   @override
   DateTime? getLastSyncTime() {
     return null; 
+  }
+
+  @override
+  String? getCustomGeminiApiKey() {
+    return _settingsBox.get('custom_gemini_api_key');
+  }
+
+  @override
+  Future<void> saveCustomGeminiApiKey(String? key) async {
+    if (key == null || key.trim().isEmpty) {
+      await _settingsBox.delete('custom_gemini_api_key');
+    } else {
+      await _settingsBox.put('custom_gemini_api_key', key.trim());
+    }
+  }
+
+  @override
+  Future<void> clearCustomGeminiApiKey() async {
+    await _settingsBox.delete('custom_gemini_api_key');
   }
 
   @override
