@@ -70,10 +70,10 @@ class S {
     );
   }
 
-  /// `Rate`
+  /// `Statistics`
   String get drawerReat {
     return Intl.message(
-      'Rate',
+      'Statistics',
       name: 'drawerReat',
       desc: '',
       args: [],
@@ -390,10 +390,10 @@ class S {
     );
   }
 
-  /// `Languig`
+  /// `Language`
   String get lan {
     return Intl.message(
-      'Languig',
+      'Language',
       name: 'lan',
       desc: '',
       args: [],
@@ -1305,6 +1305,156 @@ class S {
     return Intl.message(
       'An unexpected error occurred.',
       name: 'unexpectedError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI API Key`
+  String get aiApiKeyTitle {
+    return Intl.message(
+      'AI API Key',
+      name: 'aiApiKeyTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom Gemini API key for AI features`
+  String get aiApiKeySubtitle {
+    return Intl.message(
+      'Custom Gemini API key for AI features',
+      name: 'aiApiKeySubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom key active`
+  String get customApiKeyActive {
+    return Intl.message(
+      'Custom key active',
+      name: 'customApiKeyActive',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Default system key active`
+  String get defaultApiKeyActive {
+    return Intl.message(
+      'Default system key active',
+      name: 'defaultApiKeyActive',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Gemini API Key`
+  String get customApiKeyDialogTitle {
+    return Intl.message(
+      'Gemini API Key',
+      name: 'customApiKeyDialogTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can provide your own Gemini API key to use for AI features instead of the default key.`
+  String get customApiKeyDialogDesc {
+    return Intl.message(
+      'You can provide your own Gemini API key to use for AI features instead of the default key.',
+      name: 'customApiKeyDialogDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paste your Gemini API key (AIza...)`
+  String get apiKeyHint {
+    return Intl.message(
+      'Paste your Gemini API key (AIza...)',
+      name: 'apiKeyHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset to Default`
+  String get resetToDefault {
+    return Intl.message(
+      'Reset to Default',
+      name: 'resetToDefault',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `API key saved successfully`
+  String get apiKeySavedSuccess {
+    return Intl.message(
+      'API key saved successfully',
+      name: 'apiKeySavedSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom API key removed. Using default key.`
+  String get apiKeyClearedSuccess {
+    return Intl.message(
+      'Custom API key removed. Using default key.',
+      name: 'apiKeyClearedSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter a valid API key`
+  String get invalidApiKeyFormat {
+    return Intl.message(
+      'Please enter a valid API key',
+      name: 'invalidApiKeyFormat',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Get a free API key from Google AI Studio`
+  String get getKeyInfo {
+    return Intl.message(
+      'Get a free API key from Google AI Studio',
+      name: 'getKeyInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to configure`
+  String get tapToEdit {
+    return Intl.message(
+      'Tap to configure',
+      name: 'tapToEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save`
+  String get save {
+    return Intl.message(
+      'Save',
+      name: 'save',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paste`
+  String get paste {
+    return Intl.message(
+      'Paste',
+      name: 'paste',
       desc: '',
       args: [],
     );
