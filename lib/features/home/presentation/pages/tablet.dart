@@ -64,9 +64,9 @@ class Tablet extends StatelessWidget {
               ],
             ),
             if (!ResponsiveUtils.isDesktop(context))
-              const Positioned(
+              const PositionedDirectional(
                 top: 10,
-                left: 10,
+                start: 10,
                 child: DrawerMenuButton(),
               ),
           ],
