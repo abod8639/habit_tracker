@@ -306,9 +306,9 @@ class HabitController extends GetxController {
     }
   }
 
-  Future<void> reorderHabits(int oldIndex, int newIndex) async {
+  Future<void> reorderHabits(int oldIndex, int newIndex, {bool isAdjusted = false}) async {
     // 1. Optimistic UI update
-    if (newIndex > oldIndex) {
+    if (!isAdjusted && newIndex > oldIndex) {
       newIndex -= 1;
     }
     
