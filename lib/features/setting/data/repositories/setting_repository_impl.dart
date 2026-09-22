@@ -127,6 +127,36 @@ class SettingRepositoryImpl implements SettingRepository {
   }
 
   @override
+  Future<Either<Failure, String?>> getCustomApiKey() async {
+    try {
+      final key = localDataSource.getCustomGeminiApiKey();
+      return Right(key);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> saveCustomApiKey(String key) async {
+    try {
+      await localDataSource.saveCustomGeminiApiKey(key);
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> clearCustomApiKey() async {
+    try {
+      await localDataSource.clearCustomGeminiApiKey();
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> clearAllData() async {
     try {
       // 1. Clear Remote Data if logged in
