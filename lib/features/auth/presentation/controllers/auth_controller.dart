@@ -9,6 +9,7 @@ import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/get_auth_state_usecase.dart';
 import '../../domain/usecases/set_skip_login_usecase.dart';
 import '../pages/login_page.dart';
+import 'package:habit_tracker/core/services/fcm_service.dart';
 
 class AuthController extends GetxController {
   // Use Cases
@@ -32,6 +33,11 @@ class AuthController extends GetxController {
     super.onInit();
     // Listen to auth state changes
     _currentUser.bindStream(_getAuthStateUseCase());
+    ever(_currentUser, (user) {
+      if (user != null && Get.isRegistered<FcmService>()) {
+        Get.find<FcmService>().syncTokenToFirestore();
+      }
+    });
   }
 
   // Sign in with email
@@ -133,6 +139,11 @@ class AuthController extends GetxController {
       // Reset skip login status so they see login screen again
       await _setSkipLoginUseCase(false);
       
+      // Clear FCM token in Firestore before signing out
+      if (Get.isRegistered<FcmService>()) {
+        await Get.find<FcmService>().clearTokenFromFirestore();
+      }
+
       final result = await _signOutUseCase();
       
       result.fold(
