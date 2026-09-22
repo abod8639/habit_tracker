@@ -23,7 +23,7 @@ class ChatMessage {
 
 class AiChatController extends GetxController {
   final GeminiService _geminiService = GeminiService();
-  late ChatSession _chatSession;
+  ChatSession? _chatSession;
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;
   final TextEditingController textController = TextEditingController();
@@ -345,7 +345,15 @@ PERSONALITY CONSTANTS
       loadingMessage.value = '';
 
       try {
-        final responseStream = _chatSession.sendMessageStream(content);
+        if (_chatSession == null) {
+          targetMessage.hasError.value = true;
+          if (!isGreeting) {
+            Get.snackbar(S.current.error, S.current.unexpectedError);
+          }
+          break;
+        }
+
+        final responseStream = _chatSession!.sendMessageStream(content);
         
         String accumulatedText = '';
         bool isFirstChunk = true;
@@ -482,7 +490,7 @@ PERSONALITY CONSTANTS
     final sortedDates = heatmap.keys.toList()..sort((a, b) => b.compareTo(a));
     
     // Limit to the last 30 days to avoid overloading context
-    final recentDates = sortedDates.take(1).toList();
+    final recentDates = sortedDates.take(30).toList();
     
     final isArabic = Get.locale?.languageCode == 'ar';
     
