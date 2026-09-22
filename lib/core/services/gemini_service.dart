@@ -23,23 +23,20 @@ class ApiKeyMissingException extends GeminiException {
 }
 
 class GeminiInvalidResponseException extends GeminiException {
-  GeminiInvalidResponseException(String message, {String? details})
-      : super(message, details: details);
+  GeminiInvalidResponseException(super.message, {super.details});
 }
 
 class GeminiQuotaException extends GeminiException {
-  GeminiQuotaException(String message, {String? details})
-      : super(message, details: details);
+  GeminiQuotaException(super.message, {super.details});
 }
 
 class GeminiServerException extends GeminiException {
-  GeminiServerException(String message, {String? details})
-      : super(message, details: details);
+  GeminiServerException(super.message, {super.details});
 }
 
 class GeminiUnknownException extends GeminiException {
-  GeminiUnknownException(String message, {Object? originalError})
-      : super(message, details: originalError?.toString());
+  GeminiUnknownException(super.message, {Object? originalError})
+      : super(details: originalError?.toString());
 }
 
 // ── GEMINI SERVICE ────────────────────────────────────────────────────────────
