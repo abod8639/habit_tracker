@@ -5,7 +5,7 @@
    "drawer":"",
 
    "drawerTheme" : "Theme Color",
-   "drawerReat" : "Rate",
+   "drawerReat" : "Statistics",
    "drawerSetting" : "Setting",
 
    "themepagetitle":"Theme Setting",
@@ -42,7 +42,7 @@
   "exportYourHabitData": "Export your habit data",
   "restoreData": "Restore Data",
   "importPreviouslyExportedData": "Import previously exported data",
-   "lan":"Languig",
+   "lan":"Language",
   "scanImage":"Scan Image",
   "clearAllData": "Clear All Data",
   "deleteAllHabitsAndSettings": "Delete all habits and settings",
