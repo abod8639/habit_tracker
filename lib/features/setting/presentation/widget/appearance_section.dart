@@ -43,7 +43,7 @@ Widget buildAppearanceSection(AnimationController animationController) {
                   }
                 }
               },
-              textColor: Theme.of(context).colorScheme.onSecondary,
+              textColor: Theme.of(context).colorScheme.onSurface,
               animationController: animationController,
               index: 6,
             ),
