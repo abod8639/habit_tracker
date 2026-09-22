@@ -296,4 +296,31 @@ class FirestoreService {
       // Ignored
     }
   }
+
+  // Save FCM Token to user document
+  Future<void> saveFcmToken(String token) async {
+    if (!isUserLoggedIn) return;
+
+    try {
+      await _userDoc!.set({
+        'fcmToken': token,
+        'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Failed to save FCM token: $e');
+    }
+  }
+
+  // Remove FCM Token from user document
+  Future<void> removeFcmToken() async {
+    if (!isUserLoggedIn) return;
+
+    try {
+      await _userDoc!.set({
+        'fcmToken': FieldValue.delete(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Failed to remove FCM token: $e');
+    }
+  }
 }
