@@ -7,7 +7,7 @@ class IncrementDayCountUseCase {
 
   IncrementDayCountUseCase(this.repository);
 
-  Future<Either<Failure, void>> call() async {
-    return await repository.incrementDayCount();
+  Future<Either<Failure, void>> call([int amount = 1]) async {
+    return await repository.incrementDayCount(amount);
   }
 }
