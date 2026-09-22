@@ -14,6 +14,9 @@ import 'package:habit_tracker/core/error/error_app.dart';
 import 'package:habit_tracker/features/auth/presentation/widgets/auth_wrapper.dart';
 import 'package:habit_tracker/core/services/analytics_service.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
+import 'package:flutter/foundation.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:habit_tracker/core/services/fcm_service.dart';
 
 Future<void> main() async {
   runZonedGuarded(
@@ -23,6 +26,15 @@ Future<void> main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+
+      if (!kIsWeb &&
+          (defaultTargetPlatform == TargetPlatform.android ||
+              defaultTargetPlatform == TargetPlatform.iOS)) {
+        FirebaseMessaging.onBackgroundMessage(
+          firebaseMessagingBackgroundHandler,
+        );
+      }
+
       await initializeApp();
 
       InitialBinding().dependencies();
