@@ -15,9 +15,13 @@ import '../../domain/usecases/set_notification_time_usecase.dart';
 import '../../domain/usecases/sync_habits_usecase.dart';
 import '../../domain/usecases/get_last_sync_time_usecase.dart';
 import '../../domain/usecases/clear_all_data_usecase.dart';
+import '../../domain/usecases/get_custom_api_key_usecase.dart';
+import '../../domain/usecases/save_custom_api_key_usecase.dart';
+import '../../domain/usecases/clear_custom_api_key_usecase.dart';
 import 'lang_controller.dart';
 import 'notification_controller.dart';
 import 'sync_controller.dart';
+import 'ai_settings_controller.dart';
 
 class SettingBinding extends Bindings {
   @override
@@ -52,10 +56,20 @@ class SettingBinding extends Bindings {
     Get.lazyPut(() => SyncHabitsUseCase(Get.find()));
     Get.lazyPut(() => GetLastSyncTimeUseCase(Get.find()));
     Get.lazyPut(() => ClearAllDataUseCase(Get.find()));
+    Get.lazyPut(() => GetCustomApiKeyUseCase(Get.find()));
+    Get.lazyPut(() => SaveCustomApiKeyUseCase(Get.find()));
+    Get.lazyPut(() => ClearCustomApiKeyUseCase(Get.find()));
 
     // Controllers
     Get.lazyPut(() => LangController());
     Get.lazyPut(() => NotificationController());
     Get.lazyPut(() => SyncController());
+    Get.lazyPut(
+      () => AiSettingsController(
+        getCustomApiKeyUseCase: Get.find(),
+        saveCustomApiKeyUseCase: Get.find(),
+        clearCustomApiKeyUseCase: Get.find(),
+      ),
+    );
   }
 }
