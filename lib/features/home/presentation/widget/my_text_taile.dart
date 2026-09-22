@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:habit_tracker/features/theme/data/datasources/theme_utils.dart';
 
 class MyTextTaile extends StatefulWidget {
   final String habitName;
@@ -83,14 +84,21 @@ class _MyTextTaileState extends State<MyTextTaile>
     if (widget.habitCompleted) {
       return widget.colorValue != null
           ? baseColor
-          : baseColor.withValues(alpha: 0.5);
+          : baseColor.withValues(alpha: 0.7);
     }
 
     return widget.colorValue != null
-        ? baseColor.withValues(alpha: 0.5)
+        ? baseColor.withValues(alpha: 0.3)
         : (themeColors.brightness == Brightness.light
-              ? Colors.grey[400]!
-              : Colors.grey[700]!);
+              ? themeColors.surface
+              : Colors.grey[850]!);
+  }
+
+  Color _getTileTextColor(ColorScheme themeColors) {
+    if (widget.habitCompleted) {
+      return ThemeUtils.getContrastColor(_getTileColor(themeColors));
+    }
+    return themeColors.onSurface;
   }
 
   void _handleTap() {
@@ -177,21 +185,20 @@ Widget _buildTileContent(ColorScheme themeColors) {
 
         border: widget.isSelected
             ? Border.all(color: themeColors.primary, width: 2)
-            : Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1), 
+            : Border.all(
+                color: themeColors.brightness == Brightness.light
+                    ? Colors.black.withValues(alpha: 0.06)
+                    : Colors.white.withValues(alpha: 0.1),
+                width: 1,
+              ),
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 12,
-            blurStyle: BlurStyle.inner,
-            offset: const Offset(0, 6), 
-            spreadRadius: -2, 
-          ),
-          BoxShadow(
-            blurStyle: BlurStyle.inner,
-            // color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
-            blurRadius: 10,
-            offset: const Offset(-2, -2),
+            color: Colors.black.withValues(
+              alpha: themeColors.brightness == Brightness.light ? 0.04 : 0.2,
+            ),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -221,6 +228,7 @@ Widget _buildTileContent(ColorScheme themeColors) {
           : Checkbox(
               key: const ValueKey('checkbox'),
               activeColor: Theme.of(context).primaryColor,
+              checkColor: Theme.of(context).colorScheme.onPrimary,
               value: widget.habitCompleted,
               onChanged: widget.onChanged,
             ),
@@ -231,24 +239,13 @@ Widget _buildTileContent(ColorScheme themeColors) {
     return AnimatedDefaultTextStyle(
       duration: const Duration(milliseconds: 300),
       style: TextStyle(
-        shadows: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 12,
-            blurStyle: BlurStyle.inner,
-            offset: const Offset(0, 5),
-            // spreadRadius: -2,
-          ),
-        ],
         fontWeight: FontWeight.w600,
-        color: themeColors.onSurface,
+        color: _getTileTextColor(themeColors),
         decoration: widget.habitCompleted
             ? TextDecoration.lineThrough
             : TextDecoration.none,
       ),
-      child: Text(
-        
-        widget.habitName),
+      child: Text(widget.habitName),
     );
   }
 }
