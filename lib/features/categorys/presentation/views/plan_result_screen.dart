@@ -91,7 +91,7 @@ class PlanResultScreen extends StatelessWidget {
               child: Obx(() => ListView.separated(
                     padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
                     itemCount: controller.suggestions.length,
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (_, _) =>
                         const SizedBox(height: 12),
                     itemBuilder: (context, index) =>
                         _HabitSuggestionCard(
