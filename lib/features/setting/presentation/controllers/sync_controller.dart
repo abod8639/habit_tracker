@@ -18,7 +18,9 @@ enum SyncStatus {
 class SyncController extends GetxController {
   final SyncHabitsUseCase _syncHabitsUseCase = Get.find();
   final GetLastSyncTimeUseCase _getLastSyncTimeUseCase = Get.find();
-  final FirestoreService _firestoreService = FirestoreService();
+  final FirestoreService _firestoreService = Get.isRegistered<FirestoreService>()
+      ? Get.find<FirestoreService>()
+      : FirestoreService();
 
   final Rx<SyncStatus> syncStatus = SyncStatus.idle.obs;
   final RxBool isAutoSyncEnabled = true.obs;
@@ -53,8 +55,6 @@ class SyncController extends GetxController {
       String? localStartDay;
       if (Get.isRegistered<HabitRepository>()) {
         localTombstones = Get.find<HabitRepository>().getLocalTombstones();
-        // Since HabitRepository is an interface, check for implementation or use the controller for simplicity if needed, but repository is better.
-        // Actually HabitController wraps it.
         if (Get.isRegistered<HabitController>()) {
           localStartDay = Get.find<HabitController>().getStartDay();
         }
@@ -66,12 +66,12 @@ class SyncController extends GetxController {
         localStartDay: localStartDay,
       );
 
-      return result.fold(
+      final syncResult = result.fold<List<HabitModel>?>(
         (failure) {
           syncStatus.value = SyncStatus.error;
           errorMessage.value = failure.message;
           Get.snackbar(S.current.error, '${S.current.syncFailed}: ${failure.message}', snackPosition: SnackPosition.BOTTOM);
-          print('Error: ${failure.message}');
+          debugPrint('Error: ${failure.message}');
           return null;
         },
         (mergedHabits) {
@@ -80,10 +80,10 @@ class SyncController extends GetxController {
           }
           lastSyncTime.value = DateTime.now();
           syncStatus.value = SyncStatus.success;
-          // Get.snackbar(S.current.success, S.current.syncSuccess, snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 2));
           return mergedHabits;
-        }
+        },
       );
+      return syncResult;
     } catch (e) {
       syncStatus.value = SyncStatus.error;
       errorMessage.value = e.toString();
@@ -114,7 +114,7 @@ class SyncController extends GetxController {
         localStartDay: localStartDay,
       );
 
-      return result.fold(
+      final syncResult = result.fold<List<HabitModel>?>(
         (failure) {
           syncStatus.value = SyncStatus.error;
           errorMessage.value = failure.message;
@@ -127,8 +127,9 @@ class SyncController extends GetxController {
           lastSyncTime.value = DateTime.now();
           syncStatus.value = SyncStatus.success;
           return mergedHabits;
-        }
+        },
       );
+      return syncResult;
     } catch (e) {
       syncStatus.value = SyncStatus.error;
       errorMessage.value = e.toString();
