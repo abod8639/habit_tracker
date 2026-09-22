@@ -10,6 +10,7 @@ Widget buildNotificationsSection(AnimationController animationController) {
   final notificationController = Get.find<NotificationController>();
   return Builder(
     builder: (context) {
+      final isArabic = Get.locale?.languageCode == 'ar';
       return Column(
         children: [
           AnimatedSettingTile(
@@ -29,6 +30,20 @@ Widget buildNotificationsSection(AnimationController animationController) {
               ),
             ),
             onTap: () => myShowTimePicker(notificationController, context),
+          ),
+          AnimatedSettingTile(
+            animationController: animationController,
+            index: 9,
+            icon: Icons.notification_add_rounded,
+            title: isArabic ? 'تجربة الإشعار' : 'Test Notification',
+            subtitle: isArabic
+                ? 'إرسال إشعار فوري للتحقق من عمل الإشعارات'
+                : 'Send a test notification to verify delivery',
+            trailing: IconButton(
+              icon: const Icon(Icons.send_rounded),
+              onPressed: () => notificationController.sendTestNotification(),
+            ),
+            onTap: () => notificationController.sendTestNotification(),
           ),
         ],
       );
