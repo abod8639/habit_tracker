@@ -43,17 +43,28 @@ class GeminiUnknownException extends GeminiException {
 class GeminiService {
   GenerativeModel? _modelInstance;
 
+  static const String modelName = 'gemini-2.5-flash-lite';
+
+  static String get _apiKey {
+    const envKey = String.fromEnvironment('GEMINI_API_KEY');
+    if (envKey.isNotEmpty) return envKey;
+    if (dotenv.isInitialized) {
+      return dotenv.env['GEMINI_API_KEY'] ?? '';
+    }
+    return '';
+  }
+
   /// Lazy getter for standard GenerativeModel instance
   GenerativeModel get _model {
     if (_modelInstance != null) return _modelInstance!;
 
-    final apiKey = dotenv.env['GEMINI_API_KEY'];
-    if (apiKey == null || apiKey.isEmpty) {
+    final apiKey = _apiKey;
+    if (apiKey.isEmpty) {
       throw ApiKeyMissingException();
     }
 
     _modelInstance = GenerativeModel(
-      model: 'gemini-2.5-flash-lite',
+      model: modelName,
       apiKey: apiKey,
       generationConfig: GenerationConfig(
         responseMimeType: 'application/json',
@@ -117,13 +128,13 @@ class GeminiService {
   /// Starts a new chat session with an optional system instruction and history.
   ChatSession startChat({String? systemInstruction, List<Content>? history}) {
     try {
-      final apiKey = dotenv.env['GEMINI_API_KEY'];
-      if (apiKey == null || apiKey.isEmpty) {
+      final apiKey = _apiKey;
+      if (apiKey.isEmpty) {
         throw ApiKeyMissingException();
       }
 
       final chatModel = GenerativeModel(
-        model: 'gemini-2.5-flash-lite',
+        model: modelName,
         apiKey: apiKey,
         systemInstruction: systemInstruction != null ? Content.system(systemInstruction) : null,
       );
