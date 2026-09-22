@@ -42,49 +42,38 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // These will now be found correctly because InitialBinding() was called in main()
     final LangController controllerLanguage = Get.find<LangController>();
     final ThemeController themeController = Get.find<ThemeController>();
     final AnalyticsService analyticsService = Get.find<AnalyticsService>();
 
-    return Obx(
-      () => Listener(
-        onPointerDown: (PointerDownEvent event) {
-          final x = event.position.dx;
-          final y = event.position.dy;
-          final currentRoute = Get.currentRoute;
-          analyticsService.logTap(x, y, currentRoute);
-        },
-        child: GetMaterialApp(
-          initialBinding: InitialBinding(), // Already called in main()
-          locale: Locale(controllerLanguage.language.value),
-          navigatorObservers: [
-            analyticsService.getObserver(),
-            analyticsService.getTimeTrackerObserver(),
-          ],
+    return GetMaterialApp(
+      initialBinding: InitialBinding(),
+      locale: Locale(controllerLanguage.language.value),
+      navigatorObservers: [
+        analyticsService.getObserver(),
+        analyticsService.getTimeTrackerObserver(),
+      ],
 
-          localizationsDelegates: const [
-            S.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+      localizationsDelegates: const [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
 
-          supportedLocales: S.delegate.supportedLocales,
+      supportedLocales: S.delegate.supportedLocales,
 
-          debugShowCheckedModeBanner: false,
-          title: 'Habit Tracker',
-          defaultTransition: Transition.fadeIn,
-          smartManagement: SmartManagement.full,
+      debugShowCheckedModeBanner: false,
+      title: 'Habit Tracker',
+      defaultTransition: Transition.fadeIn,
+      smartManagement: SmartManagement.full,
 
-          theme: themeController.lightTheme.value,
-          darkTheme: themeController.darkTheme.value,
-          themeMode: themeController.themeMode.value,
+      theme: themeController.lightTheme.value,
+      darkTheme: themeController.darkTheme.value,
+      themeMode: themeController.themeMode.value,
 
-          getPages: appPages,
-          home: const AuthWrapper(),
-        ),
-      ),
+      getPages: appPages,
+      home: const AuthWrapper(),
     );
   }
 }
