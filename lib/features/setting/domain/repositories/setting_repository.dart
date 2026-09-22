@@ -14,7 +14,9 @@ abstract class SettingRepository {
   Future<Either<Failure, void>> setNotificationTime(TimeOfDay time);
 
   Future<Either<Failure, List<HabitModel>>> syncHabits(List<HabitModel> localHabits, {List<String>? localTombstones, String? localStartDay});
-  Future<Either<Failure, DateTime?>> getLastSyncTime();
-  
+  Future<Either<Failure, String?>> getCustomApiKey();
+  Future<Either<Failure, void>> saveCustomApiKey(String key);
+  Future<Either<Failure, void>> clearCustomApiKey();
+
   Future<Either<Failure, void>> clearAllData();
 }
