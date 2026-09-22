@@ -21,8 +21,8 @@ abstract class HabitRepository {
   Future<Either<Failure, DateTime?>> getLastResetDate();
   Future<Either<Failure, void>> saveLastResetDate(DateTime date);
   Future<Either<Failure, void>> resetHabitsCompletion();
-  Future<Either<Failure, void>> incrementDayCount();
-  Future<Either<Failure, void>> saveHabitCompletionToHistory(String habitName, bool isCompleted, DateTime date);
+  Future<Either<Failure, void>> incrementDayCount([int amount = 1]);
+  Future<Either<Failure, void>> saveHabitCompletionToHistory(String habitIdOrName, bool isCompleted, DateTime date, {String? habitName});
   Future<Either<Failure, Map<String, int>>> getCompletionStatusForDate(DateTime date);
   Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(int days);
   String getStartDate();
