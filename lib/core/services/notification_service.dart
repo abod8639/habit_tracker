@@ -17,19 +17,35 @@ class NotificationService {
   final fln.FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       fln.FlutterLocalNotificationsPlugin();
 
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
+
   Future<void> init() async {
+    if (_isInitialized) return;
+
     tz.initializeTimeZones();
-    final  timeZoneName = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timeZoneName.toString()));
+    try {
+      final timeZoneName = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(timeZoneName.toString()));
+    } catch (e) {
+      try {
+        tz.setLocalLocation(tz.getLocation('UTC'));
+      } catch (_) {}
+    }
 
     const fln.AndroidInitializationSettings initializationSettingsAndroid =
         fln.AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final fln.DarwinInitializationSettings initializationSettingsDarwin =
+    const fln.DarwinInitializationSettings initializationSettingsDarwin =
         fln.DarwinInitializationSettings(
           requestSoundPermission: true,
           requestBadgePermission: true,
           requestAlertPermission: true,
+        );
+
+    const fln.LinuxInitializationSettings initializationSettingsLinux =
+        fln.LinuxInitializationSettings(
+          defaultActionName: 'Open notification',
         );
 
     final fln.InitializationSettings initializationSettings =
@@ -37,59 +53,133 @@ class NotificationService {
           android: initializationSettingsAndroid,
           iOS: initializationSettingsDarwin,
           macOS: initializationSettingsDarwin,
+          linux: initializationSettingsLinux,
         );
 
-    await flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
+    await flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: (fln.NotificationResponse response) {
+        debugPrint('Notification clicked with payload: ${response.payload}');
+      },
+    );
+
+    // Create Notification Channels explicitly on Android
+    final androidPlugin = flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          fln.AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    if (androidPlugin != null) {
+      await androidPlugin.createNotificationChannel(
+        const fln.AndroidNotificationChannel(
+          'daily_reminder_channel',
+          'Daily Reminders',
+          description: 'Daily reminders for your habits',
+          importance: fln.Importance.max,
+        ),
+      );
+
+      await androidPlugin.createNotificationChannel(
+        const fln.AndroidNotificationChannel(
+          'immediate_channel',
+          'Immediate Notifications',
+          description: 'Notifications that show immediately',
+          importance: fln.Importance.max,
+        ),
+      );
+
+      await androidPlugin.createNotificationChannel(
+        const fln.AndroidNotificationChannel(
+          'fcm_channel',
+          'Firebase Notifications',
+          description: 'Notifications received from Firebase Cloud Messaging',
+          importance: fln.Importance.max,
+        ),
+      );
+    }
+
+    _isInitialized = true;
   }
 
-  Future<void> requestPermissions() async {
-    await flutterLocalNotificationsPlugin
+  Future<bool> requestPermissions() async {
+    bool granted = false;
+
+    final androidPlugin = flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           fln.AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
+        >();
 
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          fln.AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestExactAlarmsPermission();
+    if (androidPlugin != null) {
+      final notifGranted = await androidPlugin.requestNotificationsPermission();
+      final alarmGranted = await androidPlugin.requestExactAlarmsPermission();
+      granted = (notifGranted ?? false) || (alarmGranted ?? false);
+    }
 
-    await flutterLocalNotificationsPlugin
+    final iosPlugin = flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           fln.IOSFlutterLocalNotificationsPlugin
-        >()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+        >();
+
+    if (iosPlugin != null) {
+      final iosGranted = await iosPlugin.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      granted = iosGranted ?? false;
+    }
+
+    return granted;
   }
 
   Future<void> showNotification({
     required int id,
     required String title,
     required String body,
+    String channelId = 'immediate_channel',
+    String channelName = 'Immediate Notifications',
+    String? payload,
   }) async {
     try {
       await flutterLocalNotificationsPlugin.show(
-      id:   id,
-       title:  title,
+        id: id,
+        title: title,
         body: body,
-       notificationDetails:  const fln.NotificationDetails(
+        payload: payload,
+        notificationDetails: fln.NotificationDetails(
           android: fln.AndroidNotificationDetails(
-            'immediate_channel',
-            'Immediate Notifications',
-            channelDescription: 'Notifications that show immediately',
+            channelId,
+            channelName,
+            channelDescription: 'Habit Tracker notifications',
             importance: fln.Importance.max,
             priority: fln.Priority.high,
+            icon: '@mipmap/ic_launcher',
           ),
-          iOS: fln.DarwinNotificationDetails(),
+          iOS: const fln.DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+          linux: const fln.LinuxNotificationDetails(),
         ),
       );
     } catch (e) {
-      // debugPrint('Failed to show notification: $e');
+      debugPrint('Failed to show notification: $e');
     }
+  }
+
+  Future<void> showTestNotification({
+    String title = 'Habit Tracker',
+    String body = 'Notifications are working successfully! 🚀',
+  }) async {
+    await showNotification(
+      id: 777,
+      title: title,
+      body: body,
+      channelId: 'immediate_channel',
+      channelName: 'Immediate Notifications',
+      payload: 'test_notification_payload',
+    );
   }
 
   Future<void> scheduleDailyNotification({
@@ -98,39 +188,58 @@ class NotificationService {
     required String body,
     required TimeOfDay time,
   }) async {
+    final scheduledDate = _nextInstanceOfTime(time.hour, time.minute);
+    const notificationDetails = fln.NotificationDetails(
+      android: fln.AndroidNotificationDetails(
+        'daily_reminder_channel',
+        'Daily Reminders',
+        channelDescription: 'Daily reminders for your habits',
+        importance: fln.Importance.max,
+        priority: fln.Priority.high,
+        icon: '@mipmap/ic_launcher',
+      ),
+      iOS: fln.DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+      linux: fln.LinuxNotificationDetails(),
+    );
+
     try {
-      // Create a safely initialized timezone object
-      final scheduledDate = _nextInstanceOfTime(time.hour, time.minute);
-      
       await flutterLocalNotificationsPlugin.zonedSchedule(
-    id:     id,
-    title:  title,
-    body:   body,
-    scheduledDate: scheduledDate,
-    notificationDetails:  const fln.NotificationDetails(
-          android: fln.AndroidNotificationDetails(
-            'daily_reminder_channel',
-            'Daily Reminders',
-            channelDescription: 'Daily reminders for your habits',
-            importance: fln.Importance.max,
-            priority: fln.Priority.high,
-          ),
-          iOS: fln.DarwinNotificationDetails(),
-        ),
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        notificationDetails: notificationDetails,
         androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: fln.DateTimeComponents.time,
         payload: 'habit_notification_payload',
       );
     } catch (e) {
-      // debugPrint('Failed to schedule notification: $e');
+      debugPrint('Failed with exactAllowWhileIdle, falling back to inexact: $e');
+      try {
+        await flutterLocalNotificationsPlugin.zonedSchedule(
+          id: id,
+          title: title,
+          body: body,
+          scheduledDate: scheduledDate,
+          notificationDetails: notificationDetails,
+          androidScheduleMode: fln.AndroidScheduleMode.inexactAllowWhileIdle,
+          matchDateTimeComponents: fln.DateTimeComponents.time,
+          payload: 'habit_notification_payload',
+        );
+      } catch (fallbackError) {
+        debugPrint('Failed to schedule notification: $fallbackError');
+      }
     }
   }
 
   tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    // Falls back to UTC if tz.local is not initialized
     final local = tz.local;
     final now = tz.TZDateTime.now(local);
-    
+
     tz.TZDateTime scheduledDate = tz.TZDateTime(
       local,
       now.year,
@@ -149,7 +258,7 @@ class NotificationService {
     try {
       await flutterLocalNotificationsPlugin.cancel(id: id);
     } catch (e) {
-      // debugPrint('Failed to cancel notification: $e');
+      debugPrint('Failed to cancel notification: $e');
     }
   }
 
@@ -157,7 +266,7 @@ class NotificationService {
     try {
       await flutterLocalNotificationsPlugin.cancelAll();
     } catch (e) {
-      // debugPrint('Failed to cancel all notifications: $e');
+      debugPrint('Failed to cancel all notifications: $e');
     }
   }
 }
