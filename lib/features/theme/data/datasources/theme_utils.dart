@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class ThemeUtils {
@@ -133,7 +133,7 @@ class ThemeUtils {
     double g = colorToAnalyze.g;
     double b = colorToAnalyze.b;
 
-    double hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+    double hsp = math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
 
     return hsp < 128; // Using 128 for 0-255 scale
   }
