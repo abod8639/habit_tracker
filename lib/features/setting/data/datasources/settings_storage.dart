@@ -6,6 +6,7 @@ class SettingsStorage {
   static const String _isNotificationEnabledKey = 'is_notification_enabled';
   static const String _notificationTimeKey = 'notification_time';
   static const String _hasSkippedLoginKey = 'has_skipped_login';
+  static const String _customGeminiApiKeyKey = 'custom_gemini_api_key';
 
   late Box _box;
 
@@ -36,5 +37,19 @@ class SettingsStorage {
 
   Future<void> setSkippedLogin(bool skipped) async {
     await _box.put(_hasSkippedLoginKey, skipped);
+  }
+
+  String? get customGeminiApiKey => _box.get(_customGeminiApiKeyKey);
+
+  Future<void> setCustomGeminiApiKey(String? key) async {
+    if (key == null || key.trim().isEmpty) {
+      await _box.delete(_customGeminiApiKeyKey);
+    } else {
+      await _box.put(_customGeminiApiKeyKey, key.trim());
+    }
+  }
+
+  Future<void> clearCustomGeminiApiKey() async {
+    await _box.delete(_customGeminiApiKeyKey);
   }
 }
