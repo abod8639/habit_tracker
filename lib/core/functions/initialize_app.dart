@@ -46,8 +46,17 @@ Future<void> initializeApp() async {
     try {
       final notificationService = NotificationService();
       await notificationService.init();
-    } catch (_) {
-      // Notifications are non-fatal
+      Get.put<NotificationService>(notificationService, permanent: true);
+    } catch (e) {
+      debugPrint('NotificationService initialization error: $e');
+    }
+
+    try {
+      final fcmService = FcmService();
+      await fcmService.init();
+      Get.put<FcmService>(fcmService, permanent: true);
+    } catch (e) {
+      debugPrint('FcmService initialization error: $e');
     }
     
   } catch (e) {
