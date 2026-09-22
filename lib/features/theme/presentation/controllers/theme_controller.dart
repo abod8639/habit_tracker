@@ -57,7 +57,11 @@ class ThemeController extends GetxController {
       },
       (entity) {
         currentTheme.value = entity.themeName;
-        themeMode.value = entity.themeMode;
+        final themeData = themeColors[entity.themeName];
+        final isDark = themeData != null ? ThemeUtils.isDarkTheme(themeData) : true;
+        themeMode.value = entity.themeMode == ThemeMode.system
+            ? (isDark ? ThemeMode.dark : ThemeMode.light)
+            : entity.themeMode;
         useCustomBackground.value = entity.useCustomBackground;
         customBackgroundColor.value = entity.customBackgroundColor ?? Colors.transparent;
         _buildAndApply();
@@ -72,7 +76,11 @@ class ThemeController extends GetxController {
       (entity) {
         if (entity != null) {
           currentTheme.value = entity.themeName;
-          themeMode.value = entity.themeMode;
+          final themeData = themeColors[entity.themeName];
+          final isDark = themeData != null ? ThemeUtils.isDarkTheme(themeData) : true;
+          themeMode.value = entity.themeMode == ThemeMode.system
+              ? (isDark ? ThemeMode.dark : ThemeMode.light)
+              : entity.themeMode;
           useCustomBackground.value = entity.useCustomBackground;
           customBackgroundColor.value = entity.customBackgroundColor ?? Colors.transparent;
           _buildAndApply();
@@ -83,7 +91,9 @@ class ThemeController extends GetxController {
 
   void _setDefaultTheme() {
     currentTheme.value = defaultTheme;
-    themeMode.value = ThemeMode.system;
+    final themeData = themeColors[defaultTheme];
+    final isDark = themeData != null ? ThemeUtils.isDarkTheme(themeData) : true;
+    themeMode.value = isDark ? ThemeMode.dark : ThemeMode.light;
     useCustomBackground.value = false;
     customBackgroundColor.value = Colors.transparent;
     _buildAndApply();
@@ -126,6 +136,8 @@ class ThemeController extends GetxController {
   void changeCustomTheme(String themeName) {
     if (themeColors.containsKey(themeName)) {
       currentTheme.value = themeName;
+      final isDark = ThemeUtils.isDarkTheme(themeColors[themeName]!);
+      themeMode.value = isDark ? ThemeMode.dark : ThemeMode.light;
       _buildAndApply();
       _saveCurrentSettings();
     } else {
