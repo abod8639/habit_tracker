@@ -1,5 +1,4 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
 import 'package:hive/hive.dart';
 import '../../domain/entities/habit_stats_entity.dart';
@@ -15,21 +14,44 @@ class HabitStatsLocalDataSource {
 
   Future<HabitStatsEntity> getOverallStats() async {
     final result = await habitRepository.getHabits();
-    return result.fold(
-      (failure) => const HabitStatsEntity(
+    return await result.fold(
+      (failure) async => const HabitStatsEntity(
         totalHabits: 0,
         completedHabits: 0,
         completionRate: 0,
         streak: 0,
       ),
-      (habits) {
+      (habits) async {
         final int totalHabits = habits.length;
         final int completedHabits = habits.where((h) => h.isCompleted).length;
         final double completionRate = totalHabits > 0
             ? (completedHabits / totalHabits) * 100
             : 0;
 
-        final int streak = myBox.get(HabitStorage.dayCountKey) ?? 1;
+        int streak = 0;
+        final heatmapResult = await habitRepository.getHeatmapData();
+        heatmapResult.fold(
+          (_) => null,
+          (heatmapData) {
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+
+            if ((heatmapData[today] ?? 0) > 0) {
+              streak++;
+            }
+
+            var checkDay = today.subtract(const Duration(days: 1));
+            while (true) {
+              final strength = heatmapData[checkDay] ?? 0;
+              if (strength > 0) {
+                streak++;
+                checkDay = checkDay.subtract(const Duration(days: 1));
+              } else {
+                break;
+              }
+            }
+          },
+        );
 
         return HabitStatsEntity(
           totalHabits: totalHabits,
