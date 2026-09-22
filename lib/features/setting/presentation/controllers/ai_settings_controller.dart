@@ -73,12 +73,20 @@ class AiSettingsController extends GetxController {
     );
   }
 
+  String _getString(String Function() selector, String fallback) {
+    try {
+      return selector();
+    } catch (_) {
+      return fallback;
+    }
+  }
+
   Future<bool> saveApiKey(String rawKey) async {
     final trimmedKey = rawKey.trim();
     if (trimmedKey.isEmpty) {
       _showNotification(
-        S.current.aiApiKeyTitle,
-        S.current.invalidApiKeyFormat,
+        _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
+        _getString(() => S.current.invalidApiKeyFormat, 'Please enter a valid API key'),
         color: Colors.redAccent,
       );
       return false;
@@ -91,7 +99,7 @@ class AiSettingsController extends GetxController {
     return result.fold(
       (failure) {
         _showNotification(
-          S.current.aiApiKeyTitle,
+          _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
           failure.message,
           color: Colors.redAccent,
         );
@@ -102,8 +110,8 @@ class AiSettingsController extends GetxController {
         isCustom.value = true;
         keyInputController.text = trimmedKey;
         _showNotification(
-          S.current.aiApiKeyTitle,
-          S.current.apiKeySavedSuccess,
+          _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
+          _getString(() => S.current.apiKeySavedSuccess, 'API key saved successfully'),
           color: Colors.green,
         );
         return true;
@@ -119,7 +127,7 @@ class AiSettingsController extends GetxController {
     result.fold(
       (failure) {
         _showNotification(
-          S.current.aiApiKeyTitle,
+          _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
           failure.message,
           color: Colors.redAccent,
         );
@@ -129,8 +137,8 @@ class AiSettingsController extends GetxController {
         isCustom.value = false;
         keyInputController.text = '';
         _showNotification(
-          S.current.aiApiKeyTitle,
-          S.current.apiKeyClearedSuccess,
+          _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
+          _getString(() => S.current.apiKeyClearedSuccess, 'Custom API key removed'),
           color: Colors.orange,
         );
       },
