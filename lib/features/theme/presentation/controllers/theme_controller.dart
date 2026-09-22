@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/features/theme/data/datasources/themeList.dart';
+import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_utils.dart';
 import '../../domain/entities/theme_entity.dart';
 import '../../domain/usecases/get_theme_settings_usecase.dart';
