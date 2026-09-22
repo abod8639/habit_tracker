@@ -17,7 +17,7 @@ class Phone extends StatefulWidget {
   State<Phone> createState() => _PhoneState();
 }
 
-class _PhoneState extends State<Phone> with SingleTickerProviderStateMixin {
+class _PhoneState extends State<Phone> {
   final HabitController controller = Get.find<HabitController>();
   final ScrollController _scrollController = ScrollController();
 
