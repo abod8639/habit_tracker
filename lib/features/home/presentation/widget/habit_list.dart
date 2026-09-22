@@ -24,8 +24,8 @@ class HabitList extends StatelessWidget {
 
       return SliverReorderableList(
         itemCount: habits.length,
-        onReorder: (oldIndex, newIndex) =>
-            controller.reorderHabits(oldIndex, newIndex),
+        onReorderItem: (oldIndex, newIndex) =>
+            controller.reorderHabits(oldIndex, newIndex, isAdjusted: true),
         proxyDecorator: (child, index, animation) {
           return Material(
             color: Colors.transparent,
