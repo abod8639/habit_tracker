@@ -164,10 +164,15 @@ class ThemeController extends GetxController {
   }
 
   void _applyTheme() {
+    Get.rootController.theme = lightTheme.value;
+    Get.rootController.darkTheme = darkTheme.value;
+    Get.rootController.setThemeMode(themeMode.value);
+    Get.rootController.update();
     Get.changeThemeMode(themeMode.value);
     Get.changeTheme(
       themeMode.value == ThemeMode.dark ? darkTheme.value : lightTheme.value,
     );
+    update();
   }
 
   void _buildBothThemes() {
