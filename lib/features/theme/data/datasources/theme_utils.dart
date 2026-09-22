@@ -3,17 +3,18 @@ import 'package:flutter/material.dart';
 
 class ThemeUtils {
   static Color getContrastColor(Color backgroundColor) {
-    return _shouldUseDarkText(backgroundColor) ? Colors.black : Colors.white;
+    return _shouldUseDarkText(backgroundColor)
+        ? const Color(0xFF1F2328)
+        : Colors.white;
   }
 
   static bool _shouldUseDarkText(Color backgroundColor) {
-    // Using r, g, b instead of red, green, blue for modern Flutter versions
+    // In modern Flutter, r, g, b are doubles in the range [0.0, 1.0].
     final brightness =
-        (backgroundColor.r * 299 +
-            backgroundColor.g * 587 +
-            backgroundColor.b * 114) /
-        1000;
-    return brightness > 138;
+        backgroundColor.r * 0.299 +
+        backgroundColor.g * 0.587 +
+        backgroundColor.b * 0.114;
+    return brightness > 0.5;
   }
 
   static Color adjustBrightness(Color color, double brightness) {
@@ -49,6 +50,8 @@ class ThemeUtils {
       brightness: brightness,
       primaryColor: colors['primary'],
       scaffoldBackgroundColor: backgroundColor,
+      cardColor: surfaceColor,
+      dialogBackgroundColor: surfaceColor,
       colorScheme: ColorScheme(
         brightness: brightness,
         primary: colors['primary']!,
@@ -59,6 +62,8 @@ class ThemeUtils {
         onError: Colors.white,
         surface: surfaceColor,
         onSurface: onSurfaceColor,
+        surfaceContainerLowest: surfaceColor,
+        surfaceContainerHighest: surfaceColor.withValues(alpha: 0.7),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: colors['primary'],
@@ -67,8 +72,8 @@ class ThemeUtils {
       ),
       cardTheme: CardThemeData(
         color: surfaceColor,
-        shadowColor: colors['primary']!.withValues(alpha: 0.3),
-        elevation: 3,
+        shadowColor: colors['primary']!.withValues(alpha: 0.15),
+        elevation: 2,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colors['secondary'],
@@ -91,7 +96,7 @@ class ThemeUtils {
       ),
       textTheme: _createTextTheme(brightness, onBackgroundColor),
       inputDecorationTheme: InputDecorationTheme(
-        fillColor: backgroundColor.withValues(alpha: 0.8),
+        fillColor: surfaceColor,
         filled: true,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -121,10 +126,10 @@ class ThemeUtils {
 
     if (themeColors.containsKey('background')) {
       colorToAnalyze = parseColor(themeColors['background']);
-    } else if (themeColors.containsKey('primary')) {
-      colorToAnalyze = parseColor(themeColors['primary']);
     } else if (themeColors.containsKey('surface')) {
       colorToAnalyze = parseColor(themeColors['surface']);
+    } else if (themeColors.containsKey('primary')) {
+      colorToAnalyze = parseColor(themeColors['primary']);
     } else {
       return false;
     }
@@ -135,7 +140,7 @@ class ThemeUtils {
 
     double hsp = math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
 
-    return hsp < 128; // Using 128 for 0-255 scale
+    return hsp < 0.5; // Scale is 0.0 to 1.0 in modern Flutter
   }
 
   static Color parseColor(dynamic colorValue) {
