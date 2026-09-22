@@ -5,7 +5,7 @@ import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import 'package:habit_tracker/features/theme/data/datasources/themeList.dart';
+import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
 import '../widgets/section_title.dart';
 import '../controllers/theme_controller.dart';
 
