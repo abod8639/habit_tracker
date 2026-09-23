@@ -126,15 +126,6 @@ class _DrawerListState extends State<DrawerList> {
           },
           title: S.current.drawerReat,
         ),
-
-        MyDrawerListTile(
-          icon: const Icon(color: Colors.blueGrey, Icons.settings),
-          onTap: () {
-            Get.back();
-            Get.to(() => const SettingsPage(), binding: SettingBinding());
-          },
-          title: S.current.drawerSetting,
-        ),
         MyDrawerListTile(
           icon: const Icon(color: Colors.purpleAccent, Icons.psychology),
           onTap: () {
@@ -145,6 +136,14 @@ class _DrawerListState extends State<DrawerList> {
             );
           },
           title: S.current.aiCoach,
+        ),
+        MyDrawerListTile(
+          icon: const Icon(color: Colors.blueGrey, Icons.settings),
+          onTap: () {
+            Get.back();
+            Get.to(() => const SettingsPage(), binding: SettingBinding());
+          },
+          title: S.current.drawerSetting,
         ),
       ],
     );
