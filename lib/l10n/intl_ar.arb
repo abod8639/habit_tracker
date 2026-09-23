@@ -210,5 +210,7 @@
   "categoryStudy": "الدراسة والتحصيل العلمي",
   "categoryStudyDesc": "رفع مستوى أدائك وتحصيلك الأكاديمي",
   "categoryLearning": "تعلم مهارة جديدة",
-  "categoryLearningDesc": "إتقان أي مهارة ترغب بها خطوة بخطوة"
+  "categoryLearningDesc": "إتقان أي مهارة ترغب بها خطوة بخطوة",
+  "dailyReminderTitle": "متتبع العادات",
+  "dailyReminderBody": "حان وقت التحقق من عاداتك اليومية!"
 }
