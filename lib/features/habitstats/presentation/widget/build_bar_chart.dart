@@ -76,7 +76,7 @@ Widget buildBarChart() {
                           const SizedBox(width: 12),
                           _LegendDot(
                             color: colorScheme.error.withValues(alpha: .5),
-                            label: "",
+                            label: S.of(context).incomplete,
                           ),
                         ],
                       ),
