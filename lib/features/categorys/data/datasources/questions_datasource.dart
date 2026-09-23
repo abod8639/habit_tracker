@@ -200,9 +200,80 @@ class QuestionsDataSource {
     ),
   ];
 
-  // ─── SPORTS ───────────────────────────────────────────────────────────────
+  // ─── SPORTS (ARABIC) ───────────────────────────────────────────────────────
+  static const List<QuestionEntity> _sportsAr = [
+    QuestionEntity(
+      id: 'age',
+      text: 'كم عمرك؟',
+      type: QuestionType.number,
+      hint: '25',
+      unit: 'سنة',
+    ),
+    QuestionEntity(
+      id: 'fitness_level',
+      text: 'كيف تصف مستوى لياقتك البدنية الحالي؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'مبتدئ — نادراً ما أمارس الرياضة',
+        'متوسط — أمارس الرياضة 1–2 مرة أسبوعياً',
+        'نشط — أمارس الرياضة 3–4 مرات أسبوعياً',
+        'متقدم — أمارس الرياضة 5+ مرات أسبوعياً',
+      ],
+    ),
+    QuestionEntity(
+      id: 'goal',
+      text: 'ما هو هدفك الرياضي الرئيسي؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'خسارة الوزن / حرق الدهون',
+        'بناء الكتلة العضلية',
+        'تحسين صحة القلب واللياقة العامة',
+        'زيادة المرونة وتوازن الحركة',
+        'التدريب لرياضة معينة',
+        'لياقة ونشاط عام',
+      ],
+    ),
+    QuestionEntity(
+      id: 'available_days',
+      text: 'كم يوماً في الأسبوع يمكنك ممارسة التمارين فيه؟',
+      type: QuestionType.singleChoice,
+      choices: ['1–2 أيام', '3–4 أيام', '5–6 أيام', 'كل يوم'],
+    ),
+    QuestionEntity(
+      id: 'session_duration',
+      text: 'كم المدة المتاحة لديك لكل حصة تدريبية؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        '15–30 دقيقة',
+        '30–45 دقيقة',
+        '45–60 دقيقة',
+        'أكثر من 60 دقيقة',
+      ],
+    ),
+    QuestionEntity(
+      id: 'equipment',
+      text: 'ما هي الأدوات أو المرافق المتاحة لديك؟',
+      subtitle: 'اختر كل ما ينطبق',
+      type: QuestionType.multipleChoice,
+      choices: [
+        'نادي رياضي متكامل (جيم)',
+        'أوزان منزلية وأربطة مقاومة',
+        'أماكن مفتوحة (حديقة، مضمار جري)',
+        'مسبح',
+        'بدون أدوات (وزن الجسم فقط)',
+      ],
+    ),
+    QuestionEntity(
+      id: 'limitations',
+      text: 'هل تعاني من أي إصابات أو قيود بدنية؟',
+      type: QuestionType.text,
+      hint: 'مثال: ألم بالركبة، أسفل الظهر، أو اكتب لا يوجد',
+      isRequired: false,
+    ),
+  ];
 
-  static const List<QuestionEntity> _sports = [
+  // ─── SPORTS (ENGLISH) ──────────────────────────────────────────────────────
+  static const List<QuestionEntity> _sportsEn = [
     QuestionEntity(
       id: 'age',
       text: 'How old are you?',
@@ -273,9 +344,84 @@ class QuestionsDataSource {
     ),
   ];
 
-  // ─── STUDY ────────────────────────────────────────────────────────────────
+  // ─── STUDY (ARABIC) ────────────────────────────────────────────────────────
+  static const List<QuestionEntity> _studyAr = [
+    QuestionEntity(
+      id: 'subject',
+      text: 'ما هي المادة أو المجال الذي تدرسه؟',
+      type: QuestionType.text,
+      hint: 'مثال: الرياضيات، علوم الحاسب، التاريخ',
+    ),
+    QuestionEntity(
+      id: 'current_level',
+      text: 'ما هو مستواك الحالي في هذه المادة؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'مبتدئ تماماً',
+        'ملم بالأساسيات',
+        'متوسط',
+        'متقدم',
+      ],
+    ),
+    QuestionEntity(
+      id: 'goal',
+      text: 'ما هو هدفك الدراسي؟',
+      type: QuestionType.text,
+      hint: 'مثال: اجتياز اختبار، نيل شهادة، شغف واهتمام شخصي',
+    ),
+    QuestionEntity(
+      id: 'available_hours',
+      text: 'كم ساعة يومياً يمكنك تخصيصها للمذاكرة؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'أقل من ساعة',
+        '1–2 ساعة',
+        '2–4 ساعات',
+        '4+ ساعات',
+      ],
+    ),
+    QuestionEntity(
+      id: 'study_style',
+      text: 'ما هي أساليب التعلم الأكثر فاعلية بالنسبة لك؟',
+      subtitle: 'اختر كل ما ينطبق',
+      type: QuestionType.multipleChoice,
+      choices: [
+        'قراءة الكتب والملخصات',
+        'مشاهدة المحاضرات المرئية',
+        'حل المسائل والتمارين العملية',
+        'البطاقات التعليمية والتكرار المتباعد',
+        'جلسات المذاكرة الجماعية',
+        'الشرح والتعليم للآخرين',
+      ],
+    ),
+    QuestionEntity(
+      id: 'challenge',
+      text: 'ما هو التحدي الأكبر الذي يواجهك في الدراسة؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'الحفاظ على التركيز',
+        'التسويف والمماطلة',
+        'فهم المفاهيم المعقدة',
+        'إدارة وتنظيم الوقت',
+        'تثبيت واسترجاع المعلومات',
+      ],
+    ),
+    QuestionEntity(
+      id: 'deadline',
+      text: 'هل لديك موعد نهائي أو اختبار قريب؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'لا يوجد موعد نهائي',
+        'خلال شهر',
+        'خلال 1–3 أشهر',
+        'أكثر من 3 أشهر',
+      ],
+      isRequired: false,
+    ),
+  ];
 
-  static const List<QuestionEntity> _study = [
+  // ─── STUDY (ENGLISH) ───────────────────────────────────────────────────────
+  static const List<QuestionEntity> _studyEn = [
     QuestionEntity(
       id: 'subject',
       text: 'What subject are you studying?',
