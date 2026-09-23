@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 import '../../domain/entities/question_entity.dart';
 import '../controllers/plan_generator_controller.dart';
@@ -130,8 +131,8 @@ class QuestionnaireScreen extends StatelessWidget {
                             )
                           : Text(
                               controller.isLastQuestion
-                                  ? 'Generate My Plan ✨'
-                                  : 'Continue',
+                                  ? S.current.generateMyPlan
+                                  : S.current.continueButton,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
