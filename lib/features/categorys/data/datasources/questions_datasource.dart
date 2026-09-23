@@ -1,3 +1,6 @@
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 import '../../domain/entities/category_entity.dart';
 import '../../domain/entities/question_entity.dart';
 
@@ -5,22 +8,121 @@ import '../../domain/entities/question_entity.dart';
 class QuestionsDataSource {
   QuestionsDataSource._();
 
+  static bool get _isArabic {
+    if (Get.isRegistered<LangController>()) {
+      return Get.find<LangController>().isArabic;
+    }
+    final loc = Get.locale?.languageCode ?? Intl.getCurrentLocale();
+    return loc.startsWith('ar');
+  }
+
   static List<QuestionEntity> forCategory(PlanCategory category) {
-    switch (category) {
-      case PlanCategory.nutrition:
-        return _nutrition;
-      case PlanCategory.sports:
-        return _sports;
-      case PlanCategory.study:
-        return _study;
-      case PlanCategory.learning:
-        return _learning;
+    if (_isArabic) {
+      switch (category) {
+        case PlanCategory.nutrition:
+          return _nutritionAr;
+        case PlanCategory.sports:
+          return _sportsAr;
+        case PlanCategory.study:
+          return _studyAr;
+        case PlanCategory.learning:
+          return _learningAr;
+      }
+    } else {
+      switch (category) {
+        case PlanCategory.nutrition:
+          return _nutritionEn;
+        case PlanCategory.sports:
+          return _sportsEn;
+        case PlanCategory.study:
+          return _studyEn;
+        case PlanCategory.learning:
+          return _learningEn;
+      }
     }
   }
 
-  // ─── NUTRITION ────────────────────────────────────────────────────────────
+  // ─── NUTRITION (ARABIC) ────────────────────────────────────────────────────
+  static const List<QuestionEntity> _nutritionAr = [
+    QuestionEntity(
+      id: 'age',
+      text: 'كم عمرك؟',
+      type: QuestionType.number,
+      hint: '25',
+      unit: 'سنة',
+    ),
+    QuestionEntity(
+      id: 'weight',
+      text: 'ما هو وزنك الحالي؟',
+      type: QuestionType.number,
+      hint: '75',
+      unit: 'كجم',
+    ),
+    QuestionEntity(
+      id: 'height',
+      text: 'ما هو طولك؟',
+      type: QuestionType.number,
+      hint: '175',
+      unit: 'سم',
+    ),
+    QuestionEntity(
+      id: 'goal',
+      text: 'ما هو هدفك الغذائي الأساسي؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'خسارة الوزن',
+        'بناء الكتلة العضلية',
+        'الحفاظ على الوزن الحالي',
+        'زيادة مستويات الطاقة والنشاط',
+        'تناول طعام صحي بشكل عام',
+      ],
+    ),
+    QuestionEntity(
+      id: 'activity_level',
+      text: 'ما هو مستوى نشاطك خلال اليوم؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'خامل (عمل مكتبي، حركة قليلة)',
+        'نشاط خفيف (مشي خفيف)',
+        'نشاط متوسط (تمارين 2–3 مرات أسبوعياً)',
+        'نشط جداً (تمارين 5+ مرات أسبوعياً)',
+      ],
+    ),
+    QuestionEntity(
+      id: 'dietary_restrictions',
+      text: 'هل لديك أي قيود أو تفضيلات غذائية خاصة؟',
+      subtitle: 'اختر كل ما ينطبق',
+      type: QuestionType.multipleChoice,
+      choices: [
+        'لا يوجد',
+        'نباتي',
+        'نباتي صرف (فيجان)',
+        'خالٍ من الغلوتين',
+        'خالٍ من اللاكتوز',
+        'حلال',
+        'قليل الكربوهيدرات / كيتو',
+      ],
+    ),
+    QuestionEntity(
+      id: 'water_intake',
+      text: 'كم كمية الماء التي تشربها يومياً حالياً؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'أقل من لتر واحد',
+        '1–2 لتر',
+        'أكثر من 2 لتر',
+      ],
+    ),
+    QuestionEntity(
+      id: 'meals_per_day',
+      text: 'كم عدد الوجبات التي تتناولها يومياً في العادة؟',
+      type: QuestionType.singleChoice,
+      choices: ['1–2 وجبات', '3 وجبات', '4–5 وجبات', '6+ وجبات صغيرة'],
+    ),
+  ];
 
-  static const List<QuestionEntity> _nutrition = [
+  // ─── NUTRITION (ENGLISH) ───────────────────────────────────────────────────
+  static const List<QuestionEntity> _nutritionEn = [
     QuestionEntity(
       id: 'age',
       text: 'How old are you?',
