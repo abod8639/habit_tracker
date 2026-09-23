@@ -8,6 +8,7 @@ import '../../data/datasources/questions_datasource.dart';
 
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import '../../../home/presentation/controllers/habit_controller.dart';
+import '../../../home/presentation/pages/home_screen.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 enum PlanGeneratorStatus { idle, loading, success, error }
@@ -181,19 +182,21 @@ class PlanGeneratorController extends GetxController {
       }
 
       status.value = PlanGeneratorStatus.idle;
+      final count = selectedCount;
+      reset();
+
+      Get.offAll(() => const HomeScreen());
 
       Get.snackbar(
         S.current.planActivatedTitle,
-        S.current.planActivatedDesc(selectedCount),
+        S.current.planActivatedDesc(count),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: const Color(0xFF10B981),
         colorText: const Color(0xFFFFFFFF),
         duration: const Duration(seconds: 3),
       );
-
-      reset();
-      Get.until((route) => route.isFirst);
     } catch (e) {
+      debugPrint(e.toString());
       status.value = PlanGeneratorStatus.error;
       errorMessage.value = S.current.unexpectedError;
     }
