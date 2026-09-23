@@ -50,8 +50,8 @@ class _HabitStatsPageState extends State<HabitStatsPage>
               Get.back();
             },
             icon: Icon(
-              Icons.arrow_back,
-              color: Theme.of(context).colorScheme.primary,
+              Icons.arrow_back_ios_new_rounded,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           title: Text(
