@@ -1459,6 +1459,636 @@ class S {
       args: [],
     );
   }
+
+  /// `System Language`
+  String get systemLanguage {
+    return Intl.message(
+      'System Language',
+      name: 'systemLanguage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No habits yet`
+  String get noHabitsYet {
+    return Intl.message(
+      'No habits yet',
+      name: 'noHabitsYet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add your first habit with the + button`
+  String get addFirstHabitSubtitle {
+    return Intl.message(
+      'Add your first habit with the + button',
+      name: 'addFirstHabitSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} Selected`
+  String itemsSelected(int count) {
+    return Intl.message(
+      '$count Selected',
+      name: 'itemsSelected',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Choose Color`
+  String get chooseColor {
+    return Intl.message(
+      'Choose Color',
+      name: 'chooseColor',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete Selected`
+  String get deleteSelected {
+    return Intl.message(
+      'Delete Selected',
+      name: 'deleteSelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete {count} habit(s)? This action cannot be undone.`
+  String deleteSelectedConfirm(int count) {
+    return Intl.message(
+      'Are you sure you want to delete $count habit(s)? This action cannot be undone.',
+      name: 'deleteSelectedConfirm',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Scan Habits`
+  String get scanHabitsTitle {
+    return Intl.message(
+      'Scan Habits',
+      name: 'scanHabitsTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Extract tasks from an image automatically.`
+  String get scanHabitsDesc {
+    return Intl.message(
+      'Extract tasks from an image automatically.',
+      name: 'scanHabitsDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Camera`
+  String get camera {
+    return Intl.message(
+      'Camera',
+      name: 'camera',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Gallery`
+  String get gallery {
+    return Intl.message(
+      'Gallery',
+      name: 'gallery',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No Habits Detected`
+  String get noHabitsDetected {
+    return Intl.message(
+      'No Habits Detected',
+      name: 'noHabitsDetected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We could not find any clear tasks or habits in this image. Please try another one.`
+  String get noHabitsDetectedDesc {
+    return Intl.message(
+      'We could not find any clear tasks or habits in this image. Please try another one.',
+      name: 'noHabitsDetectedDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Close`
+  String get close {
+    return Intl.message(
+      'Close',
+      name: 'close',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Detected Habits`
+  String get detectedHabits {
+    return Intl.message(
+      'Detected Habits',
+      name: 'detectedHabits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save Selected`
+  String get saveSelected {
+    return Intl.message(
+      'Save Selected',
+      name: 'saveSelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Added the selected habits successfully.`
+  String get addedSelectedHabitsSuccess {
+    return Intl.message(
+      'Added the selected habits successfully.',
+      name: 'addedSelectedHabitsSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Something went wrong`
+  String get somethingWentWrong {
+    return Intl.message(
+      'Something went wrong',
+      name: 'somethingWentWrong',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Try Again`
+  String get tryAgain {
+    return Intl.message(
+      'Try Again',
+      name: 'tryAgain',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Loading your habits...`
+  String get loadingHabits {
+    return Intl.message(
+      'Loading your habits...',
+      name: 'loadingHabits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Just a moment`
+  String get justAMoment {
+    return Intl.message(
+      'Just a moment',
+      name: 'justAMoment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clearing data...`
+  String get clearingData {
+    return Intl.message(
+      'Clearing data...',
+      name: 'clearingData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Data cleared successfully! Restarting app...`
+  String get dataClearedSuccess {
+    return Intl.message(
+      'Data cleared successfully! Restarting app...',
+      name: 'dataClearedSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to clear data: {message}`
+  String failedToClearData(String message) {
+    return Intl.message(
+      'Failed to clear data: $message',
+      name: 'failedToClearData',
+      desc: '',
+      args: [message],
+    );
+  }
+
+  /// `Are you sure you want to delete all habits and settings? This action cannot be undone.`
+  String get clearAllDataConfirm {
+    return Intl.message(
+      'Are you sure you want to delete all habits and settings? This action cannot be undone.',
+      name: 'clearAllDataConfirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notifications disabled`
+  String get notificationsDisabled {
+    return Intl.message(
+      'Notifications disabled',
+      name: 'notificationsDisabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reminder set for {time}`
+  String reminderSetFor(String time) {
+    return Intl.message(
+      'Reminder set for $time',
+      name: 'reminderSetFor',
+      desc: '',
+      args: [time],
+    );
+  }
+
+  /// `Test Notification`
+  String get testNotification {
+    return Intl.message(
+      'Test Notification',
+      name: 'testNotification',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send a test notification to verify delivery`
+  String get testNotificationDesc {
+    return Intl.message(
+      'Send a test notification to verify delivery',
+      name: 'testNotificationDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification Test`
+  String get notificationTestTitle {
+    return Intl.message(
+      'Notification Test',
+      name: 'notificationTestTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Test notification sent! Check your notification bar.`
+  String get notificationTestSent {
+    return Intl.message(
+      'Test notification sent! Check your notification bar.',
+      name: 'notificationTestSent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reminders Enabled!`
+  String get remindersEnabledTitle {
+    return Intl.message(
+      'Reminders Enabled!',
+      name: 'remindersEnabledTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You will receive daily habit checks.`
+  String get remindersEnabledBody {
+    return Intl.message(
+      'You will receive daily habit checks.',
+      name: 'remindersEnabledBody',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Day {streak}`
+  String streakDay(int streak) {
+    return Intl.message(
+      'Day $streak',
+      name: 'streakDay',
+      desc: '',
+      args: [streak],
+    );
+  }
+
+  /// `Currently Selected`
+  String get currentlySelected {
+    return Intl.message(
+      'Currently Selected',
+      name: 'currentlySelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to apply`
+  String get tapToApply {
+    return Intl.message(
+      'Tap to apply',
+      name: 'tapToApply',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Theme not found`
+  String get themeNotFound {
+    return Intl.message(
+      'Theme not found',
+      name: 'themeNotFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Retry`
+  String get retry {
+    return Intl.message(
+      'Retry',
+      name: 'retry',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Generate a Plan`
+  String get generatePlan {
+    return Intl.message(
+      'Generate a Plan',
+      name: 'generatePlan',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `What do you want\nto work on?`
+  String get generatePlanTitle {
+    return Intl.message(
+      'What do you want\nto work on?',
+      name: 'generatePlanTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a category and we'll build a personalized habit plan just for you.`
+  String get generatePlanSubtitle {
+    return Intl.message(
+      'Choose a category and we\'ll build a personalized habit plan just for you.',
+      name: 'generatePlanSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Generate My Plan ✨`
+  String get generateMyPlan {
+    return Intl.message(
+      'Generate My Plan ✨',
+      name: 'generateMyPlan',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue`
+  String get continueButton {
+    return Intl.message(
+      'Continue',
+      name: 'continueButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Optional`
+  String get optional {
+    return Intl.message(
+      'Optional',
+      name: 'optional',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your {category} Plan`
+  String yourPlanTitle(String category) {
+    return Intl.message(
+      'Your $category Plan',
+      name: 'yourPlanTitle',
+      desc: '',
+      args: [category],
+    );
+  }
+
+  /// `{count} habits generated for you`
+  String habitsGeneratedCount(int count) {
+    return Intl.message(
+      '$count habits generated for you',
+      name: 'habitsGeneratedCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Select all`
+  String get selectAll {
+    return Intl.message(
+      'Select all',
+      name: 'selectAll',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clear`
+  String get clear {
+    return Intl.message(
+      'Clear',
+      name: 'clear',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add {count} Habit(s) to Tracker`
+  String addHabitsToTracker(int count) {
+    return Intl.message(
+      'Add $count Habit(s) to Tracker',
+      name: 'addHabitsToTracker',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Select at least one habit`
+  String get selectAtLeastOneHabit {
+    return Intl.message(
+      'Select at least one habit',
+      name: 'selectAtLeastOneHabit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Answer required`
+  String get answerRequired {
+    return Intl.message(
+      'Answer required',
+      name: 'answerRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please answer this question to continue.`
+  String get pleaseAnswerToContinue {
+    return Intl.message(
+      'Please answer this question to continue.',
+      name: 'pleaseAnswerToContinue',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to generate plan. Please try again.`
+  String get planGenerationFailed {
+    return Intl.message(
+      'Failed to generate plan. Please try again.',
+      name: 'planGenerationFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `🎉 Plan activated!`
+  String get planActivatedTitle {
+    return Intl.message(
+      '🎉 Plan activated!',
+      name: 'planActivatedTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} habits added to your tracker.`
+  String planActivatedDesc(int count) {
+    return Intl.message(
+      '$count habits added to your tracker.',
+      name: 'planActivatedDesc',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Sports & Fitness`
+  String get categorySports {
+    return Intl.message(
+      'Sports & Fitness',
+      name: 'categorySports',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Build a consistent fitness routine`
+  String get categorySportsDesc {
+    return Intl.message(
+      'Build a consistent fitness routine',
+      name: 'categorySportsDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Nutrition`
+  String get categoryNutrition {
+    return Intl.message(
+      'Nutrition',
+      name: 'categoryNutrition',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Improve your diet and reach your health goals`
+  String get categoryNutritionDesc {
+    return Intl.message(
+      'Improve your diet and reach your health goals',
+      name: 'categoryNutritionDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Study`
+  String get categoryStudy {
+    return Intl.message(
+      'Study',
+      name: 'categoryStudy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Boost your academic performance`
+  String get categoryStudyDesc {
+    return Intl.message(
+      'Boost your academic performance',
+      name: 'categoryStudyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Learn a New Skill`
+  String get categoryLearning {
+    return Intl.message(
+      'Learn a New Skill',
+      name: 'categoryLearning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Master any skill step by step`
+  String get categoryLearningDesc {
+    return Intl.message(
+      'Master any skill step by step',
+      name: 'categoryLearningDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
