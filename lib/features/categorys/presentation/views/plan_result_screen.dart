@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 import '../../domain/entities/plan_suggestion.dart';
 import '../controllers/plan_generator_controller.dart';
@@ -36,14 +37,14 @@ class PlanResultScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Your ${category?.displayName ?? ''} Plan',
+                          S.current.yourPlanTitle(category?.displayName ?? ''),
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Obx(() => Text(
-                              '${controller.suggestions.length} habits generated for you',
+                              S.current.habitsGeneratedCount(controller.suggestions.length),
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey.shade500,
@@ -62,7 +63,7 @@ class PlanResultScreen extends StatelessWidget {
               child: Obx(() => Row(
                     children: [
                       Text(
-                        '${controller.selectedCount} selected',
+                        S.current.itemsSelected(controller.selectedCount),
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -72,7 +73,7 @@ class PlanResultScreen extends StatelessWidget {
                       const Spacer(),
                       TextButton(
                         onPressed: controller.selectAll,
-                        child: const Text('Select all'),
+                        child: Text(S.current.selectAll),
                       ),
                       const SizedBox(width: 4),
                       TextButton(
@@ -80,7 +81,7 @@ class PlanResultScreen extends StatelessWidget {
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.grey.shade500,
                         ),
-                        child: const Text('Clear'),
+                        child: Text(S.current.clear),
                       ),
                     ],
                   )),
