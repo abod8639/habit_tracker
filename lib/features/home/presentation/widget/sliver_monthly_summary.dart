@@ -20,9 +20,14 @@ class SliverMonthlySummary extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Obx(() => MonthlySummary(
-              datasets: Map<DateTime, int>.from(controller.heatmapDateSet),
-            )),
+            child: Obx(() {
+              final datasets = controller.heatmapDateSet;
+              final startDay = controller.getStartDay();
+              return MonthlySummary(
+                key: ValueKey('${startDay}_${datasets.isEmpty}'),
+                datasets: Map<DateTime, int>.from(datasets),
+              );
+            }),
           ),
         ),
       ),
