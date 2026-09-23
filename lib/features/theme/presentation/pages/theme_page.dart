@@ -25,7 +25,7 @@ class ThemePage extends StatelessWidget {
         appBar: AppBar(
           leading: IconButton(
             color: colorScheme.onSurface,
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
             onPressed: () => Get.back(),
           ),
           centerTitle: true,
