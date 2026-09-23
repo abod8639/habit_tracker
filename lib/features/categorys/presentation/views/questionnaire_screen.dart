@@ -342,6 +342,7 @@ class _NumberInputState extends State<_NumberInput> {
       children: [
         Expanded(
           child: TextField(
+            autofocus: true,
             controller: _textController,
             onChanged: (v) =>
                 widget.controller.setAnswer(widget.question.id, v),
@@ -356,7 +357,7 @@ class _NumberInputState extends State<_NumberInput> {
             decoration: InputDecoration(
               hintText: widget.question.hint ?? '0',
               hintStyle: TextStyle(
-                color: theme.hintColor.withValues(alpha:0.5),
+                color: theme.hintColor.withValues(alpha:0.2),
                 fontSize: 32,
               ),
               filled: true,
