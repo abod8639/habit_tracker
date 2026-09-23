@@ -17,8 +17,8 @@ class ChatMessage {
     required String text,
     required this.isUser,
     bool hasError = false,
-  })  : text = text.obs,
-        hasError = hasError.obs;
+  }) : text = text.obs,
+       hasError = hasError.obs;
 }
 
 class AiChatController extends GetxController {
@@ -54,30 +54,38 @@ class AiChatController extends GetxController {
         ? Get.find<HabitController>()
         : null;
     final List<HabitEntity> habits = habitController?.habits ?? [];
-    
+
     final todayStr = todaysDateFormatted();
     final int completedCount = habits.where((h) => h.isCompleted).length;
     final int totalCount = habits.length;
-    
-    final completionRate = totalCount == 0 ? 0 : (completedCount / totalCount * 100).toInt();
+
+    final completionRate = totalCount == 0
+        ? 0
+        : (completedCount / totalCount * 100).toInt();
 
     final isArabic = Get.locale?.languageCode == 'ar';
     final appLanguage = isArabic ? 'Arabic' : 'English';
 
-    String habitsContext = isArabic ? "لا توجد عادات يتتبعها المستخدم حالياً." : "User has no habits currently tracked.";
+    String habitsContext = isArabic
+        ? "لا توجد عادات يتتبعها المستخدم حالياً."
+        : "User has no habits currently tracked.";
     if (habits.isNotEmpty) {
-      habitsContext = habits.map((h) {
-        final status = h.isCompleted
-            ? (isArabic ? '✓ مكتملة' : '✓ Completed')
-            : (isArabic ? '✗ غير مكتملة' : '✗ Not completed');
-        return "- ${h.name} ($status)";
-      }).join("\n");
+      habitsContext = habits
+          .map((h) {
+            final status = h.isCompleted
+                ? (isArabic ? '✓ مكتملة' : '✓ Completed')
+                : (isArabic ? '✗ غير مكتملة' : '✗ Not completed');
+            return "- ${h.name} ($status)";
+          })
+          .join("\n");
     }
 
     final startDateStr = habitController?.getStartDay() ?? todayStr;
     final dailyHistoryContext = habitController != null
         ? _getHeatmapContext(habitController.heatmapDateSet)
-        : (isArabic ? "لا يوجد سجل إنجاز متوفر حتى الآن." : "No history recorded yet.");
+        : (isArabic
+              ? "لا يوجد سجل إنجاز متوفر حتى الآن."
+              : "No history recorded yet.");
 
     return '''
 You are an elite, empathetic habit coach embedded inside a Habit Tracker app.
@@ -211,19 +219,20 @@ PERSONALITY CONSTANTS
       final List<Content> chatHistory = loadedMessages
           .where((msg) => !msg.hasError.value)
           .map((msg) {
-        if (msg.isUser) {
-          return Content.text(msg.text.value);
-        } else {
-          return Content.model([TextPart(msg.text.value)]);
-        }
-      }).toList();
+            if (msg.isUser) {
+              return Content.text(msg.text.value);
+            } else {
+              return Content.model([TextPart(msg.text.value)]);
+            }
+          })
+          .toList();
 
       // 3. Initialize chat session with history
       _chatSession = _geminiService.startChat(
         systemInstruction: _buildSystemInstruction(),
         history: chatHistory,
       );
-      
+
       // 4. Generate initial greeting only if the chat history is completely empty
       if (messages.isEmpty) {
         _generateInitialGreeting();
@@ -240,7 +249,7 @@ PERSONALITY CONSTANTS
   Future<void> _generateInitialGreeting() async {
     final greetingMessage = ChatMessage(text: '', isUser: false);
     messages.add(greetingMessage);
-    
+
     await _sendChatMessageWithRetry(
       content: Content.text(S.current.initialGreeting),
       targetMessage: greetingMessage,
@@ -354,7 +363,7 @@ PERSONALITY CONSTANTS
         }
 
         final responseStream = _chatSession!.sendMessageStream(content);
-        
+
         String accumulatedText = '';
         bool isFirstChunk = true;
 
@@ -373,22 +382,23 @@ PERSONALITY CONSTANTS
             _scrollToBottom();
           }
         }
-        
+
         await _saveHistory();
         return;
       } catch (e) {
         debugPrint('Attempt $attempt failed with error: $e');
-        
+
         final errorStr = e.toString().toLowerCase();
-        final isRateLimit = errorStr.contains('quota') || 
-                            errorStr.contains('limit') || 
-                            errorStr.contains('429') || 
-                            errorStr.contains('resource exhausted');
-        
+        final isRateLimit =
+            errorStr.contains('quota') ||
+            errorStr.contains('limit') ||
+            errorStr.contains('429') ||
+            errorStr.contains('resource exhausted');
+
         if (isRateLimit && attempt < maxAttempts) {
           double? retrySeconds = _extractRetrySeconds(e);
           retrySeconds ??= (4.0 * attempt);
-          
+
           for (int sec = retrySeconds.ceil(); sec > 0; sec--) {
             final isArabic = Get.locale?.languageCode == 'ar';
             loadingMessage.value = isArabic
@@ -429,11 +439,16 @@ PERSONALITY CONSTANTS
       final box = await _getHistoryBox();
       // Keep only the last 10 messages
       final start = messages.length > 10 ? messages.length - 10 : 0;
-      final listToSave = messages.sublist(start).map((msg) => {
-        'text': msg.text.value,
-        'isUser': msg.isUser,
-        'hasError': msg.hasError.value,
-      }).toList();
+      final listToSave = messages
+          .sublist(start)
+          .map(
+            (msg) => {
+              'text': msg.text.value,
+              'isUser': msg.isUser,
+              'hasError': msg.hasError.value,
+            },
+          )
+          .toList();
       await box.put('history', listToSave);
     } catch (e) {
       debugPrint('Error saving chat history: $e');
@@ -485,21 +500,24 @@ PERSONALITY CONSTANTS
           ? "لا يوجد سجل إنجاز متوفر حتى الآن."
           : "No history recorded yet.";
     }
-    
+
     // Sort dates descending (newest first)
     final sortedDates = heatmap.keys.toList()..sort((a, b) => b.compareTo(a));
-    
+
     // Limit to the last 30 days to avoid overloading context
     final recentDates = sortedDates.take(30).toList();
-    
+
     final isArabic = Get.locale?.languageCode == 'ar';
-    
-    return recentDates.map((date) {
-      final dateStr = "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
-      final percent = heatmap[date]! * 10;
-      return isArabic
-          ? "- $dateStr: نسبة الإنجاز $percent%"
-          : "- $dateStr: $percent% completed";
-    }).join("\n");
+
+    return recentDates
+        .map((date) {
+          final dateStr =
+              "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+          final percent = heatmap[date]! * 10;
+          return isArabic
+              ? "- $dateStr: نسبة الإنجاز $percent%"
+              : "- $dateStr: $percent% completed";
+        })
+        .join("\n");
   }
 }

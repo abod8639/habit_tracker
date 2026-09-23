@@ -44,13 +44,13 @@ class HabitStatsController extends GetxController {
       isLoading.value = true;
       stats.value = await getOverallStatsUseCase();
       overallTrend.assignAll(await getOverallTrendUseCase(daysPeriod.value));
-      
+
       final trends = await getIndividualHabitTrendsUseCase(daysPeriod.value);
       if (trends != null) {
         individualTrends.assignAll(trends);
         habitNames.assignAll(trends.keys.toList());
       }
-      
+
       todaySummary.assignAll(await getTodayHabitsSummaryUseCase());
     } finally {
       isLoading.value = false;

@@ -55,7 +55,7 @@ Widget buildPieChart() {
                       radius: 100,
                       titleStyle: TextStyle(
                         fontSize: 14,
-                         shadows: [
+                        shadows: [
                           Shadow(
                             blurRadius: 2,
                             color: Colors.black.withValues(alpha: 0.5),

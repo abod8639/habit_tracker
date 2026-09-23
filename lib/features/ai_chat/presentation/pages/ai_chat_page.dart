@@ -28,14 +28,21 @@ class AiChatPage extends GetView<AiChatController> {
                       itemBuilder: (context, index) {
                         final message = controller.messages[index];
                         final isLast = index == controller.messages.length - 1;
-                        return _buildMessageBubble(context, message, isDark, isLast);
+                        return _buildMessageBubble(
+                          context,
+                          message,
+                          isDark,
+                          isLast,
+                        );
                       },
                     ),
             ),
           ),
-          Obx(() => controller.isLoading.value
-              ? _buildTypingIndicator(context, isDark)
-              : const SizedBox.shrink()),
+          Obx(
+            () => controller.isLoading.value
+                ? _buildTypingIndicator(context, isDark)
+                : const SizedBox.shrink(),
+          ),
           _buildMessageInput(context, isDark),
         ],
       ),
@@ -110,7 +117,11 @@ class AiChatPage extends GetView<AiChatController> {
     );
   }
 
-  Widget _buildAiAvatar(BuildContext context, {double size = 42, bool useHero = false}) {
+  Widget _buildAiAvatar(
+    BuildContext context, {
+    double size = 42,
+    bool useHero = false,
+  }) {
     final theme = Theme.of(context);
     final iconWidget = Icon(
       Icons.auto_awesome,
@@ -195,29 +206,34 @@ class AiChatPage extends GetView<AiChatController> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
-          mainAxisAlignment:
-              isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment: isUser
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (isUser) ...[
-              Obx(() => message.hasError.value
-                  ? Material(
-                      type: MaterialType.transparency,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.refresh_rounded,
-                          color: Colors.redAccent,
+              Obx(
+                () => message.hasError.value
+                    ? Material(
+                        type: MaterialType.transparency,
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.refresh_rounded,
+                            color: Colors.redAccent,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => controller.retryMessage(message),
+                          tooltip: S.of(context).retry,
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () => controller.retryMessage(message),
-                        tooltip: S.of(context).retry,
-                      ),
-                    )
-                  : const SizedBox.shrink()),
-              Obx(() => message.hasError.value
-                  ? const SizedBox(width: 8)
-                  : const SizedBox.shrink()),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              Obx(
+                () => message.hasError.value
+                    ? const SizedBox(width: 8)
+                    : const SizedBox.shrink(),
+              ),
             ],
             if (!isUser) ...[
               _buildAiAvatar(context, size: 30),
@@ -228,7 +244,10 @@ class AiChatPage extends GetView<AiChatController> {
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.72,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   gradient: isUser
                       ? LinearGradient(
@@ -255,7 +274,9 @@ class AiChatPage extends GetView<AiChatController> {
                     BoxShadow(
                       color: isUser
                           ? theme.colorScheme.primary.withValues(alpha: 0.25)
-                          : Colors.black.withValues(alpha: isDark ? 0.25 : 0.06),
+                          : Colors.black.withValues(
+                              alpha: isDark ? 0.25 : 0.06,
+                            ),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -353,7 +374,9 @@ class AiChatPage extends GetView<AiChatController> {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.2 : 0.05,
+                      ),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -408,7 +431,9 @@ class AiChatPage extends GetView<AiChatController> {
                         ? []
                         : [
                             BoxShadow(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.45),
+                              color: theme.colorScheme.primary.withValues(
+                                alpha: 0.45,
+                              ),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -473,7 +498,9 @@ class _TypingDotsState extends State<_TypingDots>
               height: 8,
               transform: Matrix4.translationValues(0, -bounce * 5, 0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.6 + bounce * 0.4),
+                color: theme.colorScheme.primary.withValues(
+                  alpha: 0.6 + bounce * 0.4,
+                ),
                 shape: BoxShape.circle,
               ),
             );

@@ -31,11 +31,11 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
         selectedHabits.add(widget.extractedHabits[i]);
       }
     }
-    
+
     if (selectedHabits.isNotEmpty) {
       c.addMultipleHabits(selectedHabits);
     }
-    
+
     Navigator.of(context).pop(); // Close the confirmation dialog
     Get.snackbar(
       S.current.success,

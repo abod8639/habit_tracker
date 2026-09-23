@@ -42,7 +42,7 @@ class HabitList extends StatelessWidget {
               // Wrap only the tile with Obx to listen to specific state changes like selection
               final isSelected = controller.selectedHabitIds.contains(habit.id);
               final isSelectionMode = controller.isSelectionMode;
-              
+
               return MyTextTaile(
                 habitName: habit.name,
                 habitCompleted: habit.isCompleted,
@@ -58,8 +58,11 @@ class HabitList extends StatelessWidget {
                 },
                 onDelete: (context) => controller.deleteHabit(habit.id),
                 onEdit: (context) => editHabit(habit.id, habit.name, context),
-                onChanged: (value) => controller.toggleHabit(habit.id, value ?? false),
-                onLongPress: isSelectionMode ? null : () => controller.toggleHabitSelection(habit.id),
+                onChanged: (value) =>
+                    controller.toggleHabit(habit.id, value ?? false),
+                onLongPress: isSelectionMode
+                    ? null
+                    : () => controller.toggleHabitSelection(habit.id),
               );
             }),
           );

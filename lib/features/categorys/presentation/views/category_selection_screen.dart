@@ -17,7 +17,8 @@ class CategorySelectionScreen extends StatelessWidget {
         leading: IconButton(
           icon: Icon(
             color: Theme.of(context).colorScheme.onSurface,
-            Icons.arrow_back_ios_new),
+            Icons.arrow_back_ios_new,
+          ),
           onPressed: () {
             Get.back();
           },
@@ -54,7 +55,9 @@ class CategorySelectionScreen extends StatelessWidget {
                 S.current.generatePlanSubtitle,
                 style: TextStyle(
                   fontSize: 15,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
               ),
@@ -68,13 +71,15 @@ class CategorySelectionScreen extends StatelessWidget {
                   crossAxisSpacing: 16,
                   childAspectRatio: 0.88,
                   children: PlanCategory.values
-                      .map((category) => _CategoryCard(
-                            category: category,
-                            onTap: () {
-                              controller.selectCategory(category);
-                              Get.toNamed('/plan-questionnaire');
-                            },
-                          ))
+                      .map(
+                        (category) => _CategoryCard(
+                          category: category,
+                          onTap: () {
+                            controller.selectCategory(category);
+                            Get.toNamed('/plan-questionnaire');
+                          },
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -136,10 +141,10 @@ class _CategoryCardState extends State<_CategoryCard>
         scale: _scale,
         child: Container(
           decoration: BoxDecoration(
-            color: color.withValues(alpha:0.06),
+            color: color.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: color.withValues(alpha:0.22),
+              color: color.withValues(alpha: 0.22),
               width: 1.5,
             ),
           ),
@@ -152,7 +157,7 @@ class _CategoryCardState extends State<_CategoryCard>
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha:0.14),
+                  color: color.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -176,7 +181,9 @@ class _CategoryCardState extends State<_CategoryCard>
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.4,
                 ),
               ),

@@ -84,7 +84,11 @@ class AuthController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final result = await _signUpWithEmailUseCase(email, password, displayName);
+      final result = await _signUpWithEmailUseCase(
+        email,
+        password,
+        displayName,
+      );
 
       final isSuccess = result.fold<bool>(
         (failure) {
@@ -138,10 +142,10 @@ class AuthController extends GetxController {
   Future<void> signOut() async {
     try {
       isLoading.value = true;
-      
+
       // Reset skip login status so they see login screen again
       await _setSkipLoginUseCase(false);
-      
+
       // Clear FCM token in Firestore before signing out
       if (Get.isRegistered<FcmService>()) {
         await Get.find<FcmService>().clearTokenFromFirestore();
@@ -162,12 +166,12 @@ class AuthController extends GetxController {
       }
 
       final result = await _signOutUseCase();
-      
+
       result.fold(
         (failure) => _showError(failure.message),
         (_) => null,
       );
-      
+
       isLoading.value = false;
       Get.offAll(() => const LoginPage());
     } catch (e) {
@@ -192,7 +196,11 @@ class AuthController extends GetxController {
         },
         (_) {
           isLoading.value = false;
-          Get.snackbar(S.current.success, S.current.resetPasswordSuccess, snackPosition: SnackPosition.BOTTOM);
+          Get.snackbar(
+            S.current.success,
+            S.current.resetPasswordSuccess,
+            snackPosition: SnackPosition.BOTTOM,
+          );
           return true;
         },
       );

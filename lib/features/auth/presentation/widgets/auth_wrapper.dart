@@ -25,7 +25,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Future<void> _checkInitialStatus() async {
     final getSkipStatus = Get.find<GetSkipLoginStatusUseCase>();
     final result = await getSkipStatus();
-    
+
     result.fold(
       (_) => _hasSkipped = false,
       (status) => _hasSkipped = status,
@@ -50,7 +50,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
     return Obx(() {
       final user = authController.currentUser;
-      
+
       if (user != null || _hasSkipped) {
         return const HomeScreen();
       } else {

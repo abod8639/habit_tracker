@@ -1,4 +1,5 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as fln;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -206,7 +207,9 @@ class NotificationService {
   }) async {
     await _ensureTimezoneInitialized();
     final scheduledDate = _nextInstanceOfTime(time.hour, time.minute);
-    debugPrint('NotificationService: Scheduling alarm for $scheduledDate (tz: ${tz.local.name})');
+    debugPrint(
+      'NotificationService: Scheduling alarm for $scheduledDate (tz: ${tz.local.name})',
+    );
 
     const notificationDetails = fln.NotificationDetails(
       android: fln.AndroidNotificationDetails(
@@ -239,7 +242,9 @@ class NotificationService {
         payload: 'habit_notification_payload',
       );
     } catch (e) {
-      debugPrint('Failed with exactAllowWhileIdle, falling back to inexact: $e');
+      debugPrint(
+        'Failed with exactAllowWhileIdle, falling back to inexact: $e',
+      );
       try {
         await flutterLocalNotificationsPlugin.zonedSchedule(
           id: id,

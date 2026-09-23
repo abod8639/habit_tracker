@@ -6,7 +6,9 @@ Future<void> performSync(
   SyncController syncController,
   HabitController habitController,
 ) async {
-  final habitsModels = habitController.habits.map((e) => HabitModel.fromEntity(e)).toList();
+  final habitsModels = habitController.habits
+      .map((e) => HabitModel.fromEntity(e))
+      .toList();
   final result = await syncController.manualSync(habitsModels);
   if (result != null) {
     await habitController.refreshData();

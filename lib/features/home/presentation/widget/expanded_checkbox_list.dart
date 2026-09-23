@@ -18,7 +18,10 @@ class CheckboxList extends StatelessWidget {
         child: Obx(() {
           final habits = controller.habits;
           return AnimatedList(
-            key: GlobalKey<AnimatedListState>(), // Simple key for now, could be improved for better animations
+            key:
+                GlobalKey<
+                  AnimatedListState
+                >(), // Simple key for now, could be improved for better animations
             scrollDirection: Axis.vertical,
             initialItemCount: habits.length,
             itemBuilder: (context, index, animation) {
@@ -29,19 +32,22 @@ class CheckboxList extends StatelessWidget {
               final habit = habits[index];
 
               return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(1, 0),
-                  end: Offset.zero,
-                ).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeOut),
-                ),
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                    ),
                 child: MyTextTaile(
                   habitName: habit.name,
                   habitCompleted: habit.isCompleted,
-                  onTap: () => controller.toggleHabit(habit.id, !habit.isCompleted),
+                  onTap: () =>
+                      controller.toggleHabit(habit.id, !habit.isCompleted),
                   onDelete: (context) => controller.deleteHabit(habit.id),
                   onEdit: (context) => editHabit(habit.id, habit.name, context),
-                  onChanged: (value) => controller.toggleHabit(habit.id, value ?? false),
+                  onChanged: (value) =>
+                      controller.toggleHabit(habit.id, value ?? false),
                 ),
               );
             },

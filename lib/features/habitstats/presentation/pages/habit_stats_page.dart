@@ -49,7 +49,10 @@ class _HabitStatsPageState extends State<HabitStatsPage>
             onPressed: () {
               Get.back();
             },
-            icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.primary),
+            icon: Icon(
+              Icons.arrow_back,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           title: Text(
             S.current.ratepagetitle,

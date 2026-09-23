@@ -12,9 +12,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl({
     FirebaseAuth? auth,
     GoogleSignIn? googleSignIn,
-  })  : _auth = auth ?? FirebaseAuth.instance,
-        // استخدام .instance كما في الكود الذي يعمل لديك
-        _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
+  }) : _auth = auth ?? FirebaseAuth.instance,
+       // استخدام .instance كما في الكود الذي يعمل لديك
+       _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   @override
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -24,7 +24,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       // 1. التهيئة (كما في الكود الناجح لديك)
       await _googleSignIn.initialize(
-        serverClientId: '575224289908-h8s7sbtfj2bm6f0hiddld65cvauehk93.apps.googleusercontent.com',
+        serverClientId:
+            '575224289908-h8s7sbtfj2bm6f0hiddld65cvauehk93.apps.googleusercontent.com',
       );
 
       // 2. بدء عملية المصادقة باستخدام authenticate() بدلاً من signIn()
@@ -39,7 +40,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       // 5. تسجيل الدخول في فيربيز
-      final UserCredential result = await _auth.signInWithCredential(credential);
+      final UserCredential result = await _auth.signInWithCredential(
+        credential,
+      );
 
       if (result.user == null) return null;
 
@@ -48,7 +51,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (e.code == GoogleSignInExceptionCode.canceled) {
         return null;
       }
-      throw AuthException('${S.current.authErrorGoogle}: ${e.description ?? e.code}');
+      throw AuthException(
+        '${S.current.authErrorGoogle}: ${e.description ?? e.code}',
+      );
     } on FirebaseAuthException catch (e) {
       throw AuthException(_handleAuthException(e));
     } catch (e) {
@@ -70,7 +75,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthModel> signUpWithEmail(String email, String password, String? displayName) async {
+  Future<AuthModel> signUpWithEmail(
+    String email,
+    String password,
+    String? displayName,
+  ) async {
     try {
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email.trim(),
@@ -113,14 +122,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   // دالة معالجة الأخطاء لتوحيد الرسائل بناءً على ملفات الترجمة لديك
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
-      case 'user-not-found': return S.current.authErrorUserNotFound;
-      case 'wrong-password': return S.current.authErrorWrongPassword;
-      case 'email-already-in-use': return S.current.authErrorEmailInUse;
-      case 'invalid-email': return S.current.authErrorInvalidEmail;
-      case 'weak-password': return S.current.authErrorWeakPassword;
-      case 'too-many-requests': return S.current.authErrorTooManyRequests;
-      case 'network-request-failed': return S.current.authErrorNetworkFailed;
-      default: return '${S.current.authErrorDefault}: ${e.message ?? e.code}';
+      case 'user-not-found':
+        return S.current.authErrorUserNotFound;
+      case 'wrong-password':
+        return S.current.authErrorWrongPassword;
+      case 'email-already-in-use':
+        return S.current.authErrorEmailInUse;
+      case 'invalid-email':
+        return S.current.authErrorInvalidEmail;
+      case 'weak-password':
+        return S.current.authErrorWeakPassword;
+      case 'too-many-requests':
+        return S.current.authErrorTooManyRequests;
+      case 'network-request-failed':
+        return S.current.authErrorNetworkFailed;
+      default:
+        return '${S.current.authErrorDefault}: ${e.message ?? e.code}';
     }
   }
 }

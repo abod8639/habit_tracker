@@ -31,32 +31,42 @@ void main() {
       expect(S.current.dailyReminderBody, 'حان وقت التحقق من عاداتك اليومية!');
     });
 
-    test('PlanCategory displayName and description match active locale', () async {
-      await S.load(const Locale('en'));
-      expect(PlanCategory.sports.displayName, 'Sports & Fitness');
-      expect(PlanCategory.nutrition.displayName, 'Nutrition');
+    test(
+      'PlanCategory displayName and description match active locale',
+      () async {
+        await S.load(const Locale('en'));
+        expect(PlanCategory.sports.displayName, 'Sports & Fitness');
+        expect(PlanCategory.nutrition.displayName, 'Nutrition');
 
-      await S.load(const Locale('ar'));
-      expect(PlanCategory.sports.displayName, 'الرياضة واللياقة');
-      expect(PlanCategory.nutrition.displayName, 'التغذية والصحة');
-    });
+        await S.load(const Locale('ar'));
+        expect(PlanCategory.sports.displayName, 'الرياضة واللياقة');
+        expect(PlanCategory.nutrition.displayName, 'التغذية والصحة');
+      },
+    );
 
-    test('QuestionsDataSource returns localized questions based on locale', () async {
-      // Test Arabic
-      Intl.defaultLocale = 'ar';
-      await S.load(const Locale('ar'));
+    test(
+      'QuestionsDataSource returns localized questions based on locale',
+      () async {
+        // Test Arabic
+        Intl.defaultLocale = 'ar';
+        await S.load(const Locale('ar'));
 
-      final arQuestions = QuestionsDataSource.forCategory(PlanCategory.sports);
-      expect(arQuestions.isNotEmpty, true);
-      expect(arQuestions.first.text, 'كم عمرك؟');
+        final arQuestions = QuestionsDataSource.forCategory(
+          PlanCategory.sports,
+        );
+        expect(arQuestions.isNotEmpty, true);
+        expect(arQuestions.first.text, 'كم عمرك؟');
 
-      // Test English
-      Intl.defaultLocale = 'en';
-      await S.load(const Locale('en'));
+        // Test English
+        Intl.defaultLocale = 'en';
+        await S.load(const Locale('en'));
 
-      final enQuestions = QuestionsDataSource.forCategory(PlanCategory.sports);
-      expect(enQuestions.isNotEmpty, true);
-      expect(enQuestions.first.text, 'How old are you?');
-    });
+        final enQuestions = QuestionsDataSource.forCategory(
+          PlanCategory.sports,
+        );
+        expect(enQuestions.isNotEmpty, true);
+        expect(enQuestions.first.text, 'How old are you?');
+      },
+    );
   });
 }

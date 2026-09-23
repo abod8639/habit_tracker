@@ -31,6 +31,5 @@ class QuestionEntity {
 
   bool get isNumeric => type == QuestionType.number;
   bool get isChoice =>
-      type == QuestionType.singleChoice ||
-      type == QuestionType.multipleChoice;
+      type == QuestionType.singleChoice || type == QuestionType.multipleChoice;
 }

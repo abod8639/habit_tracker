@@ -68,8 +68,9 @@ class _MyalartdState extends State<MyalartDialog>
           });
           try {
             final service = GeminiService();
-            final List<String> habits = 
-            await service.extractHabitsFromImage(image);
+            final List<String> habits = await service.extractHabitsFromImage(
+              image,
+            );
 
             if (mounted) {
               setState(() {
@@ -221,8 +222,10 @@ class _MyalartdState extends State<MyalartDialog>
                         final currentText = widget.controller.text;
                         final currentPosition =
                             widget.controller.selection.base.offset;
-                        final validPosition =
-                            currentPosition.clamp(0, currentText.length);
+                        final validPosition = currentPosition.clamp(
+                          0,
+                          currentText.length,
+                        );
                         final newText =
                             '${currentText.substring(0, validPosition)}\n${currentText.substring(validPosition)}';
                         widget.controller.value = TextEditingValue(

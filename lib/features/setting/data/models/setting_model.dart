@@ -20,7 +20,9 @@ class SettingModel extends SettingEntity {
     return {
       'languageCode': languageCode,
       'isNotificationEnabled': isNotificationEnabled,
-      'notificationTime': notificationTime != null ? '${notificationTime!.hour}:${notificationTime!.minute}' : null,
+      'notificationTime': notificationTime != null
+          ? '${notificationTime!.hour}:${notificationTime!.minute}'
+          : null,
     };
   }
 

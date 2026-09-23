@@ -16,8 +16,9 @@ class HabitSubList extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final statusColor =
-        isCompleted ? colorScheme.primary : colorScheme.secondary;
+    final statusColor = isCompleted
+        ? colorScheme.primary
+        : colorScheme.secondary;
 
     return Container(
       decoration: BoxDecoration(
@@ -52,7 +53,10 @@ class HabitSubList extends StatelessWidget {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.15),
+                    color: isCompleted
+                        ? statusColor.withValues(alpha: 0.15)
+                        : colorScheme.primaryContainer,
+
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -69,15 +73,18 @@ class HabitSubList extends StatelessWidget {
                   child: Text(
                     name,
                     style: textTheme.bodyMedium?.copyWith(
-                      fontWeight:
-                          isCompleted ? FontWeight.normal : FontWeight.w600,
+                      fontWeight: isCompleted
+                          ? FontWeight.normal
+                          : FontWeight.w600,
                       color: isCompleted
                           ? colorScheme.onSurface.withValues(alpha: 0.7)
                           : colorScheme.onSurface,
-                      decoration:
-                          isCompleted ? TextDecoration.lineThrough : null,
-                      decorationColor:
-                          colorScheme.onSurface.withValues(alpha: 0.5),
+                      decoration: isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
+                      decorationColor: colorScheme.onSurface.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -110,4 +117,3 @@ Widget buildHabitList(
     isCompleted: isCompleted,
   );
 }
-

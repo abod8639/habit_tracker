@@ -16,15 +16,24 @@ abstract class HabitRepository {
   bool isUserLoggedIn();
   List<String> getLocalTombstones();
   void clearLocalTombstones();
-  
+
   // Date and Reset logic
   Future<Either<Failure, DateTime?>> getLastResetDate();
   Future<Either<Failure, void>> saveLastResetDate(DateTime date);
   Future<Either<Failure, void>> resetHabitsCompletion();
   Future<Either<Failure, void>> incrementDayCount([int amount = 1]);
-  Future<Either<Failure, void>> saveHabitCompletionToHistory(String habitIdOrName, bool isCompleted, DateTime date, {String? habitName});
-  Future<Either<Failure, Map<String, int>>> getCompletionStatusForDate(DateTime date);
-  Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(int days);
+  Future<Either<Failure, void>> saveHabitCompletionToHistory(
+    String habitIdOrName,
+    bool isCompleted,
+    DateTime date, {
+    String? habitName,
+  });
+  Future<Either<Failure, Map<String, int>>> getCompletionStatusForDate(
+    DateTime date,
+  );
+  Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(
+    int days,
+  );
   String getStartDate();
   Future<Either<Failure, void>> clearLocalData({String? earliestDateStr});
 }

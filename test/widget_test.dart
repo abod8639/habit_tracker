@@ -65,21 +65,29 @@ void main() {
       expect(shouldResetHabits(today), false);
     });
 
-    test('GeminiService throws ApiKeyMissingException when API key is not configured', () {
-      dotenv.clean();
-      final service = GeminiService();
-      expect(
-        () => service.startChat(),
-        throwsA(isA<ApiKeyMissingException>()),
-      );
-    });
+    test(
+      'GeminiService throws ApiKeyMissingException when API key is not configured',
+      () {
+        dotenv.clean();
+        final service = GeminiService();
+        expect(
+          () => service.startChat(),
+          throwsA(isA<ApiKeyMissingException>()),
+        );
+      },
+    );
 
-    test('GeminiService initializes ChatSession when API key is provided via dotenv', () {
-      dotenv.loadFromString(envString: 'GEMINI_API_KEY=AIzaSyC7a6RZ9mr10Do1G_Zk_R7HjVc_RVRLNhM');
-      addTearDown(dotenv.clean);
-      final service = GeminiService();
-      final session = service.startChat();
-      expect(session, isNotNull);
-    });
+    test(
+      'GeminiService initializes ChatSession when API key is provided via dotenv',
+      () {
+        dotenv.loadFromString(
+          envString: 'GEMINI_API_KEY=AIzaSyC7a6RZ9mr10Do1G_Zk_R7HjVc_RVRLNhM',
+        );
+        addTearDown(dotenv.clean);
+        final service = GeminiService();
+        final session = service.startChat();
+        expect(session, isNotNull);
+      },
+    );
   });
 }

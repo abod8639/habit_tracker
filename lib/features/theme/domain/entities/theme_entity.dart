@@ -23,7 +23,8 @@ class ThemeEntity {
       themeName: themeName ?? this.themeName,
       themeMode: themeMode ?? this.themeMode,
       useCustomBackground: useCustomBackground ?? this.useCustomBackground,
-      customBackgroundColor: customBackgroundColor ?? this.customBackgroundColor,
+      customBackgroundColor:
+          customBackgroundColor ?? this.customBackgroundColor,
     );
   }
 }

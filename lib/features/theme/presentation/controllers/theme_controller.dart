@@ -59,12 +59,15 @@ class ThemeController extends GetxController {
       (entity) {
         currentTheme.value = entity.themeName;
         final themeData = themeColors[entity.themeName];
-        final isDark = themeData != null ? ThemeUtils.isDarkTheme(themeData) : true;
+        final isDark = themeData != null
+            ? ThemeUtils.isDarkTheme(themeData)
+            : true;
         themeMode.value = entity.themeMode == ThemeMode.system
             ? (isDark ? ThemeMode.dark : ThemeMode.light)
             : entity.themeMode;
         useCustomBackground.value = entity.useCustomBackground;
-        customBackgroundColor.value = entity.customBackgroundColor ?? Colors.transparent;
+        customBackgroundColor.value =
+            entity.customBackgroundColor ?? Colors.transparent;
         _buildAndApply();
       },
     );
@@ -73,17 +76,21 @@ class ThemeController extends GetxController {
   Future<void> _syncWithCloud() async {
     final result = await _syncThemeWithCloudUseCase();
     result.fold(
-      (failure) =>  debugPrint('Error syncing theme from cloud: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error syncing theme from cloud: ${failure.message}'),
       (entity) {
         if (entity != null) {
           currentTheme.value = entity.themeName;
           final themeData = themeColors[entity.themeName];
-          final isDark = themeData != null ? ThemeUtils.isDarkTheme(themeData) : true;
+          final isDark = themeData != null
+              ? ThemeUtils.isDarkTheme(themeData)
+              : true;
           themeMode.value = entity.themeMode == ThemeMode.system
               ? (isDark ? ThemeMode.dark : ThemeMode.light)
               : entity.themeMode;
           useCustomBackground.value = entity.useCustomBackground;
-          customBackgroundColor.value = entity.customBackgroundColor ?? Colors.transparent;
+          customBackgroundColor.value =
+              entity.customBackgroundColor ?? Colors.transparent;
           _buildAndApply();
         }
       },
@@ -105,12 +112,15 @@ class ThemeController extends GetxController {
       themeName: currentTheme.value,
       themeMode: themeMode.value,
       useCustomBackground: useCustomBackground.value,
-      customBackgroundColor: useCustomBackground.value ? customBackgroundColor.value : null,
+      customBackgroundColor: useCustomBackground.value
+          ? customBackgroundColor.value
+          : null,
     );
-    
+
     final result = await _saveThemeSettingsUseCase(entity);
     result.fold(
-      (failure) =>  debugPrint('Error saving theme settings locally: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error saving theme settings locally: ${failure.message}'),
       (_) {
         update();
         if (_firestoreService.isUserLoggedIn) {
@@ -123,8 +133,9 @@ class ThemeController extends GetxController {
   Future<void> _uploadToCloud(ThemeEntity entity) async {
     final result = await _uploadThemeSettingsUseCase(entity);
     result.fold(
-      (failure) =>  debugPrint('Error uploading theme settings: ${failure.message}'),
-      (_) =>  debugPrint('Theme settings uploaded successfully'),
+      (failure) =>
+          debugPrint('Error uploading theme settings: ${failure.message}'),
+      (_) => debugPrint('Theme settings uploaded successfully'),
     );
   }
 
@@ -181,7 +192,9 @@ class ThemeController extends GetxController {
     if (themeData == null) return;
 
     final isDarkTheme = ThemeUtils.isDarkTheme(themeData);
-    final customBg = useCustomBackground.value ? customBackgroundColor.value : null;
+    final customBg = useCustomBackground.value
+        ? customBackgroundColor.value
+        : null;
 
     lightTheme.value = ThemeUtils.buildThemeData(
       forceDark: false,

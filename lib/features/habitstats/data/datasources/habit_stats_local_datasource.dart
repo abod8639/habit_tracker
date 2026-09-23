@@ -46,8 +46,11 @@ class HabitStatsLocalDataSource {
             // 2. Count consecutive previous calendar days
             int daysBack = 1;
             while (true) {
-              final checkDay =
-                  DateTime(today.year, today.month, today.day - daysBack);
+              final checkDay = DateTime(
+                today.year,
+                today.month,
+                today.day - daysBack,
+              );
               final strength = heatmapData[checkDay] ?? 0;
               if (strength > 0) {
                 streak++;
@@ -72,18 +75,24 @@ class HabitStatsLocalDataSource {
   Future<List<FlSpot>> getOverallTrendData(int days) async {
     final habitsResult = await habitRepository.getHabits();
     return await habitsResult.fold(
-      (failure) async => List.generate(days, (index) => FlSpot(index.toDouble(), 0.0)),
+      (failure) async =>
+          List.generate(days, (index) => FlSpot(index.toDouble(), 0.0)),
       (habits) async {
         final heatmapResult = await habitRepository.getHeatmapData();
         return await heatmapResult.fold(
-          (failure) async => List.generate(days, (index) => FlSpot(index.toDouble(), 0.0)),
+          (failure) async =>
+              List.generate(days, (index) => FlSpot(index.toDouble(), 0.0)),
           (heatmapData) async {
             final List<FlSpot> spots = [];
             final now = DateTime.now();
             final maxStrength = 10; // Heatmap data is bounded 0-10
 
             for (int i = 0; i < days; i++) {
-              final normalizedDate = DateTime(now.year, now.month, now.day - (days - 1 - i));
+              final normalizedDate = DateTime(
+                now.year,
+                now.month,
+                now.day - (days - 1 - i),
+              );
               final completionValue = heatmapData[normalizedDate];
 
               final strength = completionValue ?? 0;
@@ -121,7 +130,11 @@ class HabitStatsLocalDataSource {
               final habitHistory = historyMap[habit.name] ?? {};
 
               for (int i = 0; i < days; i++) {
-                final normalizedDate = DateTime(now.year, now.month, now.day - (days - 1 - i));
+                final normalizedDate = DateTime(
+                  now.year,
+                  now.month,
+                  now.day - (days - 1 - i),
+                );
 
                 final bool? completed = habitHistory[normalizedDate];
 
@@ -159,4 +172,3 @@ class HabitStatsLocalDataSource {
     );
   }
 }
-

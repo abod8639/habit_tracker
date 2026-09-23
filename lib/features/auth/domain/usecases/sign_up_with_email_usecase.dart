@@ -7,7 +7,11 @@ class SignUpWithEmailUseCase {
   final AuthRepository repository;
   SignUpWithEmailUseCase(this.repository);
 
-  Future<Either<Failure, AuthEntity>> call(String email, String password, String? displayName) async {
+  Future<Either<Failure, AuthEntity>> call(
+    String email,
+    String password,
+    String? displayName,
+  ) async {
     return await repository.signUpWithEmail(email, password, displayName);
   }
 }

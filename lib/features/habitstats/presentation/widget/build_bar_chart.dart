@@ -49,7 +49,7 @@ Widget buildBarChart() {
 
         return Card(
           elevation: 2,
-     
+
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
             child: Column(

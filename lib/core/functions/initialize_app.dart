@@ -37,7 +37,7 @@ Future<void> initializeApp() async {
 
     // 4. Initialize and register infrastructure services
     Get.put(FirestoreService());
-    
+
     final themeStorage = await ThemeStorageService.init();
     Get.put(themeStorage);
 
@@ -60,7 +60,6 @@ Future<void> initializeApp() async {
     } catch (e) {
       debugPrint('FcmService initialization error: $e');
     }
-    
   } catch (e) {
     throw Exception('FATAL initialization error: $e');
   }

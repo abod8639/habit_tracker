@@ -44,7 +44,7 @@ class FirestoreService {
         'metadata': {
           'platform': 'flutter',
           'lastAppVersion': '1.0.0', // Could be dynamic
-        }
+        },
       };
 
       if (startDay != null) {
@@ -71,7 +71,9 @@ class FirestoreService {
 
     try {
       final snapshot = await _habitsCollection!.get();
-      final habits = snapshot.docs.map((doc) => HabitModel.fromFirestore(doc)).toList();
+      final habits = snapshot.docs
+          .map((doc) => HabitModel.fromFirestore(doc))
+          .toList();
 
       // Sort by index for correct order across devices
       habits.sort((a, b) => (a.index ?? 0).compareTo(b.index ?? 0));
@@ -109,8 +111,10 @@ class FirestoreService {
 
       final List<HabitModel> cloudHabits = results[0] as List<HabitModel>;
       final QuerySnapshot deletedSnapshot = results[1] as QuerySnapshot;
-      
-      final deletedHabitsMap = {for (var doc in deletedSnapshot.docs) doc.id: true};
+
+      final deletedHabitsMap = {
+        for (var doc in deletedSnapshot.docs) doc.id: true,
+      };
       final localMap = {for (var h in localHabits) h.id: h};
       final cloudMap = {for (var h in cloudHabits) h.id: h};
 
@@ -129,8 +133,10 @@ class FirestoreService {
             mergedHabits.add(local);
           }
         } else {
-          final localTime = local.updatedAt ?? local.completedAt ?? local.createdAt;
-          final cloudTime = cloud.updatedAt ?? cloud.completedAt ?? cloud.createdAt;
+          final localTime =
+              local.updatedAt ?? local.completedAt ?? local.createdAt;
+          final cloudTime =
+              cloud.updatedAt ?? cloud.completedAt ?? cloud.createdAt;
 
           mergedHabits.add(localTime.isAfter(cloudTime) ? local : cloud);
         }
@@ -141,7 +147,7 @@ class FirestoreService {
 
       return mergedHabits;
     } catch (e) {
-      return localHabits; 
+      return localHabits;
     }
   }
 
@@ -183,7 +189,7 @@ class FirestoreService {
     try {
       final snapshot = await _userDoc!.collection('habitHistory').get();
       final Map<String, String> history = {};
-      
+
       for (var doc in snapshot.docs) {
         final data = doc.data();
         final date = data['date'] as String?;
@@ -230,6 +236,7 @@ class FirestoreService {
       return null;
     }
   }
+
   Future<Map<String, String>> syncHabitHistory(
     Map<String, String> localHistory,
   ) async {

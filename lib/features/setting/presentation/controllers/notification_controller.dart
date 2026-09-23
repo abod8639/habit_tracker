@@ -10,14 +10,15 @@ import '../../domain/usecases/set_notification_time_usecase.dart';
 
 class NotificationController extends GetxController {
   final IsNotificationEnabledUseCase _isNotificationEnabledUseCase = Get.find();
-  final SetNotificationEnabledUseCase _setNotificationEnabledUseCase = Get.find();
+  final SetNotificationEnabledUseCase _setNotificationEnabledUseCase =
+      Get.find();
   final GetNotificationTimeUseCase _getNotificationTimeUseCase = Get.find();
   final SetNotificationTimeUseCase _setNotificationTimeUseCase = Get.find();
-  
+
   NotificationService get _notificationService =>
       Get.isRegistered<NotificationService>()
-          ? Get.find<NotificationService>()
-          : NotificationService();
+      ? Get.find<NotificationService>()
+      : NotificationService();
 
   var isNotificationEnabled = false.obs;
   var notificationTime = Rxn<TimeOfDay>();
@@ -34,13 +35,15 @@ class NotificationController extends GetxController {
   Future<void> _loadSettings() async {
     final enabledResult = await _isNotificationEnabledUseCase();
     enabledResult.fold(
-      (failure) => debugPrint('Error loading notification status: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error loading notification status: ${failure.message}'),
       (enabled) => isNotificationEnabled.value = enabled,
     );
 
     final timeResult = await _getNotificationTimeUseCase();
     timeResult.fold(
-      (failure) => debugPrint('Error loading notification time: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error loading notification time: ${failure.message}'),
       (time) => notificationTime.value = time,
     );
 
@@ -64,12 +67,13 @@ class NotificationController extends GetxController {
     if (enabled) {
       await _notificationService.requestPermissions();
     }
-    
+
     isNotificationEnabled.value = enabled;
     final result = await _setNotificationEnabledUseCase(enabled);
-    
+
     result.fold(
-      (failure) => debugPrint('Error saving notification status: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error saving notification status: ${failure.message}'),
       (_) async {
         if (enabled) {
           if (notificationTime.value != null) {
@@ -95,7 +99,8 @@ class NotificationController extends GetxController {
     final result = await _setNotificationTimeUseCase(time);
 
     result.fold(
-      (failure) => debugPrint('Error saving notification time: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error saving notification time: ${failure.message}'),
       (_) async {
         if (isNotificationEnabled.value) {
           await _scheduleNotification(time);

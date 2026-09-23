@@ -38,10 +38,10 @@ class HabitRepositoryImpl implements HabitRepository {
     try {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       final now = DateTime.now();
-      
+
       for (final name in names) {
         if (name.trim().isEmpty) continue;
-        
+
         final newModel = HabitModel(
           id: "${now.microsecondsSinceEpoch}_${name.hashCode}_${models.length}",
           name: name,
@@ -52,9 +52,9 @@ class HabitRepositoryImpl implements HabitRepository {
         );
         models.add(newModel);
       }
-      
+
       await localDataSource.saveHabits(models);
-      
+
       if (firestoreService.isUserLoggedIn) {
         try {
           await firestoreService.uploadHabits(models);
@@ -62,7 +62,7 @@ class HabitRepositoryImpl implements HabitRepository {
           debugPrint('Cloud sync error (habits saved locally): $e');
         }
       }
-      
+
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -74,7 +74,7 @@ class HabitRepositoryImpl implements HabitRepository {
     try {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       final index = models.indexWhere((m) => m.id == id);
-      
+
       if (index != -1) {
         final m = models[index];
         models[index] = HabitModel(
@@ -87,14 +87,14 @@ class HabitRepositoryImpl implements HabitRepository {
           index: m.index,
           updatedAt: DateTime.now(),
         );
-        
+
         await localDataSource.saveHabits(models);
-        
+
         if (firestoreService.isUserLoggedIn) {
           await firestoreService.uploadHabits(models);
         }
       }
-      
+
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -106,15 +106,15 @@ class HabitRepositoryImpl implements HabitRepository {
     try {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       models.removeWhere((m) => m.id == id);
-      
+
       await localDataSource.saveHabits(models);
       localDataSource.addLocalTombstone(id);
-      
+
       if (firestoreService.isUserLoggedIn) {
         await firestoreService.deleteHabit(id);
         await firestoreService.uploadHabits(models);
       }
-      
+
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -126,7 +126,7 @@ class HabitRepositoryImpl implements HabitRepository {
     try {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       final index = models.indexWhere((m) => m.id == id);
-      
+
       if (index != -1) {
         final m = models[index];
         models[index] = HabitModel(
@@ -139,20 +139,28 @@ class HabitRepositoryImpl implements HabitRepository {
           index: m.index,
           updatedAt: DateTime.now(),
         );
-        
+
         await localDataSource.saveHabits(models);
         await localDataSource.saveHabitCompletionHistory(m.name, isCompleted);
-        
+
         final completedCount = models.where((m) => m.isCompleted).length;
-        final completionRate = models.isEmpty ? 0.0 : completedCount / models.length;
-        await localDataSource.saveHabitStrength(todaysDateFormatted(), completionRate.toStringAsFixed(1));
-        
+        final completionRate = models.isEmpty
+            ? 0.0
+            : completedCount / models.length;
+        await localDataSource.saveHabitStrength(
+          todaysDateFormatted(),
+          completionRate.toStringAsFixed(1),
+        );
+
         if (firestoreService.isUserLoggedIn) {
           await firestoreService.uploadHabits(models);
-          await firestoreService.uploadHabitHistory(todaysDateFormatted(), completionRate.toStringAsFixed(1));
+          await firestoreService.uploadHabitHistory(
+            todaysDateFormatted(),
+            completionRate.toStringAsFixed(1),
+          );
         }
       }
-      
+
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -160,16 +168,19 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
-  Future<Either<Failure, void>> reorderHabits(int oldIndex, int newIndex) async {
+  Future<Either<Failure, void>> reorderHabits(
+    int oldIndex,
+    int newIndex,
+  ) async {
     try {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
-      
+
       if (newIndex > oldIndex) {
         newIndex -= 1;
       }
       final model = models.removeAt(oldIndex);
       models.insert(newIndex, model);
-      
+
       for (int i = 0; i < models.length; i++) {
         final m = models[i];
         models[i] = HabitModel(
@@ -183,13 +194,13 @@ class HabitRepositoryImpl implements HabitRepository {
           updatedAt: DateTime.now(),
         );
       }
-      
+
       await localDataSource.saveHabits(models);
-      
+
       if (firestoreService.isUserLoggedIn) {
         await firestoreService.uploadHabits(models);
       }
-      
+
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -201,10 +212,10 @@ class HabitRepositoryImpl implements HabitRepository {
     try {
       // 1. Get historical data from local storage
       final rawHistory = await localDataSource.getAllHabitStrengths();
-      
+
       // 2. Use compute for CPU-intensive heatmap processing to avoid blocking UI thread
       final heatmapData = await compute(_processHeatmapData, rawHistory);
-      
+
       // 3. Recalculate TODAY's strength based on LIVE habits to ensure accuracy on startup
       final habits = localDataSource.loadHabits();
       if (habits.isNotEmpty) {
@@ -212,12 +223,12 @@ class HabitRepositoryImpl implements HabitRepository {
         final completionRate = completedCount / habits.length;
         int strength = (completionRate * 10).toInt();
         if (strength == 0 && completedCount > 0) strength = 1;
-        
+
         final today = DateTime.now();
         final normalizedToday = DateTime(today.year, today.month, today.day);
         heatmapData[normalizedToday] = strength;
       }
-      
+
       return Right(heatmapData);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -234,16 +245,18 @@ class HabitRepositoryImpl implements HabitRepository {
       for (int i = 0; i < ids.length; i++) {
         final m = modelMap[ids[i]];
         if (m != null) {
-          reorderedModels.add(HabitModel(
-            id: m.id,
-            name: m.name,
-            isCompleted: m.isCompleted,
-            createdAt: m.createdAt,
-            completedAt: m.completedAt,
-            colorValue: m.colorValue,
-            index: i,
-            updatedAt: DateTime.now(),
-          ));
+          reorderedModels.add(
+            HabitModel(
+              id: m.id,
+              name: m.name,
+              isCompleted: m.isCompleted,
+              createdAt: m.createdAt,
+              completedAt: m.completedAt,
+              colorValue: m.colorValue,
+              index: i,
+              updatedAt: DateTime.now(),
+            ),
+          );
         }
       }
 
@@ -265,7 +278,10 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
-  Future<Either<Failure, void>> updateHabitColor(String id, int colorValue) async {
+  Future<Either<Failure, void>> updateHabitColor(
+    String id,
+    int colorValue,
+  ) async {
     try {
       final models = localDataSource.loadHabits();
       final index = models.indexWhere((h) => h.id == id);
@@ -329,17 +345,21 @@ class HabitRepositoryImpl implements HabitRepository {
   Future<Either<Failure, void>> resetHabitsCompletion() async {
     try {
       final habits = localDataSource.loadHabits();
-      final resetHabits = habits.map((h) => HabitModel(
-        id: h.id,
-        name: h.name,
-        isCompleted: false,
-        createdAt: h.createdAt,
-        completedAt: null,
-        colorValue: h.colorValue,
-        index: h.index,
-        updatedAt: DateTime.now(),
-      )).toList();
-      
+      final resetHabits = habits
+          .map(
+            (h) => HabitModel(
+              id: h.id,
+              name: h.name,
+              isCompleted: false,
+              createdAt: h.createdAt,
+              completedAt: null,
+              colorValue: h.colorValue,
+              index: h.index,
+              updatedAt: DateTime.now(),
+            ),
+          )
+          .toList();
+
       await localDataSource.saveHabits(resetHabits);
       return const Right(null);
     } catch (e) {
@@ -358,9 +378,19 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
-  Future<Either<Failure, void>> saveHabitCompletionToHistory(String habitIdOrName, bool isCompleted, DateTime date, {String? habitName}) async {
+  Future<Either<Failure, void>> saveHabitCompletionToHistory(
+    String habitIdOrName,
+    bool isCompleted,
+    DateTime date, {
+    String? habitName,
+  }) async {
     try {
-      await localDataSource.saveHabitCompletionToHistory(habitIdOrName, isCompleted, date, habitName: habitName);
+      await localDataSource.saveHabitCompletionToHistory(
+        habitIdOrName,
+        isCompleted,
+        date,
+        habitName: habitName,
+      );
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -368,7 +398,9 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
-  Future<Either<Failure, Map<String, int>>> getCompletionStatusForDate(DateTime date) async {
+  Future<Either<Failure, Map<String, int>>> getCompletionStatusForDate(
+    DateTime date,
+  ) async {
     try {
       final status = await localDataSource.getCompletionStatusForDate(date);
       return Right(status);
@@ -378,7 +410,9 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
-  Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(int days) async {
+  Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(
+    int days,
+  ) async {
     try {
       final result = await localDataSource.getHabitHistoryMap(days);
       return Right(result);
@@ -393,7 +427,9 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
-  Future<Either<Failure, void>> clearLocalData({String? earliestDateStr}) async {
+  Future<Either<Failure, void>> clearLocalData({
+    String? earliestDateStr,
+  }) async {
     try {
       await localDataSource.clearAllData(earliestDateStr: earliestDateStr);
       return const Right(null);
@@ -413,13 +449,13 @@ Map<DateTime, int> _processHeatmapData(Map<String, String> rawData) {
       if (yyyymmdd.length > 8) {
         yyyymmdd = yyyymmdd.substring(yyyymmdd.length - 8);
       }
-      
+
       if (yyyymmdd.length != 8) continue;
-      
+
       final yyyy = int.parse(yyyymmdd.substring(0, 4));
       final mm = int.parse(yyyymmdd.substring(4, 6));
       final dd = int.parse(yyyymmdd.substring(6, 8));
-      
+
       final date = DateTime(yyyy, mm, dd);
       final doubleStrength = double.tryParse(entry.value) ?? 0.0;
       int strength = (doubleStrength * 10).toInt();

@@ -77,15 +77,18 @@ void main() {
   });
 
   group('AI Settings - Clean Architecture & Custom API Key Tests', () {
-    test('SettingsStorage correctly saves, gets, and clears custom API key', () async {
-      expect(settingsStorage.customGeminiApiKey, isNull);
+    test(
+      'SettingsStorage correctly saves, gets, and clears custom API key',
+      () async {
+        expect(settingsStorage.customGeminiApiKey, isNull);
 
-      await settingsStorage.setCustomGeminiApiKey('AIzaSyCustomKey123456');
-      expect(settingsStorage.customGeminiApiKey, 'AIzaSyCustomKey123456');
+        await settingsStorage.setCustomGeminiApiKey('AIzaSyCustomKey123456');
+        expect(settingsStorage.customGeminiApiKey, 'AIzaSyCustomKey123456');
 
-      await settingsStorage.clearCustomGeminiApiKey();
-      expect(settingsStorage.customGeminiApiKey, isNull);
-    });
+        await settingsStorage.clearCustomGeminiApiKey();
+        expect(settingsStorage.customGeminiApiKey, isNull);
+      },
+    );
 
     test('SettingLocalDataSource saves and retrieves custom API key', () async {
       await localDataSource.saveCustomGeminiApiKey('AIzaSyTestFromLocalDS');
@@ -96,7 +99,9 @@ void main() {
     });
 
     test('SettingRepository and UseCases interact properly', () async {
-      final saveResult = await saveCustomApiKeyUseCase('AIzaSyRepositoryKey999');
+      final saveResult = await saveCustomApiKeyUseCase(
+        'AIzaSyRepositoryKey999',
+      );
       expect(saveResult.isRight(), isTrue);
 
       final getResult = await getCustomApiKeyUseCase();
@@ -116,49 +121,57 @@ void main() {
       );
     });
 
-    test('GeminiService prioritizes custom API key over dotenv default', () async {
-      dotenv.loadFromString(envString: 'GEMINI_API_KEY=AIzaSyDefaultFromDotenv');
-      expect(GeminiService.currentApiKey, 'AIzaSyDefaultFromDotenv');
-      expect(GeminiService.hasCustomApiKey, isFalse);
+    test(
+      'GeminiService prioritizes custom API key over dotenv default',
+      () async {
+        dotenv.loadFromString(
+          envString: 'GEMINI_API_KEY=AIzaSyDefaultFromDotenv',
+        );
+        expect(GeminiService.currentApiKey, 'AIzaSyDefaultFromDotenv');
+        expect(GeminiService.hasCustomApiKey, isFalse);
 
-      // Now set a custom key
-      await settingsStorage.setCustomGeminiApiKey('AIzaSyUserCustomKey');
-      expect(GeminiService.currentApiKey, 'AIzaSyUserCustomKey');
-      expect(GeminiService.hasCustomApiKey, isTrue);
+        // Now set a custom key
+        await settingsStorage.setCustomGeminiApiKey('AIzaSyUserCustomKey');
+        expect(GeminiService.currentApiKey, 'AIzaSyUserCustomKey');
+        expect(GeminiService.hasCustomApiKey, isTrue);
 
-      // Chat session starts with custom key
-      final service = GeminiService();
-      final session = service.startChat();
-      expect(session, isNotNull);
+        // Chat session starts with custom key
+        final service = GeminiService();
+        final session = service.startChat();
+        expect(session, isNotNull);
 
-      // Clear custom key -> reverts to dotenv
-      await settingsStorage.clearCustomGeminiApiKey();
-      expect(GeminiService.currentApiKey, 'AIzaSyDefaultFromDotenv');
-      expect(GeminiService.hasCustomApiKey, isFalse);
-    });
+        // Clear custom key -> reverts to dotenv
+        await settingsStorage.clearCustomGeminiApiKey();
+        expect(GeminiService.currentApiKey, 'AIzaSyDefaultFromDotenv');
+        expect(GeminiService.hasCustomApiKey, isFalse);
+      },
+    );
 
-    test('AiSettingsController manages state, maskedKey, and reactions correctly', () async {
-      final controller = AiSettingsController(
-        getCustomApiKeyUseCase: getCustomApiKeyUseCase,
-        saveCustomApiKeyUseCase: saveCustomApiKeyUseCase,
-        clearCustomApiKeyUseCase: clearCustomApiKeyUseCase,
-      );
+    test(
+      'AiSettingsController manages state, maskedKey, and reactions correctly',
+      () async {
+        final controller = AiSettingsController(
+          getCustomApiKeyUseCase: getCustomApiKeyUseCase,
+          saveCustomApiKeyUseCase: saveCustomApiKeyUseCase,
+          clearCustomApiKeyUseCase: clearCustomApiKeyUseCase,
+        );
 
-      expect(controller.isCustom.value, isFalse);
-      expect(controller.maskedKey, '');
+        expect(controller.isCustom.value, isFalse);
+        expect(controller.maskedKey, '');
 
-      // Save valid custom key
-      final saved = await controller.saveApiKey('AIzaSyCustomKeyToMask1234');
-      expect(saved, isTrue);
-      expect(controller.isCustom.value, isTrue);
-      expect(controller.customApiKey.value, 'AIzaSyCustomKeyToMask1234');
-      expect(controller.maskedKey, 'AIzaSy...1234');
+        // Save valid custom key
+        final saved = await controller.saveApiKey('AIzaSyCustomKeyToMask1234');
+        expect(saved, isTrue);
+        expect(controller.isCustom.value, isTrue);
+        expect(controller.customApiKey.value, 'AIzaSyCustomKeyToMask1234');
+        expect(controller.maskedKey, 'AIzaSy...1234');
 
-      // Clear key
-      await controller.clearApiKey();
-      expect(controller.isCustom.value, isFalse);
-      expect(controller.customApiKey.value, '');
-      expect(controller.maskedKey, '');
-    });
+        // Clear key
+        await controller.clearApiKey();
+        expect(controller.isCustom.value, isFalse);
+        expect(controller.customApiKey.value, '');
+        expect(controller.maskedKey, '');
+      },
+    );
   });
 }

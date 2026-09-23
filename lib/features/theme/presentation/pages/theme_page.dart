@@ -47,7 +47,7 @@ class ThemePage extends StatelessWidget {
             children: [
               SectionTitle(title: S.current.themepage),
               const SizedBox(height: 12),
-              
+
               // Theme Mode Selector
               // Obx(() => Center(
               //   child: SegmentedButton<ThemeMode>(
@@ -79,7 +79,7 @@ class ThemePage extends StatelessWidget {
               //     ),
               //   ),
               // )),
-              
+
               // const SizedBox(height: 32),
               // const SectionTitle(title: 'Choose Theme'),
               // const SizedBox(height: 16),
@@ -93,8 +93,9 @@ class ThemePage extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: availableThemes.length,
-                  
-                  separatorBuilder: (context, index) => const SizedBox(height: 20),
+
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 20),
                   itemBuilder: (context, index) {
                     final themeName = availableThemes[index];
                     final isSelected = currentThemeName == themeName;
@@ -143,7 +144,8 @@ class ThemeCard extends StatelessWidget {
     for (int i = 0; i < 60; i++) {
       if (random.nextDouble() > 0.3) {
         final date = today.subtract(Duration(days: i));
-        data[DateTime(date.year, date.month, date.day)] = random.nextInt(10) + 1;
+        data[DateTime(date.year, date.month, date.day)] =
+            random.nextInt(10) + 1;
       }
     }
     return data;
@@ -153,7 +155,7 @@ class ThemeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final primary = colors['primary']!;
     final surface = colors['surface']!;
-    
+
     // Derived HeatMap colorsets from primary
     final Map<int, Color> activeColorSet = {
       1: primary.withValues(alpha: 0.2),
@@ -211,7 +213,10 @@ class ThemeCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: primary.withValues(alpha: 0.1),
                   border: Border(
@@ -236,7 +241,9 @@ class ThemeCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            isSelected ? S.of(context).currentlySelected : S.of(context).tapToApply,
+                            isSelected
+                                ? S.of(context).currentlySelected
+                                : S.of(context).tapToApply,
                             style: TextStyle(
                               fontSize: 12,
                               color: primary.withValues(alpha: 0.7),
@@ -277,7 +284,10 @@ class ThemeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.3), width: 0.5),
+        border: Border.all(
+          color: Colors.grey.withValues(alpha: 0.3),
+          width: 0.5,
+        ),
       ),
     );
   }

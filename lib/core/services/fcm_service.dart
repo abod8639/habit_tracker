@@ -97,13 +97,17 @@ class FcmService extends GetxService {
 
       // 7. Notification tap handling when app is in background
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        debugPrint('App opened from background via notification: ${message.data}');
+        debugPrint(
+          'App opened from background via notification: ${message.data}',
+        );
       });
 
       // 8. Notification tap handling when app was terminated
       final initialMessage = await _messaging.getInitialMessage();
       if (initialMessage != null) {
-        debugPrint('App opened from terminated state via notification: ${initialMessage.data}');
+        debugPrint(
+          'App opened from terminated state via notification: ${initialMessage.data}',
+        );
       }
     } catch (e) {
       debugPrint('Error setting up FCM: $e');

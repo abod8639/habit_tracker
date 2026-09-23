@@ -30,7 +30,6 @@ class HabitBinding extends Bindings {
     final box = Hive.box(HabitStorage.boxName);
     Get.lazyPut(() => HabitLocalDataSource(box));
     Get.lazyPut(() => FirestoreService());
-    
 
     // Repository
     Get.lazyPut<HabitRepository>(
@@ -57,7 +56,6 @@ class HabitBinding extends Bindings {
     Get.lazyPut(() => GetStartDateUseCase(Get.find()));
     Get.lazyPut(() => IncrementDayCountUseCase(Get.find()));
     Get.lazyPut(() => ClearLocalHabitsUseCase(Get.find()));
-
 
     // Controller
     Get.lazyPut(() => HabitController());

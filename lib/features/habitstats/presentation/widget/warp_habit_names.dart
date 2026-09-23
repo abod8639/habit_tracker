@@ -27,7 +27,9 @@ class WarpHabitNames extends StatelessWidget {
             _HabitLegendChip(
               name: habitNames[i],
               color: lineColors[i % lineColors.length],
-              surfaceColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+              surfaceColor: colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.4,
+              ),
               textColor: colorScheme.onSurface,
               textStyle: textTheme.labelMedium,
             ),

@@ -32,7 +32,9 @@ class ThemeModel extends ThemeEntity {
       themeName: json['themeName'] ?? 'github_dark_green',
       themeMode: _parseThemeMode(json['themeMode']),
       useCustomBackground: json['useCustomBg'] ?? false,
-      customBackgroundColor: json['customBgColor'] != null ? Color(json['customBgColor']) : null,
+      customBackgroundColor: json['customBgColor'] != null
+          ? Color(json['customBgColor'])
+          : null,
     );
   }
 

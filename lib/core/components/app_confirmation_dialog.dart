@@ -63,8 +63,12 @@ class AppConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeColors = Theme.of(context).colorScheme;
-    final primaryColor = isDestructive ? themeColors.error : themeColors.primary;
-    final onPrimaryColor = isDestructive ? themeColors.onError : themeColors.onPrimary;
+    final primaryColor = isDestructive
+        ? themeColors.error
+        : themeColors.primary;
+    final onPrimaryColor = isDestructive
+        ? themeColors.onError
+        : themeColors.onPrimary;
 
     return AlertDialog(
       shape: RoundedRectangleBorder(
@@ -123,9 +127,7 @@ class AppConfirmationDialog extends StatelessWidget {
           ),
           child: Text(
             confirmText ??
-                (isDestructive
-                    ? S.of(context).delete
-                    : S.of(context).save),
+                (isDestructive ? S.of(context).delete : S.of(context).save),
           ),
         ),
       ],

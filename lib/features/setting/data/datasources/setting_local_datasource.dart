@@ -7,15 +7,15 @@ import 'package:habit_tracker/features/theme/data/datasources/theme_storage.dart
 abstract class SettingLocalDataSource {
   Future<String> getLanguage();
   Future<void> saveLanguage(String languageCode);
-  
+
   bool isNotificationEnabled();
   Future<void> setNotificationEnabled(bool enabled);
-  
+
   TimeOfDay? getNotificationTime();
   Future<void> setNotificationTime(TimeOfDay time);
 
   DateTime? getLastSyncTime();
-  
+
   String? getCustomGeminiApiKey();
   Future<void> saveCustomGeminiApiKey(String? key);
   Future<void> clearCustomGeminiApiKey();
@@ -35,7 +35,10 @@ class SettingLocalDataSourceImpl implements SettingLocalDataSource {
 
   @override
   Future<String> getLanguage() async {
-    return _langBox.get(LangStorage.languageKey, defaultValue: LangStorage.defaultLanguage);
+    return _langBox.get(
+      LangStorage.languageKey,
+      defaultValue: LangStorage.defaultLanguage,
+    );
   }
 
   @override
@@ -68,7 +71,7 @@ class SettingLocalDataSourceImpl implements SettingLocalDataSource {
 
   @override
   DateTime? getLastSyncTime() {
-    return null; 
+    return null;
   }
 
   @override
@@ -95,12 +98,12 @@ class SettingLocalDataSourceImpl implements SettingLocalDataSource {
     // Clear all related boxes
     await _langBox.clear();
     await _settingsBox.clear();
-    
+
     // Clear other global boxes
     if (Hive.isBoxOpen(HabitStorage.boxName)) {
       await Hive.box(HabitStorage.boxName).clear();
     }
-    
+
     if (Hive.isBoxOpen(ThemeStorageService.themeBox)) {
       await Hive.box(ThemeStorageService.themeBox).clear();
     }

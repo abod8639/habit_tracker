@@ -26,7 +26,10 @@ Widget buildAiSection(AnimationController animationController) {
               title: S.current.aiApiKeyTitle,
               subtitle: subtitleText,
               trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: isCustom
                       ? Colors.teal.withValues(alpha: 0.15)
@@ -56,11 +59,11 @@ Widget buildAiSection(AnimationController animationController) {
                           ? S.current.customApiKeyActive
                           : S.current.tapToEdit,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: isCustom
-                                ? Colors.teal
-                                : Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: isCustom
+                            ? Colors.teal
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -74,8 +77,13 @@ Widget buildAiSection(AnimationController animationController) {
   );
 }
 
-void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) {
-  final textController = TextEditingController(text: controller.customApiKey.value);
+void _showAiApiKeyDialog(
+  BuildContext context,
+  AiSettingsController controller,
+) {
+  final textController = TextEditingController(
+    text: controller.customApiKey.value,
+  );
   final obscureRx = true.obs;
 
   showDialog(
@@ -107,8 +115,8 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
               child: Text(
                 S.current.customApiKeyDialogTitle,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -121,11 +129,10 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
               Text(
                 S.current.customApiKeyDialogDesc,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
-                    ),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
               const SizedBox(height: 14),
               // Helper info container linking to Google AI Studio
@@ -152,14 +159,14 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .primaryColor
-                          .withValues(alpha: 0.06),
+                      color: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: Theme.of(context)
-                            .primaryColor
-                            .withValues(alpha: 0.2),
+                        color: Theme.of(
+                          context,
+                        ).primaryColor.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -173,9 +180,7 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
                         Expanded(
                           child: Text(
                             S.current.getKeyInfo,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
+                            style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: Theme.of(context).primaryColor,
                                   fontSize: 11,
@@ -225,7 +230,9 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
                             size: 20,
                           ),
                           onPressed: () async {
-                            final data = await Clipboard.getData(Clipboard.kTextPlain);
+                            final data = await Clipboard.getData(
+                              Clipboard.kTextPlain,
+                            );
                             if (data != null && data.text != null) {
                               textController.text = data.text!.trim();
                             }
@@ -251,7 +258,11 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
                 Navigator.of(dialogContext).pop();
                 await controller.clearApiKey();
               },
-              icon: const Icon(Icons.restore_rounded, size: 16, color: Colors.redAccent),
+              icon: const Icon(
+                Icons.restore_rounded,
+                size: 16,
+                color: Colors.redAccent,
+              ),
               label: Text(
                 S.current.resetToDefault,
                 style: const TextStyle(color: Colors.redAccent, fontSize: 12),
@@ -261,18 +272,21 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
-                            style: TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 shadows: [
                   Shadow(
-                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
-                  blurRadius: 3,
-                  offset: const Offset(1, 1),
-                  )
-                ]
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.shadow.withValues(alpha: 0.3),
+                    blurRadius: 3,
+                    offset: const Offset(1, 1),
+                  ),
+                ],
               ),
-              S.current.cancel),
+              S.current.cancel,
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -301,13 +315,16 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
                 fontWeight: FontWeight.bold,
                 shadows: [
                   Shadow(
-                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
-                  blurRadius: 3,
-                  offset: const Offset(1, 1),
-                  )
-                ]
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.shadow.withValues(alpha: 0.3),
+                    blurRadius: 3,
+                    offset: const Offset(1, 1),
+                  ),
+                ],
               ),
-              S.current.save),
+              S.current.save,
+            ),
           ),
         ],
       );

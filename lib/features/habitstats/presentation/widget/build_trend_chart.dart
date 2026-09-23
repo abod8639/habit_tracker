@@ -24,7 +24,8 @@ Widget buildTrendChart() {
 
   return Obx(() {
     final List<FlSpot> trendSpots = controller.overallTrend;
-    final bool hasOverallData = trendSpots.isNotEmpty &&
+    final bool hasOverallData =
+        trendSpots.isNotEmpty &&
         !(trendSpots.length <= 1 && trendSpots[0] == const FlSpot(0, 0));
     final bool hasIndividualData = controller.individualTrends.isNotEmpty;
 

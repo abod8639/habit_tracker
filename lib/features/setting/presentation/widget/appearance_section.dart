@@ -31,7 +31,10 @@ Widget buildAppearanceSection(AnimationController animationController) {
               icon: Icons.language_rounded,
               currentValue: langController.language.value,
               entries: [
-                DropdownMenuEntry(value: "sys", label: "  ${S.of(context).systemLanguage}  "),
+                DropdownMenuEntry(
+                  value: "sys",
+                  label: "  ${S.of(context).systemLanguage}  ",
+                ),
                 const DropdownMenuEntry(value: "ar", label: "  العربية "),
                 const DropdownMenuEntry(value: "en", label: "  English  "),
               ],

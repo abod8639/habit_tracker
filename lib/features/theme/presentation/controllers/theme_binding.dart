@@ -11,7 +11,6 @@ import '../../domain/usecases/sync_theme_with_cloud_usecase.dart';
 import '../../domain/usecases/upload_theme_settings_usecase.dart';
 import 'theme_controller.dart';
 
-
 class ThemeBinding extends Bindings {
   @override
   void dependencies() {
@@ -20,8 +19,12 @@ class ThemeBinding extends Bindings {
     final firestoreService = Get.find<FirestoreService>();
 
     // Data Sources
-    Get.lazyPut<ThemeLocalDataSource>(() => ThemeLocalDataSourceImpl(themeStorage));
-    Get.lazyPut<ThemeRemoteDataSource>(() => ThemeRemoteDataSourceImpl(firestoreService));
+    Get.lazyPut<ThemeLocalDataSource>(
+      () => ThemeLocalDataSourceImpl(themeStorage),
+    );
+    Get.lazyPut<ThemeRemoteDataSource>(
+      () => ThemeRemoteDataSourceImpl(firestoreService),
+    );
 
     // Repository
     Get.lazyPut<ThemeRepository>(

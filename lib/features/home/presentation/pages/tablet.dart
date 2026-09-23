@@ -18,7 +18,7 @@ class Tablet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HabitController controller = Get.find<HabitController>();
-    
+
     return Scaffold(
       drawer: const MyDrawer(),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -48,18 +48,22 @@ class Tablet extends StatelessWidget {
                       reverse: true,
                       key: const ValueKey<String>('heatmap'),
                       scrollDirection: Axis.horizontal,
-                      child: Obx(() => MonthlySummary(
-                        datasets: controller.heatmapDateSet,
-                      )),
+                      child: Obx(
+                        () => MonthlySummary(
+                          datasets: controller.heatmapDateSet,
+                        ),
+                      ),
                     ),
                   ),
                 ),
 
                 Expanded(
                   flex: ResponsiveUtils.isDesktop(context) ? 9 : 13,
-                  child: Obx(() => controller.habits.isEmpty
-                      ? const NoHabitsYet()
-                      : const CheckboxList()),
+                  child: Obx(
+                    () => controller.habits.isEmpty
+                        ? const NoHabitsYet()
+                        : const CheckboxList(),
+                  ),
                 ),
               ],
             ),

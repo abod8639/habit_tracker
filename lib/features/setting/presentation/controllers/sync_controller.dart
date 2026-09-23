@@ -18,7 +18,8 @@ enum SyncStatus {
 class SyncController extends GetxController {
   final SyncHabitsUseCase _syncHabitsUseCase = Get.find();
   final GetLastSyncTimeUseCase _getLastSyncTimeUseCase = Get.find();
-  final FirestoreService _firestoreService = Get.isRegistered<FirestoreService>()
+  final FirestoreService _firestoreService =
+      Get.isRegistered<FirestoreService>()
       ? Get.find<FirestoreService>()
       : FirestoreService();
 
@@ -36,14 +37,19 @@ class SyncController extends GetxController {
   Future<void> _loadLastSyncTime() async {
     final result = await _getLastSyncTimeUseCase();
     result.fold(
-      (failure) => debugPrint('Error loading last sync time: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error loading last sync time: ${failure.message}'),
       (time) => lastSyncTime.value = time,
     );
   }
 
   Future<List<HabitModel>?> manualSync(List<HabitModel> localHabits) async {
     if (!_firestoreService.isUserLoggedIn) {
-      Get.snackbar(S.current.error, S.current.loginRequired, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        S.current.error,
+        S.current.loginRequired,
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return null;
     }
 
@@ -61,7 +67,7 @@ class SyncController extends GetxController {
       }
 
       final result = await _syncHabitsUseCase(
-        localHabits, 
+        localHabits,
         localTombstones: localTombstones,
         localStartDay: localStartDay,
       );
@@ -70,7 +76,11 @@ class SyncController extends GetxController {
         (failure) {
           syncStatus.value = SyncStatus.error;
           errorMessage.value = failure.message;
-          Get.snackbar(S.current.error, '${S.current.syncFailed}: ${failure.message}', snackPosition: SnackPosition.BOTTOM);
+          Get.snackbar(
+            S.current.error,
+            '${S.current.syncFailed}: ${failure.message}',
+            snackPosition: SnackPosition.BOTTOM,
+          );
           debugPrint('Error: ${failure.message}');
           return null;
         },
@@ -109,7 +119,7 @@ class SyncController extends GetxController {
       }
 
       final result = await _syncHabitsUseCase(
-        localHabits, 
+        localHabits,
         localTombstones: localTombstones,
         localStartDay: localStartDay,
       );
@@ -144,7 +154,9 @@ class SyncController extends GetxController {
   String get syncStatusMessage {
     switch (syncStatus.value) {
       case SyncStatus.idle:
-        return lastSyncTime.value != null ? '${S.current.lastSync}: ${_formatTime(lastSyncTime.value!)}' : S.current.notSyncedYet;
+        return lastSyncTime.value != null
+            ? '${S.current.lastSync}: ${_formatTime(lastSyncTime.value!)}'
+            : S.current.notSyncedYet;
       case SyncStatus.syncing:
         return S.current.syncing;
       case SyncStatus.success:
@@ -158,7 +170,8 @@ class SyncController extends GetxController {
     final now = DateTime.now();
     final difference = now.difference(time);
     if (difference.inMinutes < 1) return S.current.justNow;
-    if (difference.inHours < 1) return S.current.minutesAgo(difference.inMinutes);
+    if (difference.inHours < 1)
+      return S.current.minutesAgo(difference.inMinutes);
     if (difference.inDays < 1) return S.current.hoursAgo(difference.inHours);
     return S.current.daysAgo(difference.inDays);
   }

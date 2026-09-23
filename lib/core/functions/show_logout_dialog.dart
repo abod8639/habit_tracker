@@ -3,7 +3,10 @@ import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
-Future<void> showLogoutDialog(AuthController authController, [BuildContext? context]) async {
+Future<void> showLogoutDialog(
+  AuthController authController, [
+  BuildContext? context,
+]) async {
   final confirmed = await AppConfirmationDialog.show(
     context: context,
     title: S.current.logoutConfirmTitle,
@@ -18,4 +21,3 @@ Future<void> showLogoutDialog(AuthController authController, [BuildContext? cont
     await authController.signOut();
   }
 }
-

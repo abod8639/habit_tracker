@@ -58,15 +58,15 @@ class _MonthlySummaryState extends State<MonthlySummary>
     final primaryColor = themeColors.primary;
 
     final colorsets = {
-      1:  primaryColor.withValues(alpha: 0.1),
-      2:  primaryColor.withValues(alpha: 0.2),
-      3:  primaryColor.withValues(alpha: 0.3),
-      4:  primaryColor.withValues(alpha: 0.4),
-      5:  primaryColor.withValues(alpha: 0.5),
-      6:  primaryColor.withValues(alpha: 0.6),
-      7:  primaryColor.withValues(alpha: 0.7),
-      8:  primaryColor.withValues(alpha: 0.8),
-      9:  primaryColor.withValues(alpha: 0.9),
+      1: primaryColor.withValues(alpha: 0.1),
+      2: primaryColor.withValues(alpha: 0.2),
+      3: primaryColor.withValues(alpha: 0.3),
+      4: primaryColor.withValues(alpha: 0.4),
+      5: primaryColor.withValues(alpha: 0.5),
+      6: primaryColor.withValues(alpha: 0.6),
+      7: primaryColor.withValues(alpha: 0.7),
+      8: primaryColor.withValues(alpha: 0.8),
+      9: primaryColor.withValues(alpha: 0.9),
       10: primaryColor.withValues(alpha: 1.0),
     };
 
@@ -98,7 +98,9 @@ class _MonthlySummaryState extends State<MonthlySummary>
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   child: HeatMap(
-                    key: ValueKey('bg_heatmap_${startDateTime.year}_${startDateTime.month}_${startDateTime.day}'),
+                    key: ValueKey(
+                      'bg_heatmap_${startDateTime.year}_${startDateTime.month}_${startDateTime.day}',
+                    ),
                     startDate: startDateTime,
                     fontSize: 16,
                     endDate: DateTime.now().add(const Duration(days: 15)),
@@ -129,8 +131,10 @@ class _MonthlySummaryState extends State<MonthlySummary>
                     //   width: 10,
                     //   height: 10,
                     //   )
-                      // ],
-                    key: ValueKey('data_heatmap_${startDateTime.year}_${startDateTime.month}_${startDateTime.day}_${widget.datasets.isEmpty}'),
+                    // ],
+                    key: ValueKey(
+                      'data_heatmap_${startDateTime.year}_${startDateTime.month}_${startDateTime.day}_${widget.datasets.isEmpty}',
+                    ),
                     startDate: startDateTime,
                     fontSize: 16,
                     endDate: DateTime.now(),
@@ -146,8 +150,13 @@ class _MonthlySummaryState extends State<MonthlySummary>
                     onClick: (value) async {
                       final messenger = ScaffoldMessenger.of(context);
                       final localDate = value.isUtc ? value.toLocal() : value;
-                      final normalizedDate = DateTime(localDate.year, localDate.month, localDate.day);
-                      final status = await habitController.getCompletionStatusForDate(normalizedDate);
+                      final normalizedDate = DateTime(
+                        localDate.year,
+                        localDate.month,
+                        localDate.day,
+                      );
+                      final status = await habitController
+                          .getCompletionStatusForDate(normalizedDate);
                       final int completed = status['completed'] ?? 0;
                       final int total = status['total'] ?? 0;
 
@@ -155,7 +164,9 @@ class _MonthlySummaryState extends State<MonthlySummary>
                         messenger.clearSnackBars();
                         messenger.showSnackBar(
                           SnackBar(
-                            backgroundColor: themeColors.primary.withValues(alpha: 0.9),
+                            backgroundColor: themeColors.primary.withValues(
+                              alpha: 0.9,
+                            ),
                             duration: const Duration(seconds: 2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -181,7 +192,7 @@ class _MonthlySummaryState extends State<MonthlySummary>
                                         color: themeColors.onPrimary,
                                         fontWeight: FontWeight.w600,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 4),
@@ -190,7 +201,9 @@ class _MonthlySummaryState extends State<MonthlySummary>
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,
-                                    color: themeColors.onPrimary.withValues(alpha: 0.9),
+                                    color: themeColors.onPrimary.withValues(
+                                      alpha: 0.9,
+                                    ),
                                   ),
                                 ),
                               ],

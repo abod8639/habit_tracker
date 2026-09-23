@@ -35,4 +35,3 @@ class LogoutTile extends StatelessWidget {
 Widget buildLogoutTile(AnimationController animationController) {
   return LogoutTile(animationController: animationController);
 }
-

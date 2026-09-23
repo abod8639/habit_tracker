@@ -6,11 +6,11 @@ import 'package:habit_tracker/features/home/domain/usecases/reset_daily_habits_u
 Future<void> checkAndResetHabits() async {
   if (!Get.isRegistered<HabitController>()) return;
   final HabitController c = Get.find<HabitController>();
-  
+
   try {
     final resetDailyHabitsUseCase = Get.find<ResetDailyHabitsUseCase>();
     final result = await resetDailyHabitsUseCase();
-    
+
     result.fold(
       (failure) => null, // Silently fail for background check
       (_) async {

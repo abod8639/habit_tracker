@@ -22,7 +22,6 @@ Widget buildAccountSection(AnimationController animationController) {
                 user.photoUrl,
                 1,
               ),
-
             ],
           );
         } else {
@@ -117,7 +116,7 @@ Widget buildAnimatedUserCard(
                     onBackgroundImageError: photoUrl != null
                         ? (exception, stackTrace) {
                             // debugPrint(
-                              // 'Error loading profile image: $exception',
+                            // 'Error loading profile image: $exception',
                             // );
                           }
                         : null,

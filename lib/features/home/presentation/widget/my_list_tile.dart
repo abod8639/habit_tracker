@@ -86,20 +86,22 @@ class _MyDrawerListTileState extends State<MyDrawerListTile> {
                   Expanded(
                     child: Text(
                       widget.title,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontSize: 14.5,
-                        fontWeight: widget.isSelected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                        color: foregroundColor,
-                        letterSpacing: 0.1,
-                      ) ?? TextStyle(
-                        fontSize: 14.5,
-                        fontWeight: widget.isSelected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                        color: foregroundColor,
-                      ),
+                      style:
+                          theme.textTheme.labelLarge?.copyWith(
+                            fontSize: 14.5,
+                            fontWeight: widget.isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: foregroundColor,
+                            letterSpacing: 0.1,
+                          ) ??
+                          TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: widget.isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: foregroundColor,
+                          ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -117,4 +119,3 @@ class _MyDrawerListTileState extends State<MyDrawerListTile> {
     );
   }
 }
-

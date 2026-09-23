@@ -34,12 +34,10 @@ class PlanGeneratorController extends GetxController {
   QuestionEntity? get currentQuestion =>
       questions.isNotEmpty ? questions[currentIndex.value] : null;
 
-  double get progress => questions.isEmpty
-      ? 0
-      : (currentIndex.value + 1) / questions.length;
+  double get progress =>
+      questions.isEmpty ? 0 : (currentIndex.value + 1) / questions.length;
 
-  String get progressLabel =>
-      '${currentIndex.value + 1} / ${questions.length}';
+  String get progressLabel => '${currentIndex.value + 1} / ${questions.length}';
 
   List<PlanSuggestion> get selectedSuggestions =>
       suggestions.where((s) => s.isSelected).toList();
@@ -51,7 +49,9 @@ class PlanGeneratorController extends GetxController {
   // ── Category selection ────────────────────────────────────────────────────
   void selectCategory(PlanCategory category) {
     selectedCategory.value = category;
-    questions.value = List<QuestionEntity>.from(QuestionsDataSource.forCategory(category));
+    questions.value = List<QuestionEntity>.from(
+      QuestionsDataSource.forCategory(category),
+    );
     answers.clear();
     currentIndex.value = 0;
     suggestions.value = <PlanSuggestion>[];
@@ -169,8 +169,8 @@ class PlanGeneratorController extends GetxController {
     try {
       final HabitController habitController =
           Get.isRegistered<HabitController>()
-              ? Get.find<HabitController>()
-              : Get.put(HabitController());
+          ? Get.find<HabitController>()
+          : Get.put(HabitController());
 
       final habitNames = selectedSuggestions.map((s) => s.name).toList();
       final bool success = await habitController.addMultipleHabits(habitNames);

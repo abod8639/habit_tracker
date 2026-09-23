@@ -38,7 +38,8 @@ class HabitController extends GetxController {
   final ResetDailyHabitsUseCase _resetDailyHabitsUseCase = Get.find();
   final UpdateHabitColorUseCase _updateHabitColorUseCase = Get.find();
   final UpdateHabitOrderUseCase _updateHabitOrderUseCase = Get.find();
-  final GetCompletionStatusForDateUseCase _getCompletionStatusForDateUseCase = Get.find();
+  final GetCompletionStatusForDateUseCase _getCompletionStatusForDateUseCase =
+      Get.find();
   final GetStartDateUseCase _getStartDateUseCase = Get.find();
   final IncrementDayCountUseCase _incrementDayCountUseCase = Get.find();
   final ClearLocalHabitsUseCase _clearLocalHabitsUseCase = Get.find();
@@ -53,9 +54,9 @@ class HabitController extends GetxController {
 
   // View Getter for UI (Combines both sources seamlessly)
   Map<DateTime, int> get heatmapDateSet => {
-        ...remoteHeatmapDateSet,
-        ...localHeatmapDateSet,
-      };
+    ...remoteHeatmapDateSet,
+    ...localHeatmapDateSet,
+  };
 
   // UI State
   final TextEditingController habitTextController = TextEditingController();
@@ -101,7 +102,9 @@ class HabitController extends GetxController {
 
   void _setupAuthListener() {
     bool wasLoggedIn = FirebaseAuth.instance.currentUser != null;
-    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) async {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((
+      user,
+    ) async {
       if (user != null && isInitialized.value) {
         wasLoggedIn = true;
         _syncOnLogin();
@@ -139,8 +142,10 @@ class HabitController extends GetxController {
   Future<void> _syncOnLogin() async {
     if (!Get.isRegistered<SyncController>()) return;
     final syncController = Get.find<SyncController>();
-    
-    final result = await syncController.autoSync(habits.map((e) => HabitModel.fromEntity(e)).toList());
+
+    final result = await syncController.autoSync(
+      habits.map((e) => HabitModel.fromEntity(e)).toList(),
+    );
     if (result != null) {
       await refreshData();
     }
@@ -174,7 +179,7 @@ class HabitController extends GetxController {
     try {
       final remoteData = await firestoreService.downloadHabitHistory();
       final Map<DateTime, int> parsed = {};
-      
+
       for (var entry in remoteData.entries) {
         if (entry.key.length == 8) {
           final yyyy = int.parse(entry.key.substring(0, 4));
@@ -192,21 +197,26 @@ class HabitController extends GetxController {
 
   void _setupHabitResetChecking() {
     _resetCheckTimer?.cancel();
-    _resetCheckTimer = Timer.periodic(const Duration(minutes: 15), (_) => checkAndResetHabits());
+    _resetCheckTimer = Timer.periodic(
+      const Duration(minutes: 15),
+      (_) => checkAndResetHabits(),
+    );
   }
 
   String getStartDay() {
     String storedStartDay = _getStartDateUseCase();
-    
+
     final combinedHeatmap = heatmapDateSet;
 
     // If we have heatmap data, find the earliest date
     if (combinedHeatmap.isNotEmpty) {
-      DateTime minDate = combinedHeatmap.keys.reduce((a, b) => a.isBefore(b) ? a : b);
+      DateTime minDate = combinedHeatmap.keys.reduce(
+        (a, b) => a.isBefore(b) ? a : b,
+      );
       String minDateStr = convertDateTimeToString(minDate);
-      
+
       if (storedStartDay.isEmpty) return minDateStr;
-      
+
       // Return the earlier of the two
       try {
         DateTime storedDate = createDateTimeObject(storedStartDay);
@@ -215,7 +225,7 @@ class HabitController extends GetxController {
         return minDateStr;
       }
     }
-    
+
     return storedStartDay;
   }
 
@@ -227,7 +237,7 @@ class HabitController extends GetxController {
 
   Future<void> addHabit(String name) async {
     if (name.trim().isEmpty) return;
-    
+
     final result = await _addHabitUseCase(name);
     result.fold(
       (failure) => _showError(failure.message),
@@ -242,7 +252,7 @@ class HabitController extends GetxController {
 
   Future<bool> addMultipleHabits(List<String> names) async {
     if (names.isEmpty) return false;
-    
+
     final result = await _addMultipleHabitsUseCase(names);
     return result.fold(
       (failure) {
@@ -277,7 +287,7 @@ class HabitController extends GetxController {
 
     // 2. Perform background delete
     final result = await _deleteHabitUseCase(id);
-    
+
     result.fold(
       (failure) {
         // 3. Rollback on failure
@@ -306,7 +316,7 @@ class HabitController extends GetxController {
 
     // 2. Perform background update
     final result = await _toggleHabitUseCase(id, value);
-    
+
     result.fold(
       (failure) {
         // 3. Rollback on failure
@@ -326,34 +336,41 @@ class HabitController extends GetxController {
     final today = createDateTimeObject(todaysDateFormatted());
     final total = habits.length;
     final completed = habits.where((h) => h.isCompleted).length;
-    
+
     if (total == 0) {
       localHeatmapDateSet.remove(today);
     } else {
       double rate = completed / total;
       int strength = (rate * 10).toInt();
-      if (strength == 0 && completed > 0) strength = 1; // Show at least something if partially completed
+      if (strength == 0 && completed > 0)
+        strength = 1; // Show at least something if partially completed
       localHeatmapDateSet[today] = strength;
     }
   }
 
-  Future<void> reorderHabits(int oldIndex, int newIndex, {bool isAdjusted = false}) async {
+  Future<void> reorderHabits(
+    int oldIndex,
+    int newIndex, {
+    bool isAdjusted = false,
+  }) async {
     // 1. Optimistic UI update
     if (!isAdjusted && newIndex > oldIndex) {
       newIndex -= 1;
     }
-    
+
     final draggedItem = habits[oldIndex];
     final isDraggedItemSelected = selectedHabitIds.contains(draggedItem.id);
 
     if (isDraggedItemSelected && selectedHabitIds.length > 1) {
       // Group reorder: Move all selected habits together to the target position
       // Get all selected habits in their CURRENT list order
-      final selectedItems = habits.where((h) => selectedHabitIds.contains(h.id)).toList();
-      
+      final selectedItems = habits
+          .where((h) => selectedHabitIds.contains(h.id))
+          .toList();
+
       // Remove all selected items
       habits.removeWhere((h) => selectedHabitIds.contains(h.id));
-      
+
       // Calculate a safe insertion index based on the remaining items
       final insertIndex = newIndex.clamp(0, habits.length);
       habits.insertAll(insertIndex, selectedItems);
@@ -362,12 +379,14 @@ class HabitController extends GetxController {
       final item = habits.removeAt(oldIndex);
       habits.insert(newIndex, item);
     }
-    
+
     habits.refresh();
 
     // 2. Perform background reorder
-    final result = await _updateHabitOrderUseCase(habits.map((h) => h.id).toList());
-    
+    final result = await _updateHabitOrderUseCase(
+      habits.map((h) => h.id).toList(),
+    );
+
     result.fold(
       (failure) {
         // 3. Rollback on failure

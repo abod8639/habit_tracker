@@ -18,22 +18,31 @@ class AnalyticsService extends GetxService {
   }
 
   Future<void> logTap(double x, double y, String currentRoute) async {
-    await logEvent('screen_tap', parameters: {
-      'x_coordinate': x,
-      'y_coordinate': y,
-      'route_name': currentRoute,
-    });
+    await logEvent(
+      'screen_tap',
+      parameters: {
+        'x_coordinate': x,
+        'y_coordinate': y,
+        'route_name': currentRoute,
+      },
+    );
   }
 
   Future<void> logTimeSpent(String screenName, int seconds) async {
-    await logEvent('page_time_spent', parameters: {
-      'screen_name': screenName,
-      'duration_seconds': seconds,
-    });
+    await logEvent(
+      'page_time_spent',
+      parameters: {
+        'screen_name': screenName,
+        'duration_seconds': seconds,
+      },
+    );
   }
 
   Future<void> logScreenView(String screenName, {String? screenClass}) async {
-    await analytics.logScreenView(screenName: screenName, screenClass: screenClass);
+    await analytics.logScreenView(
+      screenName: screenName,
+      screenClass: screenClass,
+    );
   }
 
   Future<void> logLogin(String loginMethod) async {
@@ -85,15 +94,16 @@ class TimeTrackerObserver extends RouteObserver<PageRoute<dynamic>> {
   }
 
   void _logTimeSpent(Route<dynamic> route) {
-    if (route.settings.name != null && _routeStartTime.containsKey(route.settings.name)) {
+    if (route.settings.name != null &&
+        _routeStartTime.containsKey(route.settings.name)) {
       final startTime = _routeStartTime[route.settings.name]!;
       final duration = DateTime.now().difference(startTime).inSeconds;
-      
+
       // Only log if the duration is significant (e.g. > 0 seconds)
       if (duration > 0) {
         analyticsService.logTimeSpent(route.settings.name!, duration);
       }
-      
+
       _routeStartTime.remove(route.settings.name);
     }
   }

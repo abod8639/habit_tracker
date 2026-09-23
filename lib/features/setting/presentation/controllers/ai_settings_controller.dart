@@ -86,7 +86,10 @@ class AiSettingsController extends GetxController {
     if (trimmedKey.isEmpty) {
       _showNotification(
         _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
-        _getString(() => S.current.invalidApiKeyFormat, 'Please enter a valid API key'),
+        _getString(
+          () => S.current.invalidApiKeyFormat,
+          'Please enter a valid API key',
+        ),
         color: Colors.redAccent,
       );
       return false;
@@ -111,7 +114,10 @@ class AiSettingsController extends GetxController {
         keyInputController.text = trimmedKey;
         _showNotification(
           _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
-          _getString(() => S.current.apiKeySavedSuccess, 'API key saved successfully'),
+          _getString(
+            () => S.current.apiKeySavedSuccess,
+            'API key saved successfully',
+          ),
           color: Colors.green,
         );
         return true;
@@ -138,7 +144,10 @@ class AiSettingsController extends GetxController {
         keyInputController.text = '';
         _showNotification(
           _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
-          _getString(() => S.current.apiKeyClearedSuccess, 'Custom API key removed'),
+          _getString(
+            () => S.current.apiKeyClearedSuccess,
+            'Custom API key removed',
+          ),
           color: Colors.orange,
         );
       },

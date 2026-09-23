@@ -47,13 +47,17 @@ class PlanResultScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Obx(() => Text(
-                              S.current.habitsGeneratedCount(controller.suggestions.length),
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey.shade500,
-                              ),
-                            )),
+                        Obx(
+                          () => Text(
+                            S.current.habitsGeneratedCount(
+                              controller.suggestions.length,
+                            ),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -64,102 +68,108 @@ class PlanResultScreen extends StatelessWidget {
             // ── Select all / Deselect controls ────────────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              child: Obx(() => Row(
-                    children: [
-                      Text(
-                        S.current.itemsSelected(controller.selectedCount),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: color,
-                        ),
+              child: Obx(
+                () => Row(
+                  children: [
+                    Text(
+                      S.current.itemsSelected(controller.selectedCount),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: color,
                       ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: controller.selectAll,
-                        child: Text(S.current.selectAll),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: controller.selectAll,
+                      child: Text(S.current.selectAll),
+                    ),
+                    const SizedBox(width: 4),
+                    TextButton(
+                      onPressed: controller.deselectAll,
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.grey.shade500,
                       ),
-                      const SizedBox(width: 4),
-                      TextButton(
-                        onPressed: controller.deselectAll,
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.grey.shade500,
-                        ),
-                        child: Text(S.current.clear),
-                      ),
-                    ],
-                  )),
+                      child: Text(S.current.clear),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             // ── Habit list ────────────────────────────────────────────────
             Expanded(
-              child: Obx(() => ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                    itemCount: controller.suggestions.length,
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (context, index) =>
-                        _HabitSuggestionCard(
-                      suggestion: controller.suggestions[index],
-                      color: color,
-                      onToggle: () => controller.toggleSuggestion(index),
-                    ),
-                  )),
+              child: Obx(
+                () => ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                  itemCount: controller.suggestions.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) => _HabitSuggestionCard(
+                    suggestion: controller.suggestions[index],
+                    color: color,
+                    onToggle: () => controller.toggleSuggestion(index),
+                  ),
+                ),
+              ),
             ),
 
             // ── Add button ────────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-              child: Obx(() => Column(
-                    children: [
-                      if (controller.hasError) ...[
-                        Text(
-                          controller.errorMessage.value,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: (controller.hasSelections &&
-                                  !controller.isLoading)
-                              ? controller.addSelectedHabits
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: color,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: controller.isLoading
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  controller.hasSelections
-                                      ? S.current.addHabitsToTracker(controller.selectedCount)
-                                      : S.current.selectAtLeastOneHabit,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+              child: Obx(
+                () => Column(
+                  children: [
+                    if (controller.hasError) ...[
+                      Text(
+                        controller.errorMessage.value,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 13,
                         ),
                       ),
+                      const SizedBox(height: 8),
                     ],
-                  )),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed:
+                            (controller.hasSelections && !controller.isLoading)
+                            ? controller.addSelectedHabits
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: color,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: controller.isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                controller.hasSelections
+                                    ? S.current.addHabitsToTracker(
+                                        controller.selectedCount,
+                                      )
+                                    : S.current.selectAtLeastOneHabit,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -191,12 +201,12 @@ class _HabitSuggestionCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: selected
-              ? color.withValues(alpha:0.05)
-              : Colors.grey.shade50,
+          color: selected ? color.withValues(alpha: 0.05) : Colors.grey.shade50,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? color.withValues(alpha:0.4) : Colors.grey.shade200,
+            color: selected
+                ? color.withValues(alpha: 0.4)
+                : Colors.grey.shade200,
             width: selected ? 1.5 : 1,
           ),
         ),
@@ -259,7 +269,7 @@ class _HabitSuggestionCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: selected
-                          ? color.withValues(alpha:0.1)
+                          ? color.withValues(alpha: 0.1)
                           : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -269,9 +279,7 @@ class _HabitSuggestionCard extends StatelessWidget {
                         Icon(
                           Icons.repeat_rounded,
                           size: 12,
-                          color: selected
-                              ? color
-                              : Colors.grey.shade400,
+                          color: selected ? color : Colors.grey.shade400,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -279,9 +287,7 @@ class _HabitSuggestionCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: selected
-                                ? color
-                                : Colors.grey.shade500,
+                            color: selected ? color : Colors.grey.shade500,
                           ),
                         ),
                       ],

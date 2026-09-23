@@ -63,8 +63,8 @@ class HabitModel {
           : null,
       colorValue: map['colorValue'] ?? map['color_value'],
       index: map['index'] ?? 0,
-      updatedAt: map['updatedAt'] != null || map['updated_at'] != null 
-          ? _parseDate(map['updatedAt'] ?? map['updated_at']) 
+      updatedAt: map['updatedAt'] != null || map['updated_at'] != null
+          ? _parseDate(map['updatedAt'] ?? map['updated_at'])
           : null,
     );
   }
@@ -77,7 +77,9 @@ class HabitModel {
       name: map['name']?.toString() ?? 'Unnamed Habit',
       isCompleted: map['isCompleted'] ?? false,
       createdAt: _parseDate(map['createdAt']),
-      completedAt: map['completedAt'] != null ? _parseDate(map['completedAt']) : null,
+      completedAt: map['completedAt'] != null
+          ? _parseDate(map['completedAt'])
+          : null,
       colorValue: map['colorValue'] as int?,
       index: map['index'] as int? ?? 0,
       updatedAt: map['updatedAt'] != null ? _parseDate(map['updatedAt']) : null,
@@ -103,10 +105,13 @@ class HabitModel {
       'name': name,
       'isCompleted': isCompleted,
       'createdAt': Timestamp.fromDate(createdAt),
-      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+      'completedAt': completedAt != null
+          ? Timestamp.fromDate(completedAt!)
+          : null,
       'colorValue': colorValue,
       'index': index,
-      'updatedAt': FieldValue.serverTimestamp(), // Always use server time for updates
+      'updatedAt':
+          FieldValue.serverTimestamp(), // Always use server time for updates
     };
   }
 

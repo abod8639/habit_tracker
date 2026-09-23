@@ -17,17 +17,23 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Stream<AuthEntity?> get authStateChanges => remoteDataSource.authStateChanges.map(
-    (user) => user != null ? AuthEntity(
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoUrl: user.photoURL,
-    ) : null
-  );
+  Stream<AuthEntity?> get authStateChanges =>
+      remoteDataSource.authStateChanges.map(
+        (user) => user != null
+            ? AuthEntity(
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoUrl: user.photoURL,
+              )
+            : null,
+      );
 
   @override
-  Future<Either<Failure, AuthEntity>> signInWithEmail(String email, String password) async {
+  Future<Either<Failure, AuthEntity>> signInWithEmail(
+    String email,
+    String password,
+  ) async {
     try {
       final userModel = await remoteDataSource.signInWithEmail(email, password);
       return Right(userModel);
@@ -37,9 +43,17 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthEntity>> signUpWithEmail(String email, String password, String? displayName) async {
+  Future<Either<Failure, AuthEntity>> signUpWithEmail(
+    String email,
+    String password,
+    String? displayName,
+  ) async {
     try {
-      final userModel = await remoteDataSource.signUpWithEmail(email, password, displayName);
+      final userModel = await remoteDataSource.signUpWithEmail(
+        email,
+        password,
+        displayName,
+      );
       return Right(userModel);
     } catch (e) {
       return Left(_mapExceptionToFailure(e));
@@ -107,14 +121,22 @@ class AuthRepositoryImpl implements AuthRepository {
 
   String _handleAuthErrorCode(String code) {
     switch (code) {
-      case 'user-not-found': return S.current.authErrorUserNotFound;
-      case 'wrong-password': return S.current.authErrorWrongPassword;
-      case 'email-already-in-use': return S.current.authErrorEmailInUse;
-      case 'invalid-email': return S.current.authErrorInvalidEmail;
-      case 'weak-password': return S.current.authErrorWeakPassword;
-      case 'too-many-requests': return S.current.authErrorTooManyRequests;
-      case 'network-request-failed': return S.current.authErrorNetworkFailed;
-      default: return S.current.authErrorDefault;
+      case 'user-not-found':
+        return S.current.authErrorUserNotFound;
+      case 'wrong-password':
+        return S.current.authErrorWrongPassword;
+      case 'email-already-in-use':
+        return S.current.authErrorEmailInUse;
+      case 'invalid-email':
+        return S.current.authErrorInvalidEmail;
+      case 'weak-password':
+        return S.current.authErrorWeakPassword;
+      case 'too-many-requests':
+        return S.current.authErrorTooManyRequests;
+      case 'network-request-failed':
+        return S.current.authErrorNetworkFailed;
+      default:
+        return S.current.authErrorDefault;
     }
   }
 }

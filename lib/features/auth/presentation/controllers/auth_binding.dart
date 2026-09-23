@@ -24,7 +24,9 @@ class AuthBinding extends Bindings {
 
     // Data Sources
     Get.lazyPut<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl());
-    Get.lazyPut<AuthLocalDataSource>(() => AuthLocalDataSourceImpl(settingsStorage));
+    Get.lazyPut<AuthLocalDataSource>(
+      () => AuthLocalDataSourceImpl(settingsStorage),
+    );
 
     // Repository
     Get.lazyPut<AuthRepository>(

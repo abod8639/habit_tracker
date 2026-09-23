@@ -38,7 +38,7 @@ class HabitLocalDataSource {
 
     final String today = todaysDateFormatted();
     final historyBox = await _openMonthlyBox(today);
-    
+
     // Store daily list in partitioned box
     await historyBox.put(today, habits);
 
@@ -54,7 +54,7 @@ class HabitLocalDataSource {
     try {
       final historyBox = await _openMonthlyBox(dateStr);
       final data = historyBox.get(dateStr);
-      
+
       if (data != null && data is List) {
         final List<HabitModel> result = [];
         for (var item in data) {
@@ -76,7 +76,11 @@ class HabitLocalDataSource {
 
   Future<Map<String, int>> getCompletionStatusForDate(DateTime date) async {
     final localDate = date.isUtc ? date.toLocal() : date;
-    final normalizedDate = DateTime(localDate.year, localDate.month, localDate.day);
+    final normalizedDate = DateTime(
+      localDate.year,
+      localDate.month,
+      localDate.day,
+    );
     final now = DateTime.now();
     final normalizedToday = DateTime(now.year, now.month, now.day);
     final dateStr = convertDateTimeToString(normalizedDate);
@@ -121,9 +125,13 @@ class HabitLocalDataSource {
     int eligibleHabitsCount = 0;
 
     for (var habit in currentHabits) {
-      final habitCreatedDate = DateTime(habit.createdAt.year, habit.createdAt.month, habit.createdAt.day);
+      final habitCreatedDate = DateTime(
+        habit.createdAt.year,
+        habit.createdAt.month,
+        habit.createdAt.day,
+      );
       final existedOnDate = !habitCreatedDate.isAfter(normalizedDate);
-      
+
       final idKey = "${habit.id}_$dateStr";
       final nameKey = "${habit.name}_$dateStr";
       final dynamic boxVal = historyBox.get(idKey) ?? historyBox.get(nameKey);
@@ -142,7 +150,9 @@ class HabitLocalDataSource {
 
     // If we found any recorded completions or non-completions in history
     if (trackedCount > 0) {
-      final total = eligibleHabitsCount > 0 ? eligibleHabitsCount : (currentHabits.isNotEmpty ? currentHabits.length : trackedCount);
+      final total = eligibleHabitsCount > 0
+          ? eligibleHabitsCount
+          : (currentHabits.isNotEmpty ? currentHabits.length : trackedCount);
       return {
         'total': total,
         'completed': completedCount,
@@ -154,7 +164,9 @@ class HabitLocalDataSource {
     if (strengthStr != null) {
       final double? strength = double.tryParse(strengthStr);
       if (strength != null && strength > 0) {
-        final total = eligibleHabitsCount > 0 ? eligibleHabitsCount : currentHabits.length;
+        final total = eligibleHabitsCount > 0
+            ? eligibleHabitsCount
+            : currentHabits.length;
         final calcCompleted = (strength * total).round();
         return {
           'total': total,
@@ -164,14 +176,19 @@ class HabitLocalDataSource {
     }
 
     // If no activity or record exists for this past date, completed is 0
-    final total = eligibleHabitsCount > 0 ? eligibleHabitsCount : currentHabits.length;
+    final total = eligibleHabitsCount > 0
+        ? eligibleHabitsCount
+        : currentHabits.length;
     return {
       'total': total,
       'completed': 0,
     };
   }
 
-  Future<void> saveHabitCompletionHistory(String habitName, bool isCompleted) async {
+  Future<void> saveHabitCompletionHistory(
+    String habitName,
+    bool isCompleted,
+  ) async {
     final String today = todaysDateFormatted();
     final historyBox = await _openMonthlyBox(today);
     final String historyKey = "${habitName}_$today";
@@ -201,33 +218,38 @@ class HabitLocalDataSource {
 
   Future<String?> getHabitStrength(String yyyymmdd) async {
     final historyBox = await _openMonthlyBox(yyyymmdd);
-    return historyBox.get("${HabitStorage.habitStrengthPrefix}$yyyymmdd") as String?;
+    return historyBox.get("${HabitStorage.habitStrengthPrefix}$yyyymmdd")
+        as String?;
   }
 
   Future<Map<String, String>> getAllHabitStrengths() async {
     final Map<String, String> allHistory = {};
-    
+
     // We need to iterate through all months since start date
     final startDateStr = getStartDate();
     final startDate = createDateTimeObject(startDateStr);
     final now = DateTime.now();
-    
+
     var current = DateTime(startDate.year, startDate.month);
-    while (current.isBefore(now) || (current.year == now.year && current.month == now.month)) {
+    while (current.isBefore(now) ||
+        (current.year == now.year && current.month == now.month)) {
       final monthStr = convertDateTimeToString(current).substring(0, 6);
       final boxName = "${HabitStorage.boxName}_history_$monthStr";
-      
+
       final Box historyBox;
       if (Hive.isBoxOpen(boxName)) {
         historyBox = Hive.box(boxName);
       } else {
         historyBox = await Hive.openBox(boxName);
       }
-      
+
       for (var key in historyBox.keys) {
         if (key.toString().startsWith(HabitStorage.habitStrengthPrefix)) {
           // Strip the prefix, and remove any remaining underscore gracefully
-          String date = key.toString().replaceFirst(HabitStorage.habitStrengthPrefix, '');
+          String date = key.toString().replaceFirst(
+            HabitStorage.habitStrengthPrefix,
+            '',
+          );
           if (date.startsWith('_')) {
             date = date.substring(1);
           }
@@ -235,11 +257,11 @@ class HabitLocalDataSource {
           allHistory[date] = strength;
         }
       }
-      
+
       // Move to next month
       current = DateTime(current.year, current.month + 1);
     }
-    
+
     return allHistory;
   }
 
@@ -306,10 +328,11 @@ class HabitLocalDataSource {
     }
 
     var current = DateTime(startDate.year, startDate.month);
-    while (current.isBefore(now) || (current.year == now.year && current.month == now.month)) {
+    while (current.isBefore(now) ||
+        (current.year == now.year && current.month == now.month)) {
       final monthStr = convertDateTimeToString(current).substring(0, 6);
       final boxName = "${HabitStorage.boxName}_history_$monthStr";
-      
+
       try {
         if (Hive.isBoxOpen(boxName)) {
           await Hive.box(boxName).clear();
@@ -320,11 +343,11 @@ class HabitLocalDataSource {
       } catch (_) {
         // Safe to ignore if box cannot be opened
       }
-      
+
       // Move to next month
       current = DateTime(current.year, current.month + 1);
     }
-    
+
     // 2. Clear main habit box
     await _myBox.clear();
 
@@ -346,7 +369,12 @@ class HabitLocalDataSource {
     await _myBox.put(HabitStorage.dayCountKey, currentCount + amount);
   }
 
-  Future<void> saveHabitCompletionToHistory(String habitIdOrName, bool isCompleted, DateTime date, {String? habitName}) async {
+  Future<void> saveHabitCompletionToHistory(
+    String habitIdOrName,
+    bool isCompleted,
+    DateTime date, {
+    String? habitName,
+  }) async {
     final dateStr = convertDateTimeToString(date);
     final historyBox = await _openMonthlyBox(dateStr);
     await historyBox.put("${habitIdOrName}_$dateStr", isCompleted);
@@ -359,7 +387,7 @@ class HabitLocalDataSource {
     final Map<String, Map<DateTime, bool>> historyMap = {};
     final now = DateTime.now();
     final habits = loadHabits();
-    
+
     // Create map for each habit keyed by name for display compatibility
     for (var habit in habits) {
       historyMap[habit.name] = {};
@@ -370,20 +398,21 @@ class HabitLocalDataSource {
       final date = DateTime(now.year, now.month, now.day - i);
       final dateStr = convertDateTimeToString(date);
       final normalizedDate = DateTime(date.year, date.month, date.day);
-      
+
       final historyBox = await _openMonthlyBox(dateStr);
-      
+
       for (var habit in habits) {
         final idKey = "${habit.id}_$dateStr";
         final nameKey = "${habit.name}_$dateStr";
-        final bool? isCompleted = historyBox.get(idKey) ?? historyBox.get(nameKey);
-        
+        final bool? isCompleted =
+            historyBox.get(idKey) ?? historyBox.get(nameKey);
+
         if (isCompleted != null) {
           historyMap[habit.name]![normalizedDate] = isCompleted;
         }
       }
     }
-    
+
     return historyMap;
   }
 }

@@ -18,7 +18,8 @@ class SettingEntity {
   }) {
     return SettingEntity(
       languageCode: languageCode ?? this.languageCode,
-      isNotificationEnabled: isNotificationEnabled ?? this.isNotificationEnabled,
+      isNotificationEnabled:
+          isNotificationEnabled ?? this.isNotificationEnabled,
       notificationTime: notificationTime ?? this.notificationTime,
     );
   }

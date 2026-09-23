@@ -80,36 +80,46 @@ class SettingRepositoryImpl implements SettingRepository {
   }
 
   @override
-  Future<Either<Failure, List<HabitModel>>> syncHabits(List<HabitModel> localHabits, {List<String>? localTombstones, String? localStartDay}) async {
+  Future<Either<Failure, List<HabitModel>>> syncHabits(
+    List<HabitModel> localHabits, {
+    List<String>? localTombstones,
+    String? localStartDay,
+  }) async {
     try {
       // 1. Determine local start date (use parameter if provided, else get from local DS)
-      final effectiveStartDay = localStartDay ?? habitLocalDataSource.getStartDate();
+      final effectiveStartDay =
+          localStartDay ?? habitLocalDataSource.getStartDate();
 
       // 2. Sync habits via remote (now includes startDay)
       final mergedHabits = await remoteDataSource.syncHabits(
-        localHabits, 
+        localHabits,
         localTombstones: localTombstones,
         localStartDay: effectiveStartDay,
       );
-      
+
       // 3. Persist habits to local database
       await habitLocalDataSource.saveHabits(mergedHabits);
-      
+
       // 4. Sync and persist history (Heatmap data)
       final firestoreService = FirestoreService();
       if (firestoreService.isUserLoggedIn) {
         // Find if there's a cloud start day to update locally
-        final userDoc = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
         final cloudStartDay = userDoc.data()?['startDay'] as String?;
         if (cloudStartDay != null && cloudStartDay != effectiveStartDay) {
           habitLocalDataSource.updateStartDate(cloudStartDay);
         }
 
         final localHistory = await habitLocalDataSource.getAllHabitStrengths();
-        final mergedHistory = await firestoreService.syncHabitHistory(localHistory);
+        final mergedHistory = await firestoreService.syncHabitHistory(
+          localHistory,
+        );
         await habitLocalDataSource.saveAllHabitStrengths(mergedHistory);
       }
-      
+
       return Right(mergedHabits);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -164,11 +174,11 @@ class SettingRepositoryImpl implements SettingRepository {
       if (firestoreService.isUserLoggedIn) {
         await firestoreService.deleteAllUserData();
       }
-      
+
       // 2. Clear Local Data
       await localDataSource.clearAllData();
       await habitLocalDataSource.clearAllData();
-      
+
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));

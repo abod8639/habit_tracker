@@ -195,8 +195,11 @@ class _LoginPageState extends State<LoginPage> {
                   AnimatedEntry(
                     delay: delayStep * 4,
                     child: Obx(() {
-                      final bool isAuthLoading = _authController.isLoading.value;
-                      final bool isSyncing = _syncController.syncStatus.value == SyncStatus.syncing;
+                      final bool isAuthLoading =
+                          _authController.isLoading.value;
+                      final bool isSyncing =
+                          _syncController.syncStatus.value ==
+                          SyncStatus.syncing;
                       final bool isLoading = isAuthLoading || isSyncing;
 
                       return ElevatedButton(
@@ -258,8 +261,11 @@ class _LoginPageState extends State<LoginPage> {
                   AnimatedEntry(
                     delay: delayStep * 9,
                     child: Obx(() {
-                      final bool isAuthLoading = _authController.isLoading.value;
-                      final bool isSyncing = _syncController.syncStatus.value == SyncStatus.syncing;
+                      final bool isAuthLoading =
+                          _authController.isLoading.value;
+                      final bool isSyncing =
+                          _syncController.syncStatus.value ==
+                          SyncStatus.syncing;
                       final bool isLoading = isAuthLoading || isSyncing;
 
                       return OutlinedButton.icon(
@@ -268,13 +274,18 @@ class _LoginPageState extends State<LoginPage> {
                             ? const SizedBox(
                                 height: 24,
                                 width: 24,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : Image.asset(
                                 'assets/icon/google_icon.png',
                                 height: 24,
                                 errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(Icons.g_mobiledata, size: 24);
+                                  return const Icon(
+                                    Icons.g_mobiledata,
+                                    size: 24,
+                                  );
                                 },
                               ),
                         label: Text(S.current.signInWithGoogle),

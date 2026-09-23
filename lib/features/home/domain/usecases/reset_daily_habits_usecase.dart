@@ -10,21 +10,25 @@ class ResetDailyHabitsUseCase {
 
   Future<Either<Failure, void>> call() async {
     final dateResult = await repository.getLastResetDate();
-    
+
     return dateResult.fold(
       (failure) => Left(failure),
       (lastResetDate) async {
         if (shouldResetHabits(lastResetDate)) {
           // 1. Get current habits to save to history
           final habitsResult = await repository.getHabits();
-          
+
           return await habitsResult.fold(
             (failure) => Left(failure),
             (habits) async {
               final now = DateTime.now();
               final today = DateTime(now.year, now.month, now.day);
               final lastDay = lastResetDate != null
-                  ? DateTime(lastResetDate.year, lastResetDate.month, lastResetDate.day)
+                  ? DateTime(
+                      lastResetDate.year,
+                      lastResetDate.month,
+                      lastResetDate.day,
+                    )
                   : today.subtract(const Duration(days: 1));
 
               final daysDiff = today.difference(lastDay).inDays;
@@ -57,7 +61,9 @@ class ResetDailyHabitsUseCase {
               if (resetResult.isLeft()) return resetResult;
 
               // 4. Increment day count by actual days elapsed
-              final incrementResult = await repository.incrementDayCount(daysDiff > 0 ? daysDiff : 1);
+              final incrementResult = await repository.incrementDayCount(
+                daysDiff > 0 ? daysDiff : 1,
+              );
               if (incrementResult.isLeft()) return incrementResult;
 
               // 5. Update last reset date

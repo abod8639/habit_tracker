@@ -92,4 +92,3 @@ Widget buildStatItem(String title, String value, IconData icon, Color color) {
     color: color,
   );
 }
-

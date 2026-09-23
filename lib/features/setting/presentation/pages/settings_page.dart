@@ -57,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage>
             buildAiSection(_animationController),
             buildAboutSection(_animationController),
             buildDataSection(_animationController),
-            buildLogoutTile(_animationController)
+            buildLogoutTile(_animationController),
           ],
         ),
       ),

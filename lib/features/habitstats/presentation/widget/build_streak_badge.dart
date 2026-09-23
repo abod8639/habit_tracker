@@ -16,8 +16,9 @@ class StreakBadge extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     final bool hasStreak = streak > 0;
-    final Color badgeColor =
-        hasStreak ? colorScheme.secondary : colorScheme.onSurfaceVariant;
+    final Color badgeColor = hasStreak
+        ? colorScheme.secondary
+        : colorScheme.onSurfaceVariant;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -54,4 +55,3 @@ class StreakBadge extends StatelessWidget {
 Widget buildStreakBadge(int streak) {
   return StreakBadge(streak: streak);
 }
-

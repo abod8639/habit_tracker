@@ -136,13 +136,26 @@ class MyAppBar extends StatelessWidget {
 
   void _showColorPicker(BuildContext context, HabitController controller) {
     final colors = [
-      Colors.red[400]!, Colors.pink[400]!, Colors.purple[400]!,
-      Colors.deepPurple[400]!, Colors.indigo[400]!, Colors.blue[400]!,
-      Colors.lightBlue[400]!, Colors.cyan[400]!, Colors.teal[400]!,
-      Colors.green[400]!, Colors.lightGreen[500]!, Colors.lime[600]!,
-      Colors.yellow[700]!, Colors.amber[500]!, Colors.orange[600]!,
-      Colors.deepOrange[500]!, Colors.brown[400]!, Colors.blueGrey[400]!,
-      const Color(0xFF6C63FF), const Color(0xFF2D2D2D),
+      Colors.red[400]!,
+      Colors.pink[400]!,
+      Colors.purple[400]!,
+      Colors.deepPurple[400]!,
+      Colors.indigo[400]!,
+      Colors.blue[400]!,
+      Colors.lightBlue[400]!,
+      Colors.cyan[400]!,
+      Colors.teal[400]!,
+      Colors.green[400]!,
+      Colors.lightGreen[500]!,
+      Colors.lime[600]!,
+      Colors.yellow[700]!,
+      Colors.amber[500]!,
+      Colors.orange[600]!,
+      Colors.deepOrange[500]!,
+      Colors.brown[400]!,
+      Colors.blueGrey[400]!,
+      const Color(0xFF6C63FF),
+      const Color(0xFF2D2D2D),
     ];
 
     Get.dialog(
@@ -180,9 +193,9 @@ class MyAppBar extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .primaryColor
-                          .withValues(alpha: 0.15),
+                      color: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -295,17 +308,18 @@ class MyAppBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               Text(
-                S.of(context).deleteSelectedConfirm(controller.selectedHabitIds.length),
+                S
+                    .of(context)
+                    .deleteSelectedConfirm(controller.selectedHabitIds.length),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w500,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                   height: 1.5,
                 ),
               ),
@@ -320,10 +334,9 @@ class MyAppBar extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.2),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.2),
                           ),
                         ),
                       ),
@@ -343,18 +356,19 @@ class MyAppBar extends StatelessWidget {
                         controller.deleteSelectedHabits();
                         Navigator.pop(context);
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        shadowColor: Colors.red.withValues(alpha: 0.4),
-                      ).copyWith(
-                        elevation: WidgetStateProperty.all(4),
-                      ),
+                      style:
+                          ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            shadowColor: Colors.red.withValues(alpha: 0.4),
+                          ).copyWith(
+                            elevation: WidgetStateProperty.all(4),
+                          ),
                       child: Text(
                         S.of(context).delete,
                         style: const TextStyle(fontWeight: FontWeight.w700),

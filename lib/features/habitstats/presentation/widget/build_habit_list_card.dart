@@ -112,7 +112,9 @@ class HabitListCard extends StatelessWidget {
                         Icon(
                           Icons.checklist_rounded,
                           size: 48,
-                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                          color: colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.4,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -136,4 +138,3 @@ class HabitListCard extends StatelessWidget {
 Widget buildHabitListCard(BuildContext context) {
   return const HabitListCard();
 }
-

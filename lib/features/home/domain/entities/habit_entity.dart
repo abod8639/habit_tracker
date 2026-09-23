@@ -23,15 +23,15 @@ class HabitEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        isCompleted,
-        createdAt,
-        completedAt,
-        colorValue,
-        index,
-        updatedAt,
-      ];
+    id,
+    name,
+    isCompleted,
+    createdAt,
+    completedAt,
+    colorValue,
+    index,
+    updatedAt,
+  ];
 
   HabitEntity copyWith({
     String? id,

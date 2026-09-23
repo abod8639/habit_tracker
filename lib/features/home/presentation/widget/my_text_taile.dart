@@ -276,8 +276,8 @@ class _MyTextTaileState extends State<MyTextTaile>
                 color: widget.habitCompleted
                     ? Colors.transparent
                     : (widget.colorValue != null
-                        ? baseColor
-                        : themeColors.outline),
+                          ? baseColor
+                          : themeColors.outline),
                 width: 2,
               ),
               activeColor: baseColor,
@@ -292,22 +292,24 @@ class _MyTextTaileState extends State<MyTextTaile>
     final textColor = _getTileTextColor(themeColors);
     return AnimatedDefaultTextStyle(
       duration: const Duration(milliseconds: 250),
-      style: textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: textColor,
-        decoration: widget.habitCompleted
-            ? TextDecoration.lineThrough
-            : TextDecoration.none,
-        decorationColor: textColor.withValues(alpha: 0.6),
-      ) ?? TextStyle(
-        fontWeight: FontWeight.w600,
-        fontSize: 16,
-        color: textColor,
-        decoration: widget.habitCompleted
-            ? TextDecoration.lineThrough
-            : TextDecoration.none,
-        decorationColor: textColor.withValues(alpha: 0.6),
-      ),
+      style:
+          textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: textColor,
+            decoration: widget.habitCompleted
+                ? TextDecoration.lineThrough
+                : TextDecoration.none,
+            decorationColor: textColor.withValues(alpha: 0.6),
+          ) ??
+          TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            color: textColor,
+            decoration: widget.habitCompleted
+                ? TextDecoration.lineThrough
+                : TextDecoration.none,
+            decorationColor: textColor.withValues(alpha: 0.6),
+          ),
       child: Text(
         widget.habitName,
         maxLines: 2,

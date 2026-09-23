@@ -8,7 +8,15 @@ class SyncHabitsUseCase {
 
   SyncHabitsUseCase(this.repository);
 
-  Future<Either<Failure, List<HabitModel>>> call(List<HabitModel> localHabits, {List<String>? localTombstones, String? localStartDay}) async {
-    return await repository.syncHabits(localHabits, localTombstones: localTombstones, localStartDay: localStartDay);
+  Future<Either<Failure, List<HabitModel>>> call(
+    List<HabitModel> localHabits, {
+    List<String>? localTombstones,
+    String? localStartDay,
+  }) async {
+    return await repository.syncHabits(
+      localHabits,
+      localTombstones: localTombstones,
+      localStartDay: localStartDay,
+    );
   }
 }
