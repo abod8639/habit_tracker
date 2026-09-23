@@ -172,6 +172,132 @@
   "getKeyInfo": "Get a free API key from Google AI Studio",
   "tapToEdit": "Tap to configure",
   "save": "Save",
-  "paste": "Paste"
+  "paste": "Paste",
+  "systemLanguage": "System Language",
+  "noHabitsYet": "No habits yet",
+  "addFirstHabitSubtitle": "Add your first habit with the + button",
+  "itemsSelected": "{count} Selected",
+  "@itemsSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chooseColor": "Choose Color",
+  "deleteSelected": "Delete Selected",
+  "deleteSelectedConfirm": "Are you sure you want to delete {count} habit(s)? This action cannot be undone.",
+  "@deleteSelectedConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanHabitsTitle": "Scan Habits",
+  "scanHabitsDesc": "Extract tasks from an image automatically.",
+  "camera": "Camera",
+  "gallery": "Gallery",
+  "noHabitsDetected": "No Habits Detected",
+  "noHabitsDetectedDesc": "We could not find any clear tasks or habits in this image. Please try another one.",
+  "close": "Close",
+  "detectedHabits": "Detected Habits",
+  "saveSelected": "Save Selected",
+  "addedSelectedHabitsSuccess": "Added the selected habits successfully.",
+  "somethingWentWrong": "Something went wrong",
+  "tryAgain": "Try Again",
+  "loadingHabits": "Loading your habits...",
+  "justAMoment": "Just a moment",
+  "clearingData": "Clearing data...",
+  "dataClearedSuccess": "Data cleared successfully! Restarting app...",
+  "failedToClearData": "Failed to clear data: {message}",
+  "@failedToClearData": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "clearAllDataConfirm": "Are you sure you want to delete all habits and settings? This action cannot be undone.",
+  "notificationsDisabled": "Notifications disabled",
+  "reminderSetFor": "Reminder set for {time}",
+  "@reminderSetFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "testNotification": "Test Notification",
+  "testNotificationDesc": "Send a test notification to verify delivery",
+  "notificationTestTitle": "Notification Test",
+  "notificationTestSent": "Test notification sent! Check your notification bar.",
+  "remindersEnabledTitle": "Reminders Enabled!",
+  "remindersEnabledBody": "You will receive daily habit checks.",
+  "streakDay": "Day {streak}",
+  "@streakDay": {
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "currentlySelected": "Currently Selected",
+  "tapToApply": "Tap to apply",
+  "themeNotFound": "Theme not found",
+  "retry": "Retry",
+  "generatePlan": "Generate a Plan",
+  "generatePlanTitle": "What do you want\nto work on?",
+  "generatePlanSubtitle": "Choose a category and we'll build a personalized habit plan just for you.",
+  "generateMyPlan": "Generate My Plan ✨",
+  "continueButton": "Continue",
+  "optional": "Optional",
+  "yourPlanTitle": "Your {category} Plan",
+  "@yourPlanTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "habitsGeneratedCount": "{count} habits generated for you",
+  "@habitsGeneratedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectAll": "Select all",
+  "clear": "Clear",
+  "addHabitsToTracker": "Add {count} Habit(s) to Tracker",
+  "@addHabitsToTracker": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectAtLeastOneHabit": "Select at least one habit",
+  "answerRequired": "Answer required",
+  "pleaseAnswerToContinue": "Please answer this question to continue.",
+  "planGenerationFailed": "Failed to generate plan. Please try again.",
+  "planActivatedTitle": "🎉 Plan activated!",
+  "planActivatedDesc": "{count} habits added to your tracker.",
+  "@planActivatedDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categorySports": "Sports & Fitness",
+  "categorySportsDesc": "Build a consistent fitness routine",
+  "categoryNutrition": "Nutrition",
+  "categoryNutritionDesc": "Improve your diet and reach your health goals",
+  "categoryStudy": "Study",
+  "categoryStudyDesc": "Boost your academic performance",
+  "categoryLearning": "Learn a New Skill",
+  "categoryLearningDesc": "Master any skill step by step"
 }
 
