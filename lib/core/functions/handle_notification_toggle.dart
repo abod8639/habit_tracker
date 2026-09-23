@@ -15,7 +15,7 @@ Future<void> handleNotificationToggle(
   } else {
     Get.snackbar(
       S.current.success,
-      'Notifications disabled',
+      S.current.notificationsDisabled,
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
