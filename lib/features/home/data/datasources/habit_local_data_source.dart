@@ -182,22 +182,36 @@ class HabitLocalDataSource {
     _myBox.delete('local_tombstones');
   }
 
-  Future<void> clearAllData() async {
+  Future<void> clearAllData({String? earliestDateStr}) async {
     // 1. Iterate and clear monthly history boxes
-    final startDateStr = getStartDate();
-    final startDate = createDateTimeObject(startDateStr);
+    DateTime startDate;
+    if (earliestDateStr != null && earliestDateStr.isNotEmpty) {
+      final parsed = createDateTimeObject(earliestDateStr);
+      final stored = createDateTimeObject(getStartDate());
+      startDate = parsed.isBefore(stored) ? parsed : stored;
+    } else {
+      startDate = createDateTimeObject(getStartDate());
+    }
+
     final now = DateTime.now();
-    
+    if (startDate.isAfter(now)) {
+      startDate = now;
+    }
+
     var current = DateTime(startDate.year, startDate.month);
     while (current.isBefore(now) || (current.year == now.year && current.month == now.month)) {
       final monthStr = convertDateTimeToString(current).substring(0, 6);
       final boxName = "${HabitStorage.boxName}_history_$monthStr";
       
-      if (Hive.isBoxOpen(boxName)) {
-        await Hive.box(boxName).clear();
-      } else {
-        final box = await Hive.openBox(boxName);
-        await box.clear();
+      try {
+        if (Hive.isBoxOpen(boxName)) {
+          await Hive.box(boxName).clear();
+        } else {
+          final box = await Hive.openBox(boxName);
+          await box.clear();
+        }
+      } catch (_) {
+        // Safe to ignore if box cannot be opened
       }
       
       // Move to next month
@@ -206,6 +220,9 @@ class HabitLocalDataSource {
     
     // 2. Clear main habit box
     await _myBox.clear();
+
+    // 3. Reset start date to today
+    setStartDate();
   }
 
   Future<DateTime?> getLastResetDate() async {
