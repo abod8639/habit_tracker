@@ -27,7 +27,7 @@ class HabitLocalDataSource {
       if (data is List && data.isNotEmpty && data.first is List) {
         return data.map((item) => HabitModel.fromLocalFormat(item)).toList();
       } else if (data is List) {
-        return data.cast<HabitModel>();
+        return List<HabitModel>.from(data.cast<HabitModel>());
       }
     }
     return [];
@@ -58,7 +58,7 @@ class HabitLocalDataSource {
       if (data.isNotEmpty && data.first is List) {
         return data.map((item) => HabitModel.fromLocalFormat(item)).toList();
       } else {
-        return data.cast<HabitModel>();
+        return List<HabitModel>.from(data.cast<HabitModel>());
       }
     }
     return [];
