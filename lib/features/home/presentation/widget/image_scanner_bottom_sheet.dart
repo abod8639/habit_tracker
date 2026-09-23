@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageScannerBottomSheet extends StatelessWidget {
@@ -48,14 +49,14 @@ class ImageScannerBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'Scan Habits',
+            S.of(context).scanHabitsTitle,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Extract tasks from an image automatically.',
+            S.of(context).scanHabitsDesc,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -68,13 +69,13 @@ class ImageScannerBottomSheet extends StatelessWidget {
               _buildOptionCard(
                 context,
                 icon: Icons.camera_alt_rounded,
-                label: 'Camera',
+                label: S.of(context).camera,
                 onTap: () => _pickImage(context, ImageSource.camera),
               ),
               _buildOptionCard(
                 context,
                 icon: Icons.photo_library_rounded,
-                label: 'Gallery',
+                label: S.of(context).gallery,
                 onTap: () => _pickImage(context, ImageSource.gallery),
               ),
             ],
