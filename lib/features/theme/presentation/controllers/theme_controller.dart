@@ -8,6 +8,7 @@ import '../../domain/usecases/save_theme_settings_usecase.dart';
 import '../../domain/usecases/sync_theme_with_cloud_usecase.dart';
 import '../../domain/usecases/upload_theme_settings_usecase.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 class ThemeController extends GetxController {
   static const String defaultTheme = 'github_dark_green';
@@ -141,7 +142,7 @@ class ThemeController extends GetxController {
       _buildAndApply();
       _saveCurrentSettings();
     } else {
-      Get.snackbar('Error', 'Theme not found');
+      Get.snackbar(S.current.error, S.current.themeNotFound);
     }
   }
 
