@@ -38,7 +38,7 @@ Widget buildHabitList(
           title: Text(
             habit['habit'],
             style: TextStyle(
-              fontWeight: isCompleted ? FontWeight.w500 : FontWeight.normal,
+              fontWeight: isCompleted ? FontWeight.w600 : FontWeight.normal,
               decoration: isCompleted ? TextDecoration.lineThrough : null,
             ),
           ),
