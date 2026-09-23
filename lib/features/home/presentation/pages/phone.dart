@@ -9,6 +9,7 @@ import 'package:habit_tracker/core/components/build_error_screen.dart';
 import 'package:habit_tracker/core/components/build_loading_screen.dart';
 import 'package:habit_tracker/core/components/my_drawer.dart';
 import 'package:habit_tracker/features/home/presentation/widget/my_fab.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 class Phone extends StatefulWidget {
   const Phone({super.key});
@@ -82,7 +83,7 @@ class MyAppBar extends StatelessWidget {
             onPressed: () => controller.clearSelection(),
           ),
           title: Text(
-            '${controller.selectedHabitIds.length} Selected',
+            S.current.itemsSelected(controller.selectedHabitIds.length),
             style: const TextStyle(color: Colors.white),
           ),
           actions: [
@@ -125,7 +126,7 @@ class MyAppBar extends StatelessWidget {
               Icons.auto_awesome,
               color: Theme.of(context).primaryColor,
             ),
-            tooltip: 'Generate Plan',
+            tooltip: S.current.generatePlan,
             onPressed: () => Get.toNamed(AppRoutes.categorySelection),
           ),
         ],
@@ -192,7 +193,7 @@ class MyAppBar extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Choose Color',
+                    S.of(context).chooseColor,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -286,7 +287,7 @@ class MyAppBar extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Delete Selected',
+                S.of(context).deleteSelected,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -295,7 +296,7 @@ class MyAppBar extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Are you sure you want to delete ${controller.selectedHabitIds.length} habit(s)? This action cannot be undone.',
+                S.of(context).deleteSelectedConfirm(controller.selectedHabitIds.length),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13.5,
@@ -325,7 +326,7 @@ class MyAppBar extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Cancel',
+                        S.of(context).cancel,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).colorScheme.onSurface,
@@ -352,9 +353,9 @@ class MyAppBar extends StatelessWidget {
                       ).copyWith(
                         elevation: WidgetStateProperty.all(4),
                       ),
-                      child: const Text(
-                        'Delete',
-                        style: TextStyle(fontWeight: FontWeight.w700),
+                      child: Text(
+                        S.of(context).delete,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
