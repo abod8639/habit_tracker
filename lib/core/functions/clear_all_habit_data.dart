@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/clear_all_data_usecase.dart';
 import 'package:habit_tracker/core/utils/restart_widget.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 /// Safe function to clear data and restart app
 Future<void> clearAppDataAndRestart(BuildContext context) async {
@@ -49,19 +50,19 @@ Future<bool?> _showConfirmationDialog(BuildContext context) async {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Clear All Data'),
-        content: const Text(
-          'Are you sure you want to delete all habits and settings? This action cannot be undone.',
+        title: Text(S.of(context).clearAllData),
+        content: Text(
+          S.of(context).clearAllDataConfirm,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(S.of(context).cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete All'),
+            child: Text(S.of(context).delete),
           ),
         ],
       );
@@ -74,13 +75,13 @@ void _showLoadingDialog(BuildContext context) {
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return const AlertDialog(
+      return AlertDialog(
         content: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20),
-            Text('Clearing data...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 20),
+            Text(S.of(context).clearingData),
           ],
         ),
       );
@@ -90,9 +91,9 @@ void _showLoadingDialog(BuildContext context) {
 
 void _showSuccessSnackBar(BuildContext context) {
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text('Data cleared successfully! Restarting app...'),
-      duration: Duration(seconds: 1),
+    SnackBar(
+      content: Text(S.of(context).dataClearedSuccess),
+      duration: const Duration(seconds: 1),
       backgroundColor: Colors.green,
     ),
   );
@@ -101,7 +102,7 @@ void _showSuccessSnackBar(BuildContext context) {
 void _showErrorSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text('Failed to clear data: $message'),
+      content: Text(S.of(context).failedToClearData(message)),
       duration: const Duration(seconds: 3),
       backgroundColor: Colors.red,
     ),
