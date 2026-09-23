@@ -20,19 +20,43 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'ar';
 
-  static String m0(days) => "منذ ${days} يوم";
+  static String m0(count) => "إضافة ${count} عادات إلى قائمة العادات";
 
-  static String m1(hours) => "منذ ${hours} ساعة";
+  static String m1(days) => "منذ ${days} يوم";
 
-  static String m2(minutes) => "منذ ${minutes} دقيقة";
+  static String m2(count) =>
+      "هل أنت متأكد من حذف ${count} عادة؟ لا يمكن التراجع عن هذا الإجراء.";
+
+  static String m3(message) => "فشل مسح البيانات: ${message}";
+
+  static String m4(count) => "تم توليد ${count} عادات مخصصة لك";
+
+  static String m5(hours) => "منذ ${hours} ساعة";
+
+  static String m6(count) => "${count} محدد";
+
+  static String m7(minutes) => "منذ ${minutes} دقيقة";
+
+  static String m8(count) => "تمت إضافة ${count} عادات إلى متتبعك بنجاح.";
+
+  static String m9(time) => "تم ضبط التذكير في ${time}";
+
+  static String m10(streak) => "يوم ${streak}";
+
+  static String m11(category) => "خطتك في ${category}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "about": MessageLookupByLibrary.simpleMessage("حول التطبيق"),
         "account": MessageLookupByLibrary.simpleMessage("الحساب"),
         "add": MessageLookupByLibrary.simpleMessage("إضافة"),
+        "addFirstHabitSubtitle":
+            MessageLookupByLibrary.simpleMessage("أضف عادتك الأولى عبر زر +"),
+        "addHabitsToTracker": m0,
         "addNewHabit":
             MessageLookupByLibrary.simpleMessage("إضافة عادة جديدة..."),
+        "addedSelectedHabitsSuccess": MessageLookupByLibrary.simpleMessage(
+            "تمت إضافة العادات المحددة بنجاح."),
         "aiApiKeySubtitle": MessageLookupByLibrary.simpleMessage(
             "مفتاح Gemini مخصص لميزات الذكاء الاصطناعي"),
         "aiApiKeyTitle":
@@ -42,6 +66,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "أنا هنا لدعمك في رحلتك نحو أهدافك."),
         "alreadyHaveAccount":
             MessageLookupByLibrary.simpleMessage("لديك حساب بالفعل؟"),
+        "answerRequired":
+            MessageLookupByLibrary.simpleMessage("الإجابة مطلوبة"),
         "apiKeyClearedSuccess": MessageLookupByLibrary.simpleMessage(
             "تمت إزالة المفتاح المخصص والعودة للمفتاح الافتراضي."),
         "apiKeyHint": MessageLookupByLibrary.simpleMessage(
@@ -78,14 +104,38 @@ class MessageLookup extends MessageLookupByLibrary {
         "backupData": MessageLookupByLibrary.simpleMessage("نسخ احتياطي"),
         "barChartIsEmpty":
             MessageLookupByLibrary.simpleMessage("لا توجد بيانات متاحة"),
+        "camera": MessageLookupByLibrary.simpleMessage("الكاميرا"),
         "cancel": MessageLookupByLibrary.simpleMessage("إلغاء"),
+        "categoryLearning":
+            MessageLookupByLibrary.simpleMessage("تعلم مهارة جديدة"),
+        "categoryLearningDesc": MessageLookupByLibrary.simpleMessage(
+            "إتقان أي مهارة ترغب بها خطوة بخطوة"),
+        "categoryNutrition":
+            MessageLookupByLibrary.simpleMessage("التغذية والصحة"),
+        "categoryNutritionDesc": MessageLookupByLibrary.simpleMessage(
+            "تحسين نظامك الغذائي وتحقيق أهدافك الصحية"),
+        "categorySports":
+            MessageLookupByLibrary.simpleMessage("الرياضة واللياقة"),
+        "categorySportsDesc": MessageLookupByLibrary.simpleMessage(
+            "بناء روتين لياقة بدنية منتظم ومستمر"),
+        "categoryStudy":
+            MessageLookupByLibrary.simpleMessage("الدراسة والتحصيل العلمي"),
+        "categoryStudyDesc": MessageLookupByLibrary.simpleMessage(
+            "رفع مستوى أدائك وتحصيلك الأكاديمي"),
         "changeAppTheme":
             MessageLookupByLibrary.simpleMessage("تغيير ثيم ولون التطبيق"),
+        "chooseColor": MessageLookupByLibrary.simpleMessage("اختر لوناً"),
+        "clear": MessageLookupByLibrary.simpleMessage("مسح"),
         "clearAllData":
             MessageLookupByLibrary.simpleMessage("مسح جميع البيانات"),
+        "clearAllDataConfirm": MessageLookupByLibrary.simpleMessage(
+            "هل أنت متأكد من رغبتك في حذف جميع العادات والإعدادات؟ لا يمكن التراجع عن هذا الإجراء."),
         "clearChatConfirm": MessageLookupByLibrary.simpleMessage(
             "هل أنت متأكد من مسح المحادثة بالكامل؟"),
         "clearChatTitle": MessageLookupByLibrary.simpleMessage("مسح المحادثة"),
+        "clearingData":
+            MessageLookupByLibrary.simpleMessage("جاري مسح البيانات..."),
+        "close": MessageLookupByLibrary.simpleMessage("إغلاق"),
         "cloudSync": MessageLookupByLibrary.simpleMessage("المزامنة السحابية"),
         "comingSoon": MessageLookupByLibrary.simpleMessage("قريباً"),
         "completed": MessageLookupByLibrary.simpleMessage("مكتمل"),
@@ -95,8 +145,11 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("تأكيد كلمة المرور"),
         "confirmPasswordRequired":
             MessageLookupByLibrary.simpleMessage("يرجى تأكيد كلمة المرور"),
+        "continueButton": MessageLookupByLibrary.simpleMessage("متابعة"),
         "createAccount":
             MessageLookupByLibrary.simpleMessage("إنشاء حساب جديد"),
+        "currentlySelected":
+            MessageLookupByLibrary.simpleMessage("المحدد حالياً"),
         "customApiKeyActive":
             MessageLookupByLibrary.simpleMessage("المفتاح المخصص مفعّل"),
         "customApiKeyDialogDesc": MessageLookupByLibrary.simpleMessage(
@@ -104,7 +157,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "customApiKeyDialogTitle":
             MessageLookupByLibrary.simpleMessage("مفتاح Gemini API"),
         "dailyReminder": MessageLookupByLibrary.simpleMessage("التذكير اليومي"),
-        "daysAgo": m0,
+        "dataClearedSuccess": MessageLookupByLibrary.simpleMessage(
+            "تم مسح البيانات بنجاح! جاري إعادة تشغيل التطبيق..."),
+        "daysAgo": m1,
         "defaultApiKeyActive":
             MessageLookupByLibrary.simpleMessage("المفتاح الافتراضي نشط"),
         "defaultHabits1": MessageLookupByLibrary.simpleMessage("انقر هنا"),
@@ -116,6 +171,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "deleteAllHabitsAndSettings":
             MessageLookupByLibrary.simpleMessage("حذف جميع العادات والإعدادات"),
         "deleteHabit": MessageLookupByLibrary.simpleMessage("حذف العادة"),
+        "deleteSelected": MessageLookupByLibrary.simpleMessage("حذف المحدد"),
+        "deleteSelectedConfirm": m2,
+        "detectedHabits":
+            MessageLookupByLibrary.simpleMessage("العادات المكتشفة"),
         "dontHaveAccount":
             MessageLookupByLibrary.simpleMessage("ليس لديك حساب؟"),
         "drawer": MessageLookupByLibrary.simpleMessage(""),
@@ -132,18 +191,27 @@ class MessageLookup extends MessageLookupByLibrary {
         "error": MessageLookupByLibrary.simpleMessage("خطأ"),
         "exportYourHabitData":
             MessageLookupByLibrary.simpleMessage("تصدير بيانات العادات"),
+        "failedToClearData": m3,
         "forgotPassword":
             MessageLookupByLibrary.simpleMessage("نسيت كلمة المرور؟"),
+        "gallery": MessageLookupByLibrary.simpleMessage("المعرض"),
         "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
             "خطأ في إعدادات مفتاح API الخاص بـ Gemini."),
         "geminiQuotaExceeded": MessageLookupByLibrary.simpleMessage(
             "تم تجاوز حد الطلبات المسموح به. يرجى المحاولة بعد قليل."),
         "geminiServerError":
             MessageLookupByLibrary.simpleMessage("حدث خطأ في خادم Gemini."),
+        "generateMyPlan": MessageLookupByLibrary.simpleMessage("إنشاء خطتي ✨"),
+        "generatePlan": MessageLookupByLibrary.simpleMessage("إنشاء خطة عادات"),
+        "generatePlanSubtitle": MessageLookupByLibrary.simpleMessage(
+            "اختر مجالاً وسنقوم بإنشاء خطة عادات مخصصة تناسبك تماماً."),
+        "generatePlanTitle":
+            MessageLookupByLibrary.simpleMessage("ما الذي تريد\nالعمل عليه؟"),
         "getKeyInfo": MessageLookupByLibrary.simpleMessage(
             "احصل على مفتاح مجاني من Google AI Studio"),
+        "habitsGeneratedCount": m4,
         "hambitstate": MessageLookupByLibrary.simpleMessage("حالة العادة"),
-        "hoursAgo": m1,
+        "hoursAgo": m5,
         "importPreviouslyExportedData": MessageLookupByLibrary.simpleMessage(
             "استيراد بيانات محفوظة مسبقاً"),
         "incomplete": MessageLookupByLibrary.simpleMessage("غير مكتمل"),
@@ -153,10 +221,14 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("يرجى إدخال مفتاح API صالح"),
         "isEmpty":
             MessageLookupByLibrary.simpleMessage("لا توجد عادات مسجلة بعد"),
+        "itemsSelected": m6,
         "joinUs": MessageLookupByLibrary.simpleMessage("انضم إلينا"),
+        "justAMoment": MessageLookupByLibrary.simpleMessage("لحظة واحدة"),
         "justNow": MessageLookupByLibrary.simpleMessage("الآن"),
         "lan": MessageLookupByLibrary.simpleMessage("اللغة"),
         "lastSync": MessageLookupByLibrary.simpleMessage("آخر مزامنة"),
+        "loadingHabits":
+            MessageLookupByLibrary.simpleMessage("جاري تحميل عاداتك..."),
         "login": MessageLookupByLibrary.simpleMessage("تسجيل الدخول"),
         "loginRequired":
             MessageLookupByLibrary.simpleMessage("يرجى تسجيل الدخول أولاً"),
@@ -170,15 +242,28 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("تسجيل الخروج"),
         "logoutFromAccount":
             MessageLookupByLibrary.simpleMessage("الخروج من حسابك"),
-        "minutesAgo": m2,
+        "minutesAgo": m7,
         "monthly": MessageLookupByLibrary.simpleMessage("تقدم الشهري"),
         "name": MessageLookupByLibrary.simpleMessage("الاسم"),
         "nameRequired":
             MessageLookupByLibrary.simpleMessage("يرجى إدخال الاسم"),
+        "noHabitsDetected":
+            MessageLookupByLibrary.simpleMessage("لم يتم العثور على عادات"),
+        "noHabitsDetectedDesc": MessageLookupByLibrary.simpleMessage(
+            "لم نتمكن من العثور على أي مهام أو عادات واضحة في هذه الصورة. يرجى تجربة صورة أخرى."),
+        "noHabitsYet":
+            MessageLookupByLibrary.simpleMessage("لا توجد عادات بعد"),
         "notSyncedYet":
             MessageLookupByLibrary.simpleMessage("لم تتم المزامنة بعد"),
+        "notificationTestSent": MessageLookupByLibrary.simpleMessage(
+            "تم إرسال إشعار تجريبي! تفقد شريط الإشعارات."),
+        "notificationTestTitle":
+            MessageLookupByLibrary.simpleMessage("تجربة الإشعار"),
         "notifications": MessageLookupByLibrary.simpleMessage("الإشعارات"),
+        "notificationsDisabled":
+            MessageLookupByLibrary.simpleMessage("تم تعطيل الإشعارات"),
         "online": MessageLookupByLibrary.simpleMessage("متصل"),
+        "optional": MessageLookupByLibrary.simpleMessage("اختياري"),
         "or": MessageLookupByLibrary.simpleMessage("أو"),
         "password": MessageLookupByLibrary.simpleMessage("كلمة المرور"),
         "passwordMismatch":
@@ -191,8 +276,20 @@ class MessageLookup extends MessageLookupByLibrary {
         "pending": MessageLookupByLibrary.simpleMessage("قيد الانتظار"),
         "pieChartIsEmpty":
             MessageLookupByLibrary.simpleMessage("لا توجد عادات لعرضها"),
+        "planActivatedDesc": m8,
+        "planActivatedTitle":
+            MessageLookupByLibrary.simpleMessage("🎉 تم تفعيل الخطة!"),
+        "planGenerationFailed": MessageLookupByLibrary.simpleMessage(
+            "فشل إنشاء الخطة. يرجى المحاولة مجدداً."),
+        "pleaseAnswerToContinue": MessageLookupByLibrary.simpleMessage(
+            "يرجى الإجابة عن هذا السؤال للمتابعة."),
         "ratepagetitle":
             MessageLookupByLibrary.simpleMessage("إحصائيات العادات"),
+        "reminderSetFor": m9,
+        "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
+            "ستصلك إشعارات متابعة عاداتك اليومية."),
+        "remindersEnabledTitle":
+            MessageLookupByLibrary.simpleMessage("تم تفعيل التذكيرات!"),
         "resetPassword":
             MessageLookupByLibrary.simpleMessage("إعادة تعيين كلمة المرور"),
         "resetPasswordDescription": MessageLookupByLibrary.simpleMessage(
@@ -207,8 +304,16 @@ class MessageLookup extends MessageLookupByLibrary {
         "restoreFeatureWillBeAvailableInFutureUpdates":
             MessageLookupByLibrary.simpleMessage(
                 "ستتوفر ميزة الاستعادة في التحديثات القادمة"),
+        "retry": MessageLookupByLibrary.simpleMessage("إعادة المحاولة"),
         "save": MessageLookupByLibrary.simpleMessage("حفظ"),
+        "saveSelected": MessageLookupByLibrary.simpleMessage("حفظ المحدد"),
+        "scanHabitsDesc": MessageLookupByLibrary.simpleMessage(
+            "استخراج المهام من الصورة تلقائياً."),
+        "scanHabitsTitle": MessageLookupByLibrary.simpleMessage("مسح العادات"),
         "scanImage": MessageLookupByLibrary.simpleMessage("مسح الصورة"),
+        "selectAll": MessageLookupByLibrary.simpleMessage("تحديد الكل"),
+        "selectAtLeastOneHabit":
+            MessageLookupByLibrary.simpleMessage("اختر عادة واحدة على الأقل"),
         "sendResetLink":
             MessageLookupByLibrary.simpleMessage("إرسال رابط إعادة التعيين"),
         "setDailyReminder":
@@ -220,7 +325,10 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("التسجيل بواسطة Google"),
         "signup": MessageLookupByLibrary.simpleMessage("إنشاء حساب"),
         "skipNow": MessageLookupByLibrary.simpleMessage("تخطي الآن"),
+        "somethingWentWrong":
+            MessageLookupByLibrary.simpleMessage("حدث خطأ ما"),
         "streak": MessageLookupByLibrary.simpleMessage("الاستمرارية"),
+        "streakDay": m10,
         "success": MessageLookupByLibrary.simpleMessage("معدل النجاح"),
         "summary": MessageLookupByLibrary.simpleMessage("ملخص العادات"),
         "syncError": MessageLookupByLibrary.simpleMessage("فشلت المزامنة"),
@@ -229,9 +337,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "syncSuccess":
             MessageLookupByLibrary.simpleMessage("تمت المزامنة بنجاح"),
         "syncing": MessageLookupByLibrary.simpleMessage("جاري المزامنة..."),
+        "systemLanguage": MessageLookupByLibrary.simpleMessage("لغة النظام"),
+        "tapToApply": MessageLookupByLibrary.simpleMessage("اضغط للتطبيق"),
         "tapToEdit": MessageLookupByLibrary.simpleMessage("اضغط للإعداد"),
+        "testNotification":
+            MessageLookupByLibrary.simpleMessage("تجربة الإشعار"),
+        "testNotificationDesc": MessageLookupByLibrary.simpleMessage(
+            "إرسال إشعار فوري للتحقق من عمل الإشعارات"),
         "theFieldCantBeEmpty":
             MessageLookupByLibrary.simpleMessage("لا يمكن ترك الحقل فارغاً"),
+        "themeNotFound":
+            MessageLookupByLibrary.simpleMessage("الثيم غير موجود"),
         "themepage": MessageLookupByLibrary.simpleMessage("تخصيص الثيم"),
         "themepagetitle": MessageLookupByLibrary.simpleMessage("إعدادات الثيم"),
         "today": MessageLookupByLibrary.simpleMessage("تقدم اليوم"),
@@ -241,10 +357,12 @@ class MessageLookup extends MessageLookupByLibrary {
         "total": MessageLookupByLibrary.simpleMessage("المجموع"),
         "trendChartIsEmpty": MessageLookupByLibrary.simpleMessage(
             "بيانات غير كافية لعرض الإحصائيات"),
+        "tryAgain": MessageLookupByLibrary.simpleMessage("إعادة المحاولة"),
         "typeMessage": MessageLookupByLibrary.simpleMessage("اكتب رسالة..."),
         "unexpectedError":
             MessageLookupByLibrary.simpleMessage("حدث خطأ غير متوقع."),
         "user": MessageLookupByLibrary.simpleMessage("مستخدم"),
-        "weekly": MessageLookupByLibrary.simpleMessage("تقدم الأسبوعي")
+        "weekly": MessageLookupByLibrary.simpleMessage("تقدم الأسبوعي"),
+        "yourPlanTitle": m11
       };
 }
