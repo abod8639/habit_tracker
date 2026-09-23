@@ -8,6 +8,7 @@ import '../../data/datasources/questions_datasource.dart';
 
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import '../../../home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 enum PlanGeneratorStatus { idle, loading, success, error }
 
@@ -98,8 +99,8 @@ class PlanGeneratorController extends GetxController {
   void next() {
     if (!_isCurrentAnswerValid()) {
       Get.snackbar(
-        'Answer required',
-        'Please answer this question to continue.',
+        S.current.answerRequired,
+        S.current.pleaseAnswerToContinue,
         snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 2),
       );
@@ -135,7 +136,7 @@ class PlanGeneratorController extends GetxController {
       Get.toNamed('/plan-result');
     } catch (e) {
       status.value = PlanGeneratorStatus.error;
-      errorMessage.value = 'Failed to generate plan. Please try again.';
+      errorMessage.value = S.current.planGenerationFailed;
     }
   }
 
@@ -175,15 +176,15 @@ class PlanGeneratorController extends GetxController {
 
       if (!success) {
         status.value = PlanGeneratorStatus.error;
-        errorMessage.value = 'Could not save habits. Please try again.';
+        errorMessage.value = S.current.unexpectedError;
         return;
       }
 
       status.value = PlanGeneratorStatus.idle;
 
       Get.snackbar(
-        '🎉 Plan activated!',
-        '$selectedCount habits added to your tracker.',
+        S.current.planActivatedTitle,
+        S.current.planActivatedDesc(selectedCount),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: const Color(0xFF10B981),
         colorText: const Color(0xFFFFFFFF),
@@ -194,7 +195,7 @@ class PlanGeneratorController extends GetxController {
       Get.until((route) => route.isFirst);
     } catch (e) {
       status.value = PlanGeneratorStatus.error;
-      errorMessage.value = 'Could not save habits. Please try again.';
+      errorMessage.value = S.current.unexpectedError;
     }
   }
 
