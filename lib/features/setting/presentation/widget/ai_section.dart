@@ -222,7 +222,19 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
           }),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(S.current.cancel),
+            child: Text(
+                            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
+                  blurRadius: 3,
+                  offset: const Offset(1, 1),
+                  )
+                ]
+              ),
+              S.current.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -245,7 +257,19 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text(S.current.save),
+            child: Text(
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
+                  blurRadius: 3,
+                  offset: const Offset(1, 1),
+                  )
+                ]
+              ),
+              S.current.save),
           ),
         ],
       );
