@@ -212,5 +212,15 @@
   "categoryLearning": "تعلم مهارة جديدة",
   "categoryLearningDesc": "إتقان أي مهارة ترغب بها خطوة بخطوة",
   "dailyReminderTitle": "متتبع العادات",
-  "dailyReminderBody": "حان وقت التحقق من عاداتك اليومية!"
+  "dailyReminderBody": "حان وقت التحقق من عاداتك اليومية!",
+  "dailyReminderPendingTasks": "{count, plural, =1{لديك مهمة واحدة متبقية بحاجة للإنجاز اليوم.} =2{لديك مهمتان متبقيتان بحاجة للإنجاز اليوم.} few{لديك {count} مهام متبقية بحاجة للإنجاز اليوم.} many{لديك {count} مهمة متبقية بحاجة للإنجاز اليوم.} other{لديك {count} مهمة متبقية بحاجة للإنجاز اليوم.}}",
+  "@dailyReminderPendingTasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyReminderAllCompleted": "رائع جداً! لقد أكملت جميع مهامك اليوم بنجاح.",
+  "dailyReminderNoTasks": "لا توجد مهام مسجلة بعد، ابدأ بإضافة عاداتك اليومية."
 }
