@@ -75,27 +75,28 @@ class _MyTextTaileState extends State<MyTextTaile>
 
   Color _getTileColor(ColorScheme themeColors) {
     if (widget.isSelected) {
-      return Theme.of(context).primaryColor.withValues(alpha: 0.2);
+      return themeColors.primary.withValues(alpha: 0.16);
     }
 
     final baseColor = widget.colorValue != null
         ? Color(widget.colorValue!)
-        : Theme.of(context).primaryColor;
+        : themeColors.primary;
 
     if (widget.habitCompleted) {
       return widget.colorValue != null
-          ? baseColor
+          ? baseColor.withValues(alpha: 0.85)
           : baseColor.withValues(alpha: 0.7);
     }
 
     return widget.colorValue != null
-        ? baseColor.withValues(alpha: 0.3)
-        : (themeColors.brightness == Brightness.light
-              ? themeColors.surface
-              : Colors.grey[850]!);
+        ? baseColor.withValues(alpha: 0.12)
+        : themeColors.surfaceContainerHighest.withValues(alpha: 0.35);
   }
 
   Color _getTileTextColor(ColorScheme themeColors) {
+    if (widget.isSelected) {
+      return themeColors.primary;
+    }
     if (widget.habitCompleted) {
       return ThemeUtils.getContrastColor(_getTileColor(themeColors));
     }
@@ -200,32 +201,39 @@ class _MyTextTaileState extends State<MyTextTaile>
 
   @override
   Widget build(BuildContext context) {
-    final themeColors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final themeColors = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     return Material(
       color: Colors.transparent,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
         child: Slidable(
           startActionPane: _buildActionPane(
-            icon: Icons.delete,
-            color: themeColors.error,
+            icon: Icons.delete_outline_rounded,
+            color: themeColors.errorContainer,
+            foregroundColor: themeColors.onErrorContainer,
             onPressed: widget.onDelete != null
                 ? (context) => _showDeleteConfirmationDialog(context)
                 : null,
           ),
           endActionPane: _buildActionPane(
-            icon: Icons.edit,
-            color: Colors.orange[700]!,
+            icon: Icons.edit_outlined,
+            color: themeColors.secondaryContainer,
+            foregroundColor: themeColors.onSecondaryContainer,
             onPressed: widget.onEdit,
           ),
           child: ScaleTransition(
             scale: _scaleAnimation,
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              onTap: _handleTap,
-              onLongPress: widget.onLongPress,
-              title: _buildTileContent(themeColors),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: _handleTap,
+                onLongPress: widget.onLongPress,
+                child: _buildTileContent(themeColors, textTheme),
+              ),
             ),
           ),
         ),
@@ -236,14 +244,16 @@ class _MyTextTaileState extends State<MyTextTaile>
   ActionPane _buildActionPane({
     required IconData icon,
     required Color color,
+    Color? foregroundColor,
     required Function(BuildContext)? onPressed,
   }) {
     return ActionPane(
       motion: const ScrollMotion(),
       children: [
         SlidableAction(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(16),
           backgroundColor: color,
+          foregroundColor: foregroundColor,
           onPressed: onPressed,
           icon: icon,
         ),
@@ -251,53 +261,44 @@ class _MyTextTaileState extends State<MyTextTaile>
     );
   }
 
-Widget _buildTileContent(ColorScheme themeColors) {
+  Widget _buildTileContent(ColorScheme themeColors, TextTheme textTheme) {
+    final baseColor = widget.colorValue != null
+        ? Color(widget.colorValue!)
+        : themeColors.primary;
+
+    final border = widget.isSelected
+        ? Border.all(color: themeColors.primary, width: 2)
+        : Border.all(
+            color: widget.habitCompleted
+                ? baseColor.withValues(alpha: 0.3)
+                : themeColors.outlineVariant.withValues(alpha: 0.4),
+            width: 1,
+          );
+
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      padding: const EdgeInsets.all(12), 
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: _getTileColor(themeColors),
-        borderRadius: BorderRadius.circular(15), 
-        
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            _getTileColor(themeColors).withValues(alpha: 0.9),
-            _getTileColor(themeColors),
-          ],
-        ),
-
-        border: widget.isSelected
-            ? Border.all(color: themeColors.primary, width: 2)
-            : Border.all(
-                color: themeColors.brightness == Brightness.light
-                    ? Colors.black.withValues(alpha: 0.06)
-                    : Colors.white.withValues(alpha: 0.1),
-                width: 1,
-              ),
-
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(
-              alpha: themeColors.brightness == Brightness.light ? 0.04 : 0.2,
-            ),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        border: border,
       ),
       child: Row(
         children: [
           _buildLeadingIcon(themeColors),
-          const SizedBox(width: 12),
-          Expanded(child: _buildTitleText(themeColors)),
+          const SizedBox(width: 14),
+          Expanded(child: _buildTitleText(themeColors, textTheme)),
         ],
       ),
     );
   }
 
   Widget _buildLeadingIcon(ColorScheme themeColors) {
+    final baseColor = widget.colorValue != null
+        ? Color(widget.colorValue!)
+        : themeColors.primary;
+
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       child: widget.isSelectionMode
@@ -307,30 +308,55 @@ Widget _buildTileContent(ColorScheme themeColors) {
                   : Icons.radio_button_unchecked_rounded,
               key: const ValueKey('selection_icon'),
               color: widget.isSelected
-                  ? themeColors.onSurface.withValues(alpha: 0.5)
-                  : Theme.of(context).primaryColor,
+                  ? themeColors.primary
+                  : themeColors.onSurfaceVariant,
             )
           : Checkbox(
               key: const ValueKey('checkbox'),
-              activeColor: Theme.of(context).primaryColor,
-              checkColor: Theme.of(context).colorScheme.onPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              side: BorderSide(
+                color: widget.habitCompleted
+                    ? Colors.transparent
+                    : (widget.colorValue != null
+                        ? baseColor
+                        : themeColors.outline),
+                width: 2,
+              ),
+              activeColor: baseColor,
+              checkColor: ThemeUtils.getContrastColor(baseColor),
               value: widget.habitCompleted,
               onChanged: widget.onChanged,
             ),
     );
   }
 
-  Widget _buildTitleText(ColorScheme themeColors) {
+  Widget _buildTitleText(ColorScheme themeColors, TextTheme textTheme) {
+    final textColor = _getTileTextColor(themeColors);
     return AnimatedDefaultTextStyle(
-      duration: const Duration(milliseconds: 300),
-      style: TextStyle(
+      duration: const Duration(milliseconds: 250),
+      style: textTheme.titleMedium?.copyWith(
         fontWeight: FontWeight.w600,
-        color: _getTileTextColor(themeColors),
+        color: textColor,
         decoration: widget.habitCompleted
             ? TextDecoration.lineThrough
             : TextDecoration.none,
+        decorationColor: textColor.withValues(alpha: 0.6),
+      ) ?? TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 16,
+        color: textColor,
+        decoration: widget.habitCompleted
+            ? TextDecoration.lineThrough
+            : TextDecoration.none,
+        decorationColor: textColor.withValues(alpha: 0.6),
       ),
-      child: Text(widget.habitName),
+      child: Text(
+        widget.habitName,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 }
