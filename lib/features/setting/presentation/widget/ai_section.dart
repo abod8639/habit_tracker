@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/ai_settings_controller.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_tile.dart';
 import 'package:habit_tracker/generated/l10n.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Widget buildAiSection(AnimationController animationController) {
   final aiController = Get.find<AiSettingsController>();
@@ -127,34 +128,71 @@ void _showAiApiKeyDialog(BuildContext context, AiSettingsController controller) 
                     ),
               ),
               const SizedBox(height: 14),
-              // Helper info container
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withValues(alpha: 0.06),
+              // Helper info container linking to Google AI Studio
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      size: 18,
-                      color: Theme.of(context).primaryColor,
+                  onTap: () async {
+                    final Uri url = Uri.parse(
+                      'https://aistudio.google.com/app/apikey',
+                    );
+                    try {
+                      await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } catch (e) {
+                      debugPrint('Could not launch $url: $e');
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        S.current.getKeyInfo,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 11,
-                            ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .primaryColor
+                          .withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .primaryColor
+                            .withValues(alpha: 0.2),
                       ),
                     ),
-                  ],
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline_rounded,
+                          size: 18,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            S.current.getKeyInfo,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Icon(
+                          Icons.open_in_new_rounded,
+                          size: 16,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
