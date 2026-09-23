@@ -120,83 +120,38 @@ class _MyTextTaileState extends State<MyTextTaile>
   void _showDeleteConfirmationDialog(BuildContext context) {
     final themeColors = Theme.of(context).colorScheme;
 
-    showDialog(
+    AppConfirmationDialog.show(
       context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+      title: S.of(context).deleteHabit,
+      message: S.of(context).areYouSureYouWantToDeleteThisHabit,
+      icon: Icons.delete_outline_rounded,
+      confirmText: S.of(context).delete,
+      cancelText: S.of(context).cancel,
+      isDestructive: true,
+      customContent: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: themeColors.errorContainer.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: themeColors.error.withValues(alpha: 0.2),
+            width: 1,
           ),
-          icon: Icon(
-            Icons.delete_outline_rounded,
-            size: 28,
+        ),
+        child: Text(
+          widget.habitName,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
             color: themeColors.error,
+            fontSize: 15,
           ),
-          title: Text(
-            S.of(dialogContext).deleteHabit,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                S.of(dialogContext).areYouSureYouWantToDeleteThisHabit,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: themeColors.onSurfaceVariant,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: themeColors.errorContainer.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: themeColors.error.withValues(alpha: 0.2),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  widget.habitName,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: themeColors.error,
-                    fontSize: 15,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ),
-          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(S.of(dialogContext).cancel),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                widget.onDelete?.call(context);
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: themeColors.error,
-                foregroundColor: themeColors.onError,
-              ),
-              child: Text(S.of(dialogContext).delete),
-            ),
-          ],
-        );
-      },
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+      ),
+      onConfirm: () => widget.onDelete?.call(context),
     );
   }
 
