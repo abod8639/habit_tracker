@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 Widget buildStreakBadge(int streak) {
   return Builder(
@@ -22,7 +23,7 @@ Widget buildStreakBadge(int streak) {
             ),
             const SizedBox(width: 4),
             Text(
-              'Day $streak',
+              S.of(context).streakDay(streak),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.secondary,
