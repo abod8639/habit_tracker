@@ -16,6 +16,7 @@ import 'package:habit_tracker/features/home/domain/usecases/get_completion_statu
 import 'package:habit_tracker/features/home/domain/usecases/update_habit_color_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/update_habit_order_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/get_start_date_usecase.dart';
+import 'package:habit_tracker/features/home/domain/usecases/clear_local_habits_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/increment_day_count_usecase.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:hive/hive.dart';
@@ -55,6 +56,7 @@ class HabitBinding extends Bindings {
     Get.lazyPut(() => GetCompletionStatusForDateUseCase(Get.find()));
     Get.lazyPut(() => GetStartDateUseCase(Get.find()));
     Get.lazyPut(() => IncrementDayCountUseCase(Get.find()));
+    Get.lazyPut(() => ClearLocalHabitsUseCase(Get.find()));
 
 
     // Controller
