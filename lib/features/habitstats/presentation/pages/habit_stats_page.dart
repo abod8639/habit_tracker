@@ -45,6 +45,12 @@ class _HabitStatsPageState extends State<HabitStatsPage>
       onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.primary),
+          ),
           title: Text(
             S.current.ratepagetitle,
             style: TextStyle(
