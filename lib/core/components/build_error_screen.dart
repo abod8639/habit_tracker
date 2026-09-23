@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 Widget buildErrorScreen() {
   final HabitController controller = Get.put(HabitController());
@@ -20,7 +21,7 @@ Widget buildErrorScreen() {
               ),
               const SizedBox(height: 24),
               Text(
-                'Something went wrong',
+                S.of(context).somethingWentWrong,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -45,9 +46,9 @@ Widget buildErrorScreen() {
                   Get.delete<HabitController>();
                   Get.put(HabitController());
                 },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Text('Try Again'),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Text(S.of(context).tryAgain),
                 ),
               ),
             ],
