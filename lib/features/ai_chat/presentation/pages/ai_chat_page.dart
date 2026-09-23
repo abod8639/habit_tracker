@@ -360,6 +360,7 @@ class AiChatPage extends GetView<AiChatController> {
                   ],
                 ),
                 child: TextField(
+                  autofocus: true,
                   controller: controller.textController,
                   decoration: InputDecoration(
                     hintText: S.current.typeMessage,
