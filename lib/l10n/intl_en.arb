@@ -298,6 +298,8 @@
   "categoryStudy": "Study",
   "categoryStudyDesc": "Boost your academic performance",
   "categoryLearning": "Learn a New Skill",
-  "categoryLearningDesc": "Master any skill step by step"
+  "categoryLearningDesc": "Master any skill step by step",
+  "dailyReminderTitle": "Habit Tracker",
+  "dailyReminderBody": "Time to check your habits!"
 }
 
