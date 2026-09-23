@@ -61,7 +61,8 @@ class MyApp extends StatelessWidget {
     return Obx(
       () => GetMaterialApp(
         initialBinding: InitialBinding(),
-        locale: Locale(controllerLanguage.language.value),
+        locale: controllerLanguage.effectiveLocale,
+        fallbackLocale: const Locale('en'),
         navigatorObservers: [
           analyticsService.getObserver(),
           analyticsService.getTimeTrackerObserver(),
