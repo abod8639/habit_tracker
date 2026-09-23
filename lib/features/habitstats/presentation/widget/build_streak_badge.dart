@@ -15,13 +15,17 @@ class StreakBadge extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
+    final bool hasStreak = streak > 0;
+    final Color badgeColor =
+        hasStreak ? colorScheme.secondary : colorScheme.onSurfaceVariant;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: colorScheme.secondary.withValues(alpha: 0.12),
+        color: badgeColor.withValues(alpha: hasStreak ? 0.12 : 0.08),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: colorScheme.secondary.withValues(alpha: 0.3),
+          color: badgeColor.withValues(alpha: hasStreak ? 0.3 : 0.15),
           width: 1,
         ),
       ),
@@ -30,7 +34,7 @@ class StreakBadge extends StatelessWidget {
         children: [
           Icon(
             Icons.local_fire_department,
-            color: colorScheme.secondary,
+            color: badgeColor,
             size: 18,
           ),
           const SizedBox(width: 4),
@@ -38,7 +42,7 @@ class StreakBadge extends StatelessWidget {
             S.of(context).streakDay(streak),
             style: textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: colorScheme.secondary,
+              color: badgeColor,
             ),
           ),
         ],
