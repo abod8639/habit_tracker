@@ -26,7 +26,10 @@ void main() {
       );
 
       expect(content.title, 'متتبع العادات');
-      expect(content.body, 'لا توجد مهام مسجلة بعد، ابدأ بإضافة عاداتك اليومية.');
+      expect(
+        content.body,
+        'لا توجد مهام مسجلة بعد، ابدأ بإضافة عاداتك اليومية.',
+      );
       expect(emojiRegex.hasMatch(content.body), isFalse);
     });
 
@@ -102,7 +105,10 @@ void main() {
       );
 
       expect(content.title, 'Habit Tracker');
-      expect(content.body, 'No tasks registered yet. Start adding your daily habits today.');
+      expect(
+        content.body,
+        'No tasks registered yet. Start adding your daily habits today.',
+      );
       expect(emojiRegex.hasMatch(content.body), isFalse);
     });
 
@@ -113,7 +119,10 @@ void main() {
       );
 
       expect(content.title, 'Habit Tracker');
-      expect(content.body, 'Awesome! You have completed all your tasks for today.');
+      expect(
+        content.body,
+        'Awesome! You have completed all your tasks for today.',
+      );
       expect(emojiRegex.hasMatch(content.body), isFalse);
     });
 

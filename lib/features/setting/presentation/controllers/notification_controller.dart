@@ -19,12 +19,14 @@ class NotificationController extends GetxController {
   final SetNotificationTimeUseCase _setNotificationTimeUseCase = Get.find();
 
   GetHabitsUseCase? get _getHabitsUseCase =>
-      Get.isRegistered<GetHabitsUseCase>() ? Get.find<GetHabitsUseCase>() : null;
+      Get.isRegistered<GetHabitsUseCase>()
+      ? Get.find<GetHabitsUseCase>()
+      : null;
 
   NotificationService get _notificationService =>
       Get.isRegistered<NotificationService>()
-          ? Get.find<NotificationService>()
-          : NotificationService();
+      ? Get.find<NotificationService>()
+      : NotificationService();
 
   var isNotificationEnabled = false.obs;
   var notificationTime = Rxn<TimeOfDay>();
