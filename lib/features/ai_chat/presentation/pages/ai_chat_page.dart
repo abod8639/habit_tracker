@@ -211,9 +211,7 @@ class AiChatPage extends GetView<AiChatController> {
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         onPressed: () => controller.retryMessage(message),
-                        tooltip: Get.locale?.languageCode == 'ar'
-                            ? 'إعادة المحاولة'
-                            : 'Retry',
+                        tooltip: S.of(context).retry,
                       ),
                     )
                   : const SizedBox.shrink()),
