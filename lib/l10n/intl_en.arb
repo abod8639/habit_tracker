@@ -300,6 +300,16 @@
   "categoryLearning": "Learn a New Skill",
   "categoryLearningDesc": "Master any skill step by step",
   "dailyReminderTitle": "Habit Tracker",
-  "dailyReminderBody": "Time to check your habits!"
+  "dailyReminderBody": "Time to check your habits!",
+  "dailyReminderPendingTasks": "{count, plural, =1{You have 1 task left to complete today.} other{You have {count} tasks left to complete today.}}",
+  "@dailyReminderPendingTasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyReminderAllCompleted": "Awesome! You have completed all your tasks for today.",
+  "dailyReminderNoTasks": "No tasks registered yet. Start adding your daily habits today."
 }
 
