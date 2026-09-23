@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:habit_tracker/features/categorys/data/datasources/questions_datasource.dart';
 import 'package:habit_tracker/features/categorys/domain/entities/category_entity.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -43,20 +43,20 @@ void main() {
 
     test('QuestionsDataSource returns localized questions based on locale', () async {
       // Test Arabic
-      Get.updateLocale(const Locale('ar'));
+      Intl.defaultLocale = 'ar';
       await S.load(const Locale('ar'));
 
       final arQuestions = QuestionsDataSource.forCategory(PlanCategory.sports);
       expect(arQuestions.isNotEmpty, true);
-      expect(arQuestions.first.text.contains('هدفك الأساسي'), true);
+      expect(arQuestions.first.text, 'كم عمرك؟');
 
       // Test English
-      Get.updateLocale(const Locale('en'));
+      Intl.defaultLocale = 'en';
       await S.load(const Locale('en'));
 
       final enQuestions = QuestionsDataSource.forCategory(PlanCategory.sports);
       expect(enQuestions.isNotEmpty, true);
-      expect(enQuestions.first.text.contains('primary fitness goal'), true);
+      expect(enQuestions.first.text, 'How old are you?');
     });
   });
 }
