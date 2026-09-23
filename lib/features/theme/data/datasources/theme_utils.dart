@@ -51,7 +51,7 @@ class ThemeUtils {
       primaryColor: colors['primary'],
       scaffoldBackgroundColor: backgroundColor,
       cardColor: surfaceColor,
-      dialogBackgroundColor: surfaceColor,
+      dialogTheme: DialogThemeData(backgroundColor: surfaceColor),
       colorScheme: ColorScheme(
         brightness: brightness,
         primary: colors['primary']!,
