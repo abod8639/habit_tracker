@@ -39,7 +39,7 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
     Navigator.of(context).pop(); // Close the confirmation dialog
     Get.snackbar(
       S.current.success,
-      'Added the selected habits successfully.',
+      S.current.addedSelectedHabitsSuccess,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green.shade600,
       colorText: Colors.white,
@@ -50,14 +50,14 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
   Widget build(BuildContext context) {
     if (widget.extractedHabits.isEmpty) {
       return AlertDialog(
-        title: const Text('No Habits Detected'),
-        content: const Text(
-          'We could not find any clear tasks or habits in this image. Please try another one.',
+        title: Text(S.of(context).noHabitsDetected),
+        content: Text(
+          S.of(context).noHabitsDetectedDesc,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(S.of(context).close),
           ),
         ],
       );
@@ -66,7 +66,7 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AlertDialog(
-      title: const Text('Detected Habits'),
+      title: Text(S.of(context).detectedHabits),
       contentPadding: const EdgeInsets.only(top: 16, bottom: 0),
       content: SizedBox(
         width: double.maxFinite,
@@ -92,11 +92,11 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(S.current.cancel),
+          child: Text(S.of(context).cancel),
         ),
         FilledButton(
           onPressed: _saveSelectedHabits,
-          child: const Text('Save Selected'),
+          child: Text(S.of(context).saveSelected),
         ),
       ],
     );
