@@ -107,11 +107,11 @@ flutter run
 
 ##  Contributing
 
-Pull requests are welcome!
+Pull requests are welcome! Please check out our [Contributing Guide](CONTRIBUTING.md) for full details on our Clean Architecture guidelines, GetX standards, and submission workflow.
 
 1. Fork the repo  
 2. Create your feature branch (`git checkout -b feature/YourFeature`)  
-3. Commit your changes (`git commit -m "Add your feature"`)  
+3. Commit your changes (`git commit -m "feat: add YourFeature"`)  
 4. Push (`git push origin feature/YourFeature`)  
 5. Open a Pull Request  
 
