@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 import '../../domain/entities/category_entity.dart';
 import '../controllers/plan_generator_controller.dart';
@@ -13,7 +14,7 @@ class CategorySelectionScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Generate a Plan'),
+        title: Text(S.current.generatePlan),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -25,9 +26,9 @@ class CategorySelectionScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Header ───────────────────────────────────────────────────
-              const Text(
-                'What do you want\nto work on?',
-                style: TextStyle(
+              Text(
+                S.current.generatePlanTitle,
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   height: 1.25,
@@ -35,7 +36,7 @@ class CategorySelectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Choose a category and we\'ll build a personalized\nhabit plan just for you.',
+                S.current.generatePlanSubtitle,
                 style: TextStyle(
                   fontSize: 15,
                   color: Colors.grey.shade600,
