@@ -14,7 +14,22 @@ class CategorySelectionScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(S.current.generatePlan),
+        leading: IconButton(
+          icon: Icon(
+            color: Theme.of(context).colorScheme.onSurface,
+            Icons.arrow_back_ios_new),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+        title: Text(
+          S.current.generatePlan,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
