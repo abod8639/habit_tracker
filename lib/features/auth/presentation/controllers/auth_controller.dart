@@ -10,6 +10,9 @@ import '../../domain/usecases/get_auth_state_usecase.dart';
 import '../../domain/usecases/set_skip_login_usecase.dart';
 import '../pages/login_page.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
+import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
 
 class AuthController extends GetxController {
   // Use Cases
@@ -142,6 +145,20 @@ class AuthController extends GetxController {
       // Clear FCM token in Firestore before signing out
       if (Get.isRegistered<FcmService>()) {
         await Get.find<FcmService>().clearTokenFromFirestore();
+      }
+
+      // Reset habit data to default state
+      if (Get.isRegistered<HabitController>()) {
+        await Get.find<HabitController>().resetToDefaultState();
+      } else if (Get.isRegistered<HabitLocalDataSource>()) {
+        await Get.find<HabitLocalDataSource>().clearAllData();
+      }
+
+      // Reset sync state
+      if (Get.isRegistered<SyncController>()) {
+        final syncController = Get.find<SyncController>();
+        syncController.lastSyncTime.value = null;
+        syncController.syncStatus.value = SyncStatus.idle;
       }
 
       final result = await _signOutUseCase();
