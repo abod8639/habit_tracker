@@ -198,7 +198,7 @@ class _QuestionContent extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                'Optional',
+                S.current.optional,
                 style: TextStyle(
                   fontSize: 11,
                   color: Theme.of(context).hintColor,
