@@ -236,7 +236,7 @@ class ThemeCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            isSelected ? 'Currently Selected' : 'Tap to apply',
+                            isSelected ? S.of(context).currentlySelected : S.of(context).tapToApply,
                             style: TextStyle(
                               fontSize: 12,
                               color: primary.withValues(alpha: 0.7),
