@@ -49,16 +49,16 @@ class NotificationController extends GetxController {
     }
   }
 
-  Future<void> sendTestNotification() async {
-    await _notificationService.requestPermissions();
-    await _notificationService.showTestNotification();
-    Get.snackbar(
-      S.current.notificationTestTitle,
-      S.current.notificationTestSent,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
-    );
-  }
+  // Future<void> sendTestNotification() async {
+  //   await _notificationService.requestPermissions();
+  //   await _notificationService.showTestNotification();
+  //   Get.snackbar(
+  //     S.current.notificationTestTitle,
+  //     S.current.notificationTestSent,
+  //     snackPosition: SnackPosition.BOTTOM,
+  //     duration: const Duration(seconds: 3),
+  //   );
+  // }
 
   Future<void> toggleNotification(bool enabled) async {
     if (enabled) {
