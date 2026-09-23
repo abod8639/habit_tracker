@@ -2,6 +2,10 @@
 
 A **beautiful**, **responsive**, and **intuitive** habit tracking app built with Flutter — designed to help you build positive daily routines with ease.
 
+[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://raw.githubusercontent.com/abod8639/flutter_habit_tracker/main/APK/app-release.apk)
+[![Latest Release](https://img.shields.io/github/v/release/abod8639/flutter_habit_tracker?style=for-the-badge&logo=github&color=blue)](https://github.com/abod8639/flutter_habit_tracker/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
 ---
 
 ## Recent Updates & Features
@@ -70,7 +74,25 @@ Automatically extract habits from physical notes, diet sheets, or invoices.
 
 ---
 
-##  Getting Started
+## 📱 Download & Direct Install (Android)
+
+You can download and install the app directly on your Android device without building from source:
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/abod8639/flutter_habit_tracker/main/APK/app-release.apk">
+    <img src="https://img.shields.io/badge/Direct_Download-Android_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" height="42" />
+  </a>
+</p>
+
+### Quick Installation Steps:
+1. Tap the **Download Android APK** button above (or download directly from [`APK/app-release.apk`](https://raw.githubusercontent.com/abod8639/flutter_habit_tracker/main/APK/app-release.apk)).
+2. Once the download completes, open `app-release.apk` on your Android device.
+3. If prompted, grant permission to **"Install unknown apps"** in your device settings.
+4. Tap **Install** and launch the app.
+
+---
+
+## 🚀 Getting Started
 
 ### 1. Install Flutter  
 Follow the [Flutter installation guide](https://docs.flutter.dev/get-started/install).
@@ -78,7 +100,7 @@ Follow the [Flutter installation guide](https://docs.flutter.dev/get-started/ins
 
 ### 2. Clone the Repository
 ```bash
-git clone https://github.com/abod8639/habit_tracker.git
+git clone https://github.com/abod8639/flutter_habit_tracker.git
 cd habit_tracker
 ```
 
