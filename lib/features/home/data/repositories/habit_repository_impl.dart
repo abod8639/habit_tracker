@@ -36,7 +36,7 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<Either<Failure, void>> addMultipleHabits(List<String> names) async {
     try {
-      final models = localDataSource.loadHabits();
+      final models = List<HabitModel>.from(localDataSource.loadHabits());
       final now = DateTime.now();
       
       for (final name in names) {
@@ -72,7 +72,7 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<Either<Failure, void>> editHabit(String id, String newName) async {
     try {
-      final models = localDataSource.loadHabits();
+      final models = List<HabitModel>.from(localDataSource.loadHabits());
       final index = models.indexWhere((m) => m.id == id);
       
       if (index != -1) {
@@ -104,7 +104,7 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<Either<Failure, void>> deleteHabit(String id) async {
     try {
-      final models = localDataSource.loadHabits();
+      final models = List<HabitModel>.from(localDataSource.loadHabits());
       models.removeWhere((m) => m.id == id);
       
       await localDataSource.saveHabits(models);
@@ -124,7 +124,7 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<Either<Failure, void>> toggleHabit(String id, bool isCompleted) async {
     try {
-      final models = localDataSource.loadHabits();
+      final models = List<HabitModel>.from(localDataSource.loadHabits());
       final index = models.indexWhere((m) => m.id == id);
       
       if (index != -1) {
@@ -162,7 +162,7 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<Either<Failure, void>> reorderHabits(int oldIndex, int newIndex) async {
     try {
-      final models = localDataSource.loadHabits();
+      final models = List<HabitModel>.from(localDataSource.loadHabits());
       
       if (newIndex > oldIndex) {
         newIndex -= 1;
