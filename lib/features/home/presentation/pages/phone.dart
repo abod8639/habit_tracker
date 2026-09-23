@@ -295,11 +295,13 @@ class MyAppBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
+              
               Text(
                 S.of(context).deleteSelectedConfirm(controller.selectedHabitIds.length),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13.5,
+                  fontWeight: FontWeight.w500,
                   color: Theme.of(context)
                       .colorScheme
                       .onSurface
