@@ -170,9 +170,12 @@ class SyncController extends GetxController {
     final now = DateTime.now();
     final difference = now.difference(time);
     if (difference.inMinutes < 1) return S.current.justNow;
-    if (difference.inHours < 1)
+    if (difference.inHours < 1) {
       return S.current.minutesAgo(difference.inMinutes);
-    if (difference.inDays < 1) return S.current.hoursAgo(difference.inHours);
+    }
+    if (difference.inDays < 1) {
+      return S.current.hoursAgo(difference.inHours);
+    }
     return S.current.daysAgo(difference.inDays);
   }
 
