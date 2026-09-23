@@ -309,8 +309,9 @@ class _StatChip extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 10,
-                color: textColor.withValues(alpha: .7),
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: textColor,
               ),
             ),
             const SizedBox(height: 2),
