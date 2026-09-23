@@ -145,8 +145,8 @@ class PlanResultScreen extends StatelessWidget {
                                 )
                               : Text(
                                   controller.hasSelections
-                                      ? 'Add ${controller.selectedCount} Habit${controller.selectedCount > 1 ? "s" : ""} to Tracker'
-                                      : 'Select at least one habit',
+                                      ? S.current.addHabitsToTracker(controller.selectedCount)
+                                      : S.current.selectAtLeastOneHabit,
                                   style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
