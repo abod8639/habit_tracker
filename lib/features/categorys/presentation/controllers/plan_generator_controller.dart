@@ -51,10 +51,10 @@ class PlanGeneratorController extends GetxController {
   // ── Category selection ────────────────────────────────────────────────────
   void selectCategory(PlanCategory category) {
     selectedCategory.value = category;
-    questions.value = QuestionsDataSource.forCategory(category);
+    questions.value = List<QuestionEntity>.from(QuestionsDataSource.forCategory(category));
     answers.clear();
     currentIndex.value = 0;
-    suggestions.clear();
+    suggestions.value = <PlanSuggestion>[];
     status.value = PlanGeneratorStatus.idle;
     errorMessage.value = '';
   }
@@ -195,8 +195,8 @@ class PlanGeneratorController extends GetxController {
         colorText: const Color(0xFFFFFFFF),
         duration: const Duration(seconds: 3),
       );
-    } catch (e) {
-      debugPrint(e.toString());
+    } catch (e, stack) {
+      debugPrint('Error in addSelectedHabits: $e\n$stack');
       status.value = PlanGeneratorStatus.error;
       errorMessage.value = S.current.unexpectedError;
     }
@@ -205,10 +205,10 @@ class PlanGeneratorController extends GetxController {
   // ── Reset ─────────────────────────────────────────────────────────────────
   void reset() {
     selectedCategory.value = null;
-    questions.clear();
+    questions.value = <QuestionEntity>[];
     answers.clear();
     currentIndex.value = 0;
-    suggestions.clear();
+    suggestions.value = <PlanSuggestion>[];
     status.value = PlanGeneratorStatus.idle;
     errorMessage.value = '';
   }
