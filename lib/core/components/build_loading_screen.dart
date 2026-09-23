@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 Widget buildLoadingScreen() {
   return Builder(
@@ -13,7 +14,7 @@ Widget buildLoadingScreen() {
             ),
             const SizedBox(height: 24),
             Text(
-              'Loading your habits...',
+              S.of(context).loadingHabits,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
@@ -24,7 +25,7 @@ Widget buildLoadingScreen() {
             ),
             const SizedBox(height: 8),
             Text(
-              'Just a moment',
+              S.of(context).justAMoment,
               style: TextStyle(
                 fontSize: 14,
                 color: Theme.of(
