@@ -174,7 +174,7 @@ class NotificationService {
 
   Future<void> showTestNotification({
     String title = 'Habit Tracker',
-    String body = 'Notifications are working successfully! 🚀',
+    String body = 'Notifications are working successfully.',
   }) async {
     await showNotification(
       id: 777,
