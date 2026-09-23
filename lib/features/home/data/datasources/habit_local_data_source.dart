@@ -51,17 +51,124 @@ class HabitLocalDataSource {
   }
 
   Future<List<HabitModel>> getHabitsForDate(String dateStr) async {
-    final historyBox = await _openMonthlyBox(dateStr);
-    final data = historyBox.get(dateStr);
-    
-    if (data != null && data is List) {
-      if (data.isNotEmpty && data.first is List) {
-        return data.map((item) => HabitModel.fromLocalFormat(item)).toList();
-      } else {
-        return List<HabitModel>.from(data.cast<HabitModel>());
+    try {
+      final historyBox = await _openMonthlyBox(dateStr);
+      final data = historyBox.get(dateStr);
+      
+      if (data != null && data is List) {
+        final List<HabitModel> result = [];
+        for (var item in data) {
+          if (item is HabitModel) {
+            result.add(item);
+          } else if (item is Map) {
+            result.add(HabitModel.fromMap(Map<String, dynamic>.from(item)));
+          } else if (item is List) {
+            result.add(HabitModel.fromLocalFormat(item));
+          }
+        }
+        return result;
       }
+    } catch (_) {
+      // Safe fallback
     }
     return [];
+  }
+
+  Future<Map<String, int>> getCompletionStatusForDate(DateTime date) async {
+    final localDate = date.isUtc ? date.toLocal() : date;
+    final normalizedDate = DateTime(localDate.year, localDate.month, localDate.day);
+    final now = DateTime.now();
+    final normalizedToday = DateTime(now.year, now.month, now.day);
+    final dateStr = convertDateTimeToString(normalizedDate);
+    final currentHabits = loadHabits();
+
+    // 1. If it's today, return live habits count
+    if (normalizedDate.isAtSameMomentAs(normalizedToday)) {
+      final total = currentHabits.length;
+      final completed = currentHabits.where((h) => h.isCompleted).length;
+      return {'total': total, 'completed': completed};
+    }
+
+    // 2. If it's a future date, no habits can be completed
+    if (normalizedDate.isAfter(normalizedToday)) {
+      return {'total': currentHabits.length, 'completed': 0};
+    }
+
+    // 3. For past dates:
+    final historyBox = await _openMonthlyBox(dateStr);
+
+    // Check if we have a saved snapshot list for that specific date
+    final habitsForDate = await getHabitsForDate(dateStr);
+
+    if (habitsForDate.isNotEmpty) {
+      int completed = 0;
+      for (var habit in habitsForDate) {
+        final idKey = "${habit.id}_$dateStr";
+        final nameKey = "${habit.name}_$dateStr";
+        final dynamic boxVal = historyBox.get(idKey) ?? historyBox.get(nameKey);
+        if (boxVal is bool) {
+          if (boxVal) completed++;
+        } else if (habit.isCompleted) {
+          completed++;
+        }
+      }
+      return {'total': habitsForDate.length, 'completed': completed};
+    }
+
+    // If no snapshot list, query individual habit history for known habits
+    int completedCount = 0;
+    int trackedCount = 0;
+    int eligibleHabitsCount = 0;
+
+    for (var habit in currentHabits) {
+      final habitCreatedDate = DateTime(habit.createdAt.year, habit.createdAt.month, habit.createdAt.day);
+      final existedOnDate = !habitCreatedDate.isAfter(normalizedDate);
+      
+      final idKey = "${habit.id}_$dateStr";
+      final nameKey = "${habit.name}_$dateStr";
+      final dynamic boxVal = historyBox.get(idKey) ?? historyBox.get(nameKey);
+
+      if (boxVal != null && boxVal is bool) {
+        trackedCount++;
+        if (boxVal) {
+          completedCount++;
+        }
+      }
+
+      if (existedOnDate || boxVal != null) {
+        eligibleHabitsCount++;
+      }
+    }
+
+    // If we found any recorded completions or non-completions in history
+    if (trackedCount > 0) {
+      final total = eligibleHabitsCount > 0 ? eligibleHabitsCount : (currentHabits.isNotEmpty ? currentHabits.length : trackedCount);
+      return {
+        'total': total,
+        'completed': completedCount,
+      };
+    }
+
+    // Also check habit strength if stored (e.g. from heatmap or previous sync)
+    final strengthStr = await getHabitStrength(dateStr);
+    if (strengthStr != null) {
+      final double? strength = double.tryParse(strengthStr);
+      if (strength != null && strength > 0) {
+        final total = eligibleHabitsCount > 0 ? eligibleHabitsCount : currentHabits.length;
+        final calcCompleted = (strength * total).round();
+        return {
+          'total': total,
+          'completed': calcCompleted > 0 ? calcCompleted : 1,
+        };
+      }
+    }
+
+    // If no activity or record exists for this past date, completed is 0
+    final total = eligibleHabitsCount > 0 ? eligibleHabitsCount : currentHabits.length;
+    return {
+      'total': total,
+      'completed': 0,
+    };
   }
 
   Future<void> saveHabitCompletionHistory(String habitName, bool isCompleted) async {
