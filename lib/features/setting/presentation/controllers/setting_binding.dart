@@ -62,7 +62,7 @@ class SettingBinding extends Bindings {
 
     // Controllers
     Get.lazyPut(() => LangController());
-    Get.lazyPut(() => NotificationController());
+    Get.put(NotificationController(), permanent: true);
     Get.lazyPut(() => SyncController());
     Get.lazyPut(
       () => AiSettingsController(
