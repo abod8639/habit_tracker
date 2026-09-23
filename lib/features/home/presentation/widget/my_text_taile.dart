@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_utils.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
