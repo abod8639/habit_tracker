@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 enum PlanCategory {
   sports,
@@ -9,26 +10,26 @@ enum PlanCategory {
   String get displayName {
     switch (this) {
       case PlanCategory.sports:
-        return 'Sports & Fitness';
+        return S.current.categorySports;
       case PlanCategory.nutrition:
-        return 'Nutrition';
+        return S.current.categoryNutrition;
       case PlanCategory.study:
-        return 'Study';
+        return S.current.categoryStudy;
       case PlanCategory.learning:
-        return 'Learn a New Skill';
+        return S.current.categoryLearning;
     }
   }
 
   String get description {
     switch (this) {
       case PlanCategory.sports:
-        return 'Build a consistent fitness routine';
+        return S.current.categorySportsDesc;
       case PlanCategory.nutrition:
-        return 'Improve your diet and reach your health goals';
+        return S.current.categoryNutritionDesc;
       case PlanCategory.study:
-        return 'Boost your academic performance';
+        return S.current.categoryStudyDesc;
       case PlanCategory.learning:
-        return 'Master any skill step by step';
+        return S.current.categoryLearningDesc;
     }
   }
 
