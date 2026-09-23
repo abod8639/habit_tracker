@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 class MyfloatingActionButton extends StatefulWidget {
   final Function()? onPressed;
@@ -43,7 +44,7 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
           return Transform.scale(scale: _scaleAnimation.value, child: child);
         },
         child: FloatingActionButton(
-          tooltip: 'Add Habit',
+          tooltip: S.of(context).addNewHabit,
           autofocus: true,
           focusColor: Theme.of(
             context,
