@@ -2089,6 +2089,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Habit Tracker`
+  String get dailyReminderTitle {
+    return Intl.message(
+      'Habit Tracker',
+      name: 'dailyReminderTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Time to check your habits!`
+  String get dailyReminderBody {
+    return Intl.message(
+      'Time to check your habits!',
+      name: 'dailyReminderBody',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
