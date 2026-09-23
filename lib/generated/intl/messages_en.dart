@@ -152,6 +152,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "customApiKeyDialogTitle":
             MessageLookupByLibrary.simpleMessage("Gemini API Key"),
         "dailyReminder": MessageLookupByLibrary.simpleMessage("Daily Reminder"),
+        "dailyReminderBody":
+            MessageLookupByLibrary.simpleMessage("Time to check your habits!"),
+        "dailyReminderTitle":
+            MessageLookupByLibrary.simpleMessage("Habit Tracker"),
         "dataClearedSuccess": MessageLookupByLibrary.simpleMessage(
             "Data cleared successfully! Restarting app..."),
         "daysAgo": m1,
