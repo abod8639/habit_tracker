@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/services/notification_service.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
+import 'package:habit_tracker/core/functions/get_smart_notification_content.dart';
+import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/features/home/domain/usecases/get_habits_usecase.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../../domain/usecases/is_notification_enabled_usecase.dart';
 import '../../domain/usecases/set_notification_enabled_usecase.dart';
@@ -15,10 +18,13 @@ class NotificationController extends GetxController {
   final GetNotificationTimeUseCase _getNotificationTimeUseCase = Get.find();
   final SetNotificationTimeUseCase _setNotificationTimeUseCase = Get.find();
 
+  GetHabitsUseCase? get _getHabitsUseCase =>
+      Get.isRegistered<GetHabitsUseCase>() ? Get.find<GetHabitsUseCase>() : null;
+
   NotificationService get _notificationService =>
       Get.isRegistered<NotificationService>()
-      ? Get.find<NotificationService>()
-      : NotificationService();
+          ? Get.find<NotificationService>()
+          : NotificationService();
 
   var isNotificationEnabled = false.obs;
   var notificationTime = Rxn<TimeOfDay>();
@@ -52,16 +58,26 @@ class NotificationController extends GetxController {
     }
   }
 
-  // Future<void> sendTestNotification() async {
-  //   await _notificationService.requestPermissions();
-  //   await _notificationService.showTestNotification();
-  //   Get.snackbar(
-  //     S.current.notificationTestTitle,
-  //     S.current.notificationTestSent,
-  //     snackPosition: SnackPosition.BOTTOM,
-  //     duration: const Duration(seconds: 3),
-  //   );
-  // }
+  Future<void> sendTestNotification() async {
+    await _notificationService.requestPermissions();
+    final counts = await _getHabitCounts();
+    final content = getSmartNotificationContent(
+      remainingCount: counts.remaining,
+      totalCount: counts.total,
+    );
+
+    await _notificationService.showNotification(
+      id: 777,
+      title: content.title,
+      body: content.body,
+    );
+    Get.snackbar(
+      S.current.notificationTestTitle,
+      S.current.notificationTestSent,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 3),
+    );
+  }
 
   Future<void> toggleNotification(bool enabled) async {
     if (enabled) {
@@ -109,13 +125,49 @@ class NotificationController extends GetxController {
     );
   }
 
+  Future<({int total, int remaining})> _getHabitCounts() async {
+    if (Get.isRegistered<HabitController>()) {
+      final habits = Get.find<HabitController>().habits;
+      final total = habits.length;
+      final remaining = habits.where((h) => !h.isCompleted).length;
+      return (total: total, remaining: remaining);
+    }
+
+    if (_getHabitsUseCase != null) {
+      final result = await _getHabitsUseCase!();
+      return result.fold(
+        (_) => (total: 0, remaining: 0),
+        (habits) {
+          final total = habits.length;
+          final remaining = habits.where((h) => !h.isCompleted).length;
+          return (total: total, remaining: remaining);
+        },
+      );
+    }
+
+    return (total: 0, remaining: 0);
+  }
+
   Future<void> _scheduleNotification(TimeOfDay time) async {
+    final counts = await _getHabitCounts();
+    final content = getSmartNotificationContent(
+      remainingCount: counts.remaining,
+      totalCount: counts.total,
+    );
+
     await _notificationService.cancelAllNotifications();
     await _notificationService.scheduleDailyNotification(
       id: 100,
-      title: S.current.dailyReminderTitle,
-      body: S.current.dailyReminderBody,
+      title: content.title,
+      body: content.body,
       time: time,
     );
+  }
+
+  Future<void> updateDailyReminder() async {
+    if (!isNotificationEnabled.value || notificationTime.value == null) {
+      return;
+    }
+    await _scheduleNotification(notificationTime.value!);
   }
 }
