@@ -15,6 +15,7 @@ import 'package:habit_tracker/features/home/domain/usecases/toggle_habit_usecase
 import 'package:habit_tracker/features/home/domain/usecases/reset_daily_habits_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/update_habit_color_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/update_habit_order_usecase.dart';
+import 'package:habit_tracker/features/home/domain/usecases/clear_local_habits_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/get_start_date_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/increment_day_count_usecase.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
@@ -40,6 +41,7 @@ class HabitController extends GetxController {
   final GetCompletionStatusForDateUseCase _getCompletionStatusForDateUseCase = Get.find();
   final GetStartDateUseCase _getStartDateUseCase = Get.find();
   final IncrementDayCountUseCase _incrementDayCountUseCase = Get.find();
+  final ClearLocalHabitsUseCase _clearLocalHabitsUseCase = Get.find();
 
   // State
   final RxList<HabitEntity> habits = <HabitEntity>[].obs;
@@ -98,11 +100,40 @@ class HabitController extends GetxController {
   }
 
   void _setupAuthListener() {
+    bool wasLoggedIn = FirebaseAuth.instance.currentUser != null;
     _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user != null && isInitialized.value) {
+        wasLoggedIn = true;
         _syncOnLogin();
+      } else if (user == null && wasLoggedIn && isInitialized.value) {
+        wasLoggedIn = false;
+        await resetToDefaultState();
       }
     });
+  }
+
+  /// Resets all habit data and heatmap state to default
+  Future<void> resetToDefaultState() async {
+    try {
+      isLoading.value = true;
+      final earliestDate = getStartDay();
+
+      // 1. Clear in-memory observables
+      remoteHeatmapDateSet.clear();
+      localHeatmapDateSet.clear();
+      habits.clear();
+      selectedHabitIds.clear();
+
+      // 2. Clear local storage database
+      await _clearLocalHabitsUseCase(earliestDateStr: earliestDate);
+
+      // 3. Refresh controller to clean default state
+      await refreshData();
+    } catch (e) {
+      debugPrint('Error resetting habit state to default: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> _syncOnLogin() async {
