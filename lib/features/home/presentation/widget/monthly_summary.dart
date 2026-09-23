@@ -145,7 +145,9 @@ class _MonthlySummaryState extends State<MonthlySummary>
                     colorsets: colorsets,
                     onClick: (value) async {
                       final messenger = ScaffoldMessenger.of(context);
-                      final status = await habitController.getCompletionStatusForDate(value);
+                      final localDate = value.isUtc ? value.toLocal() : value;
+                      final normalizedDate = DateTime(localDate.year, localDate.month, localDate.day);
+                      final status = await habitController.getCompletionStatusForDate(normalizedDate);
                       final int completed = status['completed'] ?? 0;
                       final int total = status['total'] ?? 0;
 
@@ -184,7 +186,7 @@ class _MonthlySummaryState extends State<MonthlySummary>
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  value.toString().split(' ')[0],
+                                  "${normalizedDate.year}-${normalizedDate.month.toString().padLeft(2, '0')}-${normalizedDate.day.toString().padLeft(2, '0')}",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,
