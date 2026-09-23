@@ -24,6 +24,7 @@ import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/notification_controller.dart';
 
 class HabitController extends GetxController {
   // Use Cases
@@ -91,6 +92,7 @@ class HabitController extends GetxController {
       }
 
       _setupHabitResetChecking();
+      _syncReminder();
 
       isInitialized.value = true;
     } catch (e) {
@@ -284,6 +286,7 @@ class HabitController extends GetxController {
     final oldHabit = habits[index];
     habits.removeAt(index);
     _updateOptimisticHeatmap();
+    _syncReminder();
 
     // 2. Perform background delete
     final result = await _deleteHabitUseCase(id);
@@ -293,6 +296,7 @@ class HabitController extends GetxController {
         // 3. Rollback on failure
         habits.insert(index, oldHabit);
         _updateOptimisticHeatmap();
+        _syncReminder();
         _showError(failure.message);
       },
       (_) async {
@@ -313,6 +317,7 @@ class HabitController extends GetxController {
 
     // 1.1 Optimistic Heatmap update
     _updateOptimisticHeatmap();
+    _syncReminder();
 
     // 2. Perform background update
     final result = await _toggleHabitUseCase(id, value);
@@ -323,6 +328,7 @@ class HabitController extends GetxController {
         habits[index] = oldHabit;
         habits.refresh();
         _updateOptimisticHeatmap();
+        _syncReminder();
         _showError(failure.message);
       },
       (_) async {
@@ -342,8 +348,9 @@ class HabitController extends GetxController {
     } else {
       double rate = completed / total;
       int strength = (rate * 10).toInt();
-      if (strength == 0 && completed > 0)
+      if (strength == 0 && completed > 0) {
         strength = 1; // Show at least something if partially completed
+      }
       localHeatmapDateSet[today] = strength;
     }
   }
@@ -443,6 +450,13 @@ class HabitController extends GetxController {
   Future<void> refreshData() async {
     await _loadHabits();
     await _loadHeatmap();
+    _syncReminder();
+  }
+
+  void _syncReminder() {
+    if (Get.isRegistered<NotificationController>()) {
+      Get.find<NotificationController>().updateDailyReminder();
+    }
   }
 
   void _showError(String message) {
