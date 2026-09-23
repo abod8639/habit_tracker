@@ -496,9 +496,72 @@ class QuestionsDataSource {
     ),
   ];
 
-  // ─── LEARNING ─────────────────────────────────────────────────────────────
+  // ─── LEARNING (ARABIC) ─────────────────────────────────────────────────────
+  static const List<QuestionEntity> _learningAr = [
+    QuestionEntity(
+      id: 'skill',
+      text: 'ما هي المهارة التي تريد تعلمها؟',
+      type: QuestionType.text,
+      hint: 'مثال: العزف، لغة جديدة، البرمجة، الرسم، الإلقاء',
+    ),
+    QuestionEntity(
+      id: 'current_level',
+      text: 'ما هو مستواك الحالي في هذه المهارة؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'مبتدئ تماماً',
+        'لدي فكرة بسيطة مسبقة',
+        'متوسط — أعرف الأساسيات',
+      ],
+    ),
+    QuestionEntity(
+      id: 'motivation',
+      text: 'ما هو دافعك لتعلم هذه المهارة؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'التطور الوظيفي والمهني',
+        'هواية وشغف شخصي',
+        'تحدي وتطور ذاتي',
+        'لتعليمها ومشاركتها مع الآخرين',
+        'أسباب أخرى',
+      ],
+    ),
+    QuestionEntity(
+      id: 'time_per_week',
+      text: 'كم ساعة أسبوعياً يمكنك تخصيصها للممارسة؟',
+      type: QuestionType.singleChoice,
+      choices: [
+        'أقل من ساعتين',
+        '2–5 ساعات',
+        '5–10 ساعات',
+        '10+ ساعات',
+      ],
+    ),
+    QuestionEntity(
+      id: 'preferred_method',
+      text: 'كيف تفضل أن تتعلم؟',
+      subtitle: 'اختر كل ما ينطبق',
+      type: QuestionType.multipleChoice,
+      choices: [
+        'الدورات والفيديوهات عبر الإنترنت',
+        'الكتب والمقالات التخصصية',
+        'المشاريع والتطبيقات العملية المباشرة',
+        'المعسكرات التدريبية المكثفة',
+        'الاستعانة بمرشد أو مدرب خاص',
+        'التعلم ضمن مجتمعات وتجمعات المهتمين',
+      ],
+    ),
+    QuestionEntity(
+      id: 'milestone',
+      text: 'ما الذي يمثل لك "النجاح" بعد 3 أشهر؟',
+      type: QuestionType.text,
+      hint: 'مثال: التحدث بجمل بسيطة، إنجاز مشروعي الأول',
+      isRequired: false,
+    ),
+  ];
 
-  static const List<QuestionEntity> _learning = [
+  // ─── LEARNING (ENGLISH) ────────────────────────────────────────────────────
+  static const List<QuestionEntity> _learningEn = [
     QuestionEntity(
       id: 'skill',
       text: 'What skill do you want to learn?',
