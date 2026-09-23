@@ -26,4 +26,5 @@ abstract class HabitRepository {
   Future<Either<Failure, Map<String, int>>> getCompletionStatusForDate(DateTime date);
   Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(int days);
   String getStartDate();
+  Future<Either<Failure, void>> clearLocalData({String? earliestDateStr});
 }
