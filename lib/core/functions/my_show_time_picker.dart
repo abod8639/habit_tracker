@@ -24,10 +24,8 @@ Future<void> myShowTimePicker(
     final formattedTime = picked.format(context);
     await controller.setNotificationTime(picked);
     Get.snackbar(
-      S.current.success,
-      Get.locale?.languageCode == 'ar'
-          ? 'تم تعيين التذكير في $formattedTime'
-          : 'Reminder set for $formattedTime',
+      S.of(context).success,
+      S.of(context).reminderSetFor(formattedTime),
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 3),
     );
