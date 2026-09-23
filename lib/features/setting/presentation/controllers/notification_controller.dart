@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/services/notification_service.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 import '../../domain/usecases/is_notification_enabled_usecase.dart';
 import '../../domain/usecases/set_notification_enabled_usecase.dart';
 import '../../domain/usecases/get_notification_time_usecase.dart';
@@ -52,8 +53,8 @@ class NotificationController extends GetxController {
     await _notificationService.requestPermissions();
     await _notificationService.showTestNotification();
     Get.snackbar(
-      'Notification Test',
-      'Test notification sent! Check your notification bar.',
+      S.current.notificationTestTitle,
+      S.current.notificationTestSent,
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 3),
     );
@@ -77,8 +78,8 @@ class NotificationController extends GetxController {
             const defaultTime = TimeOfDay(hour: 9, minute: 0);
             await _notificationService.showNotification(
               id: 999,
-              title: 'Reminders Enabled!',
-              body: 'You will receive daily habit checks.',
+              title: S.current.remindersEnabledTitle,
+              body: S.current.remindersEnabledBody,
             );
             await setNotificationTime(defaultTime);
           }
@@ -107,8 +108,8 @@ class NotificationController extends GetxController {
     await _notificationService.cancelAllNotifications();
     await _notificationService.scheduleDailyNotification(
       id: 100,
-      title: 'Habit Tracker',
-      body: 'Time to check your habits!',
+      title: S.current.dailyReminderTitle,
+      body: S.current.dailyReminderBody,
       time: time,
     );
   }
