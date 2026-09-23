@@ -98,6 +98,7 @@ class _MonthlySummaryState extends State<MonthlySummary>
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   child: HeatMap(
+                    key: ValueKey('bg_heatmap_${startDateTime.year}_${startDateTime.month}_${startDateTime.day}'),
                     startDate: startDateTime,
                     fontSize: 16,
                     endDate: DateTime.now().add(const Duration(days: 15)),
@@ -129,6 +130,7 @@ class _MonthlySummaryState extends State<MonthlySummary>
                     //   height: 10,
                     //   )
                       // ],
+                    key: ValueKey('data_heatmap_${startDateTime.year}_${startDateTime.month}_${startDateTime.day}_${widget.datasets.isEmpty}'),
                     startDate: startDateTime,
                     fontSize: 16,
                     endDate: DateTime.now(),
