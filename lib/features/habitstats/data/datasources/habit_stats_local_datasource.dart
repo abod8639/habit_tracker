@@ -36,16 +36,22 @@ class HabitStatsLocalDataSource {
             final now = DateTime.now();
             final today = DateTime(now.year, now.month, now.day);
 
-            if ((heatmapData[today] ?? 0) > 0) {
+            // 1. If today has completed habits, count today
+            final bool isTodayCompleted =
+                completedHabits > 0 || (heatmapData[today] ?? 0) > 0;
+            if (isTodayCompleted) {
               streak++;
             }
 
-            var checkDay = today.subtract(const Duration(days: 1));
+            // 2. Count consecutive previous calendar days
+            int daysBack = 1;
             while (true) {
+              final checkDay =
+                  DateTime(today.year, today.month, today.day - daysBack);
               final strength = heatmapData[checkDay] ?? 0;
               if (strength > 0) {
                 streak++;
-                checkDay = checkDay.subtract(const Duration(days: 1));
+                daysBack++;
               } else {
                 break;
               }
