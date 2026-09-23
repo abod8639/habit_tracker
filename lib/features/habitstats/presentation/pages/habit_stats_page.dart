@@ -29,6 +29,12 @@ class _HabitStatsPageState extends State<HabitStatsPage>
       vsync: this,
     );
     _animationController.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<HabitStatsController>()) {
+        Get.find<HabitStatsController>().refreshStats();
+      }
+    });
   }
 
   @override
