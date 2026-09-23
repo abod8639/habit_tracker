@@ -6,27 +6,40 @@ A **beautiful**, **responsive**, and **intuitive** habit tracking app built with
 
 ## Recent Updates & Features
 
-### AI Smart Scanner (Powered by Google Gemini)
-Our most advanced feature yet—automatically extract habits from your physical notes or diet plans.
-- **Categorization**: Groups tasks (like Breakfast, Lunch, Workout) with clear prefixes.
+### AI Habit Coach & Interactive Chat (Powered by Google Gemini)
+Engage with an intelligent AI habit coach designed to keep you motivated and consistent.
+- **Conversational Habit Coaching**: Ask questions, troubleshoot routine plateaus, and seek advice on habit formation.
+- **Real-time Feedback**: Interactive chat UI featuring typing indicators, message bubbles, and smooth scrolling.
+- **Context-Aware Assistance**: Get tailored recommendations aligned with your goals.
+
+### Smart AI Plan Generator & Questionnaire
+Build a personalized routine in seconds through guided questionnaire flows.
+- **Category-Based Assessment**: Choose from diverse life pillars including Fitness, Productivity, Health, and Mindfulness.
+- **Targeted Questionnaires**: Answer focused questions to determine your routine needs, availability, and experience level.
+- **One-Click Plan Adoption**: Review AI-generated habit roadmaps and import selected habits directly into your tracker.
+
+### Bring Your Own Gemini API Key (BYOK)
+Full flexibility and control over your AI quota and capabilities.
+- **Custom Key Configuration**: Switch seamlessly between the built-in default Gemini key and your personal API key in Settings.
+- **Direct Google AI Studio Link**: Open Google AI Studio with one click via `url_launcher` to generate your free key.
+- **Privacy & Masking**: Masked key display ensuring credentials remain protected on-screen.
+
+### AI Smart Scanner
+Automatically extract habits from physical notes, diet sheets, or invoices.
+- **Categorization**: Groups tasks (e.g., Breakfast, Lunch, Workout) with clear prefixes.
 - **Emoji Enrichment**: Automatically adds relevant emojis (e.g., 🍳 for eggs, 🏃 for running).
-- **Invoice Recognition**: Detects bills and merges (Amount, Payee, and Date) into a single, clean task.
-- **Smart Validation**: A review dialog lets you preview and select items before adding them.
+- **Invoice Recognition**: Detects bills and merges amount, payee, and date into clean actionable habits.
+- **Smart Validation**: Interactive review dialog allows previewing and cherry-picking habits before adding them.
 
-### Data Integrity & Self-Healing
-Never lose your progress again with our new background sync and recovery systems:
-- **Auto-Recovery**: Automatically detects and recovers from Hive database corruption without app crashes.
-- **Conflict Resolution**: "Last Write Wins" logic ensures seamless sync between multiple devices using Firebase.
-- **Tombstones**: Proper deletion sync ensures deleted habits stay deleted safely across the cloud.
+### Data Isolation & Multi-User Safety
+- **Logout Cache Purge**: `ClearLocalHabitsUseCase` wipes local Hive caches and resets reactive state immediately upon logout to protect multi-user privacy on shared devices.
+- **Habit Deletion Confirmation**: Added explicit confirmation dialogs to prevent accidental loss of habit streaks.
+- **Auto-Recovery & Sync**: Hive self-healing against unexpected crashes combined with Firestore "Last Write Wins" cloud synchronization.
 
-### Advanced Visualization
-- **Interactive Bar Charts**: Track daily completion status with dynamic colors matching your app theme.
-- **Habit Stats**: Visual representation of your 'Goal Days' vs 'Completion Rate'.
-
-### Premium UI/UX Polish
-- **Unified Dialogs**: Clean, consistent dialogs for adding and editing habits.
-- **Responsive Navigation**: Smooth transitions between screens with an optimized drawer.
-- **Smart Labels**: Intelligent handling of long habit names and categories.
+### Material 3 Polish & Reactive Visualizations
+- **Material 3 Navigation Drawer**: Redesigned navigation adhering to Material 3 drawer guidelines.
+- **Dynamic Heatmap Synchronization**: Unique reactive keys guarantee immediate visual updates across monthly summaries and calendar heatmaps.
+- **Interactive Bar Charts & Stats**: Visualize completion trends, streak badges, and goal attainment rates with dynamic theming.
 
 ---
 
@@ -87,15 +100,17 @@ flutter run
 - **Flutter** 3.x
 - **Dart SDK** ^3.7.0
 - **Hive** for fast local storage
-- **Supabase** for backend (auth & sync)
+- **Firebase** for backend (Auth, Cloud Firestore, Cloud Messaging, Analytics)
 - **GetX** for state management & routing
 
 ### Key Packages
+- [`google_generative_ai`](https://pub.dev/packages/google_generative_ai) — Google Gemini AI SDK for chat & smart scanning  
 - [`fl_chart`](https://pub.dev/packages/fl_chart) — Responsive and animated charts  
 - [`flutter_heatmap_calendar`](https://pub.dev/packages/flutter_heatmap_calendar) — Visual heatmap for habits  
 - [`flutter_slidable`](https://pub.dev/packages/flutter_slidable) — Swipe-to-delete/edit functionality  
+- [`url_launcher`](https://pub.dev/packages/url_launcher) — External links (e.g. Google AI Studio)  
 - [`catppuccin_flutter`](https://pub.dev/packages/catppuccin_flutter) — Beautiful theme presets  
-- `flutter_colorpicker`, `flutter_secure_storage`, `hive_flutter`, and more
+- `flutter_local_notifications`, `flutter_colorpicker`, `flutter_secure_storage`, `hive_flutter`, and more
 
 ---
 
