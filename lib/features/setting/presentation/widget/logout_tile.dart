@@ -5,8 +5,6 @@ import 'package:habit_tracker/features/setting/presentation/widget/animated_sett
 import 'package:habit_tracker/core/functions/show_logout_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
-
-
 class LogoutTile extends StatelessWidget {
   final AnimationController animationController;
 
