@@ -22,10 +22,11 @@ Future<void> myShowTimePicker(
 
   if (picked != null && context.mounted) {
     final formattedTime = picked.format(context);
+    final s = S.of(context);
     await controller.setNotificationTime(picked);
     Get.snackbar(
-      S.of(context).success,
-      S.of(context).reminderSetFor(formattedTime),
+      s.success,
+      s.reminderSetFor(formattedTime),
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 3),
     );
