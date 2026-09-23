@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../domain/usecases/get_language_usecase.dart';
 import '../../domain/usecases/save_language_usecase.dart';
 import 'package:habit_tracker/features/setting/data/datasources/lang_storage.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/notification_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class LangController extends GetxController {
@@ -62,5 +63,8 @@ class LangController extends GetxController {
     await S.load(locale);
     Intl.defaultLocale = locale.languageCode;
     Get.updateLocale(locale);
+    if (Get.isRegistered<NotificationController>()) {
+      await Get.find<NotificationController>().updateDailyReminder();
+    }
   }
 }
