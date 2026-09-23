@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 class NoHabitsYet extends StatelessWidget {
   const NoHabitsYet({super.key});
@@ -16,7 +17,7 @@ class NoHabitsYet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No habits yet',
+            S.current.noHabitsYet,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
@@ -27,7 +28,7 @@ class NoHabitsYet extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Add your first habit with the + button',
+            S.current.addFirstHabitSubtitle,
             style: TextStyle(
               fontSize: 14,
               color: Theme.of(
