@@ -191,7 +191,7 @@ class _MyalartdState extends State<MyalartDialog>
                     IconButton(
                       icon: const Icon(Icons.document_scanner_rounded),
                       color: colorScheme.primary,
-                      tooltip: 'Scan from Image',
+                      tooltip: S.of(context).scanHabitsTitle,
                       onPressed: _handleScanImage,
                     ),
                 ],
