@@ -428,10 +428,10 @@ Map<DateTime, int> _processHeatmapData(Map<String, String> rawData) {
   final Map<DateTime, int> heatmapData = {};
   for (var entry in rawData.entries) {
     try {
-      // Handle both cases: key is "YYYYMMDD" or "PREFIX_YYYYMMDD"
+      // Safely extract the 8-digit date string (YYYYMMDD) even if prefixed
       String yyyymmdd = entry.key;
-      if (yyyymmdd.contains('_')) {
-        yyyymmdd = yyyymmdd.split('_').last;
+      if (yyyymmdd.length > 8) {
+        yyyymmdd = yyyymmdd.substring(yyyymmdd.length - 8);
       }
       
       if (yyyymmdd.length != 8) continue;
@@ -442,7 +442,8 @@ Map<DateTime, int> _processHeatmapData(Map<String, String> rawData) {
       
       final date = DateTime(yyyy, mm, dd);
       final doubleStrength = double.tryParse(entry.value) ?? 0.0;
-      final strength = (doubleStrength * 10).toInt();
+      int strength = (doubleStrength * 10).toInt();
+      if (strength == 0 && doubleStrength > 0) strength = 1;
       heatmapData[date] = strength;
     } catch (_) {
       // Skip invalid entries
