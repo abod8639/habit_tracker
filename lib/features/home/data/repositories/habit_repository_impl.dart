@@ -411,6 +411,16 @@ class HabitRepositoryImpl implements HabitRepository {
   String getStartDate() {
     return localDataSource.getStartDate();
   }
+
+  @override
+  Future<Either<Failure, void>> clearLocalData({String? earliestDateStr}) async {
+    try {
+      await localDataSource.clearAllData(earliestDateStr: earliestDateStr);
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
 }
 
 // Top level function for compute - Must be outside the class
