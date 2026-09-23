@@ -20,24 +20,24 @@ class QuestionsDataSource {
     if (_isArabic) {
       switch (category) {
         case PlanCategory.nutrition:
-          return _nutritionAr;
+          return List<QuestionEntity>.from(_nutritionAr);
         case PlanCategory.sports:
-          return _sportsAr;
+          return List<QuestionEntity>.from(_sportsAr);
         case PlanCategory.study:
-          return _studyAr;
+          return List<QuestionEntity>.from(_studyAr);
         case PlanCategory.learning:
-          return _learningAr;
+          return List<QuestionEntity>.from(_learningAr);
       }
     } else {
       switch (category) {
         case PlanCategory.nutrition:
-          return _nutritionEn;
+          return List<QuestionEntity>.from(_nutritionEn);
         case PlanCategory.sports:
-          return _sportsEn;
+          return List<QuestionEntity>.from(_sportsEn);
         case PlanCategory.study:
-          return _studyEn;
+          return List<QuestionEntity>.from(_studyEn);
         case PlanCategory.learning:
-          return _learningEn;
+          return List<QuestionEntity>.from(_learningEn);
       }
     }
   }
