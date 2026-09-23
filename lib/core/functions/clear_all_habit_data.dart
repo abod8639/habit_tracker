@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/clear_all_data_usecase.dart';
+import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/core/utils/restart_widget.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -46,27 +47,14 @@ Future<void> clearAppDataAndRestart(BuildContext context) async {
 }
 
 Future<bool?> _showConfirmationDialog(BuildContext context) async {
-  return showDialog<bool>(
+  return AppConfirmationDialog.show(
     context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(S.of(context).clearAllData),
-        content: Text(
-          S.of(context).clearAllDataConfirm,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(S.of(context).cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(S.of(context).delete),
-          ),
-        ],
-      );
-    },
+    title: S.of(context).clearAllData,
+    message: S.of(context).clearAllDataConfirm,
+    icon: Icons.delete_forever_rounded,
+    confirmText: S.of(context).delete,
+    cancelText: S.of(context).cancel,
+    isDestructive: true,
   );
 }
 
