@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/about_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/account_section.dart';
+import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_tile.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/appearance_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/ai_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/data_section.dart';
+import 'package:habit_tracker/features/setting/presentation/widget/logout_tile.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/sync_section.dart';
 import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -56,6 +58,8 @@ class _SettingsPageState extends State<SettingsPage>
             buildAiSection(_animationController),
             buildDataSection(_animationController),
             buildAboutSection(_animationController),
+            buildLogoutTile(_animationController)
+
           ],
         ),
       ),
