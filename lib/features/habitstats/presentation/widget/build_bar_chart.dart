@@ -220,26 +220,28 @@ Widget buildBarChart() {
                 Row(
                   children: [
                     _StatChip(
+                      icon: Icons.check_circle_outline,
                       label: S.current.completed,
                       value: '$completedCount / ${chartData.length}',
-                      color: colorScheme.primaryContainer,
-                      textColor: colorScheme.onPrimaryContainer,
+                      accentColor: colorScheme.primary,
                     ),
                     const SizedBox(width: 8),
                     _StatChip(
+                      icon: Icons.pie_chart_outline,
                       label: S.current.completionRate,
                       value: chartData.isEmpty
                           ? '0%'
                           : '${(completedCount / chartData.length * 100).round()}%',
-                      color: colorScheme.secondaryContainer,
-                      textColor: colorScheme.onSecondaryContainer,
+                      accentColor: colorScheme.secondary,
                     ),
                     const SizedBox(width: 8),
                     _StatChip(
+                      icon: Icons.local_fire_department,
                       label: S.current.streak,
                       value: '$streak',
-                      color: colorScheme.tertiaryContainer,
-                      textColor: colorScheme.onTertiaryContainer,
+                      accentColor: streak > 0
+                          ? colorScheme.secondary
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ],
                 ),
@@ -260,21 +262,23 @@ class _LegendDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 10,
-          height: 10,
+          width: 8,
+          height: 8,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(3),
+            shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 5),
         Text(
           label,
           style: TextStyle(
             fontSize: 11,
             color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -285,43 +289,71 @@ class _LegendDot extends StatelessWidget {
 class _StatChip extends StatelessWidget {
   final String label;
   final String value;
-  final Color color;
-  final Color textColor;
+  final IconData? icon;
+  final Color accentColor;
+
   const _StatChip({
     required this.label,
     required this.value,
-    required this.color,
-    required this.textColor,
+    this.icon,
+    required this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
+          color: accentColor.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: accentColor.withValues(alpha: 0.22),
+            width: 1,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: textColor,
-              ),
+            Row(
+              children: [
+                if (icon != null) ...[
+                  Icon(
+                    icon,
+                    size: 14,
+                    color: accentColor,
+                  ),
+                  const SizedBox(width: 4),
+                ],
+                Expanded(
+                  child: Text(
+                    label,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 6),
             Text(
               value,
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: textColor,
+              style: textTheme.titleMedium?.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
