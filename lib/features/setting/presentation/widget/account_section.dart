@@ -23,15 +23,7 @@ Widget buildAccountSection(AnimationController animationController) {
                 user.photoUrl,
                 1,
               ),
-              AnimatedSettingTile(
-                animationController: animationController,
-                index: 2,
-                icon: Icons.logout_rounded,
-                title: S.current.logout,
-                subtitle: S.current.logoutFromAccount,
-                textColor: Colors.red,
-                onTap: () => showLogoutDialog(authController),
-              ),
+
             ],
           );
         } else {
