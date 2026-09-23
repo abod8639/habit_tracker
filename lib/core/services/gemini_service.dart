@@ -4,9 +4,11 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:habit_tracker/features/categorys/domain/entities/category_entity.dart';
 import 'package:habit_tracker/features/categorys/domain/entities/plan_suggestion.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 
 // ── CUSTOM GEMINI EXCEPTIONS ──────────────────────────────────────────────────
 abstract class GeminiException implements Exception {
@@ -270,6 +272,14 @@ class GeminiService {
         .map((e) => '  - ${e.key.replaceAll("_", " ")}: ${e.value}')
         .join('\n');
 
+    final isArabic = Get.isRegistered<LangController>()
+        ? Get.find<LangController>().isArabic
+        : ((Get.locale?.languageCode ?? Intl.getCurrentLocale()).startsWith('ar'));
+
+    final languageInstruction = isArabic
+        ? 'LANGUAGE REQUIREMENT: Generate all habit "name" and "description" fields in natural, high-quality Arabic (اللغة العربية). The "frequency" field must also be in Arabic (e.g. "يومياً" or "3 مرات في الأسبوع").'
+        : 'LANGUAGE REQUIREMENT: Generate all habit "name", "description", and "frequency" fields in English.';
+
     return '''
 You are a ${category.coachRole}. A user is setting up a habit tracker and needs a personalised action plan.
 
@@ -292,6 +302,7 @@ STRICT OUTPUT FORMAT — return ONLY a raw JSON array, no markdown, no explanati
 ]
 
 RULES:
+- $languageInstruction
 - Habits must be actionable and time-bound where possible (e.g., "Drink 500ml water every morning" not "Drink more water").
 - Tailor every habit to the user's answers — do NOT produce generic habits.
 - If the user has restrictions or limitations, respect them completely.
