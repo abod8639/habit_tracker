@@ -60,21 +60,27 @@ Automatically extract habits from physical notes, diet sheets, or invoices.
 
 ---
 
-##  Screenshots
+## Screenshots
 
-**Home Page**  
-![Rate](assets/image/2.png)  
+<div align="center">
 
-**Theme Selection**  
-![Themes](assets/image/4.png)
+|**Home Dashboard** | **Habit Management** |
+| :---: | :---: |
+| <a href="assets/image/2.png"><img src="assets/image/2.png" width="450" alt="Home Dashboard" /></a> | <a href="assets/image/4.png"><img src="assets/image/4.png" width="450" alt="Habit Management" /></a> |
 
-**Rate Page**  
-![Home](assets/image/5.png)
-![Rate](assets/image/3.png)
+| **Theme Customization** | **Statistics & Analytics** |
+| :---: | :---: |
+| <a href="assets/image/3.png"><img src="assets/image/3.png" width="450" alt="Theme Customization" /></a> | <a href="assets/image/5.png"><img src="assets/image/5.png" width="450" alt="Statistics & Analytics" /></a> |
+
+| <p align="center"> **Detailed Monthly Progress**</p> |
+| :---: |
+| <a href="assets/image/6.png"><img src="assets/image/6.png" width="600" alt="Detailed Monthly Progress" /></a> |
+
+</div>
 
 ---
 
-## 📱 Download & Direct Install (Android)
+## Download & Direct Install (Android)
 
 You can download and install the app directly on your Android device without building from source:
 
@@ -92,7 +98,7 @@ You can download and install the app directly on your Android device without bui
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Install Flutter  
 Follow the [Flutter installation guide](https://docs.flutter.dev/get-started/install).
