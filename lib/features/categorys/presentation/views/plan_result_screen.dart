@@ -4,6 +4,7 @@ import 'package:habit_tracker/generated/l10n.dart';
 
 import '../../domain/entities/plan_suggestion.dart';
 import '../controllers/plan_generator_controller.dart';
+import 'package:habit_tracker/features/home/presentation/pages/home_screen.dart';
 
 class PlanResultScreen extends StatelessWidget {
   const PlanResultScreen({super.key});
@@ -26,7 +27,10 @@ class PlanResultScreen extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Get.until((r) => r.isFirst),
+                    onPressed: () {
+                      controller.reset();
+                      Get.offAll(() => const HomeScreen());
+                    },
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.grey.shade100,
                     ),
