@@ -118,6 +118,19 @@ class SettingRepositoryImpl implements SettingRepository {
           localHistory,
         );
         await habitLocalDataSource.saveAllHabitStrengths(mergedHistory);
+
+        // 5. Sync AI API key
+        final localKey = localDataSource.getCustomGeminiApiKey();
+        final remoteKey = await remoteDataSource.downloadCustomApiKey();
+        if ((localKey == null || localKey.trim().isEmpty) &&
+            remoteKey != null &&
+            remoteKey.trim().isNotEmpty) {
+          await localDataSource.saveCustomGeminiApiKey(remoteKey.trim());
+        } else if (localKey != null &&
+            localKey.trim().isNotEmpty &&
+            (remoteKey == null || remoteKey.trim().isEmpty)) {
+          await remoteDataSource.uploadCustomApiKey(localKey.trim());
+        }
       }
 
       return Right(mergedHabits);
@@ -139,7 +152,14 @@ class SettingRepositoryImpl implements SettingRepository {
   @override
   Future<Either<Failure, String?>> getCustomApiKey() async {
     try {
-      final key = localDataSource.getCustomGeminiApiKey();
+      var key = localDataSource.getCustomGeminiApiKey();
+      if (key == null || key.trim().isEmpty) {
+        final remoteKey = await remoteDataSource.downloadCustomApiKey();
+        if (remoteKey != null && remoteKey.trim().isNotEmpty) {
+          key = remoteKey.trim();
+          await localDataSource.saveCustomGeminiApiKey(key);
+        }
+      }
       return Right(key);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -150,9 +170,10 @@ class SettingRepositoryImpl implements SettingRepository {
   Future<Either<Failure, void>> saveCustomApiKey(String key) async {
     try {
       await localDataSource.saveCustomGeminiApiKey(key);
+      await remoteDataSource.uploadCustomApiKey(key);
       return const Right(null);
     } catch (e) {
-      return Left(CacheFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -160,9 +181,10 @@ class SettingRepositoryImpl implements SettingRepository {
   Future<Either<Failure, void>> clearCustomApiKey() async {
     try {
       await localDataSource.clearCustomGeminiApiKey();
+      await remoteDataSource.deleteCustomApiKey();
       return const Right(null);
     } catch (e) {
-      return Left(CacheFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
