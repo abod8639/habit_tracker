@@ -16,6 +16,23 @@ import 'package:habit_tracker/features/home/data/datasources/habit_local_data_so
 
 // Minimal mock/fake for dependencies not under test
 class FakeSettingRemoteDataSource implements SettingRemoteDataSource {
+  String? cloudApiKey;
+
+  @override
+  Future<void> uploadCustomApiKey(String key) async {
+    cloudApiKey = key;
+  }
+
+  @override
+  Future<String?> downloadCustomApiKey() async {
+    return cloudApiKey;
+  }
+
+  @override
+  Future<void> deleteCustomApiKey() async {
+    cloudApiKey = null;
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -33,6 +50,7 @@ void main() {
   late Box langBox;
   late SettingsStorage settingsStorage;
   late SettingLocalDataSource localDataSource;
+  late FakeSettingRemoteDataSource remoteDataSource;
   late SettingRepositoryImpl repository;
   late GetCustomApiKeyUseCase getCustomApiKeyUseCase;
   late SaveCustomApiKeyUseCase saveCustomApiKeyUseCase;
@@ -54,9 +72,11 @@ void main() {
       settingsBox: settingsBox,
     );
 
+    remoteDataSource = FakeSettingRemoteDataSource();
+
     repository = SettingRepositoryImpl(
       localDataSource: localDataSource,
-      remoteDataSource: FakeSettingRemoteDataSource(),
+      remoteDataSource: remoteDataSource,
       habitLocalDataSource: FakeHabitLocalDataSource(),
     );
 
@@ -119,6 +139,31 @@ void main() {
         (_) => fail('Expected null'),
         (key) => expect(key, isNull),
       );
+    });
+
+    test('SettingRepository syncs custom API key with remote data source', () async {
+      // 1. Saving key uploads to remote
+      final saveResult = await saveCustomApiKeyUseCase('AIzaSyCloudKey123');
+      expect(saveResult.isRight(), isTrue);
+      expect(remoteDataSource.cloudApiKey, 'AIzaSyCloudKey123');
+
+      // 2. Clear local storage, getting key restores from remote
+      await localDataSource.clearCustomGeminiApiKey();
+      expect(localDataSource.getCustomGeminiApiKey(), isNull);
+
+      final getResult = await getCustomApiKeyUseCase();
+      expect(getResult.isRight(), isTrue);
+      getResult.fold(
+        (_) => fail('Expected key from remote'),
+        (key) => expect(key, 'AIzaSyCloudKey123'),
+      );
+      // It should also cache it back to local
+      expect(localDataSource.getCustomGeminiApiKey(), 'AIzaSyCloudKey123');
+
+      // 3. Clearing key removes from remote as well
+      final clearResult = await clearCustomApiKeyUseCase();
+      expect(clearResult.isRight(), isTrue);
+      expect(remoteDataSource.cloudApiKey, isNull);
     });
 
     test(
