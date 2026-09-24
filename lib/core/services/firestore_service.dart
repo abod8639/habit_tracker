@@ -237,6 +237,45 @@ class FirestoreService {
     }
   }
 
+  // AI Settings Management
+  Future<void> uploadCustomApiKey(String apiKey) async {
+    if (!isUserLoggedIn) return;
+
+    try {
+      await _userDoc!.collection('settings').doc('ai').set({
+        'apiKey': apiKey,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Failed to upload custom API key to Firestore: $e');
+    }
+  }
+
+  Future<String?> downloadCustomApiKey() async {
+    if (!isUserLoggedIn) return null;
+
+    try {
+      final doc = await _userDoc!.collection('settings').doc('ai').get();
+      if (doc.exists) {
+        final data = doc.data();
+        return data?['apiKey'] as String?;
+      }
+    } catch (e) {
+      debugPrint('Failed to download custom API key from Firestore: $e');
+    }
+    return null;
+  }
+
+  Future<void> deleteCustomApiKey() async {
+    if (!isUserLoggedIn) return;
+
+    try {
+      await _userDoc!.collection('settings').doc('ai').delete();
+    } catch (e) {
+      debugPrint('Failed to delete custom API key from Firestore: $e');
+    }
+  }
+
   Future<Map<String, String>> syncHabitHistory(
     Map<String, String> localHistory,
   ) async {
