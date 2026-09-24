@@ -31,8 +31,6 @@ class ThemeUtils {
     required bool isDarkTheme,
     Color? customBackground,
   }) {
-    final brightness = forceDark ? Brightness.dark : Brightness.light;
-
     final backgroundColor =
         customBackground ??
         (forceDark && !isDarkTheme
@@ -42,6 +40,10 @@ class ThemeUtils {
     final surfaceColor = forceDark && !isDarkTheme
         ? adjustBrightness(colors['surface']!, 0.2)
         : colors['surface']!;
+
+    final brightness = _shouldUseDarkText(backgroundColor)
+        ? Brightness.light
+        : Brightness.dark;
 
     final onSurfaceColor = getContrastColor(surfaceColor);
     final onBackgroundColor = getContrastColor(backgroundColor);
