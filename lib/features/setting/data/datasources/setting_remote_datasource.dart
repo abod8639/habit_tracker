@@ -8,6 +8,9 @@ abstract class SettingRemoteDataSource {
     String? localStartDay,
   });
   Future<DateTime?> getLastSyncTime();
+  Future<void> uploadCustomApiKey(String key);
+  Future<String?> downloadCustomApiKey();
+  Future<void> deleteCustomApiKey();
 }
 
 class SettingRemoteDataSourceImpl implements SettingRemoteDataSource {
@@ -31,5 +34,20 @@ class SettingRemoteDataSourceImpl implements SettingRemoteDataSource {
   @override
   Future<DateTime?> getLastSyncTime() async {
     return await _firestoreService.getLastSyncTime();
+  }
+
+  @override
+  Future<void> uploadCustomApiKey(String key) async {
+    await _firestoreService.uploadCustomApiKey(key);
+  }
+
+  @override
+  Future<String?> downloadCustomApiKey() async {
+    return await _firestoreService.downloadCustomApiKey();
+  }
+
+  @override
+  Future<void> deleteCustomApiKey() async {
+    await _firestoreService.deleteCustomApiKey();
   }
 }
