@@ -58,37 +58,34 @@ class MyApp extends StatelessWidget {
     final ThemeController themeController = Get.find<ThemeController>();
     final AnalyticsService analyticsService = Get.find<AnalyticsService>();
 
-    return Obx(
-      () => GetMaterialApp(
-        initialBinding: InitialBinding(),
-        locale: controllerLanguage.effectiveLocale,
-        fallbackLocale: const Locale('en'),
-        navigatorObservers: [
-          analyticsService.getObserver(),
-          analyticsService.getTimeTrackerObserver(),
-        ],
+    return GetMaterialApp(
+      locale: controllerLanguage.effectiveLocale,
+      fallbackLocale: const Locale('en'),
+      navigatorObservers: [
+        analyticsService.getObserver(),
+        analyticsService.getTimeTrackerObserver(),
+      ],
 
-        localizationsDelegates: const [
-          S.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
+      localizationsDelegates: const [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
 
-        supportedLocales: S.delegate.supportedLocales,
+      supportedLocales: S.delegate.supportedLocales,
 
-        debugShowCheckedModeBanner: false,
-        title: 'Habit Tracker',
-        defaultTransition: Transition.fadeIn,
-        smartManagement: SmartManagement.full,
+      debugShowCheckedModeBanner: false,
+      title: 'Habit Tracker',
+      defaultTransition: Transition.fadeIn,
+      smartManagement: SmartManagement.full,
 
-        theme: themeController.lightTheme.value,
-        darkTheme: themeController.darkTheme.value,
-        themeMode: themeController.themeMode.value,
+      theme: themeController.lightTheme.value,
+      darkTheme: themeController.darkTheme.value,
+      themeMode: themeController.themeMode.value,
 
-        getPages: appPages,
-        home: const AuthWrapper(),
-      ),
+      getPages: appPages,
+      home: const AuthWrapper(),
     );
   }
 }
