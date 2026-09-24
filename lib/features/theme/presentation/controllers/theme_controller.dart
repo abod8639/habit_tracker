@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_utils.dart';
+import '../../data/datasources/theme_storage.dart';
 import '../../domain/entities/theme_entity.dart';
-import '../../domain/usecases/get_theme_settings_usecase.dart';
 import '../../domain/usecases/save_theme_settings_usecase.dart';
 import '../../domain/usecases/sync_theme_with_cloud_usecase.dart';
 import '../../domain/usecases/upload_theme_settings_usecase.dart';
@@ -13,16 +13,17 @@ import 'package:habit_tracker/generated/l10n.dart';
 class ThemeController extends GetxController {
   static const String defaultTheme = 'github_dark_green';
 
+  final ThemeStorageService _storageService = Get.find<ThemeStorageService>();
+
   // Observable state
-  final Rx<ThemeMode> themeMode = ThemeMode.system.obs;
-  final RxString currentTheme = defaultTheme.obs;
-  final RxBool useCustomBackground = false.obs;
-  final Rx<Color> customBackgroundColor = Colors.transparent.obs;
-  final Rx<ThemeData> lightTheme = ThemeData.light().obs;
-  final Rx<ThemeData> darkTheme = ThemeData.dark().obs;
+  late final Rx<ThemeMode> themeMode;
+  late final RxString currentTheme;
+  late final RxBool useCustomBackground;
+  late final Rx<Color> customBackgroundColor;
+  late final Rx<ThemeData> lightTheme;
+  late final Rx<ThemeData> darkTheme;
 
   // Use Cases
-  final GetThemeSettingsUseCase _getThemeSettingsUseCase = Get.find();
   final SaveThemeSettingsUseCase _saveThemeSettingsUseCase = Get.find();
   final SyncThemeWithCloudUseCase _syncThemeWithCloudUseCase = Get.find();
   final UploadThemeSettingsUseCase _uploadThemeSettingsUseCase = Get.find();
@@ -31,46 +32,78 @@ class ThemeController extends GetxController {
   // Getters
   List<String> get availableThemes => themeColors.keys.toList();
 
-  @override
-  void onInit() {
-    super.onInit();
-    _initializeTheme();
+  ThemeController() {
+    _initInitialTheme();
   }
 
-  Future<void> _initializeTheme() async {
+  void _initInitialTheme() {
     try {
-      await _loadSavedTheme();
-      if (_firestoreService.isUserLoggedIn) {
-        _syncWithCloud();
-      }
-    } catch (e) {
-      // debugPrint('Error initializing theme: $e');
-      _setDefaultTheme();
+      final savedTheme = _storageService.getThemeName(defaultTheme);
+      final themeKey =
+          themeColors.containsKey(savedTheme) ? savedTheme : defaultTheme;
+      currentTheme = themeKey.obs;
+
+      final themeData = themeColors[themeKey]!;
+      final isDark = ThemeUtils.isDarkTheme(themeData);
+
+      final savedMode = _storageService.getThemeMode();
+      final initialMode = savedMode == ThemeMode.system
+          ? (isDark ? ThemeMode.dark : ThemeMode.light)
+          : savedMode;
+      themeMode = initialMode.obs;
+
+      final isCustomBg = _storageService.getUseCustomBackground();
+      useCustomBackground = isCustomBg.obs;
+
+      final customBg = _storageService.getCustomBackgroundColor();
+      customBackgroundColor = (customBg ?? Colors.transparent).obs;
+
+      final customBgColor = isCustomBg ? customBg : null;
+      lightTheme = ThemeUtils.buildThemeData(
+        forceDark: false,
+        colors: themeData,
+        isDarkTheme: isDark,
+        customBackground: customBgColor,
+      ).obs;
+
+      darkTheme = ThemeUtils.buildThemeData(
+        forceDark: true,
+        colors: themeData,
+        isDarkTheme: isDark,
+        customBackground: customBgColor,
+      ).obs;
+    } catch (_) {
+      _applyDefaultThemeInitial();
     }
   }
 
-  Future<void> _loadSavedTheme() async {
-    final result = await _getThemeSettingsUseCase();
-    result.fold(
-      (failure) {
-        // debugPrint('Error loading saved theme: ${failure.message}');
-        _setDefaultTheme();
-      },
-      (entity) {
-        currentTheme.value = entity.themeName;
-        final themeData = themeColors[entity.themeName];
-        final isDark = themeData != null
-            ? ThemeUtils.isDarkTheme(themeData)
-            : true;
-        themeMode.value = entity.themeMode == ThemeMode.system
-            ? (isDark ? ThemeMode.dark : ThemeMode.light)
-            : entity.themeMode;
-        useCustomBackground.value = entity.useCustomBackground;
-        customBackgroundColor.value =
-            entity.customBackgroundColor ?? Colors.transparent;
-        _buildAndApply();
-      },
-    );
+  void _applyDefaultThemeInitial() {
+    currentTheme = defaultTheme.obs;
+    final themeData = themeColors[defaultTheme]!;
+    final isDark = ThemeUtils.isDarkTheme(themeData);
+    themeMode = (isDark ? ThemeMode.dark : ThemeMode.light).obs;
+    useCustomBackground = false.obs;
+    customBackgroundColor = Colors.transparent.obs;
+    lightTheme = ThemeUtils.buildThemeData(
+      forceDark: false,
+      colors: themeData,
+      isDarkTheme: isDark,
+      customBackground: null,
+    ).obs;
+    darkTheme = ThemeUtils.buildThemeData(
+      forceDark: true,
+      colors: themeData,
+      isDarkTheme: isDark,
+      customBackground: null,
+    ).obs;
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (_firestoreService.isUserLoggedIn) {
+      _syncWithCloud();
+    }
   }
 
   Future<void> _syncWithCloud() async {
@@ -95,16 +128,6 @@ class ThemeController extends GetxController {
         }
       },
     );
-  }
-
-  void _setDefaultTheme() {
-    currentTheme.value = defaultTheme;
-    final themeData = themeColors[defaultTheme];
-    final isDark = themeData != null ? ThemeUtils.isDarkTheme(themeData) : true;
-    themeMode.value = isDark ? ThemeMode.dark : ThemeMode.light;
-    useCustomBackground.value = false;
-    customBackgroundColor.value = Colors.transparent;
-    _buildAndApply();
   }
 
   Future<void> _saveCurrentSettings() async {
@@ -176,10 +199,6 @@ class ThemeController extends GetxController {
   }
 
   void _applyTheme() {
-    Get.rootController.theme = lightTheme.value;
-    Get.rootController.darkTheme = darkTheme.value;
-    Get.rootController.setThemeMode(themeMode.value);
-    Get.rootController.update();
     Get.changeThemeMode(themeMode.value);
     Get.changeTheme(
       themeMode.value == ThemeMode.dark ? darkTheme.value : lightTheme.value,
