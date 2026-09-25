@@ -10,13 +10,16 @@ class LineChartBox extends GetView<HabitStatsController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
-      height: 300,
+      height: 240,
       child: Obx(() {
         final Map<String, List<FlSpot>> progression =
             controller.individualTrends;
 
-        // Generate labels based on period
         final now = DateTime.now();
         final List<String> trendLabels = List.generate(
           controller.daysPeriod.value,
@@ -32,16 +35,15 @@ class LineChartBox extends GetView<HabitStatsController> {
           LineChartData(
             gridData: FlGridData(
               show: true,
+              drawVerticalLine: false,
+              horizontalInterval: 0.25,
               getDrawingHorizontalLine: (value) {
                 return FlLine(
-                  color: Colors.grey.withValues(alpha: 0.1),
-                  strokeWidth: 1,
-                );
-              },
-              getDrawingVerticalLine: (value) {
-                return FlLine(
-                  color: Colors.grey.withValues(alpha: 0.05),
-                  strokeWidth: 1,
+                  color: colorScheme.outlineVariant.withValues(
+                    alpha: isDark ? 0.12 : 0.22,
+                  ),
+                  strokeWidth: 0.8,
+                  dashArray: [4, 4],
                 );
               },
             ),
@@ -55,15 +57,13 @@ class LineChartBox extends GetView<HabitStatsController> {
                     final index = value.toInt();
                     if (index >= 0 && index < trendLabels.length) {
                       return Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
+                        padding: const EdgeInsets.only(top: 6.0),
                         child: Text(
                           trendLabels[index],
                           style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.7),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 10,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -71,7 +71,7 @@ class LineChartBox extends GetView<HabitStatsController> {
                     }
                     return const SizedBox.shrink();
                   },
-                  reservedSize: 25,
+                  reservedSize: 24,
                   interval: controller.isWeeklyView.value ? 1 : 5,
                 ),
               ),
@@ -81,23 +81,23 @@ class LineChartBox extends GetView<HabitStatsController> {
                   showTitles: true,
                   interval: 0.25,
                   getTitlesWidget: (value, meta) {
+                    if (value < 0.0 || value > 1.0) {
+                      return const SizedBox.shrink();
+                    }
                     return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
+                      padding: const EdgeInsets.only(right: 6.0),
                       child: Text(
-                        '${(value * 100).toInt()}%'
-                            .replaceAll("110%", "")
-                            .replaceAll("114%", "")
-                            .replaceAll("-10%", ""),
+                        '${(value * 100).toInt()}%',
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 10,
-                          color: Theme.of(context).colorScheme.onSecondary,
+                          color: colorScheme.outline,
                         ),
                         textAlign: TextAlign.right,
                       ),
                     );
                   },
-                  reservedSize: 45,
+                  reservedSize: 34,
                 ),
               ),
 
@@ -110,19 +110,13 @@ class LineChartBox extends GetView<HabitStatsController> {
               ),
             ),
 
-            borderData: FlBorderData(
-              show: true,
-              border: Border.all(
-                color: Colors.grey.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
+            borderData: FlBorderData(show: false),
 
             clipData: const FlClipData.all(),
-            minX: 0.10,
-            maxX: (trendLabels.length - 1).toDouble(),
-            minY: -0.10,
-            maxY: 1.15,
+            minX: 0.0,
+            maxX: (trendLabels.length - 1).toDouble().clamp(1.0, double.infinity),
+            minY: -0.05,
+            maxY: 1.10,
 
             lineBarsData: _buildLineBarsData(
               context: context,
@@ -131,6 +125,8 @@ class LineChartBox extends GetView<HabitStatsController> {
               trendLabels: trendLabels,
             ),
           ),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOutCubic,
         );
       }),
     );
@@ -147,7 +143,7 @@ class LineChartBox extends GetView<HabitStatsController> {
     if (controller.showAllHabits.value) {
       lineBars.add(
         myLineChartBarData(
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context).colorScheme.primary,
           spots: controller.overallTrend,
           label: 'Overall',
         ),
@@ -178,19 +174,7 @@ class LineChartBox extends GetView<HabitStatsController> {
     if (index < lineColors.length) {
       return lineColors[index];
     }
-
-    final fallbackColors = [
-      Theme.of(context).primaryColor,
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.red,
-      Colors.teal,
-      Colors.amber,
-    ];
-
-    return fallbackColors[index % fallbackColors.length];
+    return lineColors[index % lineColors.length];
   }
 
   String _getHabitLabel(String habitName, bool isWeekly) {
