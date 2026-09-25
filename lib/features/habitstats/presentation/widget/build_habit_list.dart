@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'stats_neumorphic_utils.dart';
 
 class HabitSubList extends StatelessWidget {
   final List<Map<String, dynamic>> habits;
@@ -15,19 +16,18 @@ class HabitSubList extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
 
-    final statusColor = isCompleted
-        ? colorScheme.primary
-        : colorScheme.secondary;
+    final Color statusColor = isCompleted
+        ? const Color(0xFF10B981) // Emerald
+        : colorScheme.error;
 
     return Container(
-      decoration: BoxDecoration(
-        color: statusColor.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: statusColor.withValues(alpha: 0.2),
-          width: 1,
-        ),
+      decoration: StatsNeumorphicTheme.wellDecoration(
+        context,
+        borderRadius: 18,
+        accentColor: statusColor,
+        accentAlpha: isDark ? 0.05 : 0.02,
       ),
       child: ListView.separated(
         physics: const NeverScrollableScrollPhysics(),
@@ -39,7 +39,9 @@ class HabitSubList extends StatelessWidget {
           thickness: 1,
           indent: 52,
           endIndent: 16,
-          color: colorScheme.outlineVariant.withValues(alpha: 0.25),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.04)
+              : const Color(0xFFA3B1C6).withValues(alpha: 0.2),
         ),
         itemBuilder: (context, index) {
           final habit = habits[index];
@@ -54,10 +56,20 @@ class HabitSubList extends StatelessWidget {
                   height: 28,
                   decoration: BoxDecoration(
                     color: isCompleted
-                        ? statusColor.withValues(alpha: 0.15)
-                        : colorScheme.primaryContainer,
-
+                        ? statusColor.withValues(alpha: isDark ? 0.2 : 0.15)
+                        : (isDark
+                            ? Colors.black.withValues(alpha: 0.3)
+                            : Colors.white.withValues(alpha: 0.7)),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black.withValues(alpha: 0.3)
+                            : const Color(0xFFA3B1C6).withValues(alpha: 0.2),
+                        offset: const Offset(1, 1),
+                        blurRadius: 2,
+                      ),
+                    ],
                   ),
                   alignment: Alignment.center,
                   child: Text(
@@ -65,6 +77,7 @@ class HabitSubList extends StatelessWidget {
                     style: textTheme.labelMedium?.copyWith(
                       color: statusColor,
                       fontWeight: FontWeight.bold,
+                      fontSize: 11,
                     ),
                   ),
                 ),
@@ -77,13 +90,13 @@ class HabitSubList extends StatelessWidget {
                           ? FontWeight.normal
                           : FontWeight.w600,
                       color: isCompleted
-                          ? colorScheme.onSurface.withValues(alpha: 0.7)
+                          ? colorScheme.onSurface.withValues(alpha: 0.55)
                           : colorScheme.onSurface,
                       decoration: isCompleted
                           ? TextDecoration.lineThrough
                           : null,
                       decorationColor: colorScheme.onSurface.withValues(
-                        alpha: 0.5,
+                        alpha: 0.45,
                       ),
                     ),
                     maxLines: 2,
@@ -105,15 +118,4 @@ class HabitSubList extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget buildHabitList(
-  BuildContext context,
-  List<Map<String, dynamic>> habits,
-  bool isCompleted,
-) {
-  return HabitSubList(
-    habits: habits,
-    isCompleted: isCompleted,
-  );
 }
