@@ -11,14 +11,15 @@ Widget buildAppearanceSection(AnimationController animationController) {
   final langController = Get.find<LangController>();
   return Builder(
     builder: (context) {
+      final s = S.of(context);
       return Column(
         children: [
           AnimatedSettingTile(
             animationController: animationController,
             index: 5,
             icon: Icons.palette_rounded,
-            title: S.current.themepage,
-            subtitle: S.current.changeAppTheme,
+            title: s.themepage,
+            subtitle: s.changeAppTheme,
             onTap: () => Get.to(
               () => const ThemePage(),
               transition: Transition.rightToLeftWithFade,
