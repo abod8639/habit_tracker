@@ -11,6 +11,10 @@ Widget buildAiSection(AnimationController animationController) {
 
   return Builder(
     builder: (context) {
+      final theme = Theme.of(context);
+      final isDark = theme.brightness == Brightness.dark;
+      final baseSurface = theme.cardColor;
+
       return Obx(() {
         final isCustom = aiController.isCustom.value;
         final subtitleText = isCustom
@@ -25,20 +29,57 @@ Widget buildAiSection(AnimationController animationController) {
               icon: Icons.auto_awesome_rounded,
               title: S.current.aiApiKeyTitle,
               subtitle: subtitleText,
-              trailing: Container(
+              trailing: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 4,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
                   color: isCustom
-                      ? Colors.teal.withValues(alpha: 0.15)
-                      : Theme.of(context).colorScheme.surfaceContainerHighest,
+                      ? Color.alphaBlend(
+                          Colors.teal.withValues(alpha: isDark ? 0.18 : 0.10),
+                          baseSurface,
+                        )
+                      : Color.alphaBlend(
+                          theme.colorScheme.onSurface
+                              .withValues(alpha: isDark ? 0.05 : 0.03),
+                          baseSurface,
+                        ),
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: isCustom
+                      ? [
+                          BoxShadow(
+                            color: Colors.teal
+                                .withValues(alpha: isDark ? 0.30 : 0.20),
+                            offset: const Offset(0, 2),
+                            blurRadius: 6,
+                          ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.03)
+                                : Colors.white.withValues(alpha: 0.75),
+                            offset: const Offset(-1.5, -1.5),
+                            blurRadius: 2.5,
+                          ),
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.3)
+                                : const Color(0xFFA3B1C6)
+                                    .withValues(alpha: 0.25),
+                            offset: const Offset(1.5, 1.5),
+                            blurRadius: 2.5,
+                          ),
+                        ],
                   border: Border.all(
                     color: isCustom
-                        ? Colors.teal.withValues(alpha: 0.4)
-                        : Colors.transparent,
+                        ? Colors.teal.withValues(alpha: isDark ? 0.35 : 0.25)
+                        : (isDark
+                            ? Colors.white.withValues(alpha: 0.04)
+                            : Colors.white.withValues(alpha: 0.6)),
+                    width: 1,
                   ),
                 ),
                 child: Row(
@@ -51,18 +92,19 @@ Widget buildAiSection(AnimationController animationController) {
                       size: 14,
                       color: isCustom
                           ? Colors.teal
-                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                          : theme.colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 5),
                     Text(
                       isCustom
                           ? S.current.customApiKeyActive
                           : S.current.tapToEdit,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      style: theme.textTheme.labelSmall?.copyWith(
                         color: isCustom
                             ? Colors.teal
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                            : theme.colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
+                        fontSize: 11.5,
                       ),
                     ),
                   ],
@@ -85,248 +127,428 @@ void _showAiApiKeyDialog(
     text: controller.customApiKey.value,
   );
   final obscureRx = true.obs;
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
+  final isDark = theme.brightness == Brightness.dark;
+  final baseSurface = theme.cardColor;
+  final primaryColor = theme.primaryColor;
 
   showDialog(
     context: context,
     builder: (dialogContext) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-        contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-        actionsPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+          decoration: BoxDecoration(
+            color: baseSurface,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.045)
+                    : Colors.white.withValues(alpha: 0.90),
+                offset: const Offset(-4, -4),
+                blurRadius: 10,
               ),
-              child: Icon(
-                Icons.auto_awesome_rounded,
-                color: Theme.of(context).primaryColor,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                S.current.customApiKeyDialogTitle,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                S.current.customApiKeyDialogDesc,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-              const SizedBox(height: 14),
-              // Helper info container linking to Google AI Studio
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () async {
-                    final Uri url = Uri.parse(
-                      'https://aistudio.google.com/app/apikey',
-                    );
-                    try {
-                      await launchUrl(
-                        url,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } catch (e) {
-                      debugPrint('Could not launch $url: $e');
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).primaryColor.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: Theme.of(
-                          context,
-                        ).primaryColor.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline_rounded,
-                          size: 18,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            S.current.getKeyInfo,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  decoration: TextDecoration.underline,
-                                ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Icon(
-                          Icons.open_in_new_rounded,
-                          size: 16,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // API Key text input
-              Obx(
-                () => TextField(
-                  controller: textController,
-                  obscureText: obscureRx.value,
-                  decoration: InputDecoration(
-                    labelText: S.current.aiApiKeyTitle,
-                    hintText: S.current.apiKeyHint,
-                    prefixIcon: const Icon(Icons.key_rounded),
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          tooltip: obscureRx.value ? 'Show' : 'Hide',
-                          icon: Icon(
-                            obscureRx.value
-                                ? Icons.visibility_off_rounded
-                                : Icons.visibility_rounded,
-                            size: 20,
-                          ),
-                          onPressed: () => obscureRx.value = !obscureRx.value,
-                        ),
-                        IconButton(
-                          tooltip: S.current.paste,
-                          icon: const Icon(
-                            Icons.paste_rounded,
-                            size: 20,
-                          ),
-                          onPressed: () async {
-                            final data = await Clipboard.getData(
-                              Clipboard.kTextPlain,
-                            );
-                            if (data != null && data.text != null) {
-                              textController.text = data.text!.trim();
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                ),
+              BoxShadow(
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.55)
+                    : const Color(0xFFA3B1C6).withValues(alpha: 0.45),
+                offset: const Offset(4, 4),
+                blurRadius: 12,
               ),
             ],
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.white.withValues(alpha: 0.8),
+              width: 1,
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Neumorphic Title Header
+                Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: Color.alphaBlend(
+                          primaryColor.withValues(alpha: isDark ? 0.16 : 0.10),
+                          baseSurface,
+                        ),
+                        borderRadius: BorderRadius.circular(13),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.035)
+                                : Colors.white.withValues(alpha: 0.85),
+                            offset: const Offset(-2, -2),
+                            blurRadius: 3,
+                          ),
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.35)
+                                : const Color(0xFFA3B1C6).withValues(alpha: 0.30),
+                            offset: const Offset(2, 2),
+                            blurRadius: 3,
+                          ),
+                        ],
+                        border: Border.all(
+                          color: primaryColor.withValues(alpha: isDark ? 0.25 : 0.18),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.auto_awesome_rounded,
+                        color: primaryColor,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        S.current.customApiKeyDialogTitle,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.5,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  S.current.customApiKeyDialogDesc,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.65),
+                    height: 1.35,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                // Neumorphic Helper info container linking to Google AI Studio
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: () async {
+                      final Uri url = Uri.parse(
+                        'https://aistudio.google.com/app/apikey',
+                      );
+                      try {
+                        await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } catch (e) {
+                        debugPrint('Could not launch $url: $e');
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color.alphaBlend(
+                          primaryColor.withValues(alpha: isDark ? 0.08 : 0.04),
+                          baseSurface,
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.03)
+                                : Colors.white.withValues(alpha: 0.75),
+                            offset: const Offset(-1.5, -1.5),
+                            blurRadius: 2.5,
+                          ),
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.3)
+                                : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
+                            offset: const Offset(1.5, 1.5),
+                            blurRadius: 2.5,
+                          ),
+                        ],
+                        border: Border.all(
+                          color: primaryColor.withValues(alpha: isDark ? 0.22 : 0.15),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: 18,
+                            color: primaryColor,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              S.current.getKeyInfo,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: primaryColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.open_in_new_rounded,
+                            size: 16,
+                            color: primaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Neumorphic Sunken TextField
+                Obx(
+                  () => Container(
+                    decoration: BoxDecoration(
+                      color: Color.alphaBlend(
+                        colorScheme.onSurface.withValues(alpha: isDark ? 0.04 : 0.02),
+                        baseSurface,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.35)
+                              : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
+                          offset: const Offset(1.5, 1.5),
+                          blurRadius: 3,
+                        ),
+                        BoxShadow(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.02)
+                              : Colors.white.withValues(alpha: 0.7),
+                          offset: const Offset(-1.5, -1.5),
+                          blurRadius: 3,
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: textController,
+                      obscureText: obscureRx.value,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: S.current.aiApiKeyTitle,
+                        hintText: S.current.apiKeyHint,
+                        prefixIcon: Icon(Icons.key_rounded, color: primaryColor),
+                        suffixIcon: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              tooltip: obscureRx.value ? 'Show' : 'Hide',
+                              icon: Icon(
+                                obscureRx.value
+                                    ? Icons.visibility_off_rounded
+                                    : Icons.visibility_rounded,
+                                size: 20,
+                              ),
+                              onPressed: () => obscureRx.value = !obscureRx.value,
+                            ),
+                            IconButton(
+                              tooltip: S.current.paste,
+                              icon: const Icon(
+                                Icons.paste_rounded,
+                                size: 20,
+                              ),
+                              onPressed: () async {
+                                final data = await Clipboard.getData(
+                                  Clipboard.kTextPlain,
+                                );
+                                if (data != null && data.text != null) {
+                                  textController.text = data.text!.trim();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.06)
+                                : Colors.black.withValues(alpha: 0.06),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.06)
+                                : Colors.black.withValues(alpha: 0.06),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: primaryColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Neumorphic Action Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // Reset to default button (if custom key active)
+                    Obx(() {
+                      if (!controller.isCustom.value) {
+                        return const SizedBox.shrink();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: TextButton.icon(
+                          onPressed: () async {
+                            Navigator.of(dialogContext).pop();
+                            await controller.clearApiKey();
+                          },
+                          icon: const Icon(
+                            Icons.restore_rounded,
+                            size: 16,
+                            color: Colors.redAccent,
+                          ),
+                          label: Text(
+                            S.current.resetToDefault,
+                            style: const TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                    const Spacer(),
+
+                    // Cancel button
+                    GestureDetector(
+                      onTap: () => Navigator.of(dialogContext).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Color.alphaBlend(
+                            colorScheme.onSurface
+                                .withValues(alpha: isDark ? 0.05 : 0.03),
+                            baseSurface,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.03)
+                                  : Colors.white.withValues(alpha: 0.75),
+                              offset: const Offset(-1.5, -1.5),
+                              blurRadius: 2.5,
+                            ),
+                            BoxShadow(
+                              color: isDark
+                                  ? Colors.black.withValues(alpha: 0.3)
+                                  : const Color(0xFFA3B1C6)
+                                      .withValues(alpha: 0.25),
+                              offset: const Offset(1.5, 1.5),
+                              blurRadius: 2.5,
+                            ),
+                          ],
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.04)
+                                : Colors.white.withValues(alpha: 0.6),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: Text(
+                          S.current.cancel,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface.withValues(alpha: 0.75),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+
+                    // Save button (Neumorphic raised primary)
+                    GestureDetector(
+                      onTap: () async {
+                        final newKey = textController.text.trim();
+                        if (newKey.isEmpty) {
+                          Navigator.of(dialogContext).pop();
+                          await controller.clearApiKey();
+                          return;
+                        }
+                        final success = await controller.saveApiKey(newKey);
+                        if (success && dialogContext.mounted) {
+                          Navigator.of(dialogContext).pop();
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primaryColor
+                                  .withValues(alpha: isDark ? 0.40 : 0.30),
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          S.current.save,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        actions: [
-          // Reset to default button (if custom key active)
-          Obx(() {
-            if (!controller.isCustom.value) return const SizedBox.shrink();
-            return TextButton.icon(
-              onPressed: () async {
-                Navigator.of(dialogContext).pop();
-                await controller.clearApiKey();
-              },
-              icon: const Icon(
-                Icons.restore_rounded,
-                size: 16,
-                color: Colors.redAccent,
-              ),
-              label: Text(
-                S.current.resetToDefault,
-                style: const TextStyle(color: Colors.redAccent, fontSize: 12),
-              ),
-            );
-          }),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.shadow.withValues(alpha: 0.3),
-                    blurRadius: 3,
-                    offset: const Offset(1, 1),
-                  ),
-                ],
-              ),
-              S.current.cancel,
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final newKey = textController.text.trim();
-              if (newKey.isEmpty) {
-                // If user cleared the input, treat as clearing custom key
-                Navigator.of(dialogContext).pop();
-                await controller.clearApiKey();
-                return;
-              }
-              final success = await controller.saveApiKey(newKey);
-              if (success && dialogContext.mounted) {
-                Navigator.of(dialogContext).pop();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Text(
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.shadow.withValues(alpha: 0.3),
-                    blurRadius: 3,
-                    offset: const Offset(1, 1),
-                  ),
-                ],
-              ),
-              S.current.save,
-            ),
-          ),
-        ],
       );
     },
   );
