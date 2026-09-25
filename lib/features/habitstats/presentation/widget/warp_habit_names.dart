@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/habitstats_controller.dart';
 import 'build_trend_chart.dart';
+import 'stats_neumorphic_utils.dart';
 
 class WarpHabitNames extends StatelessWidget {
   const WarpHabitNames({super.key});
@@ -27,9 +28,6 @@ class WarpHabitNames extends StatelessWidget {
             _HabitLegendChip(
               name: habitNames[i],
               color: lineColors[i % lineColors.length],
-              surfaceColor: colorScheme.surfaceContainerHighest.withValues(
-                alpha: 0.4,
-              ),
               textColor: colorScheme.onSurface,
               textStyle: textTheme.labelMedium,
             ),
@@ -42,89 +40,53 @@ class WarpHabitNames extends StatelessWidget {
 class _HabitLegendChip extends StatelessWidget {
   final String name;
   final Color color;
-  final Color surfaceColor;
   final Color textColor;
   final TextStyle? textStyle;
 
   const _HabitLegendChip({
     required this.name,
     required this.color,
-    required this.surfaceColor,
     required this.textColor,
     this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final baseColor = theme.cardColor;
-
-    final chipBaseColor = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.22) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.3) ?? baseColor);
-
-    final chipBg = Color.lerp(
-          chipBaseColor,
-          color,
-          isDark ? 0.12 : 0.08,
-        ) ??
-        chipBaseColor;
-
-    final lightShadow = isDark
-        ? Colors.white.withValues(alpha: 0.03)
-        : Colors.white.withValues(alpha: 0.85);
-
-    final darkShadow = isDark
-        ? Colors.black.withValues(alpha: 0.45)
-        : const Color(0xFFA3B1C6).withValues(alpha: 0.3);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        color: chipBg,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: color.withValues(alpha: isDark ? 0.4 : 0.28),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: lightShadow,
-            offset: const Offset(-2, -2),
-            blurRadius: 4,
-          ),
-          BoxShadow(
-            color: darkShadow,
-            offset: const Offset(2, 2),
-            blurRadius: 4,
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+      decoration: StatsNeumorphicTheme.wellDecoration(
+        context,
+        borderRadius: 18,
+        accentColor: color,
+        accentAlpha: isDark ? 0.08 : 0.04,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 9,
-            height: 9,
+            width: 8,
+            height: 8,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: isDark ? 0.6 : 0.45),
+                  color: color.withValues(alpha: isDark ? 0.6 : 0.4),
                   blurRadius: 4,
                   spreadRadius: 0.5,
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 7),
           Text(
             name,
             style: textStyle?.copyWith(
               color: textColor,
               fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
           ),
         ],
