@@ -12,6 +12,8 @@ import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
 /// Centralized application initialization logic
 Future<void> initializeApp() async {
@@ -59,6 +61,29 @@ Future<void> initializeApp() async {
       Get.put<FcmService>(fcmService, permanent: true);
     } catch (e) {
       debugPrint('FcmService initialization error: $e');
+    }
+
+    // 5. Initialize Localization so S.current is never null on startup or hot restart
+    try {
+      final langBox = Hive.box(LangStorage.boxName);
+      final langCode = langBox.get(
+        LangStorage.languageKey,
+        defaultValue: LangStorage.defaultLanguage,
+      );
+      Locale initialLocale;
+      if (langCode == 'ar') {
+        initialLocale = const Locale('ar');
+      } else if (langCode == 'en') {
+        initialLocale = const Locale('en');
+      } else {
+        final deviceLocale = PlatformDispatcher.instance.locale;
+        initialLocale = deviceLocale.languageCode == 'ar'
+            ? const Locale('ar')
+            : const Locale('en');
+      }
+      await S.load(initialLocale);
+    } catch (e) {
+      debugPrint('Localization initialization error: $e');
     }
   } catch (e) {
     throw Exception('FATAL initialization error: $e');
