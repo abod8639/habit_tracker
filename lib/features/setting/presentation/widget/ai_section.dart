@@ -11,6 +11,7 @@ Widget buildAiSection(AnimationController animationController) {
 
   return Builder(
     builder: (context) {
+      final s = S.of(context);
       final theme = Theme.of(context);
       final isDark = theme.brightness == Brightness.dark;
       final baseSurface = theme.cardColor;
@@ -18,8 +19,8 @@ Widget buildAiSection(AnimationController animationController) {
       return Obx(() {
         final isCustom = aiController.isCustom.value;
         final subtitleText = isCustom
-            ? '${S.current.customApiKeyActive} (${aiController.maskedKey})'
-            : S.current.defaultApiKeyActive;
+            ? '${s.customApiKeyActive} (${aiController.maskedKey})'
+            : s.defaultApiKeyActive;
 
         return Column(
           children: [
@@ -27,7 +28,7 @@ Widget buildAiSection(AnimationController animationController) {
               animationController: animationController,
               index: 7,
               icon: Icons.auto_awesome_rounded,
-              title: S.current.aiApiKeyTitle,
+              title: s.aiApiKeyTitle,
               subtitle: subtitleText,
               trailing: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -96,9 +97,7 @@ Widget buildAiSection(AnimationController animationController) {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      isCustom
-                          ? S.current.customApiKeyActive
-                          : S.current.tapToEdit,
+                      isCustom ? s.customApiKeyActive : s.tapToEdit,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: isCustom
                             ? Colors.teal
@@ -127,6 +126,7 @@ void _showAiApiKeyDialog(
     text: controller.customApiKey.value,
   );
   final obscureRx = true.obs;
+  final s = S.of(context);
   final theme = Theme.of(context);
   final colorScheme = theme.colorScheme;
   final isDark = theme.brightness == Brightness.dark;
@@ -215,7 +215,7 @@ void _showAiApiKeyDialog(
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        S.current.customApiKeyDialogTitle,
+                        s.customApiKeyDialogTitle,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 16.5,
@@ -227,7 +227,7 @@ void _showAiApiKeyDialog(
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  S.current.customApiKeyDialogDesc,
+                  s.customApiKeyDialogDesc,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.65),
                     height: 1.35,
@@ -296,7 +296,7 @@ void _showAiApiKeyDialog(
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              S.current.getKeyInfo,
+                              s.getKeyInfo,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: primaryColor,
                                 fontSize: 12,
@@ -351,8 +351,8 @@ void _showAiApiKeyDialog(
                         letterSpacing: 0.2,
                       ),
                       decoration: InputDecoration(
-                        labelText: S.current.aiApiKeyTitle,
-                        hintText: S.current.apiKeyHint,
+                        labelText: s.aiApiKeyTitle,
+                        hintText: s.apiKeyHint,
                         prefixIcon: Icon(Icons.key_rounded, color: primaryColor),
                         suffixIcon: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -368,7 +368,7 @@ void _showAiApiKeyDialog(
                               onPressed: () => obscureRx.value = !obscureRx.value,
                             ),
                             IconButton(
-                              tooltip: S.current.paste,
+                              tooltip: s.paste,
                               icon: const Icon(
                                 Icons.paste_rounded,
                                 size: 20,
@@ -439,7 +439,7 @@ void _showAiApiKeyDialog(
                             color: Colors.redAccent,
                           ),
                           label: Text(
-                            S.current.resetToDefault,
+                            s.resetToDefault,
                             style: const TextStyle(
                               color: Colors.redAccent,
                               fontSize: 12,
@@ -491,7 +491,7 @@ void _showAiApiKeyDialog(
                           ),
                         ),
                         child: Text(
-                          S.current.cancel,
+                          s.cancel,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -534,7 +534,7 @@ void _showAiApiKeyDialog(
                           ],
                         ),
                         child: Text(
-                          S.current.save,
+                          s.save,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
