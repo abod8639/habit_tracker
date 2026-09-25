@@ -8,13 +8,23 @@ LineChartBarData myLineChartBarData({
 }) {
   return LineChartBarData(
     show: true,
-    curveSmoothness: 0.30,
+    curveSmoothness: 0.32,
     spots: spots,
     isCurved: true,
     color: color,
-    barWidth: 4,
+    barWidth: 3.2,
     isStrokeCapRound: true,
-    dotData: FlDotData(show: true),
-    belowBarData: BarAreaData(show: true, color: color.withValues(alpha: 0.2)),
+    dotData: const FlDotData(show: false),
+    belowBarData: BarAreaData(
+      show: true,
+      gradient: LinearGradient(
+        colors: [
+          color.withValues(alpha: 0.22),
+          color.withValues(alpha: 0.0),
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ),
+    ),
   );
 }
