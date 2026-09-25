@@ -1,31 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/core/utils/responsive_utils.dart';
 import 'package:habit_tracker/features/habitstats/presentation/widget/build_bar_chart.dart';
 import 'package:habit_tracker/features/habitstats/presentation/widget/build_pie_chart.dart';
-import 'package:habit_tracker/features/habitstats/presentation/widget/build_trend_chart.dart';
-import 'package:habit_tracker/core/utils/responsive_utils.dart';
 
 Widget buildChartsSection(BuildContext context) {
-  return GetBuilder<HabitController>(
-    builder: (controller) {
-      return ResponsiveUtils.isDesktop(context)
-          ? Row(
-              children: [
-                Expanded(child: buildBarChart()),
-                const SizedBox(width: 10),
-                Expanded(child: buildTrendChart()),
-                const SizedBox(width: 10),
-                Expanded(child: buildPieChart()),
-              ],
-            )
-          : Column(
-              children: [
-                buildBarChart(),
-                const SizedBox(height: 16),
-                buildPieChart(),
-              ],
-            );
-    },
+  final isDesktop = ResponsiveUtils.isDesktop(context);
+
+  if (isDesktop) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: buildBarChart()),
+        const SizedBox(width: 16),
+        Expanded(child: buildPieChart()),
+      ],
+    );
+  }
+
+  return Column(
+    children: [
+      buildBarChart(),
+      const SizedBox(height: 16),
+      buildPieChart(),
+    ],
   );
 }
