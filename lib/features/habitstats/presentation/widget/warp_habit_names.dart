@@ -51,35 +51,70 @@ class _HabitLegendChip extends StatelessWidget {
     required this.color,
     required this.surfaceColor,
     required this.textColor,
-    required this.textStyle,
+    this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.cardColor;
+
+    final chipBaseColor = isDark
+        ? (Color.lerp(baseColor, Colors.black, 0.22) ?? baseColor)
+        : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.3) ?? baseColor);
+
+    final chipBg = Color.lerp(
+          chipBaseColor,
+          color,
+          isDark ? 0.12 : 0.08,
+        ) ??
+        chipBaseColor;
+
+    final lightShadow = isDark
+        ? Colors.white.withValues(alpha: 0.03)
+        : Colors.white.withValues(alpha: 0.85);
+
+    final darkShadow = isDark
+        ? Colors.black.withValues(alpha: 0.45)
+        : const Color(0xFFA3B1C6).withValues(alpha: 0.3);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: color.withAlpha(30), //surfaceColor,
+        color: chipBg,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: color.withValues(alpha: 0.35),
+          color: color.withValues(alpha: isDark ? 0.4 : 0.28),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: lightShadow,
+            offset: const Offset(-2, -2),
+            blurRadius: 4,
+          ),
+          BoxShadow(
+            color: darkShadow,
+            offset: const Offset(2, 2),
+            blurRadius: 4,
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 8,
-            height: 8,
+            width: 9,
+            height: 9,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.4),
+                  color: color.withValues(alpha: isDark ? 0.6 : 0.45),
                   blurRadius: 4,
-                  spreadRadius: 1,
+                  spreadRadius: 0.5,
                 ),
               ],
             ),
@@ -89,7 +124,7 @@ class _HabitLegendChip extends StatelessWidget {
             name,
             style: textStyle?.copyWith(
               color: textColor,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
