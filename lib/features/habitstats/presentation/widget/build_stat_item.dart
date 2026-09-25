@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/core/utils/responsive_utils.dart';
+import 'stats_neumorphic_utils.dart';
 
 class StatItem extends StatelessWidget {
   final String title;
@@ -20,22 +21,21 @@ class StatItem extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
     final isPhone = ResponsiveUtils.isPhone(context);
 
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: EdgeInsets.symmetric(
-          vertical: isPhone ? 12 : 16,
+          vertical: isPhone ? 14 : 18,
           horizontal: isPhone ? 8 : 12,
         ),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.35),
-            width: 1,
-          ),
+        decoration: StatsNeumorphicTheme.wellDecoration(
+          context,
+          borderRadius: 18,
+          accentColor: color,
+          accentAlpha: isDark ? 0.08 : 0.04,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -45,8 +45,15 @@ class StatItem extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
+                color: color.withValues(alpha: isDark ? 0.16 : 0.12),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: isDark ? 0.25 : 0.18),
+                    blurRadius: 6,
+                    spreadRadius: 0.5,
+                  ),
+                ],
               ),
               child: Icon(
                 icon,
@@ -54,13 +61,14 @@ class StatItem extends StatelessWidget {
                 color: color,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               value,
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: isPhone ? 18 : 22,
                 color: colorScheme.onSurface,
+                letterSpacing: 0.2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -70,8 +78,8 @@ class StatItem extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: textTheme.bodySmall?.copyWith(
-                fontSize: isPhone ? 12 : 14,
-                fontWeight: FontWeight.w500,
+                fontSize: isPhone ? 11 : 13,
+                fontWeight: FontWeight.w600,
                 color: colorScheme.onSurfaceVariant,
               ),
               maxLines: 1,
