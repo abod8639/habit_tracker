@@ -1,7 +1,7 @@
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 
 Widget buildAnimatedSettingLang(
   BuildContext context, {
@@ -27,24 +27,6 @@ Widget buildAnimatedSettingLang(
       curve: Curves.easeOut,
     ),
   );
-
-  // Dual ambient Neumorphic shadows
-  final List<BoxShadow> outerShadows = [
-    BoxShadow(
-      color: isDark
-          ? Colors.white.withValues(alpha: 0.045)
-          : Colors.white.withValues(alpha: 0.90),
-      offset: const Offset(-3.5, -3.5),
-      blurRadius: 7,
-    ),
-    BoxShadow(
-      color: isDark
-          ? Colors.black.withValues(alpha: 0.45)
-          : const Color(0xFFA3B1C6).withValues(alpha: 0.38),
-      offset: const Offset(3.5, 3.5),
-      blurRadius: 7,
-    ),
-  ];
 
   // Subtle convex gradient
   final Gradient gradient = LinearGradient(
@@ -82,9 +64,9 @@ Widget buildAnimatedSettingLang(
           curve: Curves.easeInOutCubic,
           decoration: BoxDecoration(
             color: baseSurface,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.badgeRadius,
             gradient: gradient,
-            boxShadow: outerShadows,
+            boxShadow: AppShadows.badge(isDark: isDark),
             border: border,
           ),
           child: Padding(
@@ -100,23 +82,8 @@ Widget buildAnimatedSettingLang(
                       primaryColor.withValues(alpha: isDark ? 0.14 : 0.09),
                       baseSurface,
                     ),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.035)
-                            : Colors.white.withValues(alpha: 0.85),
-                        offset: const Offset(-2, -2),
-                        blurRadius: 3,
-                      ),
-                      BoxShadow(
-                        color: isDark
-                            ? Colors.black.withValues(alpha: 0.35)
-                            : const Color(0xFFA3B1C6).withValues(alpha: 0.30),
-                        offset: const Offset(2, 2),
-                        blurRadius: 3,
-                      ),
-                    ],
+                    borderRadius: AppRadius.mdRadius,
+                    boxShadow: AppShadows.dotIndicator(isDark: isDark),
                     border: Border.all(
                       color: primaryColor.withValues(alpha: isDark ? 0.20 : 0.15),
                       width: 1,
@@ -145,7 +112,7 @@ Widget buildAnimatedSettingLang(
                       color: textColor ?? colorScheme.onSurface,
                     ),
                     dropdownColor: baseSurface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadius.lgRadius,
                     icon: Container(
                       width: 30,
                       height: 30,
@@ -155,22 +122,7 @@ Widget buildAnimatedSettingLang(
                           colorScheme.onSurface.withValues(alpha: isDark ? 0.04 : 0.02),
                           baseSurface,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.03)
-                                : Colors.white.withValues(alpha: 0.75),
-                            offset: const Offset(-1.5, -1.5),
-                            blurRadius: 2.5,
-                          ),
-                          BoxShadow(
-                            color: isDark
-                                ? Colors.black.withValues(alpha: 0.3)
-                                : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
-                            offset: const Offset(1.5, 1.5),
-                            blurRadius: 2.5,
-                          ),
-                        ],
+                        boxShadow: AppShadows.dotIndicator(isDark: isDark),
                         border: Border.all(
                           color: isDark
                               ? Colors.white.withValues(alpha: 0.04)
@@ -182,7 +134,7 @@ Widget buildAnimatedSettingLang(
                         child: Icon(
                           Icons.keyboard_arrow_down_rounded,
                           size: 20,
-                          color: colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ),
@@ -194,17 +146,7 @@ Widget buildAnimatedSettingLang(
                           ),
                         )
                         .toList(),
-                    onChanged: (value) {
-                      Get.showOverlay(
-                        asyncFunction: () async {
-                          await Future.delayed(const Duration(milliseconds: 100));
-                          onChanged(value);
-                        },
-                        loadingWidget: const SizedBox(),
-                        opacityColor: Colors.transparent,
-                        opacity: 0,
-                      );
-                    },
+                    onChanged: onChanged,
                   ),
                 ),
               ],
