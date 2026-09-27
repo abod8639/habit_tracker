@@ -141,6 +141,7 @@ class _MyDrawerListTileState extends State<MyDrawerListTile>
                     if (widget.icon != null) ...[
                       IconTheme(
                         data: IconThemeData(
+                          shadows: AppShadows.badge(isDark: isDark),
                           color: widget.isSelected
                               ? colorScheme.primary
                               : colorScheme.onSurface.withValues(
