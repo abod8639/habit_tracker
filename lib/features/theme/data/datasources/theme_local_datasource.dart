@@ -3,6 +3,7 @@ import '../models/theme_model.dart';
 
 abstract class ThemeLocalDataSource {
   Future<ThemeModel> getThemeSettings();
+  ThemeModel getCachedThemeSettings();
   Future<void> saveThemeSettings(ThemeModel settings);
 }
 
@@ -12,7 +13,7 @@ class ThemeLocalDataSourceImpl implements ThemeLocalDataSource {
   ThemeLocalDataSourceImpl(this.storageService);
 
   @override
-  Future<ThemeModel> getThemeSettings() async {
+  ThemeModel getCachedThemeSettings() {
     final themeName = storageService.getThemeName('github_dark_green');
     final themeMode = storageService.getThemeMode();
     final useCustomBg = storageService.getUseCustomBackground();
@@ -24,6 +25,11 @@ class ThemeLocalDataSourceImpl implements ThemeLocalDataSource {
       useCustomBackground: useCustomBg,
       customBackgroundColor: customBgColor,
     );
+  }
+
+  @override
+  Future<ThemeModel> getThemeSettings() async {
+    return getCachedThemeSettings();
   }
 
   @override
