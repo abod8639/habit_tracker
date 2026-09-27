@@ -13,23 +13,18 @@ class SliverMonthlySummary extends StatelessWidget {
     final HabitController controller = Get.find<HabitController>();
 
     return SliverToBoxAdapter(
-      child: Center(
-        child: SingleChildScrollView(
-          reverse: true,
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Obx(() {
-              final datasets = controller.heatmapDateSet;
-              final startDay = controller.getStartDay();
-              return MonthlySummary(
-                key: ValueKey('${startDay}_${datasets.isEmpty}'),
-                datasets: Map<DateTime, int>.from(datasets),
-              );
-            }),
-          ),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Obx(() {
+          final datasets = controller.heatmapDateSet;
+          // Observing habits guarantees Obx triggers on checkbox toggles
+          final _ = controller.habits;
+          final startDay = controller.getStartDay();
+          return MonthlySummary(
+            key: ValueKey(startDay),
+            datasets: Map<DateTime, int>.from(datasets),
+          );
+        }),
       ),
     );
   }
