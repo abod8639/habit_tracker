@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
-import 'package:habit_tracker/features/theme/data/datasources/theme_utils.dart';
-import '../../data/datasources/theme_storage.dart';
-import '../../domain/entities/theme_entity.dart';
-import '../../domain/usecases/save_theme_settings_usecase.dart';
-import '../../domain/usecases/sync_theme_with_cloud_usecase.dart';
-import '../../domain/usecases/upload_theme_settings_usecase.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
+import 'package:habit_tracker/core/theme/theme_utils.dart';
+import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
+import 'package:habit_tracker/features/theme/domain/entities/theme_entity.dart';
+import 'package:habit_tracker/features/theme/domain/usecases/get_theme_settings_usecase.dart';
+import 'package:habit_tracker/features/theme/domain/usecases/save_theme_settings_usecase.dart';
+import 'package:habit_tracker/features/theme/domain/usecases/sync_theme_with_cloud_usecase.dart';
+import 'package:habit_tracker/features/theme/domain/usecases/upload_theme_settings_usecase.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class ThemeController extends GetxController {
   static const String defaultTheme = 'github_dark_green';
-
-  final ThemeStorageService _storageService = Get.find<ThemeStorageService>();
 
   // Observable state
   late final Rx<ThemeMode> themeMode;
@@ -23,7 +21,8 @@ class ThemeController extends GetxController {
   late final Rx<ThemeData> lightTheme;
   late final Rx<ThemeData> darkTheme;
 
-  // Use Cases
+  // Use Cases (Clean Architecture Domain Layer)
+  final GetThemeSettingsUseCase _getThemeSettingsUseCase = Get.find();
   final SaveThemeSettingsUseCase _saveThemeSettingsUseCase = Get.find();
   final SyncThemeWithCloudUseCase _syncThemeWithCloudUseCase = Get.find();
   final UploadThemeSettingsUseCase _uploadThemeSettingsUseCase = Get.find();
@@ -38,27 +37,27 @@ class ThemeController extends GetxController {
 
   void _initInitialTheme() {
     try {
-      final savedTheme = _storageService.getThemeName(defaultTheme);
-      final themeKey =
-          themeColors.containsKey(savedTheme) ? savedTheme : defaultTheme;
+      final cachedSettings = _getThemeSettingsUseCase.getCached();
+      final themeKey = themeColors.containsKey(cachedSettings.themeName)
+          ? cachedSettings.themeName
+          : defaultTheme;
       currentTheme = themeKey.obs;
 
       final themeData = themeColors[themeKey]!;
       final isDark = ThemeUtils.isDarkTheme(themeData);
 
-      final savedMode = _storageService.getThemeMode();
-      final initialMode = savedMode == ThemeMode.system
+      final initialMode = cachedSettings.themeMode == ThemeMode.system
           ? (isDark ? ThemeMode.dark : ThemeMode.light)
-          : savedMode;
+          : cachedSettings.themeMode;
       themeMode = initialMode.obs;
 
-      final isCustomBg = _storageService.getUseCustomBackground();
-      useCustomBackground = isCustomBg.obs;
+      useCustomBackground = cachedSettings.useCustomBackground.obs;
+      customBackgroundColor =
+          (cachedSettings.customBackgroundColor ?? Colors.transparent).obs;
 
-      final customBg = _storageService.getCustomBackgroundColor();
-      customBackgroundColor = (customBg ?? Colors.transparent).obs;
-
-      final customBgColor = isCustomBg ? customBg : null;
+      final customBgColor = cachedSettings.useCustomBackground
+          ? cachedSettings.customBackgroundColor
+          : null;
       lightTheme = ThemeUtils.buildThemeData(
         forceDark: false,
         colors: themeData,
