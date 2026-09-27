@@ -12,6 +12,24 @@ class HabitStatsLocalDataSource {
     required this.habitRepository,
   });
 
+  Future<Map<DateTime, int>?>? _pendingHeatmapFuture;
+
+  Future<Map<DateTime, int>?> _getHeatmapData() async {
+    if (_pendingHeatmapFuture != null) {
+      return await _pendingHeatmapFuture;
+    }
+    _pendingHeatmapFuture = () async {
+      final heatmapResult = await habitRepository.getHeatmapData();
+      return heatmapResult.fold((_) => null, (data) => data);
+    }();
+
+    try {
+      return await _pendingHeatmapFuture;
+    } finally {
+      _pendingHeatmapFuture = null;
+    }
+  }
+
   Future<HabitStatsEntity> getOverallStats() async {
     final result = await habitRepository.getHabits();
     return await result.fold(
@@ -29,38 +47,35 @@ class HabitStatsLocalDataSource {
             : 0;
 
         int streak = 0;
-        final heatmapResult = await habitRepository.getHeatmapData();
-        heatmapResult.fold(
-          (_) => null,
-          (heatmapData) {
-            final now = DateTime.now();
-            final today = DateTime(now.year, now.month, now.day);
+        final heatmapData = await _getHeatmapData();
+        if (heatmapData != null) {
+          final now = DateTime.now();
+          final today = DateTime(now.year, now.month, now.day);
 
-            // 1. If today has completed habits, count today
-            final bool isTodayCompleted =
-                completedHabits > 0 || (heatmapData[today] ?? 0) > 0;
-            if (isTodayCompleted) {
+          // 1. If today has completed habits, count today
+          final bool isTodayCompleted =
+              completedHabits > 0 || (heatmapData[today] ?? 0) > 0;
+          if (isTodayCompleted) {
+            streak++;
+          }
+
+          // 2. Count consecutive previous calendar days
+          int daysBack = 1;
+          while (true) {
+            final checkDay = DateTime(
+              today.year,
+              today.month,
+              today.day - daysBack,
+            );
+            final strength = heatmapData[checkDay] ?? 0;
+            if (strength > 0) {
               streak++;
+              daysBack++;
+            } else {
+              break;
             }
-
-            // 2. Count consecutive previous calendar days
-            int daysBack = 1;
-            while (true) {
-              final checkDay = DateTime(
-                today.year,
-                today.month,
-                today.day - daysBack,
-              );
-              final strength = heatmapData[checkDay] ?? 0;
-              if (strength > 0) {
-                streak++;
-                daysBack++;
-              } else {
-                break;
-              }
-            }
-          },
-        );
+          }
+        }
 
         return HabitStatsEntity(
           totalHabits: totalHabits,
@@ -73,37 +88,24 @@ class HabitStatsLocalDataSource {
   }
 
   Future<List<FlSpot>> getOverallTrendData(int days) async {
-    final habitsResult = await habitRepository.getHabits();
-    return await habitsResult.fold(
-      (failure) async =>
-          List.generate(days, (index) => FlSpot(index.toDouble(), 0.0)),
-      (habits) async {
-        final heatmapResult = await habitRepository.getHeatmapData();
-        return await heatmapResult.fold(
-          (failure) async =>
-              List.generate(days, (index) => FlSpot(index.toDouble(), 0.0)),
-          (heatmapData) async {
-            final List<FlSpot> spots = [];
-            final now = DateTime.now();
-            final maxStrength = 10; // Heatmap data is bounded 0-10
+    final heatmapData = await _getHeatmapData();
+    final List<FlSpot> spots = [];
+    final now = DateTime.now();
+    const maxStrength = 10; // Heatmap data is bounded 0-10
 
-            for (int i = 0; i < days; i++) {
-              final normalizedDate = DateTime(
-                now.year,
-                now.month,
-                now.day - (days - 1 - i),
-              );
-              final completionValue = heatmapData[normalizedDate];
+    for (int i = 0; i < days; i++) {
+      final normalizedDate = DateTime(
+        now.year,
+        now.month,
+        now.day - (days - 1 - i),
+      );
+      final completionValue = heatmapData?[normalizedDate];
 
-              final strength = completionValue ?? 0;
-              final percentage = (strength / maxStrength).clamp(0.0, 1.0);
-              spots.add(FlSpot(i.toDouble(), percentage));
-            }
-            return spots;
-          },
-        );
-      },
-    );
+      final strength = completionValue ?? 0;
+      final percentage = (strength / maxStrength).clamp(0.0, 1.0);
+      spots.add(FlSpot(i.toDouble(), percentage));
+    }
+    return spots;
   }
 
   Future<Map<String, List<FlSpot>>> getIndividualHabitTrends(int days) async {
