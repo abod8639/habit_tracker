@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
+import 'package:habit_tracker/core/theme/theme_utils.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
-import 'package:habit_tracker/features/theme/data/datasources/theme_utils.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Neumorphic / Soft UI Habit Matrix heatmap summary widget.
