@@ -22,7 +22,6 @@ class SummaryCard extends StatelessWidget {
       final colorScheme = theme.colorScheme;
 
       final Color totalColor = colorScheme.primary;
-      const Color completedColor = Color(0xFF10B981); // Emerald Green
       // final Color successColor = stats.completionRate >= 50
       //     ? const Color(0xFF10B981)
       //     : const Color(0xFFF59E0B); // Amber
@@ -37,6 +36,7 @@ class SummaryCard extends StatelessWidget {
             //   trailing: StreakBadge(streak: stats.streak),
             // ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 StatItem(
@@ -50,7 +50,7 @@ class SummaryCard extends StatelessWidget {
                   title: S.current.completed,
                   value: stats.completedHabits.toString(),
                   icon: Icons.check_circle_rounded,
-                  color: completedColor,
+                  color: totalColor,
                 ),
               ],
             ),
@@ -61,5 +61,3 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
-/// Backward-compatible builder function delegating to [SummaryCard].
-Widget buildSummaryCard() => const SummaryCard();
