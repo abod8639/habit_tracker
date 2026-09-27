@@ -1,126 +1,137 @@
 import 'package:flutter/material.dart';
 
 const Map<String, Map<String, Color>> themeColors = {
+  // --- ثيمات GitHub (معدلة لتناسب النحت الناعم) ---
   'github_dark_green': {
     'primary': Color(0xFF3FB950),
-    'secondary': Color(0xFF161B22),
-    'background': Color(0xFF0D1117),
-    'surface': Color(0xFF161B22),
-    'error': Color(0xFFFA4549),
+    'secondary': Color(0xFF238636),
+    'background': Color(0xFF1E2228), // رمادي داكن يتيح توليد ضوء وظل
+    'surface': Color(0xFF1E2228),    // متطابق مع الخلفية
+    'error': Color(0xFFE5534B),
     'onPrimary': Color(0xFF0D1117),
-    'onSecondary': Color(0xFFFFFFFF),
+    'onSecondary': Color(0xFFE6EDF3),
   },
+
   'github': {
     'primary': Color(0xFF0969DA),
-    'secondary': Color(0xFF218BFF),
-    'background': Color(0xFFF6F8FA),
-    'surface': Color(0xFFFFFFFF),
+    'secondary': Color(0xFF54A0FF),
+    'background': Color(0xFFE8EEF5), // رمادي مائل للأزرق الفاتح جداً بدلاً من الأبيض الصافي
+    'surface': Color(0xFFE8EEF5),
     'error': Color(0xFFCF222E),
     'onPrimary': Color(0xFFFFFFFF),
-    'onSecondary': Color(0xFFFFFFFF),
+    'onSecondary': Color(0xFF24292F),
   },
+
   'github_dark': {
-    'primary': Color.fromARGB(255, 1, 119, 255),
-    'secondary': Color.fromARGB(255, 97, 145, 224),
-    'background': Color(0xFF0D1117),
-    'surface': Color(0xFF161B22),
-    'error': Color(0xFFFA4549),
+    'primary': Color(0xFF58A6FF),
+    'secondary': Color(0xFF1F6FEB),
+    'background': Color(0xFF1C2128),
+    'surface': Color(0xFF1C2128),
+    'error': Color(0xFFF85149),
     'onPrimary': Color(0xFF0D1117),
-    'onSecondary': Color(0xFFFFFFFF),
+    'onSecondary': Color(0xFFE6EDF3),
   },
+
+  // --- ثيمات باستيل ناعمة (Light Neumorphism) ---
   'sunset': {
-    'primary': Color(0xFFF57C00),
-    'secondary': Color(0xFFFF7043),
-    'background': Color(0xFFFFF8F0),
-    'surface': Color(0xFFFFFFFF),
-    'error': Color(0xFFD32F2F),
+    'primary': Color(0xFFE67332),
+    'secondary': Color(0xFFF2994A),
+    'background': Color(0xFFF3ECE6), // بيج/خوخي ناعم جداً
+    'surface': Color(0xFFF3ECE6),
+    'error': Color(0xFFD64545),
     'onPrimary': Color(0xFFFFFFFF),
-    'onSecondary': Color(0xFFFFFFFF),
+    'onSecondary': Color(0xFF4A3E39),
   },
+
   'lavender': {
-    'primary': Color(0xFF7E57C2),
-    'secondary': Color(0xFF9575CD),
-    'background': Color(0xFFF8F5FC),
-    'surface': Color(0xFFFFFFFF),
-    'error': Color(0xFFB00020),
+    'primary': Color(0xFF8B68C8),
+    'secondary': Color(0xFFA589D8),
+    'background': Color(0xFFECE7F4), // لافندر ضبابي ناعم
+    'surface': Color(0xFFECE7F4),
+    'error': Color(0xFFC7435E),
     'onPrimary': Color(0xFFFFFFFF),
-    'onSecondary': Color(0xFFFFFFFF),
+    'onSecondary': Color(0xFF3F374A),
   },
 
   'mint': {
-    'primary': Color(0xFF00897B),
-    'secondary': Color(0xFF26A69A),
-    'background': Color(0xFFF0FDF4),
-    'surface': Color(0xFFFFFFFF),
-    'error': Color(0xFFD32F2F),
+    'primary': Color(0xFF199A88),
+    'secondary': Color(0xFF4DB6AC),
+    'background': Color(0xFFE5ECE8), // نعناعي رمادي هادئ
+    'surface': Color(0xFFE5ECE8),
+    'error': Color(0xFFD64545),
     'onPrimary': Color(0xFFFFFFFF),
-    'onSecondary': Color(0xFFFFFFFF),
+    'onSecondary': Color(0xFF2D4039),
   },
 
+  // --- ثيمات Catppuccin معدلة لأسلوب Soft UI ---
   'catppuccin': {
-    'primary': Color.fromARGB(255, 142, 201, 250),
-    'secondary': Color.fromARGB(255, 208, 169, 255),
-    'background': Color(0xFF1E1E2E),
-    'surface': Color(0xFF313244),
-    'error': Color(0xFFF28FAD),
-    'onPrimary': Color(0xFF1E1E2E),
-    'onSecondary': Color(0xFFFFFFFF),
+    'primary': Color(0xFF89B4FA),
+    'secondary': Color(0xFFCBA6F7),
+    'background': Color(0xFF232534), // Mocha الأساسي معدل للتجسيم
+    'surface': Color(0xFF232534),
+    'error': Color(0xFFF38BA8),
+    'onPrimary': Color(0xFF11111B),
+    'onSecondary': Color(0xFFCDD6F4),
   },
+
   'catppuccin_latte': {
     'primary': Color(0xFF1E66F5),
     'secondary': Color(0xFF8839EF),
-    'background': Color(0xFFEFF1F5),
-    'surface': Color(0xFFFFFFFF),
+    'background': Color(0xFFE6E9EF), // ناعم ومثالي لظلال النيومورفيزم الفاتحة
+    'surface': Color(0xFFE6E9EF),
     'error': Color(0xFFD20F39),
     'onPrimary': Color(0xFFFFFFFF),
-    'onSecondary': Color(0xFFFFFFFF),
-  },
-  'catppuccin_frappe': {
-    'primary': Color.fromARGB(255, 122, 157, 239),
-    'secondary': Color.fromARGB(255, 255, 198, 169),
-    'background': Color(0xFF303446),
-    'surface': Color(0xFF414559),
-    'error': Color(0xFFE78284),
-    'onPrimary': Color(0xFF1E1E2E),
-    'onSecondary': Color(0xFFFFFFFF),
-  },
-  'catppuccin_macchiato': {
-    'primary': Color.fromARGB(255, 147, 158, 252),
-    'secondary': Color.fromARGB(255, 182, 147, 252),
-    'background': Color(0xFF24273A),
-    'surface': Color(0xFF363A4F),
-    'error': Color(0xFFED8796),
-    'onPrimary': Color(0xFF1E1E2E),
-    'onSecondary': Color(0xFFFFFFFF),
+    'onSecondary': Color(0xFF4C4F69),
   },
 
+  'catppuccin_frappe': {
+    'primary': Color(0xFF8CAAEE),
+    'secondary': Color(0xFFF4B8E4),
+    'background': Color(0xFF35394B),
+    'surface': Color(0xFF35394B),
+    'error': Color(0xFFE78284),
+    'onPrimary': Color(0xFF232634),
+    'onSecondary': Color(0xFFC6D0F5),
+  },
+
+  'catppuccin_macchiato': {
+    'primary': Color(0xFF8AADF4),
+    'secondary': Color(0xFFC6A0F6),
+    'background': Color(0xFF2B2E42),
+    'surface': Color(0xFF2B2E42),
+    'error': Color(0xFFED8796),
+    'onPrimary': Color(0xFF181926),
+    'onSecondary': Color(0xFFCAD3F5),
+  },
+
+  // --- الثيمات الداكنة المتخصصة (Dark Neumorphism) ---
   'dracula': {
-    'primary': Color.fromARGB(255, 174, 118, 252),
-    'secondary': Color.fromARGB(255, 177, 162, 252),
-    'background': Color(0xFF282A36),
-    'surface': Color(0xFF44475A),
+    'primary': Color(0xFFBD93F9),
+    'secondary': Color(0xFFFF79C6),
+    'background': Color(0xFF282A36), // لون دراكولا الشهير ممتاز للظلال
+    'surface': Color(0xFF282A36),
     'error': Color(0xFFFF5555),
-    'onPrimary': Color(0xFF1E1E2E),
-    'onSecondary': Color(0xFFFFFFFF),
+    'onPrimary': Color(0xFF21222C),
+    'onSecondary': Color(0xFFF8F8F2),
   },
 
   'hologram': {
-    'primary': Color(0xFF29B6F6),
-    'secondary': Color.fromARGB(255, 73, 192, 247),
-    'background': Color(0xFF0F172A),
-    'surface': Color(0xFF1E293B),
-    'error': Color(0xFFFF5252),
-    'onPrimary': Color(0xFFFFFFFF),
-    'onSecondary': Color.fromARGB(255, 255, 255, 255),
+    'primary': Color(0xFF38BDF8),
+    'secondary': Color(0xFF0EA5E9),
+    'background': Color(0xFF1A2234), // أزرق كحلي ناعم بدلاً من الأسود الداكن جداً
+    'surface': Color(0xFF1A2234),
+    'error': Color(0xFFFB7185),
+    'onPrimary': Color(0xFF0F172A),
+    'onSecondary': Color(0xFFE2E8F0),
   },
 
   'neon_circuit': {
-    'primary': Color(0xFF00FFAA),
-    'secondary': Color.fromARGB(255, 31, 119, 90),
-    'background': Color(0xFF101820),
-    'surface': Color(0xFF1A2930),
-    'error': Color(0xFFFF1744),
-    'onPrimary': Color(0xFF101820),
-    'onSecondary': Color(0xFFFFFFFF),
+    'primary': Color(0xFF00E599),
+    'secondary': Color(0xFF059669),
+    'background': Color(0xFF192329), // زيتي داكن يسمح بظهور الحواف المنحوتة
+    'surface': Color(0xFF192329),
+    'error': Color(0xFFF43F5E),
+    'onPrimary': Color(0xFF0A1014),
+    'onSecondary': Color(0xFFE0F2FE),
   },
 };
