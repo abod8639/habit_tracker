@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -34,7 +35,7 @@ class ImageScannerBottomSheet extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppRadius.top(AppRadius.card),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -44,7 +45,7 @@ class ImageScannerBottomSheet extends StatelessWidget {
             height: 4,
             decoration: BoxDecoration(
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: AppRadius.circular(2),
             ),
           ),
           const SizedBox(height: 24),
@@ -95,7 +96,7 @@ class ImageScannerBottomSheet extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: AppRadius.lgRadius,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
