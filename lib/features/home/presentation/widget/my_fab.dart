@@ -46,8 +46,16 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
         : (Color.lerp(primaryColor, Colors.white, 0.20) ?? primaryColor);
 
     final Color gradientEnd = isDark
-        ? (Color.lerp(primaryColor, Colors.black, 0.25) ?? primaryColor)
-        : (Color.lerp(primaryColor, Colors.black, 0.12) ?? primaryColor);
+        ? (Color.lerp(
+          primaryColor,
+          theme.colorScheme.secondary,
+          0.9,
+        ) ?? primaryColor)
+        : (Color.lerp(
+          primaryColor,
+          theme.colorScheme.secondary,
+          0.9,
+        ) ?? primaryColor);
 
     return MouseRegion(
       onEnter: (_) => _animationController.forward(),
@@ -114,6 +122,7 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
                   Icons.add_rounded,
                   size: 28,
                   color: theme.colorScheme.onPrimary,
+                  shadows: AppShadows.buttonPressed(isDark: isDark),
                 ),
               ),
             ),
