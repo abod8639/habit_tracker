@@ -1,29 +1,22 @@
-
 {
-
   "@@locale": "en",
-   "drawer":"",
-
-   "drawerTheme" : "Theme Color",
-   "drawerReat" : "Statistics",
-   "drawerSetting" : "Setting",
-
-   "themepagetitle":"Theme Setting",
-   "themepage":"Custom Theme",
-
-
+  "drawer": "",
+  "drawerTheme": "Theme Color",
+  "drawerReat": "Statistics",
+  "drawerSetting": "Setting",
+  "themepagetitle": "Theme Setting",
+  "themepage": "Custom Theme",
   "summary": "Habit Summary",
-   "ratepagetitle":"Habit Statistics",
-
-   "total":"Total",
-   "completed":"Completed",
-   "success":"Habit Success",
-   "today":"Today Progress",
-   "monthly":"Monthly Progress",
-   "weekly":"weekly Progress",
-   "hambitstate":"Habit State",
-   "pending":"Pending",
-   "isEmpty":"No habits tracked yet",
+  "ratepagetitle": "Habit Statistics",
+  "total": "Total",
+  "completed": "Completed",
+  "success": "Habit Success",
+  "today": "Today Progress",
+  "monthly": "Monthly Progress",
+  "weekly": "weekly Progress",
+  "hambitstate": "Habit State",
+  "pending": "Pending",
+  "isEmpty": "No habits tracked yet",
   "barChartIsEmpty": "No habit data available",
   "pieChartIsEmpty": "No habits to display",
   "trendChartIsEmpty": "Not enough data to display trends",
@@ -31,7 +24,6 @@
   "incomplete": "Incomplete",
   "tooltipItemCompleted": "Completed",
   "tooltipItem": "Go do it now",
-
   "settingPageTitle": "Settings",
   "appearance": "Appearance",
   "changeAppTheme": "Change app theme and color",
@@ -42,24 +34,22 @@
   "exportYourHabitData": "Export your habit data",
   "restoreData": "Restore Data",
   "importPreviouslyExportedData": "Import previously exported data",
-   "lan":"Language",
-  "scanImage":"Scan Image",
+  "lan": "Language",
+  "scanImage": "Scan Image",
   "clearAllData": "Clear All Data",
   "deleteAllHabitsAndSettings": "Delete all habits and settings",
   "comingSoon": "Coming Soon",
   "restoreFeatureWillBeAvailableInFutureUpdates": "Restore feature will be available in future updates",
   "about": "About",
   "appVersionAndInformation": "This app made by dexter ",
-
   "cancel": "Cancel",
-  "add": "Add",
+  "add": "Add new habit",
   "theFieldCantBeEmpty": "The field can't be empty :)",
   "addNewHabit": "Add new Habit...",
   "editThisHabit": "Edit This Habit",
   "error": "Error",
   "deleteHabit": "Delete Habit",
   "areYouSureYouWantToDeleteThisHabit": "Are you sure you want to delete this habit?",
-
   "defaultHabits1": "Click here",
   "defaultHabits2": "<== Swipe left to edit",
   "defaultHabits3": "Swipe right to delete ==>",
@@ -109,7 +99,6 @@
   "authErrorDefault": "An error occurred",
   "authErrorGoogle": "An error occurred during Google sign-in",
   "authErrorSignOut": "An error occurred during sign-out",
-
   "cloudSync": "Cloud Sync",
   "syncNow": "Sync Now",
   "syncing": "Syncing...",
@@ -312,4 +301,3 @@
   "dailyReminderAllCompleted": "Awesome! You have completed all your tasks for today.",
   "dailyReminderNoTasks": "No tasks registered yet. Start adding your daily habits today."
 }
-

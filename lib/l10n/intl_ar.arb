@@ -1,17 +1,13 @@
 {
   "@@locale": "ar",
   "drawer": "",
-
   "drawerTheme": "لون الثيم",
   "drawerReat": "الإحصائيات",
   "drawerSetting": "الإعدادات",
-
   "themepagetitle": "إعدادات الثيم",
   "themepage": "تخصيص الثيم",
-
   "summary": "ملخص العادات",
   "ratepagetitle": "إحصائيات العادات",
-
   "total": "المجموع",
   "completed": "مكتمل",
   "success": "معدل النجاح",
@@ -28,7 +24,6 @@
   "incomplete": "غير مكتمل",
   "tooltipItemCompleted": "تم إنجازه",
   "tooltipItem": "نفذه الآن",
-
   "settingPageTitle": "الإعدادات",
   "appearance": "المظهر",
   "changeAppTheme": "تغيير ثيم ولون التطبيق",
@@ -40,24 +35,22 @@
   "restoreData": "استعادة البيانات",
   "importPreviouslyExportedData": "استيراد بيانات محفوظة مسبقاً",
   "lan": "اللغة",
-
   "clearAllData": "مسح جميع البيانات",
   "deleteAllHabitsAndSettings": "حذف جميع العادات والإعدادات",
   "comingSoon": "قريباً",
   "restoreFeatureWillBeAvailableInFutureUpdates": "ستتوفر ميزة الاستعادة في التحديثات القادمة",
   "about": "حول التطبيق",
   "appVersionAndInformation": "هذا التطبيق من تطوير دكستر",
-
   "cancel": "إلغاء",
-  "add": "إضافة",
+  "add": "إضافة عادة جديدة",
   "theFieldCantBeEmpty": "لا يمكن ترك الحقل فارغاً",
   "addNewHabit": "إضافة عادة جديدة...",
   "editThisHabit": "تعديل هذه العادة",
   "error": "خطأ",
   "deleteHabit": "حذف العادة",
   "areYouSureYouWantToDeleteThisHabit": "هل أنت متأكد من رغبتك في حذف هذه العادة؟",
-  "defaultHabits1":"انقر هنا",
-  "defaultHabits2":"<== اسحب لليسار للتعديل",
+  "defaultHabits1": "انقر هنا",
+  "defaultHabits2": "<== اسحب لليسار للتعديل",
   "defaultHabits3": "اسحب لليمين للحذف ==>",
   "login": "تسجيل الدخول",
   "signup": "إنشاء حساب",
@@ -115,7 +108,7 @@
   "lastSync": "آخر مزامنة",
   "notSyncedYet": "لم تتم المزامنة بعد",
   "justNow": "الآن",
-  "scanImage":"مسح الصورة",
+  "scanImage": "مسح الصورة",
   "minutesAgo": "منذ {minutes} دقيقة",
   "hoursAgo": "منذ {hours} ساعة",
   "daysAgo": "منذ {days} يوم",
