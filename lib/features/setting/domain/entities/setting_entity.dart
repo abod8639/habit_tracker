@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SettingEntity {
+  static const String defaultLanguage = 'sys';
+
   final String languageCode;
   final bool isNotificationEnabled;
   final TimeOfDay? notificationTime;
