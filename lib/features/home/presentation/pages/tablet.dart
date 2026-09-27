@@ -44,15 +44,22 @@ class Tablet extends StatelessWidget {
                   flex: ResponsiveUtils.isDesktop(context) ? 8 : 9,
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    child: SingleChildScrollView(
-                      reverse: true,
+                    child: Padding(
                       key: const ValueKey<String>('heatmap'),
-                      scrollDirection: Axis.horizontal,
-                      child: Obx(
-                        () => MonthlySummary(
-                          datasets: controller.heatmapDateSet,
-                        ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
                       ),
+                      child: Obx(() {
+                        final datasets = controller.heatmapDateSet;
+                        // Observing habits guarantees Obx triggers on checkbox toggles
+                        final _ = controller.habits;
+                        final startDay = controller.getStartDay();
+                        return MonthlySummary(
+                          key: ValueKey(startDay),
+                          datasets: Map<DateTime, int>.from(datasets),
+                        );
+                      }),
                     ),
                   ),
                 ),
