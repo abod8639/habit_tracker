@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/core/utils/responsive_utils.dart';
 import 'stats_neumorphic_utils.dart';
 
+/// Reusable individual statistic metric widget displaying icon, numerical value, and label.
 class StatItem extends StatelessWidget {
   final String title;
   final String value;
@@ -33,7 +36,7 @@ class StatItem extends StatelessWidget {
         ),
         decoration: StatsNeumorphicTheme.wellDecoration(
           context,
-          borderRadius: 18,
+          borderRadius: AppRadius.well,
           accentColor: color,
           accentAlpha: isDark ? 0.08 : 0.04,
         ),
@@ -47,13 +50,13 @@ class StatItem extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color.withValues(alpha: isDark ? 0.16 : 0.12),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: isDark ? 0.25 : 0.18),
-                    blurRadius: 6,
-                    spreadRadius: 0.5,
-                  ),
-                ],
+                boxShadow: AppShadows.bloom(
+                  color: color,
+                  isDark: isDark,
+                  blur: 6,
+                  spread: 0.5,
+                  offset: const Offset(0, 1),
+                ),
               ),
               child: Icon(
                 icon,
@@ -92,6 +95,7 @@ class StatItem extends StatelessWidget {
   }
 }
 
+/// Backward-compatible builder function delegating to [StatItem].
 Widget buildStatItem(String title, String value, IconData icon, Color color) {
   return StatItem(
     title: title,
