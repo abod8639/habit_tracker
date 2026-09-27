@@ -128,13 +128,8 @@ class TodayBarChartCard extends StatelessWidget {
                           gradient: isCompleted
                               ? LinearGradient(
                                   colors: [
+                                   Theme.of(context).colorScheme.secondary,
                                     colorScheme.primary,
-                                    Color.lerp(
-                                          colorScheme.primary,
-                                          Colors.white,
-                                          isDark ? 0.25 : 0.35,
-                                        ) ??
-                                        colorScheme.primary,
                                   ],
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
