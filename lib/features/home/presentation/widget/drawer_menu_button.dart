@@ -11,8 +11,10 @@ class DrawerMenuButton extends StatelessWidget {
       builder: (context) {
         return Padding(
           padding: const EdgeInsets.all(12.0),
-          child: NeumorphicIconButton(
+          child: NeumorphicIconButton.square(
+            size: 46,
             icon: Icons.menu_rounded,
+            iconSize: 22,
             tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
