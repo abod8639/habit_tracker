@@ -16,6 +16,11 @@ class ThemeRepositoryImpl implements ThemeRepository {
   });
 
   @override
+  ThemeEntity getCachedThemeSettings() {
+    return localDataSource.getCachedThemeSettings();
+  }
+
+  @override
   Future<Either<Failure, ThemeEntity>> getThemeSettings() async {
     try {
       final settings = await localDataSource.getThemeSettings();
