@@ -13,20 +13,16 @@ import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/presentation/widget/image_scanner_bottom_sheet.dart';
 import 'package:habit_tracker/features/home/presentation/widget/habit_confirmation_dialog.dart';
 
+import 'package:habit_tracker/core/utils/responsive_utils.dart';
+
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
-
-  bool isPhone(BuildContext context) {
-    final double mwidth = MediaQuery.of(context).size.width;
-    return mwidth < 600.0;
-  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: isPhone(context) ? 200 : 300,
+      width: ResponsiveUtils.isPhone(context) ? 200 : 300,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      // backgroundColor: Colors.grey[900],
       child: const DrawerList(),
     );
   }
