@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/habitstats_controller.dart';
 import 'my_bar_touch_data.dart';
@@ -23,37 +24,10 @@ class TodayBarChartCard extends StatelessWidget {
 
       if (chartData.isEmpty) {
         return SoftCard(
-          child: SizedBox(
+          child: NeumorphicEmptyState(
+            icon: Icons.bar_chart_rounded,
+            message: S.current.barChartIsEmpty,
             height: 240,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: StatsNeumorphicTheme.wellDecoration(
-                      context,
-                      borderRadius: 36,
-                    ),
-                    child: Icon(
-                      Icons.bar_chart_rounded,
-                      size: 38,
-                      color: colorScheme.outline.withValues(alpha: 0.6),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    S.current.barChartIsEmpty,
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
         );
       }
@@ -78,7 +52,7 @@ class TodayBarChartCard extends StatelessWidget {
                 ),
                 decoration: StatsNeumorphicTheme.badgeDecoration(
                   context,
-                  borderRadius: 16,
+                  borderRadius: AppRadius.lg,
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -333,7 +307,7 @@ class _StatChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
         decoration: StatsNeumorphicTheme.wellDecoration(
           context,
-          borderRadius: 16,
+          borderRadius: AppRadius.lg,
           accentColor: accentColor,
           accentAlpha: isDark ? 0.07 : 0.03,
         ),
