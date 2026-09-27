@@ -429,6 +429,14 @@ class _MyTextTaileState extends State<MyTextTaile>
         height: 30,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.secondary,
+            ],
+          ),
           color: widget.isSelected
               ? themeColors.primary
               : (isDark
@@ -479,8 +487,8 @@ class _MyTextTaileState extends State<MyTextTaile>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    habitColor,
-                    Color.lerp(habitColor, Colors.black, 0.10)!,
+                    themeColors.primary,
+                    themeColors.secondary
                   ],
                 )
               : LinearGradient(
@@ -519,8 +527,9 @@ class _MyTextTaileState extends State<MyTextTaile>
                 duration: const Duration(milliseconds: 120),
                 curve: Curves.easeOutBack,
                 child: Icon(
+                  shadows: AppShadows.buttonPressed(isDark: isDark),
                   Icons.check_rounded,
-                  size: 19,
+                  size: 20,
                   color: ThemeUtils.getContrastColor(habitColor),
                 ),
               )
