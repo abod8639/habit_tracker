@@ -43,7 +43,7 @@ class HomeAppBar extends StatelessWidget {
           elevation: 0,
           toolbarHeight: 68,
           titleSpacing: 0,
-          leadingWidth: 68,
+          leadingWidth: 70,
           flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -61,16 +61,15 @@ class HomeAppBar extends StatelessWidget {
               boxShadow: AppShadows.subtleCard(isDark: isDark),
             ),
           ),
-          leading: Padding(
-            padding: const EdgeInsetsDirectional.only(
-              start: 16,
-              top: 13,
-              bottom: 13,
-            ),
-            child: NeumorphicIconButton(
-              icon: Icons.close_rounded,
-              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              onPressed: () => controller.clearSelection(),
+          leading: Center(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(start: 16),
+              child: NeumorphicIconButton.square(
+                size: 46,
+                icon: Icons.close_rounded,
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                onPressed: () => controller.clearSelection(),
+              ),
             ),
           ),
           title: Container(
@@ -110,27 +109,26 @@ class HomeAppBar extends StatelessWidget {
             ),
           ),
           actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              child: NeumorphicIconButton(
+            Center(
+              child: NeumorphicIconButton.square(
+                size: 46,
                 icon: Icons.palette_outlined,
-                accentColor: colorScheme.primary,
+                iconColor: colorScheme.primary,
                 tooltip: S.of(context).chooseColor,
                 onPressed: () => _showColorPicker(context, controller),
               ),
             ),
-            const SizedBox(width: 8),
-            Padding(
-              padding: const EdgeInsetsDirectional.only(
-                end: 16,
-                top: 13,
-                bottom: 13,
-              ),
-              child: NeumorphicIconButton(
-                icon: Icons.delete_outline_rounded,
-                accentColor: colorScheme.error,
-                tooltip: S.of(context).delete,
-                onPressed: () => _showBatchDeleteConfirm(context, controller),
+            const SizedBox(width: 10),
+            Center(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(end: 16),
+                child: NeumorphicIconButton.square(
+                  size: 46,
+                  icon: Icons.delete_outline_rounded,
+                  iconColor: colorScheme.error,
+                  tooltip: S.of(context).delete,
+                  onPressed: () => _showBatchDeleteConfirm(context, controller),
+                ),
               ),
             ),
           ],
@@ -145,9 +143,9 @@ class HomeAppBar extends StatelessWidget {
         shadowColor: Colors.transparent,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        toolbarHeight: 64,
-        titleSpacing: 16,
-        leadingWidth: 68,
+        toolbarHeight: 68,
+        titleSpacing: 0,
+        leadingWidth: 70,
         centerTitle: true,
         title: Column(
           mainAxisSize: MainAxisSize.min,
@@ -155,49 +153,50 @@ class HomeAppBar extends StatelessWidget {
             Text(
               'HABIT MATRIX',
               style: TextStyle(
-                fontSize: 11,
-                letterSpacing: 2.2,
+                fontSize: 11.5,
+                letterSpacing: 2.4,
                 fontWeight: FontWeight.w700,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 3),
             Text(
               'Daily Persistence',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.onSurface,
+                letterSpacing: 0.1,
               ),
             ),
           ],
         ),
-        leading: Padding(
-          padding: const EdgeInsetsDirectional.only(
-            start: 16,
-            top: 11,
-            bottom: 11,
-          ),
-          child: Builder(
-            builder: (context) => NeumorphicIconButton(
-              icon: Icons.menu_rounded,
-              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-              onPressed: () => Scaffold.of(context).openDrawer(),
+        leading: Center(
+          child: Padding(
+            padding: const EdgeInsetsDirectional.only(start: 16),
+            child: Builder(
+              builder: (context) => NeumorphicIconButton.square(
+                size: 46,
+                icon: Icons.menu_rounded,
+                iconSize: 22,
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
             ),
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(
-              end: 16,
-              top: 11,
-              bottom: 11,
-            ),
-            child: NeumorphicIconButton(
-              icon: Icons.auto_awesome_rounded,
-              accentColor: Theme.of(context).primaryColor,
-              tooltip: S.current.generatePlan,
-              onPressed: () => Get.toNamed(AppRoutes.categorySelection),
+          Center(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(end: 16),
+              child: NeumorphicIconButton.square(
+                size: 46,
+                icon: Icons.auto_awesome_rounded,
+                iconColor: Theme.of(context).colorScheme.primary,
+                iconSize: 22,
+                tooltip: S.current.generatePlan,
+                onPressed: () => Get.toNamed(AppRoutes.categorySelection),
+              ),
             ),
           ),
         ],
