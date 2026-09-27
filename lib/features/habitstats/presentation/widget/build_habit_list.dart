@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'stats_neumorphic_utils.dart';
 
+/// Sub-list widget rendering individual habit items within a status category.
 class HabitSubList extends StatelessWidget {
   final List<Map<String, dynamic>> habits;
   final bool isCompleted;
@@ -25,7 +28,7 @@ class HabitSubList extends StatelessWidget {
     return Container(
       decoration: StatsNeumorphicTheme.wellDecoration(
         context,
-        borderRadius: 18,
+        borderRadius: AppRadius.well,
         accentColor: statusColor,
         accentAlpha: isDark ? 0.05 : 0.02,
       ),
@@ -41,7 +44,7 @@ class HabitSubList extends StatelessWidget {
           endIndent: 16,
           color: isDark
               ? Colors.white.withValues(alpha: 0.04)
-              : const Color(0xFFA3B1C6).withValues(alpha: 0.2),
+              : const Color(0xFFA3B1C6).withValues(alpha: 0.20),
         ),
         itemBuilder: (context, index) {
           final habit = habits[index];
@@ -56,20 +59,12 @@ class HabitSubList extends StatelessWidget {
                   height: 28,
                   decoration: BoxDecoration(
                     color: isCompleted
-                        ? statusColor.withValues(alpha: isDark ? 0.2 : 0.15)
+                        ? statusColor.withValues(alpha: isDark ? 0.20 : 0.15)
                         : (isDark
-                            ? Colors.black.withValues(alpha: 0.3)
-                            : Colors.white.withValues(alpha: 0.7)),
+                            ? Colors.black.withValues(alpha: 0.30)
+                            : Colors.white.withValues(alpha: 0.70)),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDark
-                            ? Colors.black.withValues(alpha: 0.3)
-                            : const Color(0xFFA3B1C6).withValues(alpha: 0.2),
-                        offset: const Offset(1, 1),
-                        blurRadius: 2,
-                      ),
-                    ],
+                    boxShadow: AppShadows.dotIndicator(isDark: isDark),
                   ),
                   alignment: Alignment.center,
                   child: Text(
