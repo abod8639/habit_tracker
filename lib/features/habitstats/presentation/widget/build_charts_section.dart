@@ -3,25 +3,35 @@ import 'package:habit_tracker/core/utils/responsive_utils.dart';
 import 'package:habit_tracker/features/habitstats/presentation/widget/build_bar_chart.dart';
 import 'package:habit_tracker/features/habitstats/presentation/widget/build_pie_chart.dart';
 
-Widget buildChartsSection(BuildContext context) {
-  final isDesktop = ResponsiveUtils.isDesktop(context);
+/// Charts section containing the daily completion bar chart and overall pie chart.
+/// Responsive: displays side-by-side on desktop/tablet, stacked vertically on phone.
+class ChartsSection extends StatelessWidget {
+  const ChartsSection({super.key});
 
-  if (isDesktop) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = ResponsiveUtils.isDesktop(context);
+
+    if (isDesktop) {
+      return const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: TodayBarChartCard()),
+          SizedBox(width: 16),
+          Expanded(child: CompletionPieChartCard()),
+        ],
+      );
+    }
+
+    return const Column(
       children: [
-        Expanded(child: buildBarChart()),
-        const SizedBox(width: 16),
-        Expanded(child: buildPieChart()),
+        TodayBarChartCard(),
+        SizedBox(height: 16),
+        CompletionPieChartCard(),
       ],
     );
   }
-
-  return Column(
-    children: [
-      buildBarChart(),
-      const SizedBox(height: 16),
-      buildPieChart(),
-    ],
-  );
 }
+
+/// Backward-compatible builder function delegating to [ChartsSection].
+Widget buildChartsSection(BuildContext context) => const ChartsSection();
