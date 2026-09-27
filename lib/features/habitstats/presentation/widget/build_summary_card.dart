@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
-import 'package:habit_tracker/core/components/neumorphic_card_header.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/habitstats_controller.dart';
 import 'build_stat_item.dart';
-import 'build_streak_badge.dart';
 
 /// Summary overview card displaying overall total, completed habits, and success rate.
 class SummaryCard extends StatelessWidget {
