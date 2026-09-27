@@ -232,6 +232,7 @@ class _AnimatedSettingTileState extends State<AnimatedSettingTile>
       ),
       child: Center(
         child: Icon(
+          shadows: AppShadows.buttonPressed(isDark: isDark),
           widget.icon,
           color: primaryColor,
           size: 22,
