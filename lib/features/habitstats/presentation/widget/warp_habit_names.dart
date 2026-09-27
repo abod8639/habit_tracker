@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import '../controllers/habitstats_controller.dart';
 import 'build_trend_chart.dart';
 import 'stats_neumorphic_utils.dart';
 
+/// Wrap layout displaying legend chips for all active habits in trend charts.
 class WarpHabitNames extends StatelessWidget {
   const WarpHabitNames({super.key});
 
@@ -58,7 +61,7 @@ class _HabitLegendChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
       decoration: StatsNeumorphicTheme.wellDecoration(
         context,
-        borderRadius: 18,
+        borderRadius: AppRadius.well,
         accentColor: color,
         accentAlpha: isDark ? 0.08 : 0.04,
       ),
@@ -71,13 +74,7 @@ class _HabitLegendChip extends StatelessWidget {
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: isDark ? 0.6 : 0.4),
-                  blurRadius: 4,
-                  spreadRadius: 0.5,
-                ),
-              ],
+              boxShadow: AppShadows.activeDot(color: color),
             ),
           ),
           const SizedBox(width: 7),
