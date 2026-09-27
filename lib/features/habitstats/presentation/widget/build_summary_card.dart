@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
+import 'package:habit_tracker/features/habitstats/presentation/widget/build_pie_chart.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/habitstats_controller.dart';
 import 'build_stat_item.dart';
@@ -22,9 +23,9 @@ class SummaryCard extends StatelessWidget {
 
       final Color totalColor = colorScheme.primary;
       const Color completedColor = Color(0xFF10B981); // Emerald Green
-      final Color successColor = stats.completionRate >= 50
-          ? const Color(0xFF10B981)
-          : const Color(0xFFF59E0B); // Amber
+      // final Color successColor = stats.completionRate >= 50
+      //     ? const Color(0xFF10B981)
+      //     : const Color(0xFFF59E0B); // Amber
 
       return SoftCard(
         child: Column(
@@ -44,17 +45,12 @@ class SummaryCard extends StatelessWidget {
                   icon: Icons.format_list_bulleted_rounded,
                   color: totalColor,
                 ),
+                const CompletionPieChartCard.compact(),
                 StatItem(
                   title: S.current.completed,
                   value: stats.completedHabits.toString(),
                   icon: Icons.check_circle_rounded,
                   color: completedColor,
-                ),
-                StatItem(
-                  title: S.current.success,
-                  value: '${stats.completionRate.toStringAsFixed(1)}%',
-                  icon: Icons.trending_up_rounded,
-                  color: successColor,
                 ),
               ],
             ),
