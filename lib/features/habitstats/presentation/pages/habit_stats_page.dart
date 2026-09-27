@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
 import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/ai_chat/presentation/controllers/ai_chat_binding.dart';
 import 'package:habit_tracker/features/ai_chat/presentation/pages/ai_chat_page.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -55,10 +58,10 @@ class _HabitStatsPageState extends State<HabitStatsPage>
           scrolledUnderElevation: 0,
           leading: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-            child: NeumorphicCircularButton(
+            child: NeumorphicIconButton(
               size: 40,
               icon: Icons.arrow_back_ios_new_rounded,
-              iconColor: colorScheme.onSurface,
+              accentColor: colorScheme.onSurface,
               onPressed: () => Get.back(),
             ),
           ),
@@ -74,10 +77,10 @@ class _HabitStatsPageState extends State<HabitStatsPage>
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-              child: NeumorphicCircularButton(
+              child: NeumorphicIconButton(
                 size: 40,
                 icon: Icons.refresh_rounded,
-                iconColor: colorScheme.primary,
+                accentColor: colorScheme.primary,
                 tooltip: 'Refresh',
                 onPressed: () {
                   if (Get.isRegistered<HabitStatsController>()) {
@@ -97,7 +100,7 @@ class _HabitStatsPageState extends State<HabitStatsPage>
                   height: 64,
                   decoration: StatsNeumorphicTheme.wellDecoration(
                     context,
-                    borderRadius: 32,
+                    borderRadius: AppRadius.dialog,
                   ),
                   padding: const EdgeInsets.all(16),
                   child: CircularProgressIndicator(
@@ -193,7 +196,7 @@ class _NeumorphicAiFabState extends State<_NeumorphicAiFab> {
         height: 50,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(AppRadius.dialog),
           gradient: LinearGradient(
             colors: [
               primary,
@@ -207,26 +210,19 @@ class _NeumorphicAiFabState extends State<_NeumorphicAiFab> {
             width: 1.2,
           ),
           boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: primary.withValues(alpha: 0.3),
-                    offset: const Offset(0, 2),
-                    blurRadius: 6,
-                  ),
-                ]
+              ? AppShadows.buttonPressed(isDark: isDark)
               : [
-                  // Radiant primary bloom
-                  BoxShadow(
-                    color: primary.withValues(alpha: isDark ? 0.45 : 0.35),
+                  ...AppShadows.bloom(
+                    color: primary,
+                    isDark: isDark,
+                    blur: 14.0,
+                    spread: 1.0,
                     offset: const Offset(0, 5),
-                    blurRadius: 14,
-                    spreadRadius: 1,
                   ),
-                  // Ambient light
                   BoxShadow(
                     color: isDark
                         ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.white.withValues(alpha: 0.8),
+                        : Colors.white.withValues(alpha: 0.80),
                     offset: const Offset(-2, -2),
                     blurRadius: 5,
                   ),
