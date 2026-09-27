@@ -75,33 +75,64 @@ Widget buildAnimatedSettingLang(
               children: [
                 // Neumorphic Icon Badge
                 Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Color.alphaBlend(
-                      primaryColor.withValues(alpha: isDark ? 0.14 : 0.09),
-                      baseSurface,
-                    ),
-                    borderRadius: AppRadius.mdRadius,
-                    boxShadow: AppShadows.dotIndicator(isDark: isDark),
-                    border: Border.all(
-                      color: primaryColor.withValues(alpha: isDark ? 0.20 : 0.15),
-                      width: 1,
-                    ),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      icon,
-                      color: primaryColor,
-                      size: 22,
-                    ),
-                  ),
-                ),
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: Color.alphaBlend(
+          theme.primaryColor.withValues(alpha: isDark ? 0.14 : 0.09),
+          baseSurface,
+        ),
+        borderRadius: AppRadius.mdRadius,
+        boxShadow: AppShadows.dotIndicator(isDark: isDark),
+        border: Border.all(
+          color: theme.primaryColor.withValues(alpha: isDark ? 0.20 : 0.15),
+          width: 1,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          shadows: AppShadows.buttonPressed(isDark: isDark),
+          icon,
+          color: theme.primaryColor,
+          size: 22,
+        ),
+      ),
+    ),
+                // Container(
+                //   width: 44,
+                //   height: 44,
+                //   decoration: BoxDecoration(
+                //     color: Color.alphaBlend(
+                //       primaryColor.withValues(alpha: isDark ? 0.14 : 0.09),
+                //       baseSurface,
+                //     ),
+                //     borderRadius: AppRadius.mdRadius,
+                //     boxShadow: AppShadows.dotIndicator(isDark: isDark),
+                //     border: Border.all(
+                //       color: theme.primaryColor,
+                //       width: 0.5,
+                //     ),
+                //   ),
+                //   child: Center(
+                //     child: Icon(
+                //       icon,
+                //       color: theme.primaryColor,
+                //       size: 22,
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: DropdownButtonFormField<String>(
+
                     initialValue: currentValue,
-                    decoration: const InputDecoration(
+                    iconEnabledColor: Colors.transparent,
+                    iconDisabledColor: Colors.transparent ,
+                    focusColor: Colors.transparent,
+                    decoration:  InputDecoration(
+
+                      // iconColor: theme.primaryColor,
+                      fillColor: Colors.transparent,
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
                     ),
