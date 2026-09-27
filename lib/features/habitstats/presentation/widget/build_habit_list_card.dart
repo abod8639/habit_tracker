@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/components/neumorphic_card_header.dart';
+import 'package:habit_tracker/core/components/neumorphic_empty_state.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/habitstats_controller.dart';
 import 'build_habit_list.dart';
 import 'stats_neumorphic_utils.dart';
 
+/// Interactive habit list card breaking down today's completed and incomplete habits.
 class HabitListCard extends StatelessWidget {
   const HabitListCard({super.key});
 
@@ -27,37 +32,10 @@ class HabitListCard extends StatelessWidget {
 
       if (chartData.isEmpty) {
         return SoftCard(
-          child: SizedBox(
+          child: NeumorphicEmptyState(
+            icon: Icons.checklist_rounded,
+            message: S.current.isEmpty,
             height: 220,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: StatsNeumorphicTheme.wellDecoration(
-                      context,
-                      borderRadius: 36,
-                    ),
-                    child: Icon(
-                      Icons.checklist_rounded,
-                      size: 38,
-                      color: colorScheme.outline.withValues(alpha: 0.6),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    S.current.isEmpty,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
         );
       }
@@ -66,7 +44,7 @@ class HabitListCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            StatsCardHeader(
+            NeumorphicCardHeader(
               icon: Icons.task_alt_rounded,
               title: S.current.success,
               trailing: Container(
@@ -76,7 +54,7 @@ class HabitListCard extends StatelessWidget {
                 ),
                 decoration: StatsNeumorphicTheme.badgeDecoration(
                   context,
-                  borderRadius: 16,
+                  borderRadius: AppRadius.lg,
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -105,41 +83,12 @@ class HabitListCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Row(
                   children: [
-                     Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: StatsNeumorphicTheme.surfaceGradient(context),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.white.withValues(alpha: 0.9),
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.04)
-                          : Colors.white.withValues(alpha: 0.9),
-                      offset: const Offset(-2, -2),
-                      blurRadius: 4,
+                    _StatusIndicatorCircle(
+                      icon: Icons.check_circle_rounded,
+                      iconColor: colorScheme.primary,
+                      isDark: isDark,
+                      context: context,
                     ),
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.45)
-                          : const Color(0xFFA3B1C6).withValues(alpha: 0.3),
-                      offset: const Offset(2, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  size: 19,
-                  color: colorScheme.primary,
-                ),
-              ),
                     const SizedBox(width: 8),
                     Text(
                       '${S.current.completedLabel} (${completedHabits.length})',
@@ -161,41 +110,12 @@ class HabitListCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Row(
                   children: [
-                     Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: StatsNeumorphicTheme.surfaceGradient(context),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.red.withValues(alpha: 0.9),
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.04)
-                          : Colors.red.withValues(alpha: 0.9),
-                      offset: const Offset(-2, -2),
-                      blurRadius: 4,
+                    _StatusIndicatorCircle(
+                      icon: Icons.pending_actions_rounded,
+                      iconColor: colorScheme.error,
+                      isDark: isDark,
+                      context: context,
                     ),
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.45)
-                          : const Color(0xFFA3B1C6).withValues(alpha: 0.3),
-                      offset: const Offset(2, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.pending_actions_rounded,
-                  size: 19,
-                  color: colorScheme.error,
-                ),
-              ),
                     const SizedBox(width: 8),
                     Text(
                       '${S.current.incomplete} (${incompleteHabits.length})',
@@ -217,6 +137,43 @@ class HabitListCard extends StatelessWidget {
   }
 }
 
-Widget buildHabitListCard(BuildContext context) {
-  return const HabitListCard();
+class _StatusIndicatorCircle extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final bool isDark;
+  final BuildContext context;
+
+  const _StatusIndicatorCircle({
+    required this.icon,
+    required this.iconColor,
+    required this.isDark,
+    required this.context,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: StatsNeumorphicTheme.surfaceGradient(context),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.white.withValues(alpha: 0.90),
+          width: 1.0,
+        ),
+        boxShadow: AppShadows.dotIndicator(isDark: isDark),
+      ),
+      child: Icon(
+        icon,
+        size: 19,
+        color: iconColor,
+      ),
+    );
+  }
 }
+
+/// Backward-compatible builder function delegating to [HabitListCard].
+Widget buildHabitListCard(BuildContext context) => const HabitListCard();
