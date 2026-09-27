@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -50,6 +51,9 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
   Widget build(BuildContext context) {
     if (widget.extractedHabits.isEmpty) {
       return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadius.dialogRadius,
+        ),
         title: Text(S.of(context).noHabitsDetected),
         content: Text(
           S.of(context).noHabitsDetectedDesc,
@@ -66,6 +70,9 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: AppRadius.dialogRadius,
+      ),
       title: Text(S.of(context).detectedHabits),
       contentPadding: const EdgeInsets.only(top: 16, bottom: 0),
       content: SizedBox(
