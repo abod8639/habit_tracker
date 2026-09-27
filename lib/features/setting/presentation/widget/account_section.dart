@@ -1,46 +1,56 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_tile.dart';
+import 'package:habit_tracker/core/components/animated_setting_tile.dart';
 import 'package:habit_tracker/core/functions/navigate_tologin.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
+class AccountSection extends StatelessWidget {
+  final AnimationController animationController;
+
+  const AccountSection({super.key, required this.animationController});
+
+  @override
+  Widget build(BuildContext context) {
+    final authController = Get.put(AuthController());
+
+    return Obx(() {
+      final user = authController.currentUser;
+      if (user != null) {
+        return Column(
+          children: [
+            buildAnimatedUserCard(
+              animationController,
+              user.displayName ?? S.current.user,
+              user.email ?? '',
+              user.photoUrl,
+              1,
+            ),
+          ],
+        );
+      } else {
+        return Column(
+          children: [
+            AnimatedSettingTile(
+              animationController: animationController,
+              index: 1,
+              icon: Icons.login_rounded,
+              title: S.current.loginToAccount,
+              subtitle: S.current.loginToEnableSync,
+              onTap: () => navigateToLogin(),
+            ),
+          ],
+        );
+      }
+    });
+  }
+}
+
 Widget buildAccountSection(AnimationController animationController) {
-  final authController = Get.put(AuthController());
-  return Builder(
-    builder: (context) {
-      return Obx(() {
-        final user = authController.currentUser;
-        if (user != null) {
-          return Column(
-            children: [
-              buildAnimatedUserCard(
-                animationController,
-                user.displayName ?? S.current.user,
-                user.email ?? '',
-                user.photoUrl,
-                1,
-              ),
-            ],
-          );
-        } else {
-          return Column(
-            children: [
-              AnimatedSettingTile(
-                animationController: animationController,
-                index: 1,
-                icon: Icons.login_rounded,
-                title: S.current.loginToAccount,
-                subtitle: S.current.loginToEnableSync,
-                onTap: () => navigateToLogin(),
-              ),
-            ],
-          );
-        }
-      });
-    },
-  );
+  return AccountSection(animationController: animationController);
 }
 
 Widget buildAnimatedUserCard(
@@ -61,6 +71,8 @@ Widget buildAnimatedUserCard(
 
   return Builder(
     builder: (context) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+
       return FadeTransition(
         opacity: animation,
         child: SlideTransition(
@@ -80,14 +92,8 @@ Widget buildAnimatedUserCard(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              borderRadius: AppRadius.cardRadius,
+              boxShadow: AppShadows.softCard(isDark: isDark),
             ),
             child: Row(
               children: [
@@ -100,12 +106,7 @@ Widget buildAnimatedUserCard(
                       ).colorScheme.surface.withValues(alpha: 0.5),
                       width: 3,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 8,
-                      ),
-                    ],
+                    boxShadow: AppShadows.dotIndicator(isDark: isDark),
                   ),
                   child: CircleAvatar(
                     radius: 36,
@@ -115,9 +116,7 @@ Widget buildAnimatedUserCard(
                         : null,
                     onBackgroundImageError: photoUrl != null
                         ? (exception, stackTrace) {
-                            // debugPrint(
-                            // 'Error loading profile image: $exception',
-                            // );
+                            // debugPrint('Error loading profile image: $exception');
                           }
                         : null,
                     child: photoUrl == null
@@ -153,13 +152,12 @@ Widget buildAnimatedUserCard(
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.onPrimaryContainer.withValues(
-                                alpha: 0.1,
-                              ),
-                          borderRadius: BorderRadius.circular(12),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer.withValues(
+                            alpha: 0.1,
+                          ),
+                          borderRadius: AppRadius.mdRadius,
                         ),
                         child: Text(
                           email,
