@@ -43,6 +43,7 @@ class NeumorphicCardHeader extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (icon != null) 
               Container(
                 width: 36,
                 height: 36,
@@ -55,7 +56,7 @@ class NeumorphicCardHeader extends StatelessWidget {
                   ),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withValues(alpha: 0.08)
+                        ? const Color.fromARGB(255, 20, 20, 20).withValues(alpha: 0.08)
                         : Colors.white.withValues(alpha: 0.90),
                     width: 1.0,
                   ),

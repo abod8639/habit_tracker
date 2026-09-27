@@ -74,8 +74,8 @@ class TrendChartCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             NeumorphicCardHeader(
-              icon: Icons.trending_up_rounded,
-              title: S.current.weekly,
+              // icon: Icons.trending_up_rounded,
+              // title: S.current.weekly,
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
