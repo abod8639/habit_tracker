@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
-import 'package:habit_tracker/features/theme/data/datasources/theme_utils.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/theme_utils.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class MyTextTaile extends StatefulWidget {
@@ -105,7 +107,7 @@ class _MyTextTaileState extends State<MyTextTaile>
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: themeColors.errorContainer.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.mdRadius,
           border: Border.all(
             color: themeColors.error.withValues(alpha: 0.2),
             width: 1,
@@ -155,7 +157,7 @@ class _MyTextTaileState extends State<MyTextTaile>
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppRadius.badgeRadius,
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               onTap: _handleTap,
@@ -178,7 +180,7 @@ class _MyTextTaileState extends State<MyTextTaile>
       motion: const ScrollMotion(),
       children: [
         SlidableAction(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.badgeRadius,
           backgroundColor: color,
           foregroundColor: foregroundColor,
           onPressed: onPressed,
@@ -220,61 +222,28 @@ class _MyTextTaileState extends State<MyTextTaile>
     // Soft UI Shadows
     List<BoxShadow> shadows;
     if (widget.isSelected) {
-      shadows = [
-        BoxShadow(
-          color: themeColors.primary.withValues(alpha: isDark ? 0.35 : 0.25),
-          offset: const Offset(0, 4),
-          blurRadius: 14,
-          spreadRadius: 1,
-        ),
-      ];
+      shadows = AppShadows.bloom(
+        color: themeColors.primary,
+        isDark: isDark,
+        blur: 14,
+        spread: 1,
+        offset: const Offset(0, 4),
+      );
     } else if (widget.habitCompleted) {
-      // Completed state: recessed/soft indented feel
+      // Completed state: recessed/soft indented feel with radiant accent glow
       shadows = [
-        // Subtle top-left light
-        BoxShadow(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.02)
-              : Colors.white.withValues(alpha: 0.6),
-          offset: const Offset(-2, -2),
-          blurRadius: 4,
-        ),
-        // Subtle bottom-right shadow
-        BoxShadow(
-          color: isDark
-              ? Colors.black.withValues(alpha: 0.35)
-              : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
-          offset: const Offset(2, 2),
-          blurRadius: 5,
-        ),
-        // Soft colored accent glow
-        BoxShadow(
-          color: baseColor.withValues(alpha: isDark ? 0.18 : 0.12),
+        ...AppShadows.wellDual(isDark: isDark),
+        ...AppShadows.bloom(
+          color: baseColor,
+          isDark: isDark,
+          blur: 8,
+          spread: -1,
           offset: const Offset(0, 2),
-          blurRadius: 8,
-          spreadRadius: -1,
         ),
       ];
     } else {
       // Uncompleted state: elevated/extruded Soft UI feel
-      shadows = [
-        // Top-left ambient highlight
-        BoxShadow(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.055)
-              : Colors.white.withValues(alpha: 0.90),
-          offset: const Offset(-4, -4),
-          blurRadius: 8,
-        ),
-        // Bottom-right depth shadow
-        BoxShadow(
-          color: isDark
-              ? Colors.black.withValues(alpha: 0.50)
-              : const Color(0xFFA3B1C6).withValues(alpha: 0.40),
-          offset: const Offset(4, 4),
-          blurRadius: 8,
-        ),
-      ];
+      shadows = AppShadows.subtleCard(isDark: isDark);
     }
 
     // Soft UI subtle gradients
@@ -340,7 +309,7 @@ class _MyTextTaileState extends State<MyTextTaile>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.badgeRadius,
         gradient: gradient,
         boxShadow: shadows,
         border: border,
@@ -405,29 +374,13 @@ class _MyTextTaileState extends State<MyTextTaile>
                   ? Color.alphaBlend(Colors.white.withValues(alpha: 0.04), themeColors.surface)
                   : Color.alphaBlend(Colors.black.withValues(alpha: 0.02), themeColors.surface)),
           boxShadow: isChecked
-              ? [
-                  BoxShadow(
-                    color: baseColor.withValues(alpha: isDark ? 0.40 : 0.30),
-                    offset: const Offset(0, 2),
-                    blurRadius: 6,
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.white.withValues(alpha: 0.9),
-                    offset: const Offset(-1.5, -1.5),
-                    blurRadius: 3,
-                  ),
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.black.withValues(alpha: 0.4)
-                        : const Color(0xFFA3B1C6).withValues(alpha: 0.45),
-                    offset: const Offset(1.5, 1.5),
-                    blurRadius: 3,
-                  ),
-                ],
+              ? AppShadows.bloom(
+                  color: baseColor,
+                  isDark: isDark,
+                  blur: 6,
+                  offset: const Offset(0, 2),
+                )
+              : AppShadows.dotIndicator(isDark: isDark),
           border: Border.all(
             color: isChecked
                 ? Colors.transparent
