@@ -1,59 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/components/animated_setting_tile.dart';
+import 'package:habit_tracker/core/utils/restart_widget.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_lang.dart';
-import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_tile.dart';
-import 'package:habit_tracker/generated/l10n.dart';
-import 'package:habit_tracker/core/utils/restart_widget.dart';
 import 'package:habit_tracker/features/theme/presentation/pages/theme_page.dart';
+import 'package:habit_tracker/generated/l10n.dart';
+
+class AppearanceSection extends StatelessWidget {
+  final AnimationController animationController;
+
+  const AppearanceSection({super.key, required this.animationController});
+
+  @override
+  Widget build(BuildContext context) {
+    final langController = Get.find<LangController>();
+    final s = S.of(context);
+
+    return Column(
+      children: [
+        AnimatedSettingTile(
+          animationController: animationController,
+          index: 5,
+          icon: Icons.palette_rounded,
+          title: s.themepage,
+          subtitle: s.changeAppTheme,
+          onTap: () => Get.to(
+            () => const ThemePage(),
+            transition: Transition.rightToLeftWithFade,
+            duration: const Duration(milliseconds: 400),
+          ),
+        ),
+        Obx(
+          () => buildAnimatedSettingLang(
+            context,
+            icon: Icons.language_rounded,
+            currentValue: langController.language.value,
+            entries: [
+              DropdownMenuEntry(
+                value: "sys",
+                label: "  ${S.of(context).systemLanguage}  ",
+              ),
+              const DropdownMenuEntry(value: "ar", label: "  العربية "),
+              const DropdownMenuEntry(value: "en", label: "  English  "),
+            ],
+            onChanged: (value) async {
+              if (value != null) {
+                await langController.changeLanguage(value);
+                if (context.mounted) {
+                  RestartWidget.restartApp(context);
+                }
+              }
+            },
+            textColor: Theme.of(context).colorScheme.onSurface,
+            animationController: animationController,
+            index: 6,
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 Widget buildAppearanceSection(AnimationController animationController) {
-  final langController = Get.find<LangController>();
-  return Builder(
-    builder: (context) {
-      final s = S.of(context);
-      return Column(
-        children: [
-          AnimatedSettingTile(
-            animationController: animationController,
-            index: 5,
-            icon: Icons.palette_rounded,
-            title: s.themepage,
-            subtitle: s.changeAppTheme,
-            onTap: () => Get.to(
-              () => const ThemePage(),
-              transition: Transition.rightToLeftWithFade,
-              duration: const Duration(milliseconds: 400),
-            ),
-          ),
-          Obx(
-            () => buildAnimatedSettingLang(
-              context,
-              icon: Icons.language_rounded,
-              currentValue: langController.language.value,
-              entries: [
-                DropdownMenuEntry(
-                  value: "sys",
-                  label: "  ${S.of(context).systemLanguage}  ",
-                ),
-                const DropdownMenuEntry(value: "ar", label: "  العربية "),
-                const DropdownMenuEntry(value: "en", label: "  English  "),
-              ],
-              onChanged: (value) async {
-                if (value != null) {
-                  await langController.changeLanguage(value);
-                  if (context.mounted) {
-                    RestartWidget.restartApp(context);
-                  }
-                }
-              },
-              textColor: Theme.of(context).colorScheme.onSurface,
-              animationController: animationController,
-              index: 6,
-            ),
-          ),
-        ],
-      );
-    },
-  );
+  return AppearanceSection(animationController: animationController);
 }
