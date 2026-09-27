@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 
 class SoftCard extends StatelessWidget {
   final Widget child;
@@ -11,7 +13,7 @@ class SoftCard extends StatelessWidget {
     required this.child,
     this.padding,
     this.margin,
-    this.borderRadius = 24.0,
+    this.borderRadius = AppRadius.card,
   });
 
   @override
@@ -20,14 +22,6 @@ class SoftCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final baseColor = theme.cardColor;
-
-    final Color lightShadowColor = isDark
-        ? Colors.white.withValues(alpha: 0.05)
-        : Colors.white.withValues(alpha: 0.9);
-
-    final Color darkShadowColor = isDark
-        ? Colors.black.withValues(alpha: 0.65)
-        : const Color(0xFFA3B1C6).withValues(alpha: 0.35);
 
     final Color surfaceGradientStart = isDark
         ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
@@ -57,20 +51,7 @@ class SoftCard extends StatelessWidget {
           color: borderColor,
           width: 1.2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: lightShadowColor,
-            offset: const Offset(-5, -5),
-            blurRadius: 12,
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: darkShadowColor,
-            offset: const Offset(6, 6),
-            blurRadius: 14,
-            spreadRadius: 1,
-          ),
-        ],
+        boxShadow: AppShadows.softCard(isDark: isDark),
       ),
       child: Padding(
         padding: padding ?? const EdgeInsets.all(18.0),
