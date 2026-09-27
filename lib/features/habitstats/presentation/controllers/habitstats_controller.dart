@@ -32,35 +32,86 @@ class HabitStatsController extends GetxController {
   final RxBool showAllHabits = true.obs;
   final RxList<String> habitNames = <String>[].obs;
   final RxBool isLoading = false.obs;
+  bool _isRefreshing = false;
 
   @override
   void onInit() {
     super.onInit();
+    _loadInitialQuickData();
     refreshStats();
   }
 
-  Future<void> refreshStats() async {
+  Future<void> _loadInitialQuickData() async {
     try {
-      isLoading.value = true;
-      stats.value = await getOverallStatsUseCase();
-      overallTrend.assignAll(await getOverallTrendUseCase(daysPeriod.value));
+      final summary = await getTodayHabitsSummaryUseCase();
+      if (summary.isNotEmpty) {
+        if (todaySummary.isEmpty) {
+          todaySummary.assignAll(summary);
+        }
+        if (stats.value == null) {
+          final total = summary.length;
+          final completed =
+              summary.where((h) => h['completed'] == true).length;
+          final rate = total > 0 ? (completed / total) * 100 : 0.0;
+          stats.value = HabitStatsEntity(
+            totalHabits: total,
+            completedHabits: completed,
+            completionRate: rate,
+            streak: 0,
+          );
+        }
+      }
+    } catch (_) {}
+  }
 
-      final trends = await getIndividualHabitTrendsUseCase(daysPeriod.value);
+  Future<void> refreshStats() async {
+    if (_isRefreshing) return;
+    _isRefreshing = true;
+
+    try {
+      if (stats.value == null) {
+        isLoading.value = true;
+      }
+
+      final results = await Future.wait([
+        getOverallStatsUseCase(),
+        getOverallTrendUseCase(daysPeriod.value),
+        getIndividualHabitTrendsUseCase(daysPeriod.value),
+        getTodayHabitsSummaryUseCase(),
+      ]);
+
+      stats.value = results[0] as HabitStatsEntity;
+      overallTrend.assignAll(results[1] as List<FlSpot>);
+
+      final trends = results[2] as Map<String, List<FlSpot>>?;
       if (trends != null) {
         individualTrends.assignAll(trends);
         habitNames.assignAll(trends.keys.toList());
       }
 
-      todaySummary.assignAll(await getTodayHabitsSummaryUseCase());
+      todaySummary.assignAll(results[3] as List<Map<String, dynamic>>);
     } finally {
       isLoading.value = false;
+      _isRefreshing = false;
     }
   }
 
-  void togglePeriod() {
+  void togglePeriod() async {
     isWeeklyView.value = !isWeeklyView.value;
     daysPeriod.value = isWeeklyView.value ? 7 : 30;
-    refreshStats();
+
+    try {
+      final results = await Future.wait([
+        getOverallTrendUseCase(daysPeriod.value),
+        getIndividualHabitTrendsUseCase(daysPeriod.value),
+      ]);
+      overallTrend.assignAll(results[0] as List<FlSpot>);
+      final trends = results[1] as Map<String, List<FlSpot>>?;
+      if (trends != null) {
+        individualTrends.assignAll(trends);
+        habitNames.assignAll(trends.keys.toList());
+      }
+    } catch (_) {}
   }
 
   void toggleShowAllHabits() {
