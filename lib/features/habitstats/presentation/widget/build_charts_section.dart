@@ -26,8 +26,8 @@ class ChartsSection extends StatelessWidget {
     return const Column(
       children: [
         TodayBarChartCard(),
-        SizedBox(height: 16),
-        CompletionPieChartCard(),
+        // SizedBox(height: 16),
+        // CompletionPieChartCard(),
       ],
     );
   }
