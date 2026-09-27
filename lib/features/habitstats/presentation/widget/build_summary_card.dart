@@ -32,11 +32,11 @@ class SummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            NeumorphicCardHeader(
-              icon: Icons.insights_rounded,
-              title: S.current.summary,
-              trailing: StreakBadge(streak: stats.streak),
-            ),
+            // NeumorphicCardHeader(
+            //   icon: Icons.insights_rounded,
+            //   title: S.current.summary,
+            //   trailing: StreakBadge(streak: stats.streak),
+            // ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
