@@ -58,6 +58,9 @@ class _PhoneState extends State<Phone> {
               MyAppBar(),
               SliverMonthlySummary(),
               HabitList(),
+              SliverToBoxAdapter(
+                child: SizedBox(height: 85),
+              ),
             ],
           );
         }),
@@ -75,59 +78,206 @@ class MyAppBar extends StatelessWidget {
 
     return Obx(() {
       if (controller.isSelectionMode) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+        final baseColor = theme.cardColor;
+        final colorScheme = theme.colorScheme;
+
+        final Color surfaceGradientStart = isDark
+            ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
+            : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+
+        final Color surfaceGradientEnd = isDark
+            ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
+            : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ??
+                baseColor);
+
+        final Color lightShadow = isDark
+            ? Colors.white.withValues(alpha: 0.04)
+            : Colors.white.withValues(alpha: 0.90);
+
+        final Color darkShadow = isDark
+            ? Colors.black.withValues(alpha: 0.55)
+            : const Color(0xFFA3B1C6).withValues(alpha: 0.32);
+
         return SliverAppBar(
           pinned: true,
-          backgroundColor: Theme.of(context).primaryColor,
-          leading: IconButton(
-            icon: const Icon(Icons.close_rounded, color: Colors.white),
-            onPressed: () => controller.clearSelection(),
+          automaticallyImplyLeading: false,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          toolbarHeight: 68,
+          titleSpacing: 0,
+          leadingWidth: 68,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [surfaceGradientStart, surfaceGradientEnd],
+              ),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(22),
+              ),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : Colors.white.withValues(alpha: 0.85),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: darkShadow,
+                  offset: const Offset(0, 4),
+                  blurRadius: 10,
+                ),
+                BoxShadow(
+                  color: lightShadow,
+                  offset: const Offset(0, -2),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
           ),
-          title: Text(
-            S.current.itemsSelected(controller.selectedHabitIds.length),
-            style: const TextStyle(color: Colors.white),
+          leading: Padding(
+            padding: const EdgeInsetsDirectional.only(
+              start: 16,
+              top: 13,
+              bottom: 13,
+            ),
+            child: _NeumorphicAppBarIconButton(
+              icon: Icons.close_rounded,
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+              onPressed: () => controller.clearSelection(),
+            ),
+          ),
+          title: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: Color.alphaBlend(
+                colorScheme.primary.withValues(alpha: isDark ? 0.16 : 0.10),
+                baseColor,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: colorScheme.primary.withValues(
+                  alpha: isDark ? 0.30 : 0.20,
+                ),
+                width: 1.0,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.check_circle_outline_rounded,
+                  size: 16,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  S.current.itemsSelected(controller.selectedHabitIds.length),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.primary,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.color_lens, color: Colors.white),
-              onPressed: () => _showColorPicker(context, controller),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              child: _NeumorphicAppBarIconButton(
+                icon: Icons.palette_outlined,
+                accentColor: colorScheme.primary,
+                tooltip: S.of(context).chooseColor,
+                onPressed: () => _showColorPicker(context, controller),
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.white),
-              onPressed: () => _showBatchDeleteConfirm(context, controller),
+            const SizedBox(width: 8),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(
+                end: 16,
+                top: 13,
+                bottom: 13,
+              ),
+              child: _NeumorphicAppBarIconButton(
+                icon: Icons.delete_outline_rounded,
+                accentColor: colorScheme.error,
+                tooltip: S.of(context).delete,
+                onPressed: () => _showBatchDeleteConfirm(context, controller),
+              ),
             ),
           ],
         );
       }
 
       return SliverAppBar(
-        pinned: true,
-        automaticallyImplyLeading: true,
+        pinned: false,
+        floating: true,
+        automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
-        foregroundColor: Colors.transparent,
-        floating: true,
         backgroundColor: Colors.transparent,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: Icon(
-                color: Theme.of(context).colorScheme.onSurface,
-                Icons.menu,
+        elevation: 0,
+        toolbarHeight: 64,
+        titleSpacing: 16,
+        leadingWidth: 68,
+        centerTitle: true,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'HABIT MATRIX',
+              style: TextStyle(
+                fontSize: 11,
+                letterSpacing: 2.2,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.primary,
               ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'Daily Persistence',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+        leading: Padding(
+          padding: const EdgeInsetsDirectional.only(
+            start: 16,
+            top: 11,
+            bottom: 11,
+          ),
+          child: Builder(
+            builder: (context) => _NeumorphicAppBarIconButton(
+              icon: Icons.menu_rounded,
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.auto_awesome,
-              color: Theme.of(context).primaryColor,
+          Padding(
+            padding: const EdgeInsetsDirectional.only(
+              end: 16,
+              top: 11,
+              bottom: 11,
             ),
-            tooltip: S.current.generatePlan,
-            onPressed: () => Get.toNamed(AppRoutes.categorySelection),
+            child: _NeumorphicAppBarIconButton(
+              icon: Icons.auto_awesome_rounded,
+              accentColor: Theme.of(context).primaryColor,
+              tooltip: S.current.generatePlan,
+              onPressed: () => Get.toNamed(AppRoutes.categorySelection),
+            ),
           ),
         ],
       );
@@ -135,120 +285,10 @@ class MyAppBar extends StatelessWidget {
   }
 
   void _showColorPicker(BuildContext context, HabitController controller) {
-    final colors = [
-      Colors.red[400]!,
-      Colors.pink[400]!,
-      Colors.purple[400]!,
-      Colors.deepPurple[400]!,
-      Colors.indigo[400]!,
-      Colors.blue[400]!,
-      Colors.lightBlue[400]!,
-      Colors.cyan[400]!,
-      Colors.teal[400]!,
-      Colors.green[400]!,
-      Colors.lightGreen[500]!,
-      Colors.lime[600]!,
-      Colors.yellow[700]!,
-      Colors.amber[500]!,
-      Colors.orange[600]!,
-      Colors.deepOrange[500]!,
-      Colors.brown[400]!,
-      Colors.blueGrey[400]!,
-      const Color(0xFF6C63FF),
-      const Color(0xFF2D2D2D),
-    ];
-
-    Get.dialog(
-      Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? const Color(0xFF1E1E2E)
-                : Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.35),
-                blurRadius: 40,
-                spreadRadius: -4,
-                offset: const Offset(0, 16),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 80,
-                spreadRadius: -10,
-                offset: const Offset(0, 30),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).primaryColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.palette_outlined,
-                      color: Theme.of(context).primaryColor,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    S.of(context).chooseColor,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              GridView.count(
-                shrinkWrap: true,
-                crossAxisCount: 5,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                children: colors.map((color) {
-                  return GestureDetector(
-                    onTap: () {
-                      controller.updateSelectedHabitsColor(color);
-                      Get.back();
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                            blurStyle: BlurStyle.inner,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
+    showDialog(
+      context: context,
+      builder: (dialogContext) => _NeumorphicColorPickerDialog(
+        controller: controller,
       ),
     );
   }
@@ -259,128 +299,683 @@ class MyAppBar extends StatelessWidget {
   ) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.brightness == Brightness.dark
-                ? const Color(0xFF1E1E2E)
-                : Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.red.withValues(alpha: 0.2),
-                blurRadius: 40,
-                spreadRadius: -4,
-                offset: const Offset(0, 12),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 60,
-                spreadRadius: -8,
-                offset: const Offset(0, 20),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.delete_outline_rounded,
-                  color: Colors.red,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                S.of(context).deleteSelected,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 8),
+      builder: (dialogContext) => _NeumorphicDeleteConfirmDialog(
+        controller: controller,
+      ),
+    );
+  }
+}
 
-              Text(
-                S
-                    .of(context)
-                    .deleteSelectedConfirm(controller.selectedHabitIds.length),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                  height: 1.5,
+/// Tactile circular Neumorphic button for AppBars
+class _NeumorphicAppBarIconButton extends StatefulWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+  final String? tooltip;
+  final Color? accentColor;
+
+  const _NeumorphicAppBarIconButton({
+    required this.icon,
+    required this.onPressed,
+    this.tooltip,
+    this.accentColor,
+  });
+
+  @override
+  State<_NeumorphicAppBarIconButton> createState() =>
+      _NeumorphicAppBarIconButtonState();
+}
+
+class _NeumorphicAppBarIconButtonState
+    extends State<_NeumorphicAppBarIconButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.cardColor;
+    final colorScheme = theme.colorScheme;
+
+    final Color surfaceStart = isDark
+        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
+        : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+
+    final Color surfaceEnd = isDark
+        ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
+        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+
+    final Color lightShadow = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.white.withValues(alpha: 0.90);
+
+    final Color darkShadow = isDark
+        ? Colors.black.withValues(alpha: 0.50)
+        : const Color(0xFFA3B1C6).withValues(alpha: 0.35);
+
+    const double size = 42.0;
+    final Color effectiveIconColor =
+        widget.accentColor ?? colorScheme.onSurface;
+
+    Widget button = GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onPressed();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: _isPressed
+              ? null
+              : LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [surfaceStart, surfaceEnd],
                 ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.2),
+          color: _isPressed
+              ? (isDark
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : const Color(0xFFD3DCE8))
+              : null,
+          border: Border.all(
+            color: widget.accentColor != null
+                ? widget.accentColor!.withValues(alpha: isDark ? 0.35 : 0.25)
+                : (isDark
+                    ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.07)
+                    : Colors.white.withValues(alpha: _isPressed ? 0.4 : 0.85)),
+            width: 1.0,
+          ),
+          boxShadow: _isPressed
+              ? [
+                  BoxShadow(
+                    color: isDark
+                        ? Colors.black.withValues(alpha: 0.4)
+                        : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
+                    offset: const Offset(1, 1),
+                    blurRadius: 2,
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: lightShadow,
+                    offset: const Offset(-2.5, -2.5),
+                    blurRadius: 5,
+                  ),
+                  BoxShadow(
+                    color: darkShadow,
+                    offset: const Offset(2.5, 2.5),
+                    blurRadius: 5,
+                  ),
+                  if (widget.accentColor != null)
+                    BoxShadow(
+                      color: widget.accentColor!.withValues(
+                        alpha: isDark ? 0.25 : 0.15,
+                      ),
+                      offset: const Offset(0, 2),
+                      blurRadius: 6,
+                    ),
+                ],
+        ),
+        child: Center(
+          child: Icon(
+            widget.icon,
+            size: size * 0.50,
+            color: effectiveIconColor,
+          ),
+        ),
+      ),
+    );
+
+    if (widget.tooltip != null) {
+      button = Tooltip(
+        message: widget.tooltip!,
+        child: button,
+      );
+    }
+
+    return button;
+  }
+}
+
+/// Neumorphic Color Picker Dialog with 3D color coins
+class _NeumorphicColorPickerDialog extends StatelessWidget {
+  final HabitController controller;
+
+  const _NeumorphicColorPickerDialog({required this.controller});
+
+  static final List<Color> _colors = [
+    Colors.red[400]!,
+    Colors.pink[400]!,
+    Colors.purple[400]!,
+    Colors.deepPurple[400]!,
+    Colors.indigo[400]!,
+    Colors.blue[400]!,
+    Colors.lightBlue[400]!,
+    Colors.cyan[400]!,
+    Colors.teal[400]!,
+    Colors.green[400]!,
+    Colors.lightGreen[500]!,
+    Colors.lime[600]!,
+    Colors.yellow[700]!,
+    Colors.amber[500]!,
+    Colors.orange[600]!,
+    Colors.deepOrange[500]!,
+    Colors.brown[400]!,
+    Colors.blueGrey[400]!,
+    const Color(0xFF6C63FF),
+    const Color(0xFF2D2D2D),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+    final baseColor = theme.cardColor;
+
+    final Color surfaceGradientStart = isDark
+        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
+        : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+
+    final Color surfaceGradientEnd = isDark
+        ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
+        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+
+    final Color lightShadow = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.white.withValues(alpha: 0.90);
+
+    final Color darkShadow = isDark
+        ? Colors.black.withValues(alpha: 0.65)
+        : const Color(0xFFA3B1C6).withValues(alpha: 0.35);
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(26),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [surfaceGradientStart, surfaceGradientEnd],
+          ),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.07)
+                : Colors.white.withValues(alpha: 0.85),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: lightShadow,
+              offset: const Offset(-5, -5),
+              blurRadius: 14,
+            ),
+            BoxShadow(
+              color: darkShadow,
+              offset: const Offset(6, 6),
+              blurRadius: 16,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color.alphaBlend(
+                          colorScheme.primary.withValues(
+                            alpha: isDark ? 0.14 : 0.09,
                           ),
+                          baseColor,
                         ),
-                      ),
-                      child: Text(
-                        S.of(context).cancel,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.white.withValues(alpha: 0.9),
+                          width: 1.0,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: lightShadow,
+                            offset: const Offset(-2, -2),
+                            blurRadius: 4,
+                          ),
+                          BoxShadow(
+                            color: darkShadow,
+                            offset: const Offset(2, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
+                      child: Icon(
+                        Icons.palette_outlined,
+                        color: colorScheme.primary,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      S.of(context).chooseColor,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isDark
+                          ? (Color.lerp(baseColor, Colors.black, 0.2) ??
+                              baseColor)
+                          : (Color.lerp(
+                                  baseColor,
+                                  const Color(0xFFDCE2EC),
+                                  0.3,
+                                ) ??
+                                baseColor),
+                      boxShadow: [
+                        BoxShadow(
+                          color: lightShadow,
+                          offset: const Offset(-1.5, -1.5),
+                          blurRadius: 3,
+                        ),
+                        BoxShadow(
+                          color: darkShadow,
+                          offset: const Offset(1.5, 1.5),
+                          blurRadius: 3,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 16,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        controller.deleteSelectedHabits();
-                        Navigator.pop(context);
-                      },
-                      style:
-                          ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            shadowColor: Colors.red.withValues(alpha: 0.4),
-                          ).copyWith(
-                            elevation: WidgetStateProperty.all(4),
-                          ),
-                      child: Text(
-                        S.of(context).delete,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 5,
+              mainAxisSpacing: 14,
+              crossAxisSpacing: 14,
+              children: _colors.map((color) {
+                return _ColorCoin(
+                  color: color,
+                  onTap: () {
+                    controller.updateSelectedHabitsColor(color);
+                    Navigator.pop(context);
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Tactile Neumorphic Color Coin
+class _ColorCoin extends StatelessWidget {
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ColorCoin({required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withValues(alpha: isDark ? 0.35 : 0.65),
+            width: 1.5,
+          ),
+          boxShadow: [
+            // Soft radiant glow of the color itself
+            BoxShadow(
+              color: color.withValues(alpha: isDark ? 0.5 : 0.35),
+              offset: const Offset(0, 3),
+              blurRadius: 6,
+            ),
+            // Top-left ambient reflection
+            BoxShadow(
+              color: Colors.white.withValues(alpha: 0.6),
+              offset: const Offset(-1.5, -1.5),
+              blurRadius: 3,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Neumorphic Batch Delete Confirmation Dialog
+class _NeumorphicDeleteConfirmDialog extends StatelessWidget {
+  final HabitController controller;
+
+  const _NeumorphicDeleteConfirmDialog({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+    final baseColor = theme.cardColor;
+
+    final Color surfaceGradientStart = isDark
+        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
+        : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+
+    final Color surfaceGradientEnd = isDark
+        ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
+        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+
+    final Color lightShadow = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.white.withValues(alpha: 0.90);
+
+    final Color darkShadow = isDark
+        ? Colors.black.withValues(alpha: 0.65)
+        : const Color(0xFFA3B1C6).withValues(alpha: 0.35);
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(26),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [surfaceGradientStart, surfaceGradientEnd],
+          ),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.07)
+                : Colors.white.withValues(alpha: 0.85),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: lightShadow,
+              offset: const Offset(-5, -5),
+              blurRadius: 14,
+            ),
+            BoxShadow(
+              color: darkShadow,
+              offset: const Offset(6, 6),
+              blurRadius: 16,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Warning Icon Badge with Neumorphic dual shadows & subtle red glow
+            Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color.alphaBlend(
+                  colorScheme.error.withValues(alpha: isDark ? 0.16 : 0.10),
+                  baseColor,
+                ),
+                border: Border.all(
+                  color: colorScheme.error.withValues(
+                    alpha: isDark ? 0.35 : 0.25,
+                  ),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.error.withValues(
+                      alpha: isDark ? 0.35 : 0.20,
                     ),
+                    offset: const Offset(0, 4),
+                    blurRadius: 10,
+                  ),
+                  BoxShadow(
+                    color: lightShadow,
+                    offset: const Offset(-2, -2),
+                    blurRadius: 4,
                   ),
                 ],
               ),
-            ],
+              child: Icon(
+                Icons.delete_outline_rounded,
+                color: colorScheme.error,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              S.of(context).deleteSelected,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+                letterSpacing: 0.2,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              S
+                  .of(context)
+                  .deleteSelectedConfirm(controller.selectedHabitIds.length),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w500,
+                color: colorScheme.onSurface.withValues(alpha: 0.65),
+                height: 1.45,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: _NeumorphicDialogButton(
+                    label: S.of(context).cancel,
+                    isDestructive: false,
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _NeumorphicDialogButton(
+                    label: S.of(context).delete,
+                    isDestructive: true,
+                    onPressed: () {
+                      controller.deleteSelectedHabits();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Tactile button for dialog actions
+class _NeumorphicDialogButton extends StatefulWidget {
+  final String label;
+  final bool isDestructive;
+  final VoidCallback onPressed;
+
+  const _NeumorphicDialogButton({
+    required this.label,
+    required this.isDestructive,
+    required this.onPressed,
+  });
+
+  @override
+  State<_NeumorphicDialogButton> createState() =>
+      _NeumorphicDialogButtonState();
+}
+
+class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+    final baseColor = theme.cardColor;
+
+    final Color lightShadow = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.white.withValues(alpha: 0.85);
+
+    final Color darkShadow = isDark
+        ? Colors.black.withValues(alpha: 0.45)
+        : const Color(0xFFA3B1C6).withValues(alpha: 0.32);
+
+    final Color destructiveColor = colorScheme.error;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onPressed();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: widget.isDestructive
+              ? LinearGradient(
+                  colors: [
+                    destructiveColor,
+                    Color.lerp(
+                          destructiveColor,
+                          Colors.black,
+                          isDark ? 0.25 : 0.12,
+                        ) ??
+                        destructiveColor,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: widget.isDestructive
+              ? null
+              : (_isPressed
+                  ? (isDark
+                      ? Colors.black.withValues(alpha: 0.25)
+                      : const Color(0xFFD3DCE8))
+                  : (Color.lerp(
+                          baseColor,
+                          isDark ? Colors.black : const Color(0xFFDCE2EC),
+                          isDark ? 0.15 : 0.25,
+                        ) ??
+                        baseColor)),
+          border: Border.all(
+            color: widget.isDestructive
+                ? Colors.white.withValues(alpha: isDark ? 0.15 : 0.35)
+                : (isDark
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : Colors.white.withValues(alpha: 0.8)),
+            width: 1.0,
+          ),
+          boxShadow: widget.isDestructive
+              ? [
+                  BoxShadow(
+                    color: destructiveColor.withValues(
+                      alpha: isDark ? 0.45 : 0.32,
+                    ),
+                    offset: Offset(0, _isPressed ? 1 : 4),
+                    blurRadius: _isPressed ? 4 : 10,
+                  ),
+                  BoxShadow(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.white.withValues(alpha: 0.6),
+                    offset: const Offset(-1.5, -1.5),
+                    blurRadius: 3,
+                  ),
+                ]
+              : (_isPressed
+                  ? [
+                      BoxShadow(
+                        color: darkShadow,
+                        offset: const Offset(1, 1),
+                        blurRadius: 2,
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: lightShadow,
+                        offset: const Offset(-2, -2),
+                        blurRadius: 4,
+                      ),
+                      BoxShadow(
+                        color: darkShadow,
+                        offset: const Offset(2.5, 2.5),
+                        blurRadius: 4,
+                      ),
+                    ]),
+        ),
+        child: Center(
+          child: Text(
+            widget.label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: widget.isDestructive
+                  ? Colors.white
+                  : colorScheme.onSurface,
+            ),
           ),
         ),
       ),
     );
   }
 }
+
+
