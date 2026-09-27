@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/components/animated_setting_tile.dart';
 import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_tile.dart';
 import 'package:habit_tracker/core/functions/show_logout_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
