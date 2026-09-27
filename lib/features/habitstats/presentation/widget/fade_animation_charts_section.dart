@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:habit_tracker/features/habitstats/presentation/widget/build_charts_section.dart';
 
 class FadeAnimationChartsSection extends StatelessWidget {
+  final AnimationController _animationController;
+
   const FadeAnimationChartsSection({
     super.key,
     required AnimationController animationController,
   }) : _animationController = animationController;
-
-  final AnimationController _animationController;
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +19,16 @@ class FadeAnimationChartsSection extends StatelessWidget {
         ),
       ),
       child: SlideTransition(
-        position:
-            Tween<Offset>(
-              begin: const Offset(0, 0.2),
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(
-                parent: _animationController,
-                curve: const Interval(0.2, 0.7, curve: Curves.easeOut),
-              ),
-            ),
-        child: buildChartsSection(context),
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.2),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.2, 0.7, curve: Curves.easeOut),
+          ),
+        ),
+        child: const ChartsSection(),
       ),
     );
   }
