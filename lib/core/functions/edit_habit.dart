@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/features/home/presentation/widget/myalart_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import 'package:habit_tracker/core/components/myalart_dialog.dart';
 
 void editHabit(String id, String currentName, BuildContext context) {
   HabitController c = Get.find<HabitController>();
