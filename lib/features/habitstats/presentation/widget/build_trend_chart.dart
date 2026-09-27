@@ -45,6 +45,20 @@ class TrendChartCard extends StatelessWidget {
 
       final colorScheme = Theme.of(context).colorScheme;
 
+      if (isEmpty && controller.isLoading.value) {
+        return SoftCard(
+          child: SizedBox(
+            height: 240,
+            child: Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: colorScheme.primary,
+              ),
+            ),
+          ),
+        );
+      }
+
       if (isEmpty && !controller.isLoading.value) {
         return SoftCard(
           child: NeumorphicEmptyState(
@@ -59,38 +73,38 @@ class TrendChartCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            NeumorphicCardHeader(
-              icon: Icons.trending_up_rounded,
-              title: S.current.weekly,
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  NeumorphicPillToggle(
-                    options: [S.current.weekly, S.current.monthly],
-                    selectedIndex: controller.isWeeklyView.value ? 0 : 1,
-                    onSelect: (index) {
-                      if ((index == 0 && !controller.isWeeklyView.value) ||
-                          (index == 1 && controller.isWeeklyView.value)) {
-                        controller.togglePeriod();
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  NeumorphicIconButton(
-                    size: 36,
-                    icon: controller.showAllHabits.value
-                        ? Icons.stacked_line_chart_rounded
-                        : Icons.view_list_rounded,
-                    accentColor: colorScheme.primary,
-                    tooltip: controller.showAllHabits.value
-                        ? 'Show individual habits'
-                        : 'Show overall trend',
-                    onPressed: () => controller.toggleShowAllHabits(),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
+            // NeumorphicCardHeader(
+            //   icon: Icons.trending_up_rounded,
+            //   title: S.current.weekly,
+            //   trailing: Row(
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       NeumorphicPillToggle(
+            //         options: [S.current.weekly, S.current.monthly],
+            //         selectedIndex: controller.isWeeklyView.value ? 0 : 1,
+            //         onSelect: (index) {
+            //           if ((index == 0 && !controller.isWeeklyView.value) ||
+            //               (index == 1 && controller.isWeeklyView.value)) {
+            //             controller.togglePeriod();
+            //           }
+            //         },
+            //       ),
+            //       const SizedBox(width: 8),
+            //       NeumorphicIconButton(
+            //         size: 36,
+            //         icon: controller.showAllHabits.value
+            //             ? Icons.stacked_line_chart_rounded
+            //             : Icons.view_list_rounded,
+            //         accentColor: colorScheme.primary,
+            //         tooltip: controller.showAllHabits.value
+            //             ? 'Show individual habits'
+            //             : 'Show overall trend',
+            //         onPressed: () => controller.toggleShowAllHabits(),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // const SizedBox(height: 8),
             const LineChartBox(),
             if (!controller.showAllHabits.value) ...[
               const SizedBox(height: 16),
