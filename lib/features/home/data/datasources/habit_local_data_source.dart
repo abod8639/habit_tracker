@@ -393,13 +393,21 @@ class HabitLocalDataSource {
       historyMap[habit.name] = {};
     }
 
+    // Pre-cache open monthly boxes (at most 2 boxes for 30 days)
+    final Map<String, Box> openBoxes = {};
+
     // Iterate backwards N days
     for (int i = 0; i < days; i++) {
       final date = DateTime(now.year, now.month, now.day - i);
       final dateStr = convertDateTimeToString(date);
       final normalizedDate = DateTime(date.year, date.month, date.day);
+      final monthStr = dateStr.substring(0, 6);
 
-      final historyBox = await _openMonthlyBox(dateStr);
+      Box? historyBox = openBoxes[monthStr];
+      if (historyBox == null) {
+        historyBox = await _openMonthlyBox(dateStr);
+        openBoxes[monthStr] = historyBox;
+      }
 
       for (var habit in habits) {
         final idKey = "${habit.id}_$dateStr";
