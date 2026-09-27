@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/core/components/neumorphic_card_header.dart';
 import 'package:habit_tracker/core/components/neumorphic_empty_state.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/habitstats_controller.dart';
@@ -44,39 +42,39 @@ class HabitListCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            NeumorphicCardHeader(
-              icon: Icons.task_alt_rounded,
-              title: S.current.success,
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: StatsNeumorphicTheme.badgeDecoration(
-                  context,
-                  borderRadius: AppRadius.lg,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.checklist_rtl_rounded,
-                      size: 14,
-                      color: colorScheme.primary,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      '${completedHabits.length}/${chartData.length}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // NeumorphicCardHeader(
+            //   icon: Icons.task_alt_rounded,
+            //   title: S.current.success,
+            //   trailing: Container(
+            //     padding: const EdgeInsets.symmetric(
+            //       horizontal: 10,
+            //       vertical: 5,
+            //     ),
+            //     decoration: StatsNeumorphicTheme.badgeDecoration(
+            //       context,
+            //       borderRadius: AppRadius.lg,
+            //     ),
+            //     child: Row(
+            //       mainAxisSize: MainAxisSize.min,
+            //       children: [
+            //         Icon(
+            //           Icons.checklist_rtl_rounded,
+            //           size: 14,
+            //           color: colorScheme.primary,
+            //         ),
+            //         const SizedBox(width: 5),
+            //         Text(
+            //           '${completedHabits.length}/${chartData.length}',
+            //           style: TextStyle(
+            //             fontSize: 12,
+            //             fontWeight: FontWeight.bold,
+            //             color: colorScheme.onSurface,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
 
             if (completedHabits.isNotEmpty) ...[
               Padding(
