@@ -8,13 +8,14 @@ import 'package:habit_tracker/features/habitstats/presentation/controllers/habit
 import 'package:habit_tracker/features/setting/presentation/pages/settings_page.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/setting_binding.dart';
 import 'package:habit_tracker/features/theme/presentation/pages/theme_page.dart';
-import 'package:habit_tracker/features/home/presentation/widget/my_list_tile.dart';
+import 'my_drawer_list_tile.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/presentation/widget/image_scanner_bottom_sheet.dart';
 import 'package:habit_tracker/features/home/presentation/widget/habit_confirmation_dialog.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
+
   bool isPhone(BuildContext context) {
     final double mwidth = MediaQuery.of(context).size.width;
     return mwidth < 600.0;
