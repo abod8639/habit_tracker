@@ -130,6 +130,10 @@ class ThemeController extends GetxController {
     );
   }
 
+  // Caching compiled ThemeData to avoid expensive recalculation on every theme switch
+  final Map<String, ThemeData> _lightThemeCache = {};
+  final Map<String, ThemeData> _darkThemeCache = {};
+
   Future<void> _saveCurrentSettings() async {
     final entity = ThemeEntity(
       themeName: currentTheme.value,
@@ -145,7 +149,6 @@ class ThemeController extends GetxController {
       (failure) =>
           debugPrint('Error saving theme settings locally: ${failure.message}'),
       (_) {
-        update();
         if (_firestoreService.isUserLoggedIn) {
           _uploadToCloud(entity);
         }
@@ -163,18 +166,24 @@ class ThemeController extends GetxController {
   }
 
   void changeThemeMode(ThemeMode mode) {
+    if (themeMode.value == mode) return;
     themeMode.value = mode;
     _buildAndApply();
-    _saveCurrentSettings();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _saveCurrentSettings();
+    });
   }
 
   void changeCustomTheme(String themeName) {
+    if (currentTheme.value == themeName) return;
     if (themeColors.containsKey(themeName)) {
       currentTheme.value = themeName;
       final isDark = ThemeUtils.isDarkTheme(themeColors[themeName]!);
       themeMode.value = isDark ? ThemeMode.dark : ThemeMode.light;
       _buildAndApply();
-      _saveCurrentSettings();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _saveCurrentSettings();
+      });
     } else {
       Get.snackbar(S.current.error, S.current.themeNotFound);
     }
@@ -183,14 +192,22 @@ class ThemeController extends GetxController {
   void changeBackgroundColor(Color color) {
     customBackgroundColor.value = color;
     useCustomBackground.value = true;
+    _lightThemeCache.clear();
+    _darkThemeCache.clear();
     _buildAndApply();
-    _saveCurrentSettings();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _saveCurrentSettings();
+    });
   }
 
   void resetBackgroundColor() {
     useCustomBackground.value = false;
+    _lightThemeCache.clear();
+    _darkThemeCache.clear();
     _buildAndApply();
-    _saveCurrentSettings();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _saveCurrentSettings();
+    });
   }
 
   void _buildAndApply() {
@@ -199,11 +216,12 @@ class ThemeController extends GetxController {
   }
 
   void _applyTheme() {
-    Get.changeThemeMode(themeMode.value);
-    Get.changeTheme(
-      themeMode.value == ThemeMode.dark ? darkTheme.value : lightTheme.value,
-    );
-    update();
+    final activeTheme =
+        themeMode.value == ThemeMode.dark ? darkTheme.value : lightTheme.value;
+    Get.rootController.theme = activeTheme;
+    Get.rootController.darkTheme = activeTheme;
+    Get.rootController.themeMode = themeMode.value;
+    Get.rootController.update();
   }
 
   void _buildBothThemes() {
@@ -215,18 +233,26 @@ class ThemeController extends GetxController {
         ? customBackgroundColor.value
         : null;
 
-    lightTheme.value = ThemeUtils.buildThemeData(
-      forceDark: false,
-      colors: themeData,
-      isDarkTheme: isDarkTheme,
-      customBackground: customBg,
+    final cacheKey = '${currentTheme.value}_${customBg?.toARGB32()}';
+
+    lightTheme.value = _lightThemeCache.putIfAbsent(
+      cacheKey,
+      () => ThemeUtils.buildThemeData(
+        forceDark: false,
+        colors: themeData,
+        isDarkTheme: isDarkTheme,
+        customBackground: customBg,
+      ),
     );
 
-    darkTheme.value = ThemeUtils.buildThemeData(
-      forceDark: true,
-      colors: themeData,
-      isDarkTheme: isDarkTheme,
-      customBackground: customBg,
+    darkTheme.value = _darkThemeCache.putIfAbsent(
+      cacheKey,
+      () => ThemeUtils.buildThemeData(
+        forceDark: true,
+        colors: themeData,
+        isDarkTheme: isDarkTheme,
+        customBackground: customBg,
+      ),
     );
   }
 }
