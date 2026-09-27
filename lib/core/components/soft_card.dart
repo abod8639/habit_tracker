@@ -25,15 +25,15 @@ class SoftCard extends StatelessWidget {
 
     final Color surfaceGradientStart = isDark
         ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+        : (Color.lerp(baseColor, Colors.white, 0.25) ?? baseColor);
 
     final Color surfaceGradientEnd = isDark
         ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.09) ?? baseColor);
 
     final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.06)
-        : Colors.white.withValues(alpha: 0.8);
+        : Colors.white.withValues(alpha: 0.85);
 
     return Container(
       margin: margin ?? const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2.0),
