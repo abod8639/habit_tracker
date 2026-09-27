@@ -4,16 +4,16 @@ import 'package:habit_tracker/core/theme/app_shadows.dart';
 /// A reusable tactile Neumorphic header for cards, sections, and dialogs.
 /// Displays an embossed circular icon, clean title, and optional trailing widget.
 class NeumorphicCardHeader extends StatelessWidget {
-  final IconData icon;
-  final String title;
+  final IconData? icon;
+  final String? title;
   final Widget? trailing;
   final Color? iconColor;
   final TextStyle? titleStyle;
 
   const NeumorphicCardHeader({
     super.key,
-    required this.icon,
-    required this.title,
+    this.icon,
+    this.title,
     this.trailing,
     this.iconColor,
     this.titleStyle,
@@ -69,7 +69,7 @@ class NeumorphicCardHeader extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                title,
+                title??"",
                 style: titleStyle ??
                     theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
