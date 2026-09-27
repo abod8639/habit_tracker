@@ -8,6 +8,10 @@ class GetThemeSettingsUseCase {
 
   GetThemeSettingsUseCase(this.repository);
 
+  ThemeEntity getCached() {
+    return repository.getCachedThemeSettings();
+  }
+
   Future<Either<Failure, ThemeEntity>> call() async {
     return await repository.getThemeSettings();
   }
