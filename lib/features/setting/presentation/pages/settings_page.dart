@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/about_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/account_section.dart';
-import 'package:habit_tracker/features/setting/presentation/widget/appearance_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/ai_section.dart';
+import 'package:habit_tracker/features/setting/presentation/widget/appearance_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/data_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/logout_tile.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/notifications_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/sync_section.dart';
-import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -47,7 +47,7 @@ class _SettingsPageState extends State<SettingsPage>
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
             onPressed: () => Get.back(),
           ),
           centerTitle: true,
@@ -57,14 +57,14 @@ class _SettingsPageState extends State<SettingsPage>
         body: ListView(
           padding: const EdgeInsets.only(bottom: 24),
           children: [
-            buildAccountSection(_animationController),
-            buildSyncSection(_animationController),
-            buildAppearanceSection(_animationController),
-            buildNotificationsSection(_animationController),
-            buildAiSection(_animationController),
-            buildAboutSection(_animationController),
-            buildDataSection(_animationController),
-            buildLogoutTile(_animationController),
+            AccountSection(animationController: _animationController),
+            SyncSection(animationController: _animationController),
+            AppearanceSection(animationController: _animationController),
+            NotificationsSection(animationController: _animationController),
+            AiSection(animationController: _animationController),
+            AboutSection(animationController: _animationController),
+            DataSection(animationController: _animationController),
+            LogoutTile(animationController: _animationController),
           ],
         ),
       ),
