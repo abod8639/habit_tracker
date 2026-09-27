@@ -42,34 +42,34 @@ class TodayBarChartCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            StatsCardHeader(
-              icon: Icons.bar_chart_rounded,
-              title: S.current.today,
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: StatsNeumorphicTheme.badgeDecoration(
-                  context,
-                  borderRadius: AppRadius.lg,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _LegendDot(
-                      color: colorScheme.primary,
-                      label: S.current.completed,
-                    ),
-                    const SizedBox(width: 10),
-                    _LegendDot(
-                      color: colorScheme.error.withValues(alpha: 0.8),
-                      label: S.of(context).incomplete,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // StatsCardHeader(
+            //   icon: Icons.bar_chart_rounded,
+            //   title: S.current.today,
+            //   trailing: Container(
+            //     padding: const EdgeInsets.symmetric(
+            //       horizontal: 10,
+            //       vertical: 6,
+            //     ),
+            //     decoration: StatsNeumorphicTheme.badgeDecoration(
+            //       context,
+            //       borderRadius: AppRadius.lg,
+            //     ),
+            //     child: Row(
+            //       mainAxisSize: MainAxisSize.min,
+            //       children: [
+            //         _LegendDot(
+            //           color: colorScheme.primary,
+            //           label: S.current.completed,
+            //         ),
+            //         const SizedBox(width: 10),
+            //         _LegendDot(
+            //           color: colorScheme.error.withValues(alpha: 0.8),
+            //           label: S.of(context).incomplete,
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             SizedBox(
               height: 210,
               child: BarChart(
@@ -243,44 +243,44 @@ Widget buildBarChart() {
   return const TodayBarChartCard();
 }
 
-class _LegendDot extends StatelessWidget {
-  final Color color;
-  final String label;
-  const _LegendDot({required this.color, required this.label});
+// class _LegendDot extends StatelessWidget {
+//   final Color color;
+//   final String label;
+//   const _LegendDot({required this.color, required this.label});
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.4),
-                blurRadius: 3,
-                spreadRadius: 0.5,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisSize: MainAxisSize.min,
+//       children: [
+//         Container(
+//           width: 8,
+//           height: 8,
+//           decoration: BoxDecoration(
+//             color: color,
+//             shape: BoxShape.circle,
+//             boxShadow: [
+//               BoxShadow(
+//                 color: color.withValues(alpha: 0.4),
+//                 blurRadius: 3,
+//                 spreadRadius: 0.5,
+//               ),
+//             ],
+//           ),
+//         ),
+//         const SizedBox(width: 5),
+//         Text(
+//           label,
+//           style: TextStyle(
+//             fontSize: 11,
+//             color: Theme.of(context).colorScheme.onSurfaceVariant,
+//             fontWeight: FontWeight.w600,
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class _StatChip extends StatelessWidget {
   final String label;
