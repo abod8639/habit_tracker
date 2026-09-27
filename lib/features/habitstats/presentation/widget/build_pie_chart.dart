@@ -46,28 +46,28 @@ class CompletionPieChartCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            NeumorphicCardHeader(
-              icon: Icons.donut_large_rounded,
-              title: S.current.completionRate,
-              iconColor: completedColor,
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: StatsNeumorphicTheme.badgeDecoration(
-                  context,
-                  color: completedColor,
-                  borderRadius: AppRadius.lg,
-                ),
-                child: Text(
-                  '${completionRate.toStringAsFixed(1)}%',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
+            // NeumorphicCardHeader(
+            //   icon: Icons.donut_large_rounded,
+            //   title: S.current.completionRate,
+            //   iconColor: completedColor,
+            //   trailing: Container(
+            //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            //     decoration: StatsNeumorphicTheme.badgeDecoration(
+            //       context,
+            //       color: completedColor,
+            //       borderRadius: AppRadius.lg,
+            //     ),
+            //     child: Text(
+            //       '${completionRate.toStringAsFixed(1)}%',
+            //       style: TextStyle(
+            //         fontSize: 12,
+            //         fontWeight: FontWeight.bold,
+            //         color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(height: 8),
             SizedBox(
               height: 200,
               child: Stack(
