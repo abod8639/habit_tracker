@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'stats_neumorphic_utils.dart';
 
+/// Reusable streak indicator badge with flame icon and dynamic radiant styling.
 class StreakBadge extends StatelessWidget {
   final int streak;
 
@@ -28,7 +30,7 @@ class StreakBadge extends StatelessWidget {
       decoration: StatsNeumorphicTheme.badgeDecoration(
         context,
         color: hasStreak ? streakColor : colorScheme.surfaceContainerHighest,
-        borderRadius: 20,
+        borderRadius: AppRadius.badge,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -40,7 +42,7 @@ class StreakBadge extends StatelessWidget {
             shadows: hasStreak
                 ? [
                     Shadow(
-                      color: streakColor.withValues(alpha: isDark ? 0.7 : 0.4),
+                      color: streakColor.withValues(alpha: isDark ? 0.70 : 0.40),
                       blurRadius: 6,
                     ),
                   ]
@@ -62,6 +64,5 @@ class StreakBadge extends StatelessWidget {
   }
 }
 
-Widget buildStreakBadge(int streak) {
-  return StreakBadge(streak: streak);
-}
+/// Backward-compatible builder function delegating to [StreakBadge].
+Widget buildStreakBadge(int streak) => StreakBadge(streak: streak);
