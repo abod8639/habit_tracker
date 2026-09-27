@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class MyfloatingActionButton extends StatefulWidget {
@@ -48,14 +49,6 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
         ? (Color.lerp(primaryColor, Colors.black, 0.25) ?? primaryColor)
         : (Color.lerp(primaryColor, Colors.black, 0.12) ?? primaryColor);
 
-    final Color lightShadow = isDark
-        ? Colors.white.withValues(alpha: 0.10)
-        : Colors.white.withValues(alpha: 0.85);
-
-    final Color darkShadow = isDark
-        ? Colors.black.withValues(alpha: 0.60)
-        : const Color(0xFFA3B1C6).withValues(alpha: 0.45);
-
     return MouseRegion(
       onEnter: (_) => _animationController.forward(),
       onExit: (_) => _animationController.reverse(),
@@ -98,36 +91,21 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
                 ),
                 boxShadow: _isPressed
                     ? [
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.black.withValues(alpha: 0.5)
-                              : const Color(0xFFA3B1C6).withValues(alpha: 0.35),
-                          offset: const Offset(1, 1),
-                          blurRadius: 3,
-                        ),
-                        BoxShadow(
-                          color: primaryColor.withValues(alpha: 0.30),
+                        ...AppShadows.buttonPressed(isDark: isDark),
+                        ...AppShadows.bloom(
+                          color: primaryColor,
+                          isDark: isDark,
+                          blur: 6,
                           offset: const Offset(0, 2),
-                          blurRadius: 6,
                         ),
                       ]
                     : [
-                        BoxShadow(
-                          color: lightShadow,
-                          offset: const Offset(-3, -3),
-                          blurRadius: 7,
-                        ),
-                        BoxShadow(
-                          color: darkShadow,
-                          offset: const Offset(4, 4),
-                          blurRadius: 9,
-                        ),
-                        BoxShadow(
-                          color: primaryColor.withValues(
-                            alpha: isDark ? 0.40 : 0.30,
-                          ),
+                        ...AppShadows.buttonResting(isDark: isDark),
+                        ...AppShadows.bloom(
+                          color: primaryColor,
+                          isDark: isDark,
+                          blur: 12,
                           offset: const Offset(0, 5),
-                          blurRadius: 12,
                         ),
                       ],
               ),
