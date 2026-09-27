@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../domain/entities/setting_entity.dart';
 import '../../domain/usecases/get_language_usecase.dart';
 import '../../domain/usecases/save_language_usecase.dart';
-import 'package:habit_tracker/features/setting/data/datasources/lang_storage.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/notification_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -11,7 +11,7 @@ class LangController extends GetxController {
   final GetLanguageUseCase _getLanguageUseCase = Get.find();
   final SaveLanguageUseCase _saveLanguageUseCase = Get.find();
 
-  var language = LangStorage.defaultLanguage.obs;
+  var language = SettingEntity.defaultLanguage.obs;
 
   Locale get effectiveLocale {
     final code = language.value;
@@ -36,7 +36,7 @@ class LangController extends GetxController {
     final result = await _getLanguageUseCase();
     result.fold(
       (failure) {
-        language.value = LangStorage.defaultLanguage;
+        language.value = SettingEntity.defaultLanguage;
         _applyLocale(effectiveLocale);
       },
       (langCode) {
