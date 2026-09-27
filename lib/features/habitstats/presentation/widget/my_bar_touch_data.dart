@@ -14,6 +14,16 @@ BarTouchData myBarTouchData(BuildContext context) {
       fitInsideVertically: true,
       tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       tooltipMargin: 8,
+      // tooltipRoundedRadius: 10,
+      getTooltipColor: (group) => Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF1E222D)
+          : const Color(0xFFF0F3F8),
+      tooltipBorder: BorderSide(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white.withValues(alpha: 0.12)
+            : Colors.white.withValues(alpha: 0.90),
+        width: 1.0,
+      ),
       getTooltipItem: (group, groupIndex, rod, rodIndex) {
         final List<Map<String, dynamic>> chartData = controller.todaySummary;
         if (groupIndex < 0 || groupIndex >= chartData.length) return null;
@@ -22,12 +32,14 @@ BarTouchData myBarTouchData(BuildContext context) {
         final String name = habit['habit'] ?? 'Unnamed';
         final bool completed = habit['completed'] ?? false;
 
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
         return BarTooltipItem(
           name,
-          const TextStyle(
-            color: Colors.white,
+          TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
             fontWeight: FontWeight.bold,
-            fontSize: 14,
+            fontSize: 13,
           ),
           children: [
             TextSpan(
@@ -35,11 +47,9 @@ BarTouchData myBarTouchData(BuildContext context) {
                   '\n${completed ? S.current.tooltipItemCompleted : S.current.tooltipItem}',
               style: TextStyle(
                 color: completed
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(
-                        context,
-                      ).colorScheme.error.withValues(alpha: 1.0),
-                fontSize: 12,
+                    ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
+                    : (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626)),
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),
             ),
