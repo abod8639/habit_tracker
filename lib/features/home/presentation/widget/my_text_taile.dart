@@ -285,7 +285,7 @@ class _MyTextTaileState extends State<MyTextTaile>
       );
     } else if (widget.habitCompleted) {
       surfaceColor = Color.alphaBlend(
-        habitColor.withValues(alpha: isDark ? 0.10 : 0.05),
+        habitColor.withValues(alpha: isDark ? 0.03 : 0.02),
         cardBase,
       );
     } else if (_isHovered) {
@@ -328,7 +328,7 @@ class _MyTextTaileState extends State<MyTextTaile>
             isDark ? Colors.black : const Color(0xFFA3B1C6),
             isDark ? 0.14 : 0.09,
           )!,
-          Color.lerp(surfaceColor, Colors.white, isDark ? 0.03 : 0.35)!,
+          Color.lerp(surfaceColor, Colors.white, isDark ? 0.03 : 0.12)!,
         ],
       );
     } else {
@@ -355,17 +355,8 @@ class _MyTextTaileState extends State<MyTextTaile>
         isDark: isDark,
       );
     } else if (widget.habitCompleted) {
-      // Sunken recessed well shadows + soft ambient color bloom
-      shadows = [
-        ...AppShadows.wellDual(isDark: isDark),
-        ...AppShadows.bloom(
-          color: habitColor,
-          isDark: isDark,
-          blur: 10,
-          spread: -1,
-          offset: const Offset(0, 2),
-        ),
-      ];
+      // Sunken recessed well shadows without harsh glowing bloom
+      shadows = AppShadows.wellDual(isDark: isDark);
     } else if (_isHovered) {
       shadows = AppShadows.softCard(isDark: isDark);
     } else {
@@ -381,8 +372,8 @@ class _MyTextTaileState extends State<MyTextTaile>
       );
     } else if (widget.habitCompleted) {
       border = Border.all(
-        color: habitColor.withValues(alpha: isDark ? 0.30 : 0.22),
-        width: 1.1,
+        color: habitColor.withValues(alpha: isDark ? 0.10 : 0.08),
+        width: 1.0,
       );
     } else {
       border = Border.all(
@@ -488,7 +479,7 @@ class _MyTextTaileState extends State<MyTextTaile>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color.lerp(habitColor, Colors.white, 0.15)!,
+                    habitColor,
                     Color.lerp(habitColor, Colors.black, 0.10)!,
                   ],
                 )
@@ -506,27 +497,20 @@ class _MyTextTaileState extends State<MyTextTaile>
                 ),
           boxShadow: isChecked
               ? [
-                  ...AppShadows.bloom(
-                    color: habitColor,
-                    isDark: isDark,
-                    blur: 8,
-                    spread: 0.5,
-                    offset: const Offset(0, 2),
-                  ),
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: isDark ? 0.20 : 0.50),
-                    offset: const Offset(-1, -1),
-                    blurRadius: 3,
+                    color: habitColor.withValues(alpha: isDark ? 0.25 : 0.18),
+                    blurRadius: 5,
+                    offset: const Offset(0, 1.5),
                   ),
                 ]
               : AppShadows.buttonResting(isDark: isDark),
           border: Border.all(
             color: isChecked
-                ? Colors.white.withValues(alpha: isDark ? 0.35 : 0.70)
+                ? Colors.white.withValues(alpha: isDark ? 0.18 : 0.35)
                 : (isDark
                     ? Colors.white.withValues(alpha: 0.08)
                     : Colors.white.withValues(alpha: 0.95)),
-            width: 1.1,
+            width: 1.0,
           ),
         ),
         child: isChecked
