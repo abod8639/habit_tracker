@@ -23,6 +23,7 @@ class HabitStatsBinding extends Bindings {
         myBox: Hive.box(HabitStorage.boxName),
         habitRepository: habitRepo,
       ),
+      fenix: true,
     );
 
     // Repository
@@ -31,21 +32,26 @@ class HabitStatsBinding extends Bindings {
         localDataSource: Get.find<HabitStatsLocalDataSource>(),
         habitRepository: Get.find<HabitRepository>(),
       ),
+      fenix: true,
     );
 
     // UseCases
     Get.lazyPut(
       () => GetOverallStatsUseCase(Get.find<HabitStatsRepositoryImpl>()),
+      fenix: true,
     );
     Get.lazyPut(
       () => GetOverallTrendUseCase(Get.find<HabitStatsRepositoryImpl>()),
+      fenix: true,
     );
     Get.lazyPut(
       () =>
           GetIndividualHabitTrendsUseCase(Get.find<HabitStatsRepositoryImpl>()),
+      fenix: true,
     );
     Get.lazyPut(
       () => GetTodayHabitsSummaryUseCase(Get.find<HabitStatsRepositoryImpl>()),
+      fenix: true,
     );
 
     // Controller
@@ -57,6 +63,7 @@ class HabitStatsBinding extends Bindings {
             Get.find<GetIndividualHabitTrendsUseCase>(),
         getTodayHabitsSummaryUseCase: Get.find<GetTodayHabitsSummaryUseCase>(),
       ),
+      fenix: true,
     );
   }
 }
