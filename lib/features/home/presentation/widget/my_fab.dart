@@ -13,17 +13,18 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 180),
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
     );
   }
 
@@ -35,36 +36,109 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.primaryColor;
+
+    final Color gradientStart = isDark
+        ? (Color.lerp(primaryColor, Colors.white, 0.12) ?? primaryColor)
+        : (Color.lerp(primaryColor, Colors.white, 0.20) ?? primaryColor);
+
+    final Color gradientEnd = isDark
+        ? (Color.lerp(primaryColor, Colors.black, 0.25) ?? primaryColor)
+        : (Color.lerp(primaryColor, Colors.black, 0.12) ?? primaryColor);
+
+    final Color lightShadow = isDark
+        ? Colors.white.withValues(alpha: 0.10)
+        : Colors.white.withValues(alpha: 0.85);
+
+    final Color darkShadow = isDark
+        ? Colors.black.withValues(alpha: 0.60)
+        : const Color(0xFFA3B1C6).withValues(alpha: 0.45);
+
     return MouseRegion(
       onEnter: (_) => _animationController.forward(),
       onExit: (_) => _animationController.reverse(),
       child: AnimatedBuilder(
         animation: _animationController,
         builder: (context, child) {
-          return Transform.scale(scale: _scaleAnimation.value, child: child);
+          return Transform.scale(
+            scale: _isPressed ? 0.94 : _scaleAnimation.value,
+            child: child,
+          );
         },
-        child: FloatingActionButton(
-          tooltip: S.of(context).addNewHabit,
-          autofocus: true,
-          focusColor: Theme.of(
-            context,
-          ).colorScheme.secondary.withValues(alpha: 0.6),
-          isExtended: true,
-          backgroundColor: Theme.of(context).primaryColor,
-          onPressed: () {
-            if (widget.onPressed != null) {
-              // Add tap animation
-              _animationController.forward().then((_) {
-                _animationController.reverse();
+        child: Tooltip(
+          message: S.of(context).addNewHabit,
+          child: GestureDetector(
+            onTapDown: (_) => setState(() => _isPressed = true),
+            onTapUp: (_) {
+              setState(() => _isPressed = false);
+              if (widget.onPressed != null) {
                 widget.onPressed!();
-              });
-            }
-          },
-          splashColor: Theme.of(context).colorScheme.primary,
-          child: Icon(
-            size: 25,
-            color: Theme.of(context).colorScheme.onPrimary,
-            Icons.add,
+              }
+            },
+            onTapCancel: () => setState(() => _isPressed = false),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 140),
+              curve: Curves.easeOutCubic,
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: _isPressed
+                      ? [gradientEnd, gradientStart]
+                      : [gradientStart, gradientEnd],
+                ),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: isDark ? 0.25 : 0.60),
+                  width: 1.2,
+                ),
+                boxShadow: _isPressed
+                    ? [
+                        BoxShadow(
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.5)
+                              : const Color(0xFFA3B1C6).withValues(alpha: 0.35),
+                          offset: const Offset(1, 1),
+                          blurRadius: 3,
+                        ),
+                        BoxShadow(
+                          color: primaryColor.withValues(alpha: 0.30),
+                          offset: const Offset(0, 2),
+                          blurRadius: 6,
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: lightShadow,
+                          offset: const Offset(-3, -3),
+                          blurRadius: 7,
+                        ),
+                        BoxShadow(
+                          color: darkShadow,
+                          offset: const Offset(4, 4),
+                          blurRadius: 9,
+                        ),
+                        BoxShadow(
+                          color: primaryColor.withValues(
+                            alpha: isDark ? 0.40 : 0.30,
+                          ),
+                          offset: const Offset(0, 5),
+                          blurRadius: 12,
+                        ),
+                      ],
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.add_rounded,
+                  size: 28,
+                  color: theme.colorScheme.onPrimary,
+                ),
+              ),
+            ),
           ),
         ),
       ),
