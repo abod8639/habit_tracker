@@ -168,8 +168,8 @@ abstract final class AppShadows {
     return [
       BoxShadow(
         color: isDark
-            ? Colors.white.withValues(alpha: 0.04)
-            : Colors.white.withValues(alpha: 0.90),
+            ? Colors.white.withValues(alpha: 0.02)
+            : Colors.white.withValues(alpha: 0.70),
         offset: const Offset(-2.5, -2.5),
         blurRadius: 6,
       ),
@@ -188,7 +188,7 @@ abstract final class AppShadows {
     return [
       BoxShadow(
         color: isDark
-            ? Colors.black.withValues(alpha: 0.50)
+            ? Colors.black.withValues(alpha: 0.40)
             : const Color(0xFFA3B1C6).withValues(alpha: 0.30),
         offset: const Offset(1.5, 1.5),
         blurRadius: 3,
@@ -220,7 +220,7 @@ abstract final class AppShadows {
   static List<BoxShadow> activeDot({required Color color}) {
     return [
       BoxShadow(
-        color: color.withValues(alpha: 0.60),
+        color: color.withValues(alpha: 0.40),
         blurRadius: 4,
         spreadRadius: 1,
       ),
