@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:habit_tracker/features/habitstats/presentation/widget/build_summary_card.dart';
 
 class FadeAnimationSummaryCard extends StatelessWidget {
+  final AnimationController _animationController;
+
   const FadeAnimationSummaryCard({
     super.key,
     required AnimationController animationController,
-    // required this.stats,
   }) : _animationController = animationController;
-
-  final AnimationController _animationController;
-  // final Map<String, dynamic> stats;
 
   @override
   Widget build(BuildContext context) {
@@ -21,17 +19,16 @@ class FadeAnimationSummaryCard extends StatelessWidget {
         ),
       ),
       child: SlideTransition(
-        position:
-            Tween<Offset>(
-              begin: const Offset(0, -0.2),
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(
-                parent: _animationController,
-                curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-              ),
-            ),
-        child: buildSummaryCard(),
+        position: Tween<Offset>(
+          begin: const Offset(0, -0.2),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+          ),
+        ),
+        child: const SummaryCard(),
       ),
     );
   }
