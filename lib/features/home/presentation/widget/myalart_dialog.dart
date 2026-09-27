@@ -249,23 +249,12 @@ class _MyalartdState extends State<MyalartDialog>
                           )
                         else
                           NeumorphicIconButton(
-                            size: 36,
+                            size: 40,
                             icon: Icons.document_scanner_rounded,
                             accentColor: colorScheme.primary,
                             tooltip: S.of(context).scanHabitsTitle,
                             onPressed: _handleScanImage,
                           ),
-                        const SizedBox(width: 8),
-                        NeumorphicIconButton(
-                          size: 36,
-                          icon: Icons.close_rounded,
-                          accentColor: colorScheme.onSurfaceVariant,
-                          tooltip: S.current.cancel,
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            widget.controller.clear();
-                          },
-                        ),
                       ],
                     ),
                   ],
@@ -364,7 +353,7 @@ class _MyalartdState extends State<MyalartDialog>
 
                 // Tactile Action Buttons (Cancel & Save)
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _NeumorphicDialogButton(
                       label: S.current.cancel,
