@@ -196,6 +196,41 @@ abstract final class AppShadows {
     ];
   }
 
+  /// Raised soft tactile button dual shadows with smooth feathered depth (matching AppBar squircle buttons).
+  static List<BoxShadow> softButton({required bool isDark}) {
+    return [
+      BoxShadow(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.045)
+            : Colors.white.withValues(alpha: 0.92),
+        offset: const Offset(-2.5, -2.5),
+        blurRadius: 5.5,
+        spreadRadius: 0,
+      ),
+      BoxShadow(
+        color: isDark
+            ? Colors.black.withValues(alpha: 0.60)
+            : const Color(0xFFA3B1C6).withValues(alpha: 0.40),
+        offset: const Offset(3.5, 3.5),
+        blurRadius: 7.5,
+        spreadRadius: 0,
+      ),
+    ];
+  }
+
+  /// Pressed tactile button inset shadow for soft squircle buttons.
+  static List<BoxShadow> softButtonPressed({required bool isDark}) {
+    return [
+      BoxShadow(
+        color: isDark
+            ? Colors.black.withValues(alpha: 0.50)
+            : const Color(0xFFA3B1C6).withValues(alpha: 0.35),
+        offset: const Offset(1.5, 1.5),
+        blurRadius: 2.5,
+      ),
+    ];
+  }
+
   /// Dual micro shadows for dot indicators and tiny circular markers.
   static List<BoxShadow> dotIndicator({required bool isDark}) {
     return [
