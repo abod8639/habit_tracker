@@ -104,6 +104,14 @@ class _DrawerListState extends State<DrawerList> {
           title: S.current.scanImage,
         ),
         MyDrawerListTile(
+          icon: const Icon(color: Colors.blueAccent, Icons.auto_graph_sharp),
+          onTap: () {
+            Get.back();
+            Get.to(() => const HabitStatsPage(), binding: HabitStatsBinding());
+          },
+          title: S.current.drawerReat,
+        ),
+        MyDrawerListTile(
           icon: Icon(
             color: Theme.of(context).primaryColor,
             Icons.color_lens_outlined,
@@ -115,14 +123,6 @@ class _DrawerListState extends State<DrawerList> {
           title: S.current.drawerTheme,
         ),
 
-        MyDrawerListTile(
-          icon: const Icon(color: Colors.blueAccent, Icons.auto_graph_sharp),
-          onTap: () {
-            Get.back();
-            Get.to(() => const HabitStatsPage(), binding: HabitStatsBinding());
-          },
-          title: S.current.drawerReat,
-        ),
         MyDrawerListTile(
           icon: const Icon(color: Colors.purpleAccent, Icons.psychology),
           onTap: () {
