@@ -54,6 +54,7 @@ class HabitRepositoryImpl implements HabitRepository {
       }
 
       await localDataSource.saveHabits(models);
+      _cachedHeatmapData = null;
 
       if (firestoreService.isUserLoggedIn) {
         try {
@@ -108,6 +109,7 @@ class HabitRepositoryImpl implements HabitRepository {
       models.removeWhere((m) => m.id == id);
 
       await localDataSource.saveHabits(models);
+      _cachedHeatmapData = null;
       localDataSource.addLocalTombstone(id);
 
       if (firestoreService.isUserLoggedIn) {
@@ -141,6 +143,7 @@ class HabitRepositoryImpl implements HabitRepository {
         );
 
         await localDataSource.saveHabits(models);
+        _cachedHeatmapData = null;
         await localDataSource.saveHabitCompletionHistory(m.name, isCompleted);
 
         final completedCount = models.where((m) => m.isCompleted).length;
@@ -207,28 +210,48 @@ class HabitRepositoryImpl implements HabitRepository {
     }
   }
 
+  Map<DateTime, int>? _cachedHeatmapData;
+
+  void invalidateHeatmapCache() {
+    _cachedHeatmapData = null;
+  }
+
   @override
   Future<Either<Failure, Map<DateTime, int>>> getHeatmapData() async {
     try {
-      // 1. Get historical data from local storage
-      final rawHistory = await localDataSource.getAllHabitStrengths();
-
-      // 2. Use compute for CPU-intensive heatmap processing to avoid blocking UI thread
-      final heatmapData = await compute(_processHeatmapData, rawHistory);
-
-      // 3. Recalculate TODAY's strength based on LIVE habits to ensure accuracy on startup
       final habits = localDataSource.loadHabits();
+      final today = DateTime.now();
+      final normalizedToday = DateTime(today.year, today.month, today.day);
+
+      int todayStrength = 0;
       if (habits.isNotEmpty) {
         final completedCount = habits.where((h) => h.isCompleted).length;
         final completionRate = completedCount / habits.length;
-        int strength = (completionRate * 10).toInt();
-        if (strength == 0 && completedCount > 0) strength = 1;
-
-        final today = DateTime.now();
-        final normalizedToday = DateTime(today.year, today.month, today.day);
-        heatmapData[normalizedToday] = strength;
+        todayStrength = (completionRate * 10).toInt();
+        if (todayStrength == 0 && completedCount > 0) todayStrength = 1;
       }
 
+      if (_cachedHeatmapData != null) {
+        final cached = Map<DateTime, int>.from(_cachedHeatmapData!);
+        cached[normalizedToday] = todayStrength;
+        return Right(cached);
+      }
+
+      // 1. Get historical data from local storage
+      final rawHistory = await localDataSource.getAllHabitStrengths();
+
+      // 2. Compute heatmap directly for normal sizes to avoid isolate startup overhead
+      final Map<DateTime, int> heatmapData;
+      if (rawHistory.length >= 500) {
+        heatmapData = await compute(_processHeatmapData, rawHistory);
+      } else {
+        heatmapData = _processHeatmapData(rawHistory);
+      }
+
+      // 3. Recalculate TODAY's strength based on LIVE habits
+      heatmapData[normalizedToday] = todayStrength;
+
+      _cachedHeatmapData = Map<DateTime, int>.from(heatmapData);
       return Right(heatmapData);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -361,6 +384,7 @@ class HabitRepositoryImpl implements HabitRepository {
           .toList();
 
       await localDataSource.saveHabits(resetHabits);
+      _cachedHeatmapData = null;
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -432,6 +456,7 @@ class HabitRepositoryImpl implements HabitRepository {
   }) async {
     try {
       await localDataSource.clearAllData(earliestDateStr: earliestDateStr);
+      _cachedHeatmapData = null;
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
