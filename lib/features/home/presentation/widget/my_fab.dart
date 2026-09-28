@@ -40,6 +40,7 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.primaryColor;
+    final double size = 50;
 
     final Color gradientStart = isDark
         ? (Color.lerp(primaryColor, Colors.white, 0.12) ?? primaryColor)
@@ -47,15 +48,17 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
 
     final Color gradientEnd = isDark
         ? (Color.lerp(
-          primaryColor,
-          theme.colorScheme.secondary,
-          0.9,
-        ) ?? primaryColor)
+                primaryColor,
+                theme.colorScheme.secondary,
+                0.9,
+              ) ??
+              primaryColor)
         : (Color.lerp(
-          primaryColor,
-          theme.colorScheme.secondary,
-          0.9,
-        ) ?? primaryColor);
+                primaryColor,
+                theme.colorScheme.secondary,
+                0.9,
+              ) ??
+              primaryColor);
 
     return MouseRegion(
       onEnter: (_) => _animationController.forward(),
@@ -82,10 +85,11 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 140),
               curve: Curves.easeOutCubic,
-              width: 58,
-              height: 58,
+              width: size * 1.6,
+              height: size,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(16),
+                shape: BoxShape.rectangle,
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -112,8 +116,8 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
                         ...AppShadows.bloom(
                           color: primaryColor,
                           isDark: isDark,
-                          blur: 12,
-                          offset: const Offset(0, 5),
+                          blur: 6,
+                          offset: const Offset(0, 2),
                         ),
                       ],
               ),
@@ -121,7 +125,7 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
                 child: Icon(
                   Icons.add_rounded,
                   size: 28,
-                  color: theme.colorScheme.onPrimary,
+                  color: theme.colorScheme.onError,
                   shadows: AppShadows.buttonPressed(isDark: isDark),
                 ),
               ),
