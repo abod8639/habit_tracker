@@ -213,12 +213,12 @@ class _MyTextTaileState extends State<MyTextTaile>
         CustomSlidableAction(
           onPressed: onPressed,
           backgroundColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
           child: Tooltip(
             message: tooltip,
             child: Container(
-              width: 46,
-              height: 46,
+              width: 50*1.6,
+              height: 65,
               decoration: BoxDecoration(
                 borderRadius: AppRadius.mdRadius,
                 gradient: LinearGradient(
@@ -255,7 +255,8 @@ class _MyTextTaileState extends State<MyTextTaile>
               child: Center(
                 child: Icon(
                   icon,
-                  size: 22,
+                  size: 25,
+                  // shadows: AppShadows.buttonResting(isDark: isDark),
                   color: ThemeUtils.getContrastColor(baseColor),
                 ),
               ),
@@ -527,25 +528,13 @@ class _MyTextTaileState extends State<MyTextTaile>
                 duration: const Duration(milliseconds: 120),
                 curve: Curves.easeOutBack,
                 child: Icon(
-                  shadows: AppShadows.buttonPressed(isDark: isDark),
+                  // shadows: AppShadows.buttonPressed(isDark: isDark),
                   Icons.check_rounded,
-                  size: 20,
-                  color: ThemeUtils.getContrastColor(habitColor),
+                  size: 24,
+                  color: themeColors.onError,
                 ),
               )
-            : (widget.colorValue != null
-                ? Center(
-                    child: Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: habitColor.withValues(alpha: 0.65),
-                        boxShadow: AppShadows.dotIndicator(isDark: isDark),
-                      ),
-                    ),
-                  )
-                : null),
+            :  null,
       ),
     );
   }
@@ -566,8 +555,8 @@ class _MyTextTaileState extends State<MyTextTaile>
             ? null
             : [
                 BoxShadow(
-                  color: habitColor.withValues(alpha: isDark ? 0.40 : 0.30),
-                  blurRadius: 5,
+                  color: habitColor.withValues(alpha:  0.30),
+                  blurRadius: 3,
                   spreadRadius: 0.5,
                   offset: const Offset(0, 1),
                 ),
