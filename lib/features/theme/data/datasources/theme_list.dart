@@ -6,7 +6,7 @@ const Map<String, Map<String, Color>> themeColors = {
     'primary': Color(0xFF3FB950),
     'secondary': Color.fromARGB(255, 19, 160, 179),
     'background': Color(0xFF1E2228), // رمادي داكن يتيح توليد ضوء وظل
-    'surface': Color(0xFF1E2228),    // متطابق مع الخلفية
+    'surface': Color(0xFF1E2228), // متطابق مع الخلفية
     'error': Color(0xFFE5534B),
     'onPrimary': Color(0xFF0D1117),
     'onSecondary': Color(0xFFE6EDF3),
@@ -15,7 +15,9 @@ const Map<String, Map<String, Color>> themeColors = {
   'github': {
     'primary': Color(0xFF0969DA),
     'secondary': Color(0xFF54A0FF),
-    'background': Color(0xFFE8EEF5), // رمادي مائل للأزرق الفاتح جداً بدلاً من الأبيض الصافي
+    'background': Color(
+      0xFFE8EEF5,
+    ), // رمادي مائل للأزرق الفاتح جداً بدلاً من الأبيض الصافي
     'surface': Color(0xFFE8EEF5),
     'error': Color(0xFFCF222E),
     'onPrimary': Color(0xFFFFFFFF),
@@ -108,7 +110,9 @@ const Map<String, Map<String, Color>> themeColors = {
   'hologram': {
     'primary': Color(0xFF38BDF8),
     'secondary': Color.fromARGB(255, 138, 14, 233),
-    'background': Color(0xFF1A2234), // أزرق كحلي ناعم بدلاً من الأسود الداكن جداً
+    'background': Color(
+      0xFF1A2234,
+    ), // أزرق كحلي ناعم بدلاً من الأسود الداكن جداً
     'surface': Color(0xFF1A2234),
     'error': Color(0xFFFB7185),
     'onPrimary': Color(0xFF0F172A),

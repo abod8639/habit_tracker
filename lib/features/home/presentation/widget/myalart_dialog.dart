@@ -166,7 +166,10 @@ class _MyalartdState extends State<MyalartDialog>
         child: Dialog(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 32),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 22,
+            vertical: 32,
+          ),
           child: Container(
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
@@ -240,7 +243,9 @@ class _MyalartdState extends State<MyalartDialog>
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              boxShadow: AppShadows.dotIndicator(isDark: isDark),
+                              boxShadow: AppShadows.dotIndicator(
+                                isDark: isDark,
+                              ),
                             ),
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
@@ -314,7 +319,10 @@ class _MyalartdState extends State<MyalartDialog>
                       ),
                       boxShadow: AppShadows.wellDual(isDark: isDark),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
+                    ),
                     child: TextFormField(
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
@@ -397,7 +405,8 @@ class _NeumorphicDialogButton extends StatefulWidget {
   });
 
   @override
-  State<_NeumorphicDialogButton> createState() => _NeumorphicDialogButtonState();
+  State<_NeumorphicDialogButton> createState() =>
+      _NeumorphicDialogButtonState();
 }
 
 class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
@@ -486,8 +495,8 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
             color: widget.isPrimary
                 ? Colors.white.withValues(alpha: isDark ? 0.15 : 0.40)
                 : (isDark
-                    ? Colors.white.withValues(alpha: 0.06)
-                    : Colors.white.withValues(alpha: 0.85)),
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : Colors.white.withValues(alpha: 0.85)),
             width: 1.0,
           ),
           boxShadow: shadows,

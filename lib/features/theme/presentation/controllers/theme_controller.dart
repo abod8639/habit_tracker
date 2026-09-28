@@ -215,8 +215,9 @@ class ThemeController extends GetxController {
   }
 
   void _applyTheme() {
-    final activeTheme =
-        themeMode.value == ThemeMode.dark ? darkTheme.value : lightTheme.value;
+    final activeTheme = themeMode.value == ThemeMode.dark
+        ? darkTheme.value
+        : lightTheme.value;
     Get.rootController.theme = activeTheme;
     Get.rootController.darkTheme = activeTheme;
     Get.rootController.themeMode = themeMode.value;

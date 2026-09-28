@@ -92,18 +92,18 @@ class _AiSendButtonState extends State<AiSendButton>
             color: isActive
                 ? null
                 : (isDark
-                    ? Color.alphaBlend(
-                        Colors.white.withValues(alpha: 0.05),
-                        surface,
-                      )
-                    : const Color(0xFFF0F3F8)),
+                      ? Color.alphaBlend(
+                          Colors.white.withValues(alpha: 0.05),
+                          surface,
+                        )
+                      : const Color(0xFFF0F3F8)),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isActive
                   ? Colors.white.withValues(alpha: isDark ? 0.25 : 0.4)
                   : (isDark
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.white.withValues(alpha: 0.8)),
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : Colors.white.withValues(alpha: 0.8)),
               width: 1.2,
             ),
             boxShadow: isActive

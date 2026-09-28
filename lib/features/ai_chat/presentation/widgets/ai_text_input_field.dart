@@ -159,8 +159,9 @@ class _AiTextInputFieldState extends State<AiTextInputField> {
                       child: Icon(
                         Icons.cancel_rounded,
                         size: 18,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.4,
+                        ),
                       ),
                     ),
                   )

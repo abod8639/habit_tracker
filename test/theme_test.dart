@@ -18,20 +18,26 @@ void main() {
       expect(theme.scaffoldBackgroundColor.computeLuminance(), lessThan(0.5));
     });
 
-    test('buildThemeData computes Brightness.light when background is light', () {
-      final lightColors = themeColors.values.firstWhere(
-        (c) => !ThemeUtils.isDarkTheme(c),
-      );
-      final theme = ThemeUtils.buildThemeData(
-        forceDark: false,
-        colors: lightColors,
-        isDarkTheme: false,
-      );
+    test(
+      'buildThemeData computes Brightness.light when background is light',
+      () {
+        final lightColors = themeColors.values.firstWhere(
+          (c) => !ThemeUtils.isDarkTheme(c),
+        );
+        final theme = ThemeUtils.buildThemeData(
+          forceDark: false,
+          colors: lightColors,
+          isDarkTheme: false,
+        );
 
-      expect(theme.brightness, Brightness.light);
-      expect(theme.colorScheme.brightness, Brightness.light);
-      expect(theme.scaffoldBackgroundColor.computeLuminance(), greaterThan(0.5));
-    });
+        expect(theme.brightness, Brightness.light);
+        expect(theme.colorScheme.brightness, Brightness.light);
+        expect(
+          theme.scaffoldBackgroundColor.computeLuminance(),
+          greaterThan(0.5),
+        );
+      },
+    );
 
     test('custom background dynamically drives brightness and contrast', () {
       final colors = themeColors['github_dark_green']!;

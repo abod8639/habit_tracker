@@ -124,7 +124,7 @@ class NeumorphicColorPickerDialog extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: isDark
                           ? (Color.lerp(baseColor, Colors.black, 0.20) ??
-                              baseColor)
+                                baseColor)
                           : (Color.lerp(
                                   baseColor,
                                   const Color(0xFFDCE2EC),

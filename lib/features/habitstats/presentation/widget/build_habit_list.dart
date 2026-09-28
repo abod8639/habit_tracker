@@ -22,7 +22,8 @@ class HabitSubList extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final Color statusColor = isCompleted
-        ? colorScheme.primary // Emerald
+        ? colorScheme
+              .primary // Emerald
         : colorScheme.error;
 
     return Container(
@@ -61,8 +62,8 @@ class HabitSubList extends StatelessWidget {
                     color: isCompleted
                         ? statusColor.withValues(alpha: isDark ? 0.20 : 0.15)
                         : (isDark
-                            ? Colors.black.withValues(alpha: 0.30)
-                            : Colors.white.withValues(alpha: 0.70)),
+                              ? Colors.black.withValues(alpha: 0.30)
+                              : Colors.white.withValues(alpha: 0.70)),
                     shape: BoxShape.circle,
                     boxShadow: AppShadows.dotIndicator(isDark: isDark),
                   ),

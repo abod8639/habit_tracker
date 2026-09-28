@@ -15,7 +15,8 @@ BarTouchData myBarTouchData(BuildContext context) {
       tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       tooltipMargin: 8,
       // tooltipRoundedRadius: 10,
-      getTooltipColor: (group) => Theme.of(context).brightness == Brightness.dark
+      getTooltipColor: (group) =>
+          Theme.of(context).brightness == Brightness.dark
           ? const Color(0xFF1E222D)
           : const Color(0xFFF0F3F8),
       tooltipBorder: BorderSide(
@@ -47,8 +48,12 @@ BarTouchData myBarTouchData(BuildContext context) {
                   '\n${completed ? S.current.tooltipItemCompleted : S.current.tooltipItem}',
               style: TextStyle(
                 color: completed
-                    ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
-                    : (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626)),
+                    ? (isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF059669))
+                    : (isDark
+                          ? const Color(0xFFF87171)
+                          : const Color(0xFFDC2626)),
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),

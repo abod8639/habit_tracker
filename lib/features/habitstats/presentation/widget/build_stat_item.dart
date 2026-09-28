@@ -38,7 +38,7 @@ class StatItem extends StatelessWidget {
         : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.10) ?? baseColor);
 
     final double iconContainerSize = isPhone ? 38.0 : 42.0;
-    final double effectiveIconSize =  21.0;
+    final double effectiveIconSize = 21.0;
 
     return Expanded(
       child: Container(

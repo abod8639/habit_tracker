@@ -72,7 +72,9 @@ class AiApiKeyDialog extends StatelessWidget {
                       borderRadius: AppRadius.mdRadius,
                       boxShadow: AppShadows.dotIndicator(isDark: isDark),
                       border: Border.all(
-                        color: primaryColor.withValues(alpha: isDark ? 0.25 : 0.18),
+                        color: primaryColor.withValues(
+                          alpha: isDark ? 0.25 : 0.18,
+                        ),
                         width: 1,
                       ),
                     ),
@@ -137,7 +139,9 @@ class AiApiKeyDialog extends StatelessWidget {
                       borderRadius: AppRadius.mdRadius,
                       boxShadow: AppShadows.dotIndicator(isDark: isDark),
                       border: Border.all(
-                        color: primaryColor.withValues(alpha: isDark ? 0.22 : 0.15),
+                        color: primaryColor.withValues(
+                          alpha: isDark ? 0.22 : 0.15,
+                        ),
                         width: 1,
                       ),
                     ),
@@ -177,7 +181,9 @@ class AiApiKeyDialog extends StatelessWidget {
                 () => Container(
                   decoration: BoxDecoration(
                     color: Color.alphaBlend(
-                      colorScheme.onSurface.withValues(alpha: isDark ? 0.04 : 0.02),
+                      colorScheme.onSurface.withValues(
+                        alpha: isDark ? 0.04 : 0.02,
+                      ),
                       baseSurface,
                     ),
                     borderRadius: AppRadius.lgRadius,
@@ -301,8 +307,9 @@ class AiApiKeyDialog extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: Color.alphaBlend(
-                          colorScheme.onSurface
-                              .withValues(alpha: isDark ? 0.05 : 0.03),
+                          colorScheme.onSurface.withValues(
+                            alpha: isDark ? 0.05 : 0.03,
+                          ),
                           baseSurface,
                         ),
                         borderRadius: AppRadius.mdRadius,

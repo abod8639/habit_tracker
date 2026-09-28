@@ -50,8 +50,7 @@ class HabitStatsController extends GetxController {
         }
         if (stats.value == null) {
           final total = summary.length;
-          final completed =
-              summary.where((h) => h['completed'] == true).length;
+          final completed = summary.where((h) => h['completed'] == true).length;
           final rate = total > 0 ? (completed / total) * 100 : 0.0;
           stats.value = HabitStatsEntity(
             totalHabits: total,

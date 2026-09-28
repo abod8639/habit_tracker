@@ -152,11 +152,12 @@ Widget buildAnimatedUserCard(
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onPrimaryContainer.withValues(
-                            alpha: 0.1,
-                          ),
+                          color:
+                              Theme.of(
+                                context,
+                              ).colorScheme.onPrimaryContainer.withValues(
+                                alpha: 0.1,
+                              ),
                           borderRadius: AppRadius.mdRadius,
                         ),
                         child: Text(

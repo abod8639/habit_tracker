@@ -36,7 +36,8 @@ class SoftCard extends StatelessWidget {
         : Colors.white.withValues(alpha: 0.85);
 
     return Container(
-      margin: margin ?? const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2.0),
+      margin:
+          margin ?? const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
         gradient: LinearGradient(

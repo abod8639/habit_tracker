@@ -75,29 +75,33 @@ Widget buildAnimatedSettingLang(
               children: [
                 // Neumorphic Icon Badge
                 Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: Color.alphaBlend(
-          theme.primaryColor.withValues(alpha: isDark ? 0.14 : 0.09),
-          baseSurface,
-        ),
-        borderRadius: AppRadius.mdRadius,
-        boxShadow: AppShadows.dotIndicator(isDark: isDark),
-        border: Border.all(
-          color: theme.primaryColor.withValues(alpha: isDark ? 0.20 : 0.15),
-          width: 1,
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          shadows: AppShadows.buttonPressed(isDark: isDark),
-          icon,
-          color: theme.primaryColor,
-          size: 22,
-        ),
-      ),
-    ),
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Color.alphaBlend(
+                      theme.primaryColor.withValues(
+                        alpha: isDark ? 0.14 : 0.09,
+                      ),
+                      baseSurface,
+                    ),
+                    borderRadius: AppRadius.mdRadius,
+                    boxShadow: AppShadows.dotIndicator(isDark: isDark),
+                    border: Border.all(
+                      color: theme.primaryColor.withValues(
+                        alpha: isDark ? 0.20 : 0.15,
+                      ),
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      shadows: AppShadows.buttonPressed(isDark: isDark),
+                      icon,
+                      color: theme.primaryColor,
+                      size: 22,
+                    ),
+                  ),
+                ),
                 // Container(
                 //   width: 44,
                 //   height: 44,
@@ -124,24 +128,23 @@ Widget buildAnimatedSettingLang(
                 const SizedBox(width: 16),
                 Expanded(
                   child: DropdownButtonFormField<String>(
-
                     initialValue: currentValue,
                     iconEnabledColor: Colors.transparent,
-                    iconDisabledColor: Colors.transparent ,
+                    iconDisabledColor: Colors.transparent,
                     focusColor: Colors.transparent,
-                    decoration:  InputDecoration(
-
+                    decoration: InputDecoration(
                       // iconColor: theme.primaryColor,
                       fillColor: Colors.transparent,
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
                     ),
-                    style: (theme.textTheme.titleMedium ?? const TextStyle()).copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15.5,
-                      letterSpacing: 0.2,
-                      color: textColor ?? colorScheme.onSurface,
-                    ),
+                    style: (theme.textTheme.titleMedium ?? const TextStyle())
+                        .copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15.5,
+                          letterSpacing: 0.2,
+                          color: textColor ?? colorScheme.onSurface,
+                        ),
                     dropdownColor: baseSurface,
                     borderRadius: AppRadius.lgRadius,
                     icon: Container(
@@ -150,7 +153,9 @@ Widget buildAnimatedSettingLang(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Color.alphaBlend(
-                          colorScheme.onSurface.withValues(alpha: isDark ? 0.04 : 0.02),
+                          colorScheme.onSurface.withValues(
+                            alpha: isDark ? 0.04 : 0.02,
+                          ),
                           baseSurface,
                         ),
                         boxShadow: AppShadows.dotIndicator(isDark: isDark),

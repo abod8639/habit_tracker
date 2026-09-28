@@ -31,14 +31,13 @@ class AiChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: Padding(
         padding: const EdgeInsetsDirectional.only(start: 16),
         child: Center(
-          child:
-          NeumorphicIconButton(
+          child: NeumorphicIconButton(
             icon: Icons.arrow_back_ios_new_rounded,
             size: 40,
             iconSize: 18,
             onPressed: () => Get.back(),
             iconColor: theme.colorScheme.onSurface,
-          )
+          ),
         ),
       ),
       title: Row(
@@ -114,14 +113,14 @@ class AiChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         Padding(
           padding: const EdgeInsetsDirectional.only(end: 16),
-          child:NeumorphicIconButton(
+          child: NeumorphicIconButton(
             icon: Icons.delete_sweep_rounded,
             size: 40,
             iconSize: 22,
             onPressed: onClearChat,
             tooltip: S.current.clearChatTitle,
             iconColor: theme.colorScheme.error.withValues(alpha: 0.85),
-          )
+          ),
         ),
       ],
     );

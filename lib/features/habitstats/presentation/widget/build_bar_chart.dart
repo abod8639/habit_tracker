@@ -33,10 +33,11 @@ class TodayBarChartCard extends StatelessWidget {
 
       final double effectiveStreak = streak > 0 ? streak.toDouble() : 1.0;
       final double maxY = effectiveStreak * 1.25;
-      final double interval =
-          (maxY / 5).ceilToDouble().clamp(1.0, double.infinity);
+      final double interval = (maxY / 5).ceilToDouble().clamp(
+        1.0,
+        double.infinity,
+      );
       final double rodWidth = (180.0 / chartData.length).clamp(10.0, 18.0);
-
 
       return SoftCard(
         child: Column(
@@ -63,15 +64,14 @@ class TodayBarChartCard extends StatelessWidget {
                           return SideTitleWidget(
                             meta: meta,
                             space: 5,
-                              child: Text(
-                                '${index + 1}',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            child: Text(
+                              '${index + 1}',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w700,
                               ),
-                            
+                            ),
                           );
                         },
                       ),
@@ -108,8 +108,7 @@ class TodayBarChartCard extends StatelessWidget {
                   borderData: FlBorderData(show: false),
                   barGroups: chartData.asMap().entries.map((entry) {
                     final int index = entry.key;
-                    final bool isCompleted =
-                        entry.value['completed'] ?? false;
+                    final bool isCompleted = entry.value['completed'] ?? false;
                     final double barHeight = isCompleted
                         ? effectiveStreak
                         : maxY * 0.12;
@@ -122,7 +121,7 @@ class TodayBarChartCard extends StatelessWidget {
                           gradient: isCompleted
                               ? LinearGradient(
                                   colors: [
-                                   Theme.of(context).colorScheme.secondary,
+                                    Theme.of(context).colorScheme.secondary,
                                     colorScheme.primary,
                                   ],
                                   begin: Alignment.bottomCenter,
@@ -150,8 +149,9 @@ class TodayBarChartCard extends StatelessWidget {
                             toY: maxY,
                             color: isDark
                                 ? Colors.black.withValues(alpha: 0.32)
-                                : const Color(0xFFA3B1C6)
-                                    .withValues(alpha: 0.20),
+                                : const Color(
+                                    0xFFA3B1C6,
+                                  ).withValues(alpha: 0.20),
                           ),
                         ),
                       ],
@@ -162,7 +162,6 @@ class TodayBarChartCard extends StatelessWidget {
                 curve: Curves.easeInOutCubic,
               ),
             ),
-
           ],
         ),
       );

@@ -46,11 +46,10 @@ class _HabitStatsPageState extends State<HabitStatsPage>
       onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar:
-        myAppBar(
+        appBar: myAppBar(
           context: context,
           title: S.current.ratepagetitle,
-        ),         
+        ),
         body: GetX<HabitStatsController>(
           builder: (controller) {
             if (controller.stats.value == null && controller.isLoading.value) {
@@ -160,7 +159,8 @@ class _NeumorphicAiFabState extends State<_NeumorphicAiFab> {
           gradient: LinearGradient(
             colors: [
               primary,
-              Color.lerp(primary, Colors.black, isDark ? 0.25 : 0.12) ?? primary,
+              Color.lerp(primary, Colors.black, isDark ? 0.25 : 0.12) ??
+                  primary,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

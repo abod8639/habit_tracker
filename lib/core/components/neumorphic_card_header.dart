@@ -43,35 +43,41 @@ class NeumorphicCardHeader extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) 
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [surfaceGradientStart, surfaceGradientEnd],
+              if (icon != null)
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [surfaceGradientStart, surfaceGradientEnd],
+                    ),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color.fromARGB(
+                              255,
+                              20,
+                              20,
+                              20,
+                            ).withValues(alpha: 0.08)
+                          : Colors.white.withValues(alpha: 0.90),
+                      width: 1.0,
+                    ),
+                    boxShadow: AppShadows.dotIndicator(isDark: isDark),
                   ),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color.fromARGB(255, 20, 20, 20).withValues(alpha: 0.08)
-                        : Colors.white.withValues(alpha: 0.90),
-                    width: 1.0,
+                  child: Icon(
+                    icon,
+                    size: 19,
+                    color: effectiveIconColor,
                   ),
-                  boxShadow: AppShadows.dotIndicator(isDark: isDark),
                 ),
-                child: Icon(
-                  icon,
-                  size: 19,
-                  color: effectiveIconColor,
-                ),
-              ),
               const SizedBox(width: 12),
               Text(
-                title??"",
-                style: titleStyle ??
+                title ?? "",
+                style:
+                    titleStyle ??
                     theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.3,

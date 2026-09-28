@@ -238,7 +238,8 @@ class _AppConfirmationDialogState extends State<AppConfirmationDialog>
                     const SizedBox(width: 12),
                     Expanded(
                       child: _NeumorphicDialogButton(
-                        label: widget.confirmText ??
+                        label:
+                            widget.confirmText ??
                             (widget.isDestructive
                                 ? S.of(context).delete
                                 : S.of(context).save),
@@ -281,7 +282,8 @@ class _NeumorphicDialogButton extends StatefulWidget {
   });
 
   @override
-  State<_NeumorphicDialogButton> createState() => _NeumorphicDialogButtonState();
+  State<_NeumorphicDialogButton> createState() =>
+      _NeumorphicDialogButtonState();
 }
 
 class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
@@ -368,8 +370,16 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
                 )
               : LinearGradient(
                   colors: [
-                    Color.lerp(surfaceColor, Colors.white, isDark ? 0.04 : 0.40)!,
-                    Color.lerp(surfaceColor, isDark ? Colors.black : const Color(0xFFA3B1C6), isDark ? 0.12 : 0.08)!,
+                    Color.lerp(
+                      surfaceColor,
+                      Colors.white,
+                      isDark ? 0.04 : 0.40,
+                    )!,
+                    Color.lerp(
+                      surfaceColor,
+                      isDark ? Colors.black : const Color(0xFFA3B1C6),
+                      isDark ? 0.12 : 0.08,
+                    )!,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -378,8 +388,8 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
             color: widget.isPrimary
                 ? Colors.white.withValues(alpha: isDark ? 0.15 : 0.40)
                 : (isDark
-                    ? Colors.white.withValues(alpha: 0.06)
-                    : Colors.white.withValues(alpha: 0.85)),
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : Colors.white.withValues(alpha: 0.85)),
             width: 1.0,
           ),
           boxShadow: shadows,

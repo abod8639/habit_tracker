@@ -35,8 +35,7 @@ class NeumorphicTimePickerDialog extends StatefulWidget {
       _NeumorphicTimePickerDialogState();
 }
 
-class _NeumorphicTimePickerDialogState
-    extends State<NeumorphicTimePickerDialog>
+class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -251,8 +250,14 @@ class _NeumorphicTimePickerDialogState
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? (Color.lerp(baseColor, Colors.black, 0.25) ?? baseColor)
-                        : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.35) ?? baseColor),
+                        ? (Color.lerp(baseColor, Colors.black, 0.25) ??
+                              baseColor)
+                        : (Color.lerp(
+                                baseColor,
+                                const Color(0xFFDCE2EC),
+                                0.35,
+                              ) ??
+                              baseColor),
                     borderRadius: BorderRadius.circular(AppRadius.well),
                     border: Border.all(
                       color: isDark
@@ -454,7 +459,9 @@ class _NeumorphicTimePickerDialogState
               ? [
                   ...AppShadows.buttonResting(isDark: isDark),
                   BoxShadow(
-                    color: colorScheme.primary.withValues(alpha: isDark ? 0.40 : 0.25),
+                    color: colorScheme.primary.withValues(
+                      alpha: isDark ? 0.40 : 0.25,
+                    ),
                     blurRadius: 5,
                     offset: const Offset(0, 1.5),
                   ),
@@ -659,8 +666,8 @@ class _StepperButtonState extends State<_StepperButton> {
                 ),
           color: _isPressed
               ? (isDark
-                  ? Colors.black.withValues(alpha: 0.32)
-                  : const Color(0xFFD3DCE8))
+                    ? Colors.black.withValues(alpha: 0.32)
+                    : const Color(0xFFD3DCE8))
               : null,
           border: Border.all(
             color: isDark
@@ -677,7 +684,9 @@ class _StepperButtonState extends State<_StepperButton> {
             widget.icon,
             size: 20,
             color: colorScheme.onSurface,
-            shadows: _isPressed ? AppShadows.buttonPressed(isDark: isDark) : null,
+            shadows: _isPressed
+                ? AppShadows.buttonPressed(isDark: isDark)
+                : null,
           ),
         ),
       ),
@@ -731,8 +740,9 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
         ? ThemeUtils.getContrastColor(primaryColor)
         : colorScheme.onSurfaceVariant;
 
-    final Color iconColor =
-        widget.isPrimary ? textColor : colorScheme.onSurfaceVariant;
+    final Color iconColor = widget.isPrimary
+        ? textColor
+        : colorScheme.onSurfaceVariant;
 
     final List<BoxShadow> shadows;
     if (_isPressed) {
@@ -784,8 +794,10 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
             color: widget.isPrimary
                 ? Colors.white.withValues(alpha: isDark ? 0.25 : 0.85)
                 : (isDark
-                    ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
-                    : Colors.white.withValues(alpha: _isPressed ? 0.40 : 0.85)),
+                      ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
+                      : Colors.white.withValues(
+                          alpha: _isPressed ? 0.40 : 0.85,
+                        )),
             width: 1.0,
           ),
           boxShadow: shadows,
@@ -794,10 +806,12 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-             widget.icon,
+              widget.icon,
               size: 20,
               color: iconColor,
-              shadows: _isPressed ? AppShadows.buttonPressed(isDark: isDark) : null,
+              shadows: _isPressed
+                  ? AppShadows.buttonPressed(isDark: isDark)
+                  : null,
             ),
             const SizedBox(width: 6),
             Text(

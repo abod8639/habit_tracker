@@ -21,7 +21,8 @@ class SectionTitle extends StatelessWidget {
       padding: padding,
       child: Text(
         title,
-        style: style ??
+        style:
+            style ??
             theme.textTheme.titleMedium?.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,

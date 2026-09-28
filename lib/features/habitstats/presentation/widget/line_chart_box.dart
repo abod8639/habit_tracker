@@ -114,7 +114,10 @@ class LineChartBox extends GetView<HabitStatsController> {
 
             clipData: const FlClipData.all(),
             minX: 0.0,
-            maxX: (trendLabels.length - 1).toDouble().clamp(1.0, double.infinity),
+            maxX: (trendLabels.length - 1).toDouble().clamp(
+              1.0,
+              double.infinity,
+            ),
             minY: -0.05,
             maxY: 1.10,
 
@@ -144,8 +147,10 @@ class LineChartBox extends GetView<HabitStatsController> {
       lineBars.add(
         myLineChartBarData(
           color: Theme.of(context).colorScheme.secondary,
-          color1: Theme.of(context).colorScheme.primary.withValues(alpha:   0.8),
-          color2: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+          color1: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+          color2: Theme.of(
+            context,
+          ).colorScheme.secondary.withValues(alpha: 0.1),
           spots: controller.overallTrend,
           label: 'Overall',
         ),

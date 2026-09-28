@@ -57,7 +57,8 @@ class _MonthlySummaryState extends State<MonthlySummary>
 
   int _getStrength(DateTime normalizedDate, DateTime today) {
     // 1. Live status for today directly from controller so today's progress updates immediately!
-    final bool isToday = normalizedDate.year == today.year &&
+    final bool isToday =
+        normalizedDate.year == today.year &&
         normalizedDate.month == today.month &&
         normalizedDate.day == today.day;
     if (isToday) {
@@ -291,7 +292,8 @@ class _MonthlySummaryState extends State<MonthlySummary>
               Expanded(
                 child: SingleChildScrollView(
                   controller: _scrollController,
-                  reverse: true, // Natively anchors scroll to the latest weeks/today!
+                  reverse:
+                      true, // Natively anchors scroll to the latest weeks/today!
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   child: Column(
@@ -355,7 +357,7 @@ class _MonthlySummaryState extends State<MonthlySummary>
                                   normalizedDay,
                                   today,
                                 );
-          
+
                                 return Container(
                                   margin: EdgeInsets.only(
                                     bottom: rowIdx < 6 ? _tileGap : 0,
@@ -430,8 +432,7 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
     final Color activeStart = isDark
         ? (Color.lerp(primary, Colors.white, 0.14) ?? primary)
         : (Color.lerp(primary, Colors.white, 0.08) ?? primary);
-    final Color activeEnd =
-        Color.lerp(secondary, primary, 0.35) ?? primary;
+    final Color activeEnd = Color.lerp(secondary, primary, 0.35) ?? primary;
 
     // Recessed base for inactive tiles derived natively from cardColor to maintain theme hue
     final Color inactiveBase = isDark
@@ -480,8 +481,8 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
           color: widget.isToday
               ? Colors.white.withValues(alpha: isDark ? 0.55 : 0.95)
               : (isDark
-                  ? Colors.white.withValues(alpha: 0.10 + (progress * 0.16))
-                  : Colors.white.withValues(alpha: 0.35 + (progress * 0.35))),
+                    ? Colors.white.withValues(alpha: 0.10 + (progress * 0.16))
+                    : Colors.white.withValues(alpha: 0.35 + (progress * 0.35))),
           width: widget.isToday ? 1.5 : 1.0,
         ),
         boxShadow: [
@@ -528,8 +529,8 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
           color: widget.isToday
               ? primary.withValues(alpha: 0.85)
               : (isDark
-                  ? Colors.white.withValues(alpha: 0.04)
-                  : Colors.white.withValues(alpha: 0.65)),
+                    ? Colors.white.withValues(alpha: 0.04)
+                    : Colors.white.withValues(alpha: 0.65)),
           width: widget.isToday ? 1.5 : 0.8,
         ),
         boxShadow: [

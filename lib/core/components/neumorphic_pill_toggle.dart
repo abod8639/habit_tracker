@@ -63,7 +63,11 @@ class NeumorphicPillToggle extends StatelessWidget {
                     ? LinearGradient(
                         colors: [
                           colorScheme.primary,
-                          Color.lerp(colorScheme.primary, Colors.black, isDark ? 0.15 : 0.08) ??
+                          Color.lerp(
+                                colorScheme.primary,
+                                Colors.black,
+                                isDark ? 0.15 : 0.08,
+                              ) ??
                               colorScheme.primary,
                         ],
                         begin: Alignment.topLeft,
@@ -98,8 +102,9 @@ class NeumorphicPillToggle extends StatelessWidget {
                     options[index],
                     style: TextStyle(
                       fontSize: 12.0,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.w600,
                       color: isSelected
                           ? colorScheme.onPrimary
                           : colorScheme.onSurfaceVariant,

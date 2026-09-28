@@ -47,8 +47,9 @@ class AiSection extends StatelessWidget {
                         baseSurface,
                       )
                     : Color.alphaBlend(
-                        theme.colorScheme.onSurface
-                            .withValues(alpha: isDark ? 0.05 : 0.03),
+                        theme.colorScheme.onSurface.withValues(
+                          alpha: isDark ? 0.05 : 0.03,
+                        ),
                         baseSurface,
                       ),
                 borderRadius: AppRadius.badgeRadius,
@@ -64,8 +65,8 @@ class AiSection extends StatelessWidget {
                   color: isCustom
                       ? Colors.teal.withValues(alpha: isDark ? 0.35 : 0.25)
                       : (isDark
-                          ? Colors.white.withValues(alpha: 0.04)
-                          : Colors.white.withValues(alpha: 0.6)),
+                            ? Colors.white.withValues(alpha: 0.04)
+                            : Colors.white.withValues(alpha: 0.6)),
                   width: 1,
                 ),
               ),
@@ -73,9 +74,7 @@ class AiSection extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    isCustom
-                        ? Icons.check_circle_rounded
-                        : Icons.tune_rounded,
+                    isCustom ? Icons.check_circle_rounded : Icons.tune_rounded,
                     size: 14,
                     color: isCustom
                         ? Colors.teal

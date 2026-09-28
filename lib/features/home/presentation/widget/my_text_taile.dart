@@ -190,7 +190,12 @@ class _MyTextTaileState extends State<MyTextTaile>
                   setState(() => _isHovered = hovered);
                 }
               },
-              child: _buildNeumorphicTile(theme, themeColors, textTheme, isDark),
+              child: _buildNeumorphicTile(
+                theme,
+                themeColors,
+                textTheme,
+                isDark,
+              ),
             ),
           ),
         ),
@@ -217,7 +222,7 @@ class _MyTextTaileState extends State<MyTextTaile>
           child: Tooltip(
             message: tooltip,
             child: Container(
-              width: 50*1.6,
+              width: 50 * 1.6,
               height: 65,
               decoration: BoxDecoration(
                 borderRadius: AppRadius.mdRadius,
@@ -441,8 +446,8 @@ class _MyTextTaileState extends State<MyTextTaile>
           color: widget.isSelected
               ? themeColors.primary
               : (isDark
-                  ? Color.lerp(cardBase, Colors.black, 0.20)
-                  : Color.lerp(cardBase, const Color(0xFFA3B1C6), 0.15)),
+                    ? Color.lerp(cardBase, Colors.black, 0.20)
+                    : Color.lerp(cardBase, const Color(0xFFA3B1C6), 0.15)),
           boxShadow: widget.isSelected
               ? AppShadows.bloom(
                   color: themeColors.primary,
@@ -455,8 +460,8 @@ class _MyTextTaileState extends State<MyTextTaile>
             color: widget.isSelected
                 ? Colors.white.withValues(alpha: isDark ? 0.40 : 0.85)
                 : (isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.white.withValues(alpha: 0.90)),
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.white.withValues(alpha: 0.90)),
             width: 1.2,
           ),
         ),
@@ -487,10 +492,7 @@ class _MyTextTaileState extends State<MyTextTaile>
               ? LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    themeColors.primary,
-                    themeColors.secondary
-                  ],
+                  colors: [themeColors.primary, themeColors.secondary],
                 )
               : LinearGradient(
                   begin: Alignment.topLeft,
@@ -517,8 +519,8 @@ class _MyTextTaileState extends State<MyTextTaile>
             color: isChecked
                 ? Colors.white.withValues(alpha: isDark ? 0.18 : 0.35)
                 : (isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.white.withValues(alpha: 0.95)),
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.white.withValues(alpha: 0.95)),
             width: 1.0,
           ),
         ),
@@ -534,7 +536,7 @@ class _MyTextTaileState extends State<MyTextTaile>
                   color: themeColors.onError,
                 ),
               )
-            :  null,
+            : null,
       ),
     );
   }
@@ -555,7 +557,7 @@ class _MyTextTaileState extends State<MyTextTaile>
             ? null
             : [
                 BoxShadow(
-                  color: habitColor.withValues(alpha:  0.30),
+                  color: habitColor.withValues(alpha: 0.30),
                   blurRadius: 3,
                   spreadRadius: 0.5,
                   offset: const Offset(0, 1),
@@ -590,5 +592,3 @@ class _MyTextTaileState extends State<MyTextTaile>
     );
   }
 }
-
-

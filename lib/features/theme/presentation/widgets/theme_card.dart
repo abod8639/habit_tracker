@@ -92,7 +92,10 @@ class _ThemeCardState extends State<ThemeCard>
   }
 
   String _formatThemeName(String name) {
-    return name.split('_').map((word) => word.capitalizeFirst ?? word).join(' ');
+    return name
+        .split('_')
+        .map((word) => word.capitalizeFirst ?? word)
+        .join(' ');
   }
 
   @override
@@ -119,8 +122,14 @@ class _ThemeCardState extends State<ThemeCard>
                 end: Alignment.bottomRight,
                 colors: widget.isSelected
                     ? [
-                        Color.alphaBlend(primary.withValues(alpha: 0.08), surface),
-                        Color.alphaBlend(primary.withValues(alpha: 0.02), surface),
+                        Color.alphaBlend(
+                          primary.withValues(alpha: 0.08),
+                          surface,
+                        ),
+                        Color.alphaBlend(
+                          primary.withValues(alpha: 0.02),
+                          surface,
+                        ),
                       ]
                     : [
                         isCardDark
@@ -139,12 +148,15 @@ class _ThemeCardState extends State<ThemeCard>
                 color: widget.isSelected
                     ? primary
                     : (pageIsDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.black.withValues(alpha: 0.06)),
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.black.withValues(alpha: 0.06)),
                 width: widget.isSelected ? 2.2 : 1.0,
               ),
               boxShadow: widget.isSelected
-                  ? AppShadows.selectedCard(primary: primary, isDark: pageIsDark)
+                  ? AppShadows.selectedCard(
+                      primary: primary,
+                      isDark: pageIsDark,
+                    )
                   : AppShadows.subtleCard(isDark: pageIsDark),
             ),
             child: ClipRRect(
@@ -204,15 +216,15 @@ class _ThemeCardState extends State<ThemeCard>
                       color: widget.isSelected
                           ? primary.withValues(alpha: isCardDark ? 0.12 : 0.07)
                           : (isCardDark
-                              ? Colors.black.withValues(alpha: 0.15)
-                              : Colors.black.withValues(alpha: 0.02)),
+                                ? Colors.black.withValues(alpha: 0.15)
+                                : Colors.black.withValues(alpha: 0.02)),
                       border: Border(
                         top: BorderSide(
                           color: widget.isSelected
                               ? primary.withValues(alpha: 0.25)
                               : (isCardDark
-                                  ? Colors.white.withValues(alpha: 0.05)
-                                  : Colors.black.withValues(alpha: 0.05)),
+                                    ? Colors.white.withValues(alpha: 0.05)
+                                    : Colors.black.withValues(alpha: 0.05)),
                           width: 1,
                         ),
                       ),
@@ -243,12 +255,12 @@ class _ThemeCardState extends State<ThemeCard>
                                       color: widget.isSelected
                                           ? primary
                                           : (isCardDark
-                                              ? Colors.white.withValues(
-                                                  alpha: 0.35,
-                                                )
-                                              : Colors.black.withValues(
-                                                  alpha: 0.35,
-                                                )),
+                                                ? Colors.white.withValues(
+                                                    alpha: 0.35,
+                                                  )
+                                                : Colors.black.withValues(
+                                                    alpha: 0.35,
+                                                  )),
                                       boxShadow: widget.isSelected
                                           ? AppShadows.activeDot(color: primary)
                                           : null,
@@ -267,12 +279,12 @@ class _ThemeCardState extends State<ThemeCard>
                                       color: widget.isSelected
                                           ? primary
                                           : (isCardDark
-                                              ? Colors.white.withValues(
-                                                  alpha: 0.65,
-                                                )
-                                              : Colors.black.withValues(
-                                                  alpha: 0.55,
-                                                )),
+                                                ? Colors.white.withValues(
+                                                    alpha: 0.65,
+                                                  )
+                                                : Colors.black.withValues(
+                                                    alpha: 0.55,
+                                                  )),
                                     ),
                                   ),
                                 ],
@@ -316,7 +328,8 @@ class _ThemeCardState extends State<ThemeCard>
                             child: Center(
                               child: Icon(
                                 Icons.check_rounded,
-                                color: widget.colors['onPrimary'] ?? Colors.white,
+                                color:
+                                    widget.colors['onPrimary'] ?? Colors.white,
                                 size: 20,
                               ),
                             ),

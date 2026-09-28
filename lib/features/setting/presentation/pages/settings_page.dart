@@ -45,7 +45,7 @@ class _SettingsPageState extends State<SettingsPage>
       focusNode: FocusNode(),
       onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
       child: Scaffold(
-        appBar:myAppBar(
+        appBar: myAppBar(
           context: context,
           title: S.current.settingPageTitle,
         ),

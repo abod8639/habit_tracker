@@ -32,7 +32,7 @@ class HomeAppBar extends StatelessWidget {
         final Color surfaceGradientEnd = isDark
             ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
             : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ??
-                baseColor);
+                  baseColor);
 
         return SliverAppBar(
           pinned: true,

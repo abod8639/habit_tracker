@@ -114,8 +114,12 @@ class _MyDrawerListTileState extends State<MyDrawerListTile>
               color: widget.isSelected
                   ? colorScheme.primary.withValues(alpha: isDark ? 0.40 : 0.30)
                   : (isDark
-                      ? Colors.white.withValues(alpha: _isHovered ? 0.08 : 0.03)
-                      : Colors.white.withValues(alpha: _isHovered ? 0.90 : 0.70)),
+                        ? Colors.white.withValues(
+                            alpha: _isHovered ? 0.08 : 0.03,
+                          )
+                        : Colors.white.withValues(
+                            alpha: _isHovered ? 0.90 : 0.70,
+                          )),
               width: widget.isSelected ? 1.4 : 1.0,
             ),
           ),
@@ -165,7 +169,9 @@ class _MyDrawerListTileState extends State<MyDrawerListTile>
                           fontSize: 14.5,
                           fontWeight: widget.isSelected
                               ? FontWeight.w700
-                              : (_isHovered ? FontWeight.w600 : FontWeight.w500),
+                              : (_isHovered
+                                    ? FontWeight.w600
+                                    : FontWeight.w500),
                           letterSpacing: 0.2,
                         ),
                       ),

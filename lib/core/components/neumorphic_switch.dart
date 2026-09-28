@@ -73,8 +73,8 @@ class NeumorphicSwitch extends StatelessWidget {
               color: value
                   ? primary.withValues(alpha: isDark ? 0.40 : 0.28)
                   : (isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.white.withValues(alpha: 0.70)),
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.white.withValues(alpha: 0.70)),
               width: 1.0,
             ),
             boxShadow: AppShadows.wellDual(isDark: isDark),
@@ -107,15 +107,17 @@ class NeumorphicSwitch extends StatelessWidget {
                   color: value
                       ? Colors.white.withValues(alpha: isDark ? 0.35 : 0.85)
                       : (isDark
-                          ? Colors.white.withValues(alpha: 0.10)
-                          : Colors.white.withValues(alpha: 0.95)),
+                            ? Colors.white.withValues(alpha: 0.10)
+                            : Colors.white.withValues(alpha: 0.95)),
                   width: 1.0,
                 ),
                 boxShadow: value
                     ? [
                         ...AppShadows.buttonResting(isDark: isDark),
                         BoxShadow(
-                          color: primary.withValues(alpha: isDark ? 0.45 : 0.30),
+                          color: primary.withValues(
+                            alpha: isDark ? 0.45 : 0.30,
+                          ),
                           blurRadius: 6,
                           offset: const Offset(0, 1.5),
                         ),

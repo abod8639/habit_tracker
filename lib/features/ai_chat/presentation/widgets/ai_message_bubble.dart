@@ -31,8 +31,9 @@ class AiMessageBubble extends StatelessWidget {
       snackPosition: SnackPosition.BOTTOM,
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       borderRadius: 16,
-      backgroundColor:
-          Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.9),
+      backgroundColor: Theme.of(
+        context,
+      ).colorScheme.inverseSurface.withValues(alpha: 0.9),
       icon: const Icon(
         Icons.check_circle_outline,
         color: Colors.greenAccent,
@@ -53,8 +54,9 @@ class AiMessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Retry button for user failed message
@@ -145,8 +147,8 @@ class AiMessageBubble extends StatelessWidget {
                     color: isUser
                         ? Colors.white.withValues(alpha: 0.28)
                         : (isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.white.withValues(alpha: 0.85)),
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.white.withValues(alpha: 0.85)),
                     width: 1.0,
                   ),
                   boxShadow: isUser

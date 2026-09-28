@@ -42,7 +42,9 @@ class StreakBadge extends StatelessWidget {
             shadows: hasStreak
                 ? [
                     Shadow(
-                      color: streakColor.withValues(alpha: isDark ? 0.70 : 0.40),
+                      color: streakColor.withValues(
+                        alpha: isDark ? 0.70 : 0.40,
+                      ),
                       blurRadius: 6,
                     ),
                   ]

@@ -150,26 +150,30 @@ class _AnimatedSettingTileState extends State<AnimatedSettingTile>
                         children: [
                           Text(
                             widget.title,
-                            style: (theme.textTheme.titleMedium ??
-                                    const TextStyle())
-                                .copyWith(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15.5,
-                              letterSpacing: 0.2,
-                              color: widget.textColor ?? colorScheme.onSurface,
-                            ),
+                            style:
+                                (theme.textTheme.titleMedium ??
+                                        const TextStyle())
+                                    .copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15.5,
+                                      letterSpacing: 0.2,
+                                      color:
+                                          widget.textColor ??
+                                          colorScheme.onSurface,
+                                    ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             widget.subtitle,
-                            style: (theme.textTheme.bodySmall ??
-                                    const TextStyle())
-                                .copyWith(
-                              color: colorScheme.onSurface
-                                  .withValues(alpha: 0.60),
-                              fontSize: 13,
-                              height: 1.25,
-                            ),
+                            style:
+                                (theme.textTheme.bodySmall ?? const TextStyle())
+                                    .copyWith(
+                                      color: colorScheme.onSurface.withValues(
+                                        alpha: 0.60,
+                                      ),
+                                      fontSize: 13,
+                                      height: 1.25,
+                                    ),
                           ),
                         ],
                       ),

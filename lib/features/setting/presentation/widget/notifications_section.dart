@@ -44,8 +44,10 @@ class NotificationsSection extends StatelessWidget {
               GestureDetector(
                 onTap: () => myShowTimePicker(notificationController, context),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: Color.alphaBlend(
                       primaryColor.withValues(alpha: isDark ? 0.14 : 0.08),
@@ -53,8 +55,9 @@ class NotificationsSection extends StatelessWidget {
                     ),
                     borderRadius: AppRadius.badgeRadius,
                     border: Border.all(
-                      color:
-                          primaryColor.withValues(alpha: isDark ? 0.25 : 0.18),
+                      color: primaryColor.withValues(
+                        alpha: isDark ? 0.25 : 0.18,
+                      ),
                       width: 0.9,
                     ),
                     boxShadow: AppShadows.badge(isDark: isDark),
@@ -99,5 +102,3 @@ class NotificationsSection extends StatelessWidget {
     });
   }
 }
-
-

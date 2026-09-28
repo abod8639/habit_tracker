@@ -44,8 +44,8 @@ class NeumorphicIconButton extends StatefulWidget {
     this.iconSize,
     this.glowWithAccent = false,
     this.customShadows,
-  })  : shape = BoxShape.circle,
-        borderRadius = null;
+  }) : shape = BoxShape.circle,
+       borderRadius = null;
 
   const NeumorphicIconButton.square({
     super.key,
@@ -83,21 +83,22 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
         ? (Color.lerp(baseColor, Colors.black, 0.16) ?? baseColor)
         : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
 
-    final Color effectiveIconColor = widget.iconColor ??
-        widget.accentColor ??
-        colorScheme.onSurface;
+    final Color effectiveIconColor =
+        widget.iconColor ?? widget.accentColor ?? colorScheme.onSurface;
 
     final double effectiveIconSize = widget.iconSize ?? (widget.size * 0.48);
 
     final BorderRadius? effectiveBorderRadius = widget.shape == BoxShape.circle
         ? null
-        : (widget.borderRadius ?? const BorderRadius.all(Radius.circular(16.0)));
+        : (widget.borderRadius ??
+              const BorderRadius.all(Radius.circular(16.0)));
 
-    final List<BoxShadow> effectiveShadows = widget.customShadows ??
+    final List<BoxShadow> effectiveShadows =
+        widget.customShadows ??
         (_isPressed
             ? (widget.shape == BoxShape.circle
-                ? AppShadows.buttonPressed(isDark: isDark)
-                : AppShadows.softButtonPressed(isDark: isDark))
+                  ? AppShadows.buttonPressed(isDark: isDark)
+                  : AppShadows.softButtonPressed(isDark: isDark))
             : [
                 ...(widget.shape == BoxShape.circle
                     ? AppShadows.buttonResting(isDark: isDark)
@@ -127,7 +128,7 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 140),
           curve: Curves.easeOutCubic,
-          width: widget.size*1.6,
+          width: widget.size * 1.6,
           height: widget.size,
           decoration: BoxDecoration(
             shape: widget.shape,
@@ -141,15 +142,19 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
                   ),
             color: _isPressed
                 ? (isDark
-                    ? Colors.black.withValues(alpha: 0.32)
-                    : const Color(0xFFD3DCE8))
+                      ? Colors.black.withValues(alpha: 0.32)
+                      : const Color(0xFFD3DCE8))
                 : null,
             border: Border.all(
               color: (widget.glowWithAccent && widget.accentColor != null)
                   ? widget.accentColor!.withValues(alpha: isDark ? 0.35 : 0.25)
                   : (isDark
-                      ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
-                      : Colors.white.withValues(alpha: _isPressed ? 0.35 : 0.80)),
+                        ? Colors.white.withValues(
+                            alpha: _isPressed ? 0.03 : 0.06,
+                          )
+                        : Colors.white.withValues(
+                            alpha: _isPressed ? 0.35 : 0.80,
+                          )),
               width: 1.0,
             ),
             boxShadow: effectiveShadows,

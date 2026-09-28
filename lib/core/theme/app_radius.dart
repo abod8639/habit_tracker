@@ -39,21 +39,37 @@ abstract final class AppRadius {
   static const BorderRadius smRadius = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius mdRadius = BorderRadius.all(Radius.circular(md));
   static const BorderRadius lgRadius = BorderRadius.all(Radius.circular(lg));
-  static const BorderRadius wellRadius = BorderRadius.all(Radius.circular(well));
-  static const BorderRadius badgeRadius = BorderRadius.all(Radius.circular(badge));
-  static const BorderRadius buttonRadius = BorderRadius.all(Radius.circular(button));
-  static const BorderRadius cardRadius = BorderRadius.all(Radius.circular(card));
-  static const BorderRadius dialogRadius = BorderRadius.all(Radius.circular(dialog));
-  static const BorderRadius pillRadius = BorderRadius.all(Radius.circular(pill));
+  static const BorderRadius wellRadius = BorderRadius.all(
+    Radius.circular(well),
+  );
+  static const BorderRadius badgeRadius = BorderRadius.all(
+    Radius.circular(badge),
+  );
+  static const BorderRadius buttonRadius = BorderRadius.all(
+    Radius.circular(button),
+  );
+  static const BorderRadius cardRadius = BorderRadius.all(
+    Radius.circular(card),
+  );
+  static const BorderRadius dialogRadius = BorderRadius.all(
+    Radius.circular(dialog),
+  );
+  static const BorderRadius pillRadius = BorderRadius.all(
+    Radius.circular(pill),
+  );
 
   // ── Helper Constructors ───────────────────────────────────────────────────
   static BorderRadius circular(double radius) => BorderRadius.circular(radius);
 
-  static BorderRadius top(double radius) => BorderRadius.vertical(top: Radius.circular(radius));
+  static BorderRadius top(double radius) =>
+      BorderRadius.vertical(top: Radius.circular(radius));
 
-  static BorderRadius bottom(double radius) => BorderRadius.vertical(bottom: Radius.circular(radius));
+  static BorderRadius bottom(double radius) =>
+      BorderRadius.vertical(bottom: Radius.circular(radius));
 
-  static BorderRadius left(double radius) => BorderRadius.horizontal(left: Radius.circular(radius));
+  static BorderRadius left(double radius) =>
+      BorderRadius.horizontal(left: Radius.circular(radius));
 
-  static BorderRadius right(double radius) => BorderRadius.horizontal(right: Radius.circular(radius));
+  static BorderRadius right(double radius) =>
+      BorderRadius.horizontal(right: Radius.circular(radius));
 }

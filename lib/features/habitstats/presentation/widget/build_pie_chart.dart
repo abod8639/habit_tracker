@@ -80,7 +80,6 @@ class CompletionPieChartCard extends StatelessWidget {
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),
@@ -105,11 +104,11 @@ class CompletionPieChartCard extends StatelessWidget {
       if (isCompact) {
         return Expanded(
           child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: EdgeInsets.symmetric(
-          vertical: isPhone ? 22 : 16,
-          horizontal: isPhone ? 6 : 10,
-        ),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            padding: EdgeInsets.symmetric(
+              vertical: isPhone ? 22 : 16,
+              horizontal: isPhone ? 6 : 10,
+            ),
             decoration: StatsNeumorphicTheme.wellDecoration(
               context,
               borderRadius: AppRadius.well,
@@ -152,9 +151,7 @@ class CompletionPieChartCard extends StatelessWidget {
                                 showTitle: false,
                                 radius: 6,
                                 color: Theme.of(context).colorScheme.error,
-         
-                                   )
-                              
+                              ),
                           ],
                         ),
                       ),
@@ -252,6 +249,7 @@ class CompletionPieChartCard extends StatelessWidget {
                 ],
               ),
             ),
+
             // const SizedBox(height: 16),
             // Row(
             //   children: [
@@ -358,7 +356,6 @@ class CompletionPieChartCard extends StatelessWidget {
             //     ),
             //   ],
             // ),
-        
           ],
         ),
       );

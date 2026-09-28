@@ -112,7 +112,8 @@ abstract final class StatsNeumorphicTheme {
         ? (Color.lerp(baseColor, Colors.black, 0.18) ?? baseColor)
         : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.28) ?? baseColor);
 
-    final surfaceColor = Color.lerp(
+    final surfaceColor =
+        Color.lerp(
           badgeBase,
           badgeColor,
           isDark ? 0.14 : 0.09,
