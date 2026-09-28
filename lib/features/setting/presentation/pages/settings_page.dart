@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/about_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/account_section.dart';
@@ -45,14 +45,9 @@ class _SettingsPageState extends State<SettingsPage>
       focusNode: FocusNode(),
       onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            onPressed: () => Get.back(),
-          ),
-          centerTitle: true,
-          title: Text(S.current.settingPageTitle),
-          elevation: 0,
+        appBar:myAppBar(
+          context: context,
+          title: S.current.settingPageTitle,
         ),
         body: ListView(
           padding: const EdgeInsets.only(bottom: 24),
