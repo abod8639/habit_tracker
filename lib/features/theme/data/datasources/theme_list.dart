@@ -4,7 +4,7 @@ const Map<String, Map<String, Color>> themeColors = {
   // --- ثيمات GitHub (معدلة لتناسب النحت الناعم) ---
   'github_dark_green': {
     'primary': Color(0xFF3FB950),
-    'secondary': Color(0xFF238636),
+    'secondary': Color.fromARGB(255, 19, 160, 179),
     'background': Color(0xFF1E2228), // رمادي داكن يتيح توليد ضوء وظل
     'surface': Color(0xFF1E2228),    // متطابق مع الخلفية
     'error': Color(0xFFE5534B),
@@ -23,8 +23,8 @@ const Map<String, Map<String, Color>> themeColors = {
   },
 
   'github_dark': {
-    'primary': Color(0xFF58A6FF),
-    'secondary': Color(0xFF1F6FEB),
+    'primary': Color.fromARGB(255, 100, 172, 255),
+    'secondary': Color.fromARGB(255, 11, 96, 222),
     'background': Color(0xFF1C2128),
     'surface': Color(0xFF1C2128),
     'error': Color(0xFFF85149),
@@ -55,7 +55,7 @@ const Map<String, Map<String, Color>> themeColors = {
 
   'mint': {
     'primary': Color(0xFF199A88),
-    'secondary': Color(0xFF4DB6AC),
+    'secondary': Color.fromARGB(255, 77, 135, 182),
     'background': Color(0xFFE5ECE8), // نعناعي رمادي هادئ
     'surface': Color(0xFFE5ECE8),
     'error': Color(0xFFD64545),
@@ -65,11 +65,11 @@ const Map<String, Map<String, Color>> themeColors = {
 
   // --- ثيمات Catppuccin معدلة لأسلوب Soft UI ---
   'catppuccin': {
-    'primary': Color(0xFF89B4FA),
-    'secondary': Color(0xFFCBA6F7),
+    'primary': Color.fromARGB(255, 130, 178, 255),
+    'secondary': Color.fromARGB(255, 196, 147, 255),
     'background': Color(0xFF232534), // Mocha الأساسي معدل للتجسيم
     'surface': Color(0xFF232534),
-    'error': Color(0xFFF38BA8),
+    'error': Color.fromARGB(255, 255, 128, 164),
     'onPrimary': Color(0xFF11111B),
     'onSecondary': Color(0xFFCDD6F4),
   },
@@ -84,16 +84,6 @@ const Map<String, Map<String, Color>> themeColors = {
     'onSecondary': Color(0xFF4C4F69),
   },
 
-  'catppuccin_frappe': {
-    'primary': Color(0xFF8CAAEE),
-    'secondary': Color(0xFFF4B8E4),
-    'background': Color(0xFF35394B),
-    'surface': Color(0xFF35394B),
-    'error': Color(0xFFE78284),
-    'onPrimary': Color(0xFF232634),
-    'onSecondary': Color(0xFFC6D0F5),
-  },
-
   'catppuccin_macchiato': {
     'primary': Color(0xFF8AADF4),
     'secondary': Color(0xFFC6A0F6),
@@ -106,8 +96,8 @@ const Map<String, Map<String, Color>> themeColors = {
 
   // --- الثيمات الداكنة المتخصصة (Dark Neumorphism) ---
   'dracula': {
-    'primary': Color(0xFFBD93F9),
-    'secondary': Color(0xFFFF79C6),
+    'primary': Color.fromARGB(255, 176, 120, 255),
+    'secondary': Color.fromARGB(255, 255, 110, 192),
     'background': Color(0xFF282A36), // لون دراكولا الشهير ممتاز للظلال
     'surface': Color(0xFF282A36),
     'error': Color(0xFFFF5555),
@@ -117,7 +107,7 @@ const Map<String, Map<String, Color>> themeColors = {
 
   'hologram': {
     'primary': Color(0xFF38BDF8),
-    'secondary': Color(0xFF0EA5E9),
+    'secondary': Color.fromARGB(255, 138, 14, 233),
     'background': Color(0xFF1A2234), // أزرق كحلي ناعم بدلاً من الأسود الداكن جداً
     'surface': Color(0xFF1A2234),
     'error': Color(0xFFFB7185),
@@ -127,7 +117,7 @@ const Map<String, Map<String, Color>> themeColors = {
 
   'neon_circuit': {
     'primary': Color(0xFF00E599),
-    'secondary': Color(0xFF059669),
+    'secondary': Color.fromARGB(255, 5, 106, 150),
     'background': Color(0xFF192329), // زيتي داكن يسمح بظهور الحواف المنحوتة
     'surface': Color(0xFF192329),
     'error': Color(0xFFF43F5E),
