@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/core/components/neumorphic_time_picker_dialog.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/notification_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -16,9 +15,9 @@ Future<void> myShowTimePicker(
 
   if (!context.mounted) return;
 
-  // final TimeOfDay? picked = await showTimePicker(
+  final TimeOfDay? picked = await showTimePicker(
 
-  final TimeOfDay? picked = await showNeumorphicTimePicker(
+  // final TimeOfDay? picked = await showNeumorphicTimePicker(
     context: context,
     initialTime: controller.notificationTime.value ?? TimeOfDay.now(),
   );
