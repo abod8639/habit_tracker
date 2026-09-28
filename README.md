@@ -2,8 +2,8 @@
 
 A **beautiful**, **responsive**, and **intuitive** habit tracking app built with Flutter — designed to help you build positive daily routines with ease.
 
-[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/abod8639/flutter_habit_tracker/releases/download/v1.3/app-release.apk)
-[![Latest Release](https://img.shields.io/github/v/release/abod8639/flutter_habit_tracker?style=for-the-badge&logo=github&color=blue)](https://github.com/abod8639/flutter_habit_tracker/releases)
+[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/abod8639/habit_tracker/releases/download/V1.3/app-release.apk)
+[![Latest Release](https://img.shields.io/github/v/release/abod8639/habit_tracker?style=for-the-badge&logo=github&color=blue)](https://github.com/abod8639/habit_tracker/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 ---
