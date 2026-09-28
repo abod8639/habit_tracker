@@ -45,9 +45,9 @@ class AiAvatar extends StatelessWidget {
           ),
           // Bottom-right soft depth glow
           BoxShadow(
-            color: primary.withValues(alpha: isDark ? 0.45 : 0.35),
+            color: primary.withValues(alpha: isDark ? 0.25 : 0.35),
             offset: const Offset(2, 4),
-            blurRadius: 10,
+            blurRadius: 5,
           ),
         ],
       ),
