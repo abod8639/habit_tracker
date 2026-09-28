@@ -35,7 +35,7 @@ const Map<String, Map<String, Color>> themeColors = {
   // --- ثيمات باستيل ناعمة (Light Neumorphism) ---
   'sunset': {
     'primary': Color(0xFFE67332),
-    'secondary': Color(0xFFF2994A),
+    'secondary': Color.fromARGB(255, 242, 113, 74),
     'background': Color(0xFFF3ECE6), // بيج/خوخي ناعم جداً
     'surface': Color(0xFFF3ECE6),
     'error': Color(0xFFD64545),
