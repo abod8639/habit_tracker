@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
@@ -45,45 +46,11 @@ class _HabitStatsPageState extends State<HabitStatsPage>
       onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppBar(
-          backgroundColor: theme.scaffoldBackgroundColor,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-            child: NeumorphicIconButton(
-              size: 40,
-              icon: Icons.arrow_back_ios_new_rounded,
-              accentColor: colorScheme.onSurface,
-              onPressed: () => Get.back(),
-            ),
-          ),
-          title: Text(
-            S.current.ratepagetitle,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.3,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          centerTitle: true,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-              child: NeumorphicIconButton(
-                size: 40,
-                icon: Icons.refresh_rounded,
-                accentColor: colorScheme.primary,
-                tooltip: 'Refresh',
-                onPressed: () {
-                  if (Get.isRegistered<HabitStatsController>()) {
-                    Get.find<HabitStatsController>().refreshStats();
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
+        appBar:
+        myAppBar(
+          context: context,
+          title: S.current.ratepagetitle,
+        ),         
         body: GetX<HabitStatsController>(
           builder: (controller) {
             if (controller.stats.value == null && controller.isLoading.value) {
