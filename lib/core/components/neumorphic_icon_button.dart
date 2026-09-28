@@ -127,7 +127,7 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 140),
           curve: Curves.easeOutCubic,
-          width: widget.size,
+          width: widget.size*1.6,
           height: widget.size,
           decoration: BoxDecoration(
             shape: widget.shape,
