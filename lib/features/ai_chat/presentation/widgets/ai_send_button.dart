@@ -118,9 +118,9 @@ class _AiSendButtonState extends State<AiSendButton>
                     ),
                     // Radiant colored bloom / depth
                     BoxShadow(
-                      color: primary.withValues(alpha: isDark ? 0.48 : 0.35),
+                      color: primary.withValues(alpha: isDark ? 0.28 : 0.35),
                       offset: const Offset(2, 4),
-                      blurRadius: 10,
+                      blurRadius: 5,
                     ),
                   ]
                 : [
