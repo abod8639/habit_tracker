@@ -143,7 +143,9 @@ class LineChartBox extends GetView<HabitStatsController> {
     if (controller.showAllHabits.value) {
       lineBars.add(
         myLineChartBarData(
-          color: Theme.of(context).colorScheme.primary,
+          color: Theme.of(context).colorScheme.secondary,
+          color1: Theme.of(context).colorScheme.primary.withValues(alpha:   0.8),
+          color2: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
           spots: controller.overallTrend,
           label: 'Overall',
         ),
@@ -157,8 +159,10 @@ class LineChartBox extends GetView<HabitStatsController> {
           if (spots != null && spots.isNotEmpty) {
             lineBars.add(
               myLineChartBarData(
-                spots: spots,
                 color: _getHabitColor(i, context),
+                spots: spots,
+                color1: _getHabitColor(i, context).withValues(alpha: 0.05),
+                color2: _getHabitColor(i, context).withValues(alpha: 0.07),
                 label: _getHabitLabel(habitName, controller.isWeeklyView.value),
               ),
             );
