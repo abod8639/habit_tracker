@@ -17,7 +17,7 @@ Widget buildAnimatedSettingLang(
   final colorScheme = theme.colorScheme;
   final isDark = theme.brightness == Brightness.dark;
   final baseSurface = theme.cardColor;
-  final primaryColor = textColor ?? theme.primaryColor;
+  // final primaryColosr = textColor ?? theme.primaryColor;
 
   final Animation<double> animation = CurvedAnimation(
     parent: animationController,
