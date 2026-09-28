@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/components/section_title.dart';
 import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
@@ -13,30 +14,15 @@ class ThemePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
-    final colorScheme = Theme.of(context).colorScheme;
 
     return KeyboardListener(
       autofocus: true,
       focusNode: FocusNode(),
       onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            color: colorScheme.onSurface,
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            onPressed: () => Get.back(),
-          ),
-          centerTitle: true,
-          title: Text(
-            S.current.themepagetitle,
-            style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
+        appBar: myAppBar(
+          context: context,
+          title: S.current.themepagetitle,
         ),
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
