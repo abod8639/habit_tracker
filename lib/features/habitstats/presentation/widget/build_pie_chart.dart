@@ -105,11 +105,11 @@ class CompletionPieChartCard extends StatelessWidget {
       if (isCompact) {
         return Expanded(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            padding: EdgeInsets.symmetric(
-              vertical: isPhone ? 19 : 16,
-              horizontal: isPhone ? 6 : 10,
-            ),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: EdgeInsets.symmetric(
+          vertical: isPhone ? 22 : 16,
+          horizontal: isPhone ? 6 : 10,
+        ),
             decoration: StatsNeumorphicTheme.wellDecoration(
               context,
               borderRadius: AppRadius.well,
