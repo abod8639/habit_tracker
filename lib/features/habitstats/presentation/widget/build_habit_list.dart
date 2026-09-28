@@ -22,7 +22,7 @@ class HabitSubList extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final Color statusColor = isCompleted
-        ? const Color(0xFF10B981) // Emerald
+        ? colorScheme.primary // Emerald
         : colorScheme.error;
 
     return Container(
