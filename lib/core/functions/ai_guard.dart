@@ -54,12 +54,13 @@ class AiGuard {
       return true;
     }
 
+    if (!context.mounted) return false;
+
     // Display localized warning dialog explaining that the key is missing or invalid
-    final targetContext = context.mounted ? context : (Get.context ?? context);
-    final s = S.of(targetContext);
+    final s = S.of(context);
 
     final confirmed = await AppConfirmationDialog.show(
-      context: targetContext,
+      context: context,
       title: s.aiServiceUnavailableTitle,
       message: s.apiKeyRequiredDialogMessage,
       icon: Icons.key_off_rounded,
@@ -67,10 +68,10 @@ class AiGuard {
       cancelText: s.cancel,
     );
 
-    if (confirmed == true && targetContext.mounted) {
+    if (confirmed == true && context.mounted) {
       final activeController = controller ?? _getController();
       if (activeController != null) {
-        AiApiKeyDialog.show(targetContext, activeController);
+        AiApiKeyDialog.show(context, activeController);
       }
     }
 
