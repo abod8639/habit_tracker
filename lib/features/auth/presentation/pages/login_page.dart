@@ -1,336 +1,160 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:habit_tracker/generated/l10n.dart';
-import 'package:habit_tracker/features/auth/presentation/widgets/login_page_icon.dart';
-import 'package:habit_tracker/features/home/presentation/pages/home_screen.dart';
-import 'package:habit_tracker/features/auth/presentation/widgets/fade_slide_transition.dart';
-import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
 import 'package:habit_tracker/core/functions/perform_sync.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:habit_tracker/features/auth/presentation/widgets/fade_slide_transition.dart';
+import 'package:habit_tracker/features/auth/presentation/widgets/login_page_icon.dart';
+import 'package:habit_tracker/features/auth/presentation/widgets/neumorphic_google_button.dart';
+import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/features/home/presentation/pages/home_screen.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final AuthController _authController = Get.find<AuthController>();
-  final HabitController _habitController = Get.find<HabitController>();
-  final SyncController _syncController = Get.find<SyncController>();
-  bool _obscurePassword = true;
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleEmailSignIn() async {
-    if (_formKey.currentState!.validate()) {
-      final success = await _authController.signInWithEmail(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      if (success) {
-        await performSync(_syncController, _habitController);
-      }
-    }
-  }
-
-  Future<void> _handleGoogleSignIn() async {
-    final success = await _authController.signInWithGoogle();
+  Future<void> _handleGoogleSignIn({
+    required AuthController authController,
+    required SyncController syncController,
+    required HabitController habitController,
+  }) async {
+    final success = await authController.signInWithGoogle();
     if (success) {
-      await performSync(_syncController, _habitController);
+      await performSync(syncController, habitController);
+      Get.offAll(() => const HomeScreen());
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const delayStep = Duration(milliseconds: 100);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.cardColor;
+
+    final AuthController authController = Get.find<AuthController>();
+    final HabitController habitController = Get.find<HabitController>();
+    final SyncController syncController = Get.find<SyncController>();
+
+    const delayStep = Duration(milliseconds: 120);
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(
               horizontal: 24.0,
-              vertical: 16.0,
+              vertical: 20.0,
             ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Skip Button
-                  AnimatedEntry(
-                    delay: Duration.zero,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Skip Button (Neumorphic Chip style)
+                AnimatedEntry(
+                  delay: Duration.zero,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _NeumorphicSkipButton(
+                      label: S.current.skipNow,
+                      onPressed: () async {
+                        await authController.setSkipLogin(true);
+                        Get.offAll(() => const HomeScreen());
+                      },
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 36),
+
+                // Neumorphic Main Card
+                AnimatedEntry(
+                  delay: delayStep,
+                  child: Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28.0,
+                      vertical: 36.0,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(AppRadius.card),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          isDark
+                              ? (Color.lerp(baseColor, Colors.white, 0.04) ??
+                                  baseColor)
+                              : (Color.lerp(baseColor, Colors.white, 0.50) ??
+                                  baseColor),
+                          isDark
+                              ? (Color.lerp(baseColor, Colors.black, 0.16) ??
+                                  baseColor)
+                              : (Color.lerp(
+                                    baseColor,
+                                    const Color(0xFFA3B1C6),
+                                    0.10,
+                                  ) ??
+                                  baseColor),
+                        ],
+                      ),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.06)
+                            : Colors.white.withValues(alpha: 0.85),
+                        width: 1.2,
+                      ),
+                      boxShadow: AppShadows.softCard(isDark: isDark),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextButton(
-                          onPressed: () async {
-                            await _authController.setSkipLogin(true);
-                            Get.offAll(() => const HomeScreen());
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: theme.colorScheme.secondary,
+                        // Soft UI Icon Header
+                        LoginPageIcon(theme: theme),
+
+                        const SizedBox(height: 12),
+
+                        // Subtitle / Prompt
+                        Text(
+                          S.current.login,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            letterSpacing: 0.3,
                           ),
-                          child: Text(S.current.skipNow),
+                          textAlign: TextAlign.center,
                         ),
+
+                        const SizedBox(height: 36),
+
+                        // Google Sign-In Only
+                        Obx(() {
+                          final bool isAuthLoading =
+                              authController.isLoading.value;
+                          final bool isSyncing =
+                              syncController.syncStatus.value ==
+                              SyncStatus.syncing;
+                          final bool isLoading = isAuthLoading || isSyncing;
+
+                          return NeumorphicGoogleButton(
+                            label: S.current.signInWithGoogle,
+                            isLoading: isLoading,
+                            onPressed: isLoading
+                                ? null
+                                : () => _handleGoogleSignIn(
+                                      authController: authController,
+                                      syncController: syncController,
+                                      habitController: habitController,
+                                    ),
+                          );
+                        }),
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Header Icon
-                  AnimatedEntry(
-                    delay: delayStep,
-                    child: LoginPageIcon(theme: theme),
-                  ),
-
-                  // const SizedBox(height: 48),
-
-                  // // Email Field
-                  // AnimatedEntry(
-                  //   delay: delayStep * 2,
-                  //   child: TextFormField(
-                  //     controller: _emailController,
-                  //     keyboardType: TextInputType.emailAddress,
-                  //     decoration: InputDecoration(
-                  //       labelText: S.current.email,
-                  //       prefixIcon: const Icon(Icons.email_outlined),
-                  //       border: OutlineInputBorder(
-                  //         borderRadius: BorderRadius.circular(16),
-                  //       ),
-                  //       filled: true,
-                  //       fillColor: theme.colorScheme.surfaceContainerLowest,
-                  //     ),
-                  //     validator: (value) {
-                  //       if (value == null || value.isEmpty) {
-                  //         return S.current.emailRequired;
-                  //       }
-                  //       if (!value.contains('@')) {
-                  //         return S.current.emailInvalid;
-                  //       }
-                  //       return null;
-                  //     },
-                  //   ),
-                  // ),
-
-                  // const SizedBox(height: 16),
-
-                  // Password Field
-                  // AnimatedEntry(
-                  //   delay: delayStep * 3,
-                  //   child: TextFormField(
-                  //     controller: _passwordController,
-                  //     obscureText: _obscurePassword,
-                  //     decoration: InputDecoration(
-                  //       labelText: S.current.password,
-                  //       prefixIcon: const Icon(Icons.lock_outlined),
-                  //       suffixIcon: IconButton(
-                  //         icon: Icon(
-                  //           _obscurePassword
-                  //               ? Icons.visibility_outlined
-                  //               : Icons.visibility_off_outlined,
-                  //         ),
-                  //         onPressed: () {
-                  //           setState(() {
-                  //             _obscurePassword = !_obscurePassword;
-                  //           });
-                  //         },
-                  //       ),
-                  //       border: OutlineInputBorder(
-                  //         borderRadius: BorderRadius.circular(16),
-                  //       ),
-                  //       filled: true,
-                  //       fillColor: theme.colorScheme.surfaceContainerLowest,
-                  //     ),
-                  //     validator: (value) {
-                  //       if (value == null || value.isEmpty) {
-                  //         return S.current.passwordRequired;
-                  //       }
-                  //       if (value.length < 6) {
-                  //         return S.current.passwordTooShort;
-                  //       }
-                  //       return null;
-                  //     },
-                  //   ),
-                  // ),
-
-                  // const SizedBox(height: 8),
-
-                  // // Forgot Password
-                  // AnimatedEntry(
-                  //   delay: delayStep * 3,
-                  //   child: Align(
-                  //     alignment: Alignment.centerRight,
-                  //     child: TextButton(
-                  //       onPressed: () {
-                  //         Get.to(() => const ForgotPasswordPage());
-                  //       },
-                  //       style: TextButton.styleFrom(
-                  //         foregroundColor: theme.colorScheme.secondary,
-                  //       ),
-                  //       child: Text(S.current.forgotPassword),
-                  //     ),
-                  //   ),
-                  // ),
-
-                  // const SizedBox(height: 24),
-
-                  // Sign In Button
-                  // AnimatedEntry(
-                  //   delay: delayStep * 4,
-                  //   child: Obx(() {
-                  //     final bool isAuthLoading =
-                  //         _authController.isLoading.value;
-                  //     final bool isSyncing =
-                  //         _syncController.syncStatus.value ==
-                  //         SyncStatus.syncing;
-                  //     final bool isLoading = isAuthLoading || isSyncing;
-
-                  //     return ElevatedButton(
-                  //       onPressed: isLoading ? null : _handleEmailSignIn,
-                  //       style: ElevatedButton.styleFrom(
-                  //         padding: const EdgeInsets.symmetric(vertical: 16),
-                  //         backgroundColor: theme.colorScheme.primary,
-                  //         foregroundColor: theme.colorScheme.onPrimary,
-                  //         elevation: 2,
-                  //         shape: RoundedRectangleBorder(
-                  //           borderRadius: BorderRadius.circular(16),
-                  //         ),
-                  //       ),
-                  //       child: isLoading
-                  //           ? SizedBox(
-                  //               height: 24,
-                  //               width: 24,
-                  //               child: CircularProgressIndicator(
-                  //                 strokeWidth: 2,
-                  //                 color: theme.colorScheme.onPrimary,
-                  //               ),
-                  //             )
-                  //           : Text(
-                  //               S.current.login,
-                  //               style: const TextStyle(
-                  //                 fontSize: 16,
-                  //                 fontWeight: FontWeight.bold,
-                  //               ),
-                  //             ),
-                  //     );
-                  //   }),
-                  // ),
-
-                  // const SizedBox(height: 24),
-
-                  // Divider
-                  // AnimatedEntry(
-                  //   delay: delayStep * 5,
-                  //   child: Row(
-                  //     children: [
-                  //       const Expanded(child: Divider()),
-                  //       Padding(
-                  //         padding: const EdgeInsets.symmetric(horizontal: 16),
-                  //         child: Text(
-                  //           S.current.or,
-                  //           style: theme.textTheme.bodyMedium?.copyWith(
-                  //             color: theme.colorScheme.outline,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       const Expanded(child: Divider()),
-                  //     ],
-                  //   ),
-                  // ),
-
-                  // const SizedBox(height: 24),
-
-                  // Google Sign In Button
-                  AnimatedEntry(
-                    delay: delayStep * 9,
-                    child: Obx(() {
-                      final bool isAuthLoading =
-                          _authController.isLoading.value;
-                      final bool isSyncing =
-                          _syncController.syncStatus.value ==
-                          SyncStatus.syncing;
-                      final bool isLoading = isAuthLoading || isSyncing;
-
-                      return OutlinedButton.icon(
-                        onPressed: isLoading ? null : _handleGoogleSignIn,
-                        icon: isLoading
-                            ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Image.asset(
-                                'assets/icon/google_icon.png',
-                                height: 24,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(
-                                    Icons.g_mobiledata,
-                                    size: 24,
-                                  );
-                                },
-                              ),
-                        label: Text(S.current.signInWithGoogle),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(
-                            color: theme.colorScheme.outlineVariant,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-
-                  // const SizedBox(height: 32),
-
-                  // // Sign Up Link
-                  // AnimatedEntry(
-                  //   delay: delayStep * 7,
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       Text(
-                  //         S.current.dontHaveAccount,
-                  //         style: TextStyle(
-                  //           color: theme.colorScheme.onSurfaceVariant,
-                  //         ),
-                  //       ),
-                  //       TextButton(
-                  //         onPressed: () {
-                  //           Get.to(() => const SignUpPage());
-                  //         },
-                  //         child: Text(
-                  //           S.current.createAccount,
-                  //           style: TextStyle(
-                  //             fontWeight: FontWeight.bold,
-                  //             color: theme.colorScheme.primary,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -338,3 +162,113 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+class _NeumorphicSkipButton extends StatefulWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const _NeumorphicSkipButton({
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  State<_NeumorphicSkipButton> createState() => _NeumorphicSkipButtonState();
+}
+
+class _NeumorphicSkipButtonState extends State<_NeumorphicSkipButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.cardColor;
+
+    final Color surfaceGradientStart = isDark
+        ? (Color.lerp(baseColor, Colors.white, 0.05) ?? baseColor)
+        : (Color.lerp(baseColor, Colors.white, 0.50) ?? baseColor);
+
+    final Color surfaceGradientEnd = isDark
+        ? (Color.lerp(baseColor, Colors.black, 0.16) ?? baseColor)
+        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.10) ?? baseColor);
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onPressed();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.badge),
+            gradient: _isPressed
+                ? null
+                : LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [surfaceGradientStart, surfaceGradientEnd],
+                  ),
+            color: _isPressed
+                ? (isDark
+                    ? Colors.black.withValues(alpha: 0.25)
+                    : const Color(0xFFD6DFEC))
+                : null,
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.08)
+                  : Colors.white.withValues(alpha: _isPressed ? 0.35 : 0.85),
+              width: 1.0,
+            ),
+            boxShadow: _isPressed
+                ? (isDark
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.45),
+                          offset: const Offset(1, 1),
+                          blurRadius: 2,
+                        ),
+                      ]
+                    : [
+                        const BoxShadow(
+                          color: Color(0x40A3B1C6),
+                          offset: Offset(1, 1),
+                          blurRadius: 2,
+                        ),
+                      ])
+                : AppShadows.badge(isDark: isDark),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 12,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
