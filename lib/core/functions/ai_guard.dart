@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/ai_settings_controller.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/setting_binding.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/ai_api_key_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -16,6 +17,12 @@ class AiGuard {
     if (Get.isRegistered<AiSettingsController>()) {
       return Get.find<AiSettingsController>();
     }
+    try {
+      SettingBinding().dependencies();
+      if (Get.isRegistered<AiSettingsController>()) {
+        return Get.find<AiSettingsController>();
+      }
+    } catch (_) {}
     return null;
   }
 
