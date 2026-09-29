@@ -334,44 +334,73 @@ class AiApiKeyDialog extends StatelessWidget {
                   const SizedBox(width: 10),
 
                   // Save button (Neumorphic raised primary)
-                  GestureDetector(
-                    onTap: () async {
-                      final newKey = textController.text.trim();
-                      if (newKey.isEmpty) {
-                        Navigator.of(context).pop();
-                        await controller.clearApiKey();
-                        return;
-                      }
-                      final success = await controller.saveApiKey(newKey);
-                      if (success && context.mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: AppRadius.mdRadius,
-                        boxShadow: AppShadows.bloom(
+                  Obx(() {
+                    final isValidating = controller.isValidating.value;
+                    return GestureDetector(
+                      onTap: isValidating
+                          ? null
+                          : () async {
+                              final newKey = textController.text.trim();
+                              if (newKey.isEmpty) {
+                                Navigator.of(context).pop();
+                                await controller.clearApiKey();
+                                return;
+                              }
+                              final success =
+                                  await controller.saveApiKey(newKey);
+                              if (success && context.mounted) {
+                                Navigator.of(context).pop();
+                              }
+                            },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
                           color: primaryColor,
-                          isDark: isDark,
-                          blur: 8,
-                          offset: const Offset(0, 3),
+                          borderRadius: AppRadius.mdRadius,
+                          boxShadow: AppShadows.bloom(
+                            color: primaryColor,
+                            isDark: isDark,
+                            blur: 8,
+                            offset: const Offset(0, 3),
+                          ),
                         ),
+                        child: isValidating
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    s.apiKeyValidating,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                s.save,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
-                      child: Text(
-                        s.save,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
+                    );
+                  }),
                 ],
               ),
             ],
