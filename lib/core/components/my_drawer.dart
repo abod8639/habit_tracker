@@ -105,7 +105,10 @@ class _DrawerListState extends State<DrawerList> {
                   color: Colors.lightBlue,
                   Icons.document_scanner_rounded,
                 ),
-          onTap: _isScanning ? null : _handleScanImage,
+          onTap:()=> _isScanning ? null : AiGuard.protect(
+              context,
+              onValid: () =>  _handleScanImage,
+          ),
           title: S.current.scanImage,
         ),
         MyDrawerListTile(
