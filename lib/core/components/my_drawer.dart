@@ -8,6 +8,7 @@ import 'package:habit_tracker/features/habitstats/presentation/controllers/habit
 import 'package:habit_tracker/features/setting/presentation/pages/settings_page.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/setting_binding.dart';
 import 'package:habit_tracker/features/theme/presentation/pages/theme_page.dart';
+import 'package:habit_tracker/core/functions/ai_guard.dart';
 import 'my_drawer_list_tile.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/presentation/widget/image_scanner_bottom_sheet.dart';
@@ -127,9 +128,12 @@ class _DrawerListState extends State<DrawerList> {
           icon: const Icon(color: Colors.purpleAccent, Icons.psychology),
           onTap: () {
             Get.back();
-            Get.to(
-              () => const AiChatPage(),
-              binding: AiChatBinding(),
+            AiGuard.protect(
+              context,
+              onValid: () => Get.to(
+                () => const AiChatPage(),
+                binding: AiChatBinding(),
+              ),
             );
           },
           title: S.current.aiCoach,
