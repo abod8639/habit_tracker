@@ -86,6 +86,42 @@ class GeminiService {
   /// Returns the current active API key (or empty string)
   static String get currentApiKey => _apiKey;
 
+  /// Validates whether an API key is valid and working with the Gemini model
+  static Future<bool> validateApiKey(String apiKey) async {
+    final trimmed = apiKey.trim();
+    if (trimmed.isEmpty) return false;
+    try {
+      final model = GenerativeModel(
+        model: modelName,
+        apiKey: trimmed,
+      );
+      final countResult = await model.countTokens([
+        Content.text('test'),
+      ]).timeout(const Duration(seconds: 8));
+      return countResult.totalTokens > 0;
+    } catch (e) {
+      try {
+        final model = GenerativeModel(
+          model: modelName,
+          apiKey: trimmed,
+        );
+        final response = await model.generateContent([
+          Content.text('ping'),
+        ]).timeout(const Duration(seconds: 8));
+        return response.text != null && response.text!.isNotEmpty;
+      } catch (err) {
+        return false;
+      }
+    }
+  }
+
+  /// Checks if the current active API key is valid and operational
+  static Future<bool> isCurrentKeyValid() async {
+    final key = currentApiKey;
+    if (key.isEmpty) return false;
+    return validateApiKey(key);
+  }
+
   /// Lazy getter for standard GenerativeModel instance
   GenerativeModel get _model {
     final apiKey = _apiKey;
