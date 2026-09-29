@@ -6,25 +6,59 @@ class LoginPageIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.cardColor;
+
+    final Color surfaceGradientStart = isDark
+        ? (Color.lerp(baseColor, Colors.white, 0.05) ?? baseColor)
+        : (Color.lerp(baseColor, Colors.white, 0.50) ?? baseColor);
+
+    final Color surfaceGradientEnd = isDark
+        ? (Color.lerp(baseColor, Colors.black, 0.18) ?? baseColor)
+        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.12) ?? baseColor);
+
     return Column(
       children: [
         Container(
+          width: 120,
+          height: 120,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
             shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [surfaceGradientStart, surfaceGradientEnd],
+            ),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.white.withValues(alpha: 0.90),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
-                color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.04)
+                    : Colors.white.withValues(alpha: 0.95),
+                offset: const Offset(-5, -5),
+                blurRadius: 10,
+              ),
+              BoxShadow(
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.65)
+                    : const Color(0xFFA3B1C6).withValues(alpha: 0.45),
+                offset: const Offset(6, 6),
+                blurRadius: 12,
               ),
             ],
           ),
-          child: Icon(
-            Icons.task_alt_rounded,
-            size: 80,
-            color: theme.colorScheme.primary,
+          child: Center(
+            child: Icon(
+              Icons.task_alt_rounded,
+              size: 56,
+              color: theme.colorScheme.primary,
+            ),
           ),
         ),
         const SizedBox(height: 24),
