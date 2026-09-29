@@ -18,10 +18,8 @@ class S {
   static S? _current;
 
   static S get current {
-    assert(
-      _current != null,
-      'No instance of S was loaded. Try to initialize the S delegate before accessing S.current.',
-    );
+    assert(_current != null,
+        'No instance of S was loaded. Try to initialize the S delegate before accessing S.current.');
     return _current!;
   }
 
@@ -43,10 +41,8 @@ class S {
 
   static S of(BuildContext context) {
     final instance = S.maybeOf(context);
-    assert(
-      instance != null,
-      'No instance of S present in the widget tree. Did you add S.delegate in localizationsDelegates?',
-    );
+    assert(instance != null,
+        'No instance of S present in the widget tree. Did you add S.delegate in localizationsDelegates?');
     return instance!;
   }
 
@@ -484,10 +480,10 @@ class S {
     );
   }
 
-  /// `Add`
+  /// `Add new habit`
   String get add {
     return Intl.message(
-      'Add',
+      'Add new habit',
       name: 'add',
       desc: '',
       args: [],
@@ -1459,6 +1455,96 @@ class S {
     return Intl.message(
       'Paste',
       name: 'paste',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `API Key Required`
+  String get apiKeyRequired {
+    return Intl.message(
+      'API Key Required',
+      name: 'apiKeyRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Working`
+  String get apiKeyValid {
+    return Intl.message(
+      'Working',
+      name: 'apiKeyValid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not Working`
+  String get apiKeyNotWorking {
+    return Intl.message(
+      'Not Working',
+      name: 'apiKeyNotWorking',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checking...`
+  String get apiKeyChecking {
+    return Intl.message(
+      'Checking...',
+      name: 'apiKeyChecking',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI Service Unavailable`
+  String get aiServiceUnavailableTitle {
+    return Intl.message(
+      'AI Service Unavailable',
+      name: 'aiServiceUnavailableTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `There is an issue with the AI API key. A valid API key must be added for AI services to work.`
+  String get apiKeyRequiredDialogMessage {
+    return Intl.message(
+      'There is an issue with the AI API key. A valid API key must be added for AI services to work.',
+      name: 'apiKeyRequiredDialogMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Configure Key`
+  String get configureApiKey {
+    return Intl.message(
+      'Configure Key',
+      name: 'configureApiKey',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The API key is invalid or has expired. Please verify and try again.`
+  String get apiKeyInvalidError {
+    return Intl.message(
+      'The API key is invalid or has expired. Please verify and try again.',
+      name: 'apiKeyInvalidError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Validating key...`
+  String get apiKeyValidating {
+    return Intl.message(
+      'Validating key...',
+      name: 'apiKeyValidating',
       desc: '',
       args: [],
     );
