@@ -6,6 +6,7 @@ import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/ai_chat/presentation/controllers/ai_chat_binding.dart';
 import 'package:habit_tracker/features/ai_chat/presentation/pages/ai_chat_page.dart';
+import 'package:habit_tracker/core/functions/ai_guard.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/habitstats_controller.dart';
 import '../widget/fade_animation_summary_card.dart';
@@ -103,12 +104,13 @@ class _HabitStatsPageState extends State<HabitStatsPage>
           },
         ),
         floatingActionButton: _NeumorphicAiFab(
-          onTap: () {
-            Get.to(
+          onTap: () => AiGuard.protect(
+            context,
+            onValid: () => Get.to(
               () => const AiChatPage(),
               binding: AiChatBinding(),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
