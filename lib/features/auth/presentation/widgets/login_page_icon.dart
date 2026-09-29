@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/generated/l10n.dart';
 
 class LoginPageIcon extends StatelessWidget {
   final ThemeData theme;
@@ -39,14 +38,14 @@ class LoginPageIcon extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
-        Text(
-          S.current.login,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-            letterSpacing: 0.5,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        // Text(
+        //   S.current.login,
+        //   style: theme.textTheme.bodyLarge?.copyWith(
+        //     color: theme.colorScheme.onSurfaceVariant,
+        //     letterSpacing: 0.5,
+        //   ),
+        //   textAlign: TextAlign.center,
+        // ),
       ],
     );
   }
