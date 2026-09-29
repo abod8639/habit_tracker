@@ -56,9 +56,9 @@ class SettingBinding extends Bindings {
     Get.lazyPut(() => SyncHabitsUseCase(Get.find()));
     Get.lazyPut(() => GetLastSyncTimeUseCase(Get.find()));
     Get.lazyPut(() => ClearAllDataUseCase(Get.find()));
-    Get.lazyPut(() => GetCustomApiKeyUseCase(Get.find()));
-    Get.lazyPut(() => SaveCustomApiKeyUseCase(Get.find()));
-    Get.lazyPut(() => ClearCustomApiKeyUseCase(Get.find()));
+    Get.lazyPut(() => GetCustomApiKeyUseCase(Get.find()), fenix: true);
+    Get.lazyPut(() => SaveCustomApiKeyUseCase(Get.find()), fenix: true);
+    Get.lazyPut(() => ClearCustomApiKeyUseCase(Get.find()), fenix: true);
 
     // Controllers
     Get.lazyPut(() => LangController());
@@ -70,6 +70,7 @@ class SettingBinding extends Bindings {
         saveCustomApiKeyUseCase: Get.find(),
         clearCustomApiKeyUseCase: Get.find(),
       ),
+      fenix: true,
     );
   }
 }
