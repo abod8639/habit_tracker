@@ -146,6 +146,7 @@ Widget buildAnimatedUserCard(
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 6),
+                      
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -162,7 +163,7 @@ Widget buildAnimatedUserCard(
                         ),
                         child: Text(
                           email,
-                          style: Theme.of(context).textTheme.bodySmall
+                          style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: Theme.of(
                                   context,
