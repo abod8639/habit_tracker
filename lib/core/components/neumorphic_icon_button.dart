@@ -12,6 +12,7 @@ class NeumorphicIconButton extends StatefulWidget {
   final Color? accentColor;
   final Color? iconColor;
   final double size;
+  final double? width;
   final double? iconSize;
   final BorderRadius? borderRadius;
   final BoxShape shape;
@@ -26,6 +27,7 @@ class NeumorphicIconButton extends StatefulWidget {
     this.accentColor,
     this.iconColor,
     this.size = 46.0,
+    this.width,
     this.iconSize,
     this.borderRadius,
     this.shape = BoxShape.rectangle,
@@ -41,6 +43,7 @@ class NeumorphicIconButton extends StatefulWidget {
     this.accentColor,
     this.iconColor,
     this.size = 42.0,
+    this.width,
     this.iconSize,
     this.glowWithAccent = false,
     this.customShadows,
@@ -55,6 +58,7 @@ class NeumorphicIconButton extends StatefulWidget {
     this.accentColor,
     this.iconColor,
     this.size = 46.0,
+    this.width,
     this.iconSize = 22.0,
     this.borderRadius = const BorderRadius.all(Radius.circular(16.0)),
     this.glowWithAccent = false,
@@ -114,13 +118,16 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
                   ),
               ]);
 
+    final double buttonWidth = widget.width ?? widget.size;
+
     Widget button = GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
+      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: () {
         setState(() => _isPressed = false);
         widget.onPressed();
       },
-      onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedScale(
         scale: _isPressed ? 0.94 : 1.0,
         duration: const Duration(milliseconds: 120),
@@ -128,7 +135,7 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 140),
           curve: Curves.easeOutCubic,
-          width: widget.size * 1.6,
+          width: buttonWidth,
           height: widget.size,
           decoration: BoxDecoration(
             shape: widget.shape,
