@@ -40,6 +40,10 @@ class _DrawerListState extends State<DrawerList> {
   bool _isScanning = false;
 
   Future<void> _handleScanImage() async {
+    final canProceed = await AiGuard.protect(context, onValid: () {});
+    if (!canProceed) return;
+
+    if (!mounted) return;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
