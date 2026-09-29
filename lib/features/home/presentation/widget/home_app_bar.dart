@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
+import 'package:habit_tracker/core/functions/ai_guard.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
@@ -195,7 +196,10 @@ class HomeAppBar extends StatelessWidget {
                 iconColor: Theme.of(context).colorScheme.primary,
                 iconSize: 22,
                 tooltip: S.current.generatePlan,
-                onPressed: () => Get.toNamed(AppRoutes.categorySelection),
+                onPressed: () => AiGuard.protect(
+                  context,
+                  onValid: () => Get.toNamed(AppRoutes.categorySelection),
+                ),
               ),
             ),
           ),
