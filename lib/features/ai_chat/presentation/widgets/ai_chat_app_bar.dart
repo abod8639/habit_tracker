@@ -37,7 +37,13 @@ class AiChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             icon: Icons.arrow_back_ios_new_rounded,
             size: 40,
             iconSize: 18,
-            onPressed: () => Get.back(),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Get.back();
+              }
+            },
             iconColor: theme.colorScheme.onSurface,
           ),
         ),
