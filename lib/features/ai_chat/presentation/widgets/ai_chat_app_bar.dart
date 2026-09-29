@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
 import 'package:habit_tracker/generated/l10n.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/ai_settings_controller.dart';
+import 'package:habit_tracker/features/setting/presentation/widget/ai_api_key_dialog.dart';
 import 'ai_avatar.dart';
 
 /// Neumorphic styled App Bar for AI Chat with soft tactile buttons
@@ -57,54 +59,151 @@ class AiChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 7,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.black.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.06)
-                        : Colors.black.withValues(alpha: 0.04),
-                    width: 0.75,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF4CAF50),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x664CAF50),
-                            blurRadius: 4,
-                            spreadRadius: 1,
+              Builder(
+                builder: (context) {
+                  final aiController =
+                      Get.isRegistered<AiSettingsController>()
+                          ? Get.find<AiSettingsController>()
+                          : null;
+
+                  if (aiController == null) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.black.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.06)
+                              : Colors.black.withValues(alpha: 0.04),
+                          width: 0.75,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF4CAF50),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x664CAF50),
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            S.current.online,
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w500,
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      S.current.online,
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w500,
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.6,
+                    );
+                  }
+
+                  return Obx(() {
+                    final isWorking = aiController.isKeyWorking;
+                    final statusColor = isWorking
+                        ? const Color(0xFF4CAF50)
+                        : Colors.orangeAccent;
+                    final statusText = isWorking
+                        ? S.current.online
+                        : S.current.apiKeyRequired;
+
+                    return GestureDetector(
+                      onTap: isWorking
+                          ? null
+                          : () =>
+                              AiApiKeyDialog.show(context, aiController),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isWorking
+                              ? (isDark
+                                  ? Colors.white.withValues(alpha: 0.05)
+                                  : Colors.black.withValues(alpha: 0.04))
+                              : Colors.orange.withValues(
+                                  alpha: isDark ? 0.16 : 0.08,
+                                ),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isWorking
+                                ? (isDark
+                                    ? Colors.white.withValues(alpha: 0.06)
+                                    : Colors.black.withValues(alpha: 0.04))
+                                : Colors.orange.withValues(alpha: 0.35),
+                            width: 0.75,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: statusColor,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: statusColor.withValues(alpha: 0.45),
+                                    blurRadius: 4,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              statusText,
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w600,
+                                color: isWorking
+                                    ? theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.6,
+                                      )
+                                    : (isDark
+                                        ? Colors.orange.shade300
+                                        : Colors.orange.shade800),
+                              ),
+                            ),
+                            if (!isWorking) ...[
+                              const SizedBox(width: 3),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 8,
+                                color: isDark
+                                    ? Colors.orange.shade300
+                                    : Colors.orange.shade800,
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    );
+                  });
+                },
               ),
             ],
           ),
