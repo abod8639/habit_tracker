@@ -202,6 +202,7 @@ void main() {
           getCustomApiKeyUseCase: getCustomApiKeyUseCase,
           saveCustomApiKeyUseCase: saveCustomApiKeyUseCase,
           clearCustomApiKeyUseCase: clearCustomApiKeyUseCase,
+          apiKeyValidator: (key) async => key.startsWith('AIzaSy'),
         );
 
         expect(controller.isCustom.value, isFalse);
@@ -221,5 +222,34 @@ void main() {
         expect(controller.maskedKey, '');
       },
     );
+
+    test('AiSettingsController rejects invalid API key during save', () async {
+      final controller = AiSettingsController(
+        getCustomApiKeyUseCase: getCustomApiKeyUseCase,
+        saveCustomApiKeyUseCase: saveCustomApiKeyUseCase,
+        clearCustomApiKeyUseCase: clearCustomApiKeyUseCase,
+        apiKeyValidator: (key) async => false,
+      );
+
+      final saved = await controller.saveApiKey('InvalidKey123');
+      expect(saved, isFalse);
+      expect(controller.apiKeyStatus.value, ApiKeyStatus.invalid);
+      expect(controller.isCustom.value, isFalse);
+    });
+
+    test('AiSettingsController checkKeyHealth updates status correctly', () async {
+      final controller = AiSettingsController(
+        getCustomApiKeyUseCase: getCustomApiKeyUseCase,
+        saveCustomApiKeyUseCase: saveCustomApiKeyUseCase,
+        clearCustomApiKeyUseCase: clearCustomApiKeyUseCase,
+        apiKeyValidator: (key) async => key == 'AIzaSyValid',
+      );
+
+      dotenv.loadFromString(envString: 'GEMINI_API_KEY=AIzaSyValid');
+      final valid = await controller.checkKeyHealth(force: true);
+      expect(valid, isTrue);
+      expect(controller.apiKeyStatus.value, ApiKeyStatus.valid);
+      expect(controller.isKeyWorking, isTrue);
+    });
   });
 }
