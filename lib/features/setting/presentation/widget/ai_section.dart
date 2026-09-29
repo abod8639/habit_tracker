@@ -22,9 +22,45 @@ class AiSection extends StatelessWidget {
 
     return Obx(() {
       final isCustom = aiController.isCustom.value;
-      final subtitleText = isCustom
-          ? '${s.customApiKeyActive} (${aiController.maskedKey})'
-          : s.defaultApiKeyActive;
+      final keyStatus = aiController.apiKeyStatus.value;
+
+      final Color statusColor;
+      final IconData statusIcon;
+      final String badgeText;
+      final String subtitleText;
+
+      switch (keyStatus) {
+        case ApiKeyStatus.valid:
+          statusColor = Colors.teal;
+          statusIcon = Icons.check_circle_rounded;
+          badgeText = s.apiKeyValid;
+          subtitleText = isCustom
+              ? '${s.customApiKeyActive} (${aiController.maskedKey}) • ${s.apiKeyValid}'
+              : '${s.defaultApiKeyActive} • ${s.apiKeyValid}';
+          break;
+        case ApiKeyStatus.invalid:
+          statusColor = Colors.redAccent;
+          statusIcon = Icons.error_outline_rounded;
+          badgeText = s.apiKeyNotWorking;
+          subtitleText = isCustom
+              ? '${s.customApiKeyActive} (${aiController.maskedKey}) • ${s.apiKeyNotWorking}'
+              : s.apiKeyRequired;
+          break;
+        case ApiKeyStatus.validating:
+          statusColor = Colors.amber;
+          statusIcon = Icons.sync_rounded;
+          badgeText = s.apiKeyChecking;
+          subtitleText = s.apiKeyChecking;
+          break;
+        case ApiKeyStatus.unknown:
+          statusColor = theme.colorScheme.onSurfaceVariant;
+          statusIcon = isCustom ? Icons.check_circle_rounded : Icons.tune_rounded;
+          badgeText = isCustom ? s.customApiKeyActive : s.tapToEdit;
+          subtitleText = isCustom
+              ? '${s.customApiKeyActive} (${aiController.maskedKey})'
+              : s.defaultApiKeyActive;
+          break;
+      }
 
       return Column(
         children: [
@@ -41,52 +77,47 @@ class AiSection extends StatelessWidget {
                 vertical: 5,
               ),
               decoration: BoxDecoration(
-                color: isCustom
-                    ? Color.alphaBlend(
-                        Colors.teal.withValues(alpha: isDark ? 0.18 : 0.10),
-                        baseSurface,
-                      )
-                    : Color.alphaBlend(
-                        theme.colorScheme.onSurface.withValues(
-                          alpha: isDark ? 0.05 : 0.03,
-                        ),
-                        baseSurface,
-                      ),
+                color: Color.alphaBlend(
+                  statusColor.withValues(alpha: isDark ? 0.18 : 0.10),
+                  baseSurface,
+                ),
                 borderRadius: AppRadius.badgeRadius,
-                boxShadow: isCustom
+                boxShadow: keyStatus == ApiKeyStatus.valid || isCustom
                     ? AppShadows.bloom(
-                        color: Colors.teal,
+                        color: statusColor,
                         isDark: isDark,
                         blur: 6,
                         offset: const Offset(0, 2),
                       )
                     : AppShadows.dotIndicator(isDark: isDark),
                 border: Border.all(
-                  color: isCustom
-                      ? Colors.teal.withValues(alpha: isDark ? 0.35 : 0.25)
-                      : (isDark
-                            ? Colors.white.withValues(alpha: 0.04)
-                            : Colors.white.withValues(alpha: 0.6)),
+                  color: statusColor.withValues(alpha: isDark ? 0.35 : 0.25),
                   width: 1,
                 ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    isCustom ? Icons.check_circle_rounded : Icons.tune_rounded,
-                    size: 14,
-                    color: isCustom
-                        ? Colors.teal
-                        : theme.colorScheme.onSurfaceVariant,
-                  ),
+                  if (keyStatus == ApiKeyStatus.validating)
+                    SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.5,
+                        color: statusColor,
+                      ),
+                    )
+                  else
+                    Icon(
+                      statusIcon,
+                      size: 14,
+                      color: statusColor,
+                    ),
                   const SizedBox(width: 5),
                   Text(
-                    isCustom ? s.customApiKeyActive : s.tapToEdit,
+                    badgeText,
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: isCustom
-                          ? Colors.teal
-                          : theme.colorScheme.onSurfaceVariant,
+                      color: statusColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 11.5,
                     ),
