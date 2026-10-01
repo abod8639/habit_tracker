@@ -1,10 +1,10 @@
-import 'package:get/get.dart';
+import 'package:habit_tracker/core/routes/app_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
-import 'package:habit_tracker/features/auth/presentation/pages/login_page.dart';
 
 Future<void> navigateToLogin() async {
   final settingsStorage = SettingsStorage();
   await settingsStorage.init();
   await settingsStorage.setSkippedLogin(false);
-  Get.offAll(() => const LoginPage());
+  AppRouter.router.go(AppRoutes.login);
 }
