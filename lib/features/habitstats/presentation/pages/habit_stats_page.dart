@@ -4,8 +4,8 @@ import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
-import 'package:habit_tracker/features/ai_chat/presentation/controllers/ai_chat_binding.dart';
-import 'package:habit_tracker/features/ai_chat/presentation/pages/ai_chat_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/functions/ai_guard.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/habitstats_controller.dart';
@@ -106,10 +106,7 @@ class _HabitStatsPageState extends State<HabitStatsPage>
         floatingActionButton: _NeumorphicAiFab(
           onTap: () => AiGuard.protect(
             context,
-            onValid: () => Get.to(
-              () => const AiChatPage(),
-              binding: AiChatBinding(),
-            ),
+            onValid: () => context.push(AppRoutes.aiCoach),
           ),
         ),
       ),
