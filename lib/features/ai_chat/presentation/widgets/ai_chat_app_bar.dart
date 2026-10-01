@@ -40,8 +40,6 @@ class AiChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             onPressed: () {
               if (Navigator.of(context).canPop()) {
                 Navigator.of(context).pop();
-              } else {
-                Get.back();
               }
             },
             iconColor: theme.colorScheme.onSurface,
