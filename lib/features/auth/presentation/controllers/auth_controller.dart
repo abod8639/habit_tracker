@@ -8,7 +8,8 @@ import '../../domain/usecases/sign_out_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/get_auth_state_usecase.dart';
 import '../../domain/usecases/set_skip_login_usecase.dart';
-import '../pages/login_page.dart';
+import 'package:habit_tracker/core/routes/app_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
@@ -173,7 +174,7 @@ class AuthController extends GetxController {
       );
 
       isLoading.value = false;
-      Get.offAll(() => const LoginPage());
+      AppRouter.router.go(AppRoutes.login);
     } catch (e) {
       isLoading.value = false;
       _showError(e.toString());
