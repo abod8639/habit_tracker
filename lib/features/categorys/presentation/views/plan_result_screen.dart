@@ -4,7 +4,8 @@ import 'package:habit_tracker/generated/l10n.dart';
 
 import '../../domain/entities/plan_suggestion.dart';
 import '../controllers/plan_generator_controller.dart';
-import 'package:habit_tracker/features/home/presentation/pages/home_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 
 class PlanResultScreen extends StatelessWidget {
   const PlanResultScreen({super.key});
@@ -29,7 +30,7 @@ class PlanResultScreen extends StatelessWidget {
                     icon: const Icon(Icons.close_rounded),
                     onPressed: () {
                       controller.reset();
-                      Get.offAll(() => const HomeScreen());
+                      context.go(AppRoutes.home);
                     },
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.grey.shade100,
