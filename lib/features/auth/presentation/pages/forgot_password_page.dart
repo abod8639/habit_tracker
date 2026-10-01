@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -30,7 +31,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       if (success && mounted) {
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) {
-          Get.back();
+          context.pop();
         }
       }
     }
@@ -128,7 +129,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                   TextButton(
                     onPressed: () {
-                      Get.back();
+                      context.pop();
                     },
                     child: Text(S.current.backToLogin),
                   ),
