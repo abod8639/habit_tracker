@@ -22,7 +22,7 @@ class CategorySelectionScreen extends StatelessWidget {
             Icons.arrow_back_ios_new,
           ),
           onPressed: () {
-            Get.back();
+            context.pop();
           },
         ),
         title: Text(
@@ -78,7 +78,7 @@ class CategorySelectionScreen extends StatelessWidget {
                           category: category,
                           onTap: () {
                             controller.selectCategory(category);
-                            Get.toNamed('/plan-questionnaire');
+                            context.push(AppRoutes.questionnaire);
                           },
                         ),
                       )
