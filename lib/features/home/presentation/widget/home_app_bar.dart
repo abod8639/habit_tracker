@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
 import 'package:habit_tracker/core/functions/ai_guard.dart';
+import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
@@ -198,7 +199,7 @@ class HomeAppBar extends StatelessWidget {
                 tooltip: S.current.generatePlan,
                 onPressed: () => AiGuard.protect(
                   context,
-                  onValid: () => Get.toNamed(AppRoutes.categorySelection),
+                  onValid: () => context.push(AppRoutes.categorySelection),
                 ),
               ),
             ),
