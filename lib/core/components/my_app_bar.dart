@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 
@@ -23,8 +22,6 @@ PreferredSizeWidget myAppBar({
         onPressed: () {
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
-          } else {
-            Get.back();
           }
         },
       ),
