@@ -8,7 +8,8 @@ import 'package:habit_tracker/features/auth/presentation/widgets/fade_slide_tran
 import 'package:habit_tracker/features/auth/presentation/widgets/login_page_icon.dart';
 import 'package:habit_tracker/features/auth/presentation/widgets/neumorphic_google_button.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
-import 'package:habit_tracker/features/home/presentation/pages/home_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -16,6 +17,7 @@ class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   Future<void> _handleGoogleSignIn({
+    required BuildContext context,
     required AuthController authController,
     required SyncController syncController,
     required HabitController habitController,
@@ -23,7 +25,9 @@ class LoginPage extends StatelessWidget {
     final success = await authController.signInWithGoogle();
     if (success) {
       await performSync(syncController, habitController);
-      Get.offAll(() => const HomeScreen());
+      if (context.mounted) {
+        context.go(AppRoutes.home);
+      }
     }
   }
 
@@ -61,7 +65,9 @@ class LoginPage extends StatelessWidget {
                       label: S.current.skipNow,
                       onPressed: () async {
                         await authController.setSkipLogin(true);
-                        Get.offAll(() => const HomeScreen());
+                        if (context.mounted) {
+                          context.go(AppRoutes.home);
+                        }
                       },
                     ),
                   ),
@@ -144,6 +150,7 @@ class LoginPage extends StatelessWidget {
                             onPressed: isLoading
                                 ? null
                                 : () => _handleGoogleSignIn(
+                                      context: context,
                                       authController: authController,
                                       syncController: syncController,
                                       habitController: habitController,
