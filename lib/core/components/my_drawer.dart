@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:habit_tracker/features/ai_chat/presentation/controllers/ai_chat_binding.dart';
-import 'package:habit_tracker/features/ai_chat/presentation/pages/ai_chat_page.dart';
-import 'package:habit_tracker/features/habitstats/presentation/pages/habit_stats_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import 'package:habit_tracker/features/habitstats/presentation/controllers/habitstats_binding.dart';
-import 'package:habit_tracker/features/setting/presentation/pages/settings_page.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/setting_binding.dart';
-import 'package:habit_tracker/features/theme/presentation/pages/theme_page.dart';
 import 'package:habit_tracker/core/functions/ai_guard.dart';
 import 'my_drawer_list_tile.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
@@ -61,7 +55,7 @@ class _DrawerListState extends State<DrawerList> {
                 _isScanning = false;
               });
               // Close the drawer if it's still open
-              Get.back();
+              Navigator.of(context).pop();
               // Show the confirmation dialog
               showDialog(
                 context: context,
@@ -89,8 +83,6 @@ class _DrawerListState extends State<DrawerList> {
 
   @override
   Widget build(BuildContext context) {
-    // HabitController controller = Get.put(HabitController());
-
     return ListView(
       children: [
         const SizedBox(height: 20),
@@ -114,8 +106,8 @@ class _DrawerListState extends State<DrawerList> {
         MyDrawerListTile(
           icon: const Icon(color: Colors.blueAccent, Icons.auto_graph_sharp),
           onTap: () {
-            Get.back();
-            Get.to(() => const HabitStatsPage(), binding: HabitStatsBinding());
+            Navigator.of(context).pop();
+            context.push(AppRoutes.stats);
           },
           title: S.current.drawerReat,
         ),
@@ -125,8 +117,8 @@ class _DrawerListState extends State<DrawerList> {
             Icons.color_lens_outlined,
           ),
           onTap: () {
-            Get.back();
-            Get.to(() => ThemePage());
+            Navigator.of(context).pop();
+            context.push(AppRoutes.theme);
           },
           title: S.current.drawerTheme,
         ),
@@ -134,13 +126,10 @@ class _DrawerListState extends State<DrawerList> {
         MyDrawerListTile(
           icon: const Icon(color: Colors.purpleAccent, Icons.psychology),
           onTap: () {
-            Get.back();
+            Navigator.of(context).pop();
             AiGuard.protect(
               context,
-              onValid: () => Get.to(
-                () => const AiChatPage(),
-                binding: AiChatBinding(),
-              ),
+              onValid: () => context.push(AppRoutes.aiCoach),
             );
           },
           title: S.current.aiCoach,
@@ -148,8 +137,8 @@ class _DrawerListState extends State<DrawerList> {
         MyDrawerListTile(
           icon: const Icon(color: Colors.blueGrey, Icons.settings),
           onTap: () {
-            Get.back();
-            Get.to(() => const SettingsPage(), binding: SettingBinding());
+            Navigator.of(context).pop();
+            context.push(AppRoutes.settings);
           },
           title: S.current.drawerSetting,
         ),
