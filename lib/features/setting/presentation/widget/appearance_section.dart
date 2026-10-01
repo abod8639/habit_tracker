@@ -4,7 +4,8 @@ import 'package:habit_tracker/core/components/animated_setting_tile.dart';
 import 'package:habit_tracker/core/utils/restart_widget.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_lang.dart';
-import 'package:habit_tracker/features/theme/presentation/pages/theme_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class AppearanceSection extends StatelessWidget {
@@ -25,11 +26,7 @@ class AppearanceSection extends StatelessWidget {
           icon: Icons.palette_rounded,
           title: s.themepage,
           subtitle: s.changeAppTheme,
-          onTap: () => Get.to(
-            () => const ThemePage(),
-            transition: Transition.rightToLeftWithFade,
-            duration: const Duration(milliseconds: 400),
-          ),
+          onTap: () => context.push(AppRoutes.theme),
         ),
         Obx(
           () => buildAnimatedSettingLang(
