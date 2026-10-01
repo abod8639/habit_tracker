@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:habit_tracker/features/home/presentation/pages/home_screen.dart';
+import 'package:habit_tracker/core/routes/app_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 
 class ErrorApp extends StatelessWidget {
   final String error;
@@ -9,7 +9,7 @@ class ErrorApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Center(
@@ -18,9 +18,9 @@ class ErrorApp extends StatelessWidget {
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text(
+              const Text(
                 'An error occurred',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -34,9 +34,10 @@ class ErrorApp extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
+              const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => Get.offAll(HomeScreen()),
-                child: Text("Restart"),
+                onPressed: () => AppRouter.router.go(AppRoutes.home),
+                child: const Text("Restart"),
               ),
             ],
           ),
