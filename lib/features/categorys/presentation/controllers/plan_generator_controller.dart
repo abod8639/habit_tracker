@@ -8,7 +8,8 @@ import '../../data/datasources/questions_datasource.dart';
 
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import '../../../home/presentation/controllers/habit_controller.dart';
-import '../../../home/presentation/pages/home_screen.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
+import 'package:habit_tracker/core/routes/app_router.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 enum PlanGeneratorStatus { idle, loading, success, error }
@@ -134,7 +135,7 @@ class PlanGeneratorController extends GetxController {
       suggestions.value = result;
 
       status.value = PlanGeneratorStatus.success;
-      Get.toNamed('/plan-result');
+      AppRouter.router.push(AppRoutes.result);
     } catch (e) {
       status.value = PlanGeneratorStatus.error;
       errorMessage.value = S.current.planGenerationFailed;
@@ -185,7 +186,7 @@ class PlanGeneratorController extends GetxController {
       final count = selectedCount;
       reset();
 
-      Get.offAll(() => const HomeScreen());
+      AppRouter.router.go(AppRoutes.home);
 
       Get.snackbar(
         S.current.planActivatedTitle,
