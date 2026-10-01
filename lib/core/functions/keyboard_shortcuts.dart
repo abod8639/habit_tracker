@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:habit_tracker/core/routes/app_router.dart';
 
 void keyboardShortCutsPages(KeyEvent event) {
   if (event.physicalKey == PhysicalKeyboardKey.numLock) {
@@ -7,6 +7,8 @@ void keyboardShortCutsPages(KeyEvent event) {
   }
   if (event.logicalKey == LogicalKeyboardKey.escape ||
       event.logicalKey == LogicalKeyboardKey.backspace) {
-    Get.back();
+    if (AppRouter.router.canPop()) {
+      AppRouter.router.pop();
+    }
   }
 }
