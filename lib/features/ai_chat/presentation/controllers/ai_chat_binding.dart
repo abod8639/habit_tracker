@@ -4,6 +4,6 @@ import 'package:habit_tracker/features/ai_chat/presentation/controllers/ai_chat_
 class AiChatBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => AiChatController());
+    Get.lazyPut(() => AiChatController(), fenix: true);
   }
 }
