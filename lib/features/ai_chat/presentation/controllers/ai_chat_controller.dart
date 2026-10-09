@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
-import 'package:hive/hive.dart';
+import '../../domain/entities/chat_message_entity.dart';
+import '../../domain/repositories/ai_chat_repository.dart';
+import '../../domain/usecases/clear_chat_history_usecase.dart';
+import '../../domain/usecases/get_chat_history_usecase.dart';
+import '../../domain/usecases/save_chat_history_usecase.dart';
+import 'ai_chat_binding.dart';
 
 class ChatMessage {
   final RxString text;
@@ -17,13 +21,47 @@ class ChatMessage {
     required String text,
     required this.isUser,
     bool hasError = false,
-  }) : text = text.obs,
-       hasError = hasError.obs;
+  })  : text = text.obs,
+        hasError = hasError.obs;
+
+  ChatMessageEntity toEntity() => ChatMessageEntity(
+        text: text.value,
+        isUser: isUser,
+        hasError: hasError.value,
+      );
+
+  factory ChatMessage.fromEntity(ChatMessageEntity entity) => ChatMessage(
+        text: entity.text,
+        isUser: entity.isUser,
+        hasError: entity.hasError,
+      );
 }
 
 class AiChatController extends GetxController {
-  final GeminiService _geminiService = GeminiService();
-  ChatSession? _chatSession;
+  final AiChatRepository _chatRepository;
+  final GetChatHistoryUseCase _getChatHistoryUseCase;
+  final SaveChatHistoryUseCase _saveChatHistoryUseCase;
+  final ClearChatHistoryUseCase _clearChatHistoryUseCase;
+
+  AiChatController({
+    AiChatRepository? chatRepository,
+    GetChatHistoryUseCase? getChatHistoryUseCase,
+    SaveChatHistoryUseCase? saveChatHistoryUseCase,
+    ClearChatHistoryUseCase? clearChatHistoryUseCase,
+  })  : _chatRepository = chatRepository ?? _resolve<AiChatRepository>(),
+        _getChatHistoryUseCase =
+            getChatHistoryUseCase ?? _resolve<GetChatHistoryUseCase>(),
+        _saveChatHistoryUseCase =
+            saveChatHistoryUseCase ?? _resolve<SaveChatHistoryUseCase>(),
+        _clearChatHistoryUseCase =
+            clearChatHistoryUseCase ?? _resolve<ClearChatHistoryUseCase>();
+
+  static T _resolve<T>() {
+    if (!Get.isRegistered<T>()) {
+      AiChatBinding().dependencies();
+    }
+    return Get.find<T>();
+  }
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;
   final TextEditingController textController = TextEditingController();
@@ -31,23 +69,11 @@ class AiChatController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString loadingMessage = ''.obs;
 
-  Box? _historyBox;
-
-  Future<Box> _getHistoryBox() async {
-    if (_historyBox != null && _historyBox!.isOpen) {
-      return _historyBox!;
-    }
-    _historyBox = await Hive.openBox(_historyBoxName);
-    return _historyBox!;
-  }
-
   @override
   void onInit() {
     super.onInit();
     _initializeChat();
   }
-
-  static const String _historyBoxName = 'ai_chat_history';
 
   String _buildSystemInstruction() {
     final habitController = Get.isRegistered<HabitController>()
@@ -183,57 +209,29 @@ PERSONALITY CONSTANTS
 → Uses the user's name only if it's available in context.
 → References specific habits by name (never says "your habits" generically).
 → Never says "Great question!" or "Absolutely!".
-// You are a highly empathetic, encouraging, and psychological support coach integrated into a Habit Tracker app.
-// Your goal is to motivate the user to achieve their goals, build strong habits, and offer psychological support when they feel down or unmotivated.
-
-// Here is the context about the user's habits for today ($todayStr):
-// Total Habits: $totalCount
-// Completed: $completedCount ($completionRate%)
-// List of habits:
-// $habitsContext
-
-// Keep your responses concise, friendly, and highly motivating. Adapt your language to the user's input language (especially if they use Arabic, respond in fluent Arabic).
-// If the completion rate is low, encourage them to take a small step. If it's high, praise their consistency and discipline.
 ''';
   }
 
   Future<void> _initializeChat() async {
     try {
-      // 1. Load History from Hive (last 10 messages)
-      final box = await _getHistoryBox();
-      final storedList = box.get('history', defaultValue: []) as List;
-      final loadedMessages = storedList.map((item) {
-        final map = Map<String, dynamic>.from(item as Map);
-        return ChatMessage(
-          text: map['text'] as String,
-          isUser: map['isUser'] as bool,
-          hasError: map['hasError'] as bool? ?? false,
-        );
-      }).toList();
+      // 1. Load History from UseCase
+      final result = await _getChatHistoryUseCase();
+      final List<ChatMessageEntity> loadedEntities = result.fold(
+        (failure) => [],
+        (entities) => entities,
+      );
 
+      final loadedMessages = loadedEntities.map(ChatMessage.fromEntity).toList();
       messages.clear();
       messages.addAll(loadedMessages);
 
-      // 2. Map loaded messages to Content objects for ChatSession history
-      // Note: Skip messages with errors when building history
-      final List<Content> chatHistory = loadedMessages
-          .where((msg) => !msg.hasError.value)
-          .map((msg) {
-            if (msg.isUser) {
-              return Content.text(msg.text.value);
-            } else {
-              return Content.model([TextPart(msg.text.value)]);
-            }
-          })
-          .toList();
-
-      // 3. Initialize chat session with history
-      _chatSession = _geminiService.startChat(
+      // 2. Initialize chat session with history via Repository
+      _chatRepository.initChatSession(
         systemInstruction: _buildSystemInstruction(),
-        history: chatHistory,
+        history: loadedEntities,
       );
 
-      // 4. Generate initial greeting only if the chat history is completely empty
+      // 3. Generate initial greeting only if the chat history is completely empty
       if (messages.isEmpty) {
         _generateInitialGreeting();
       } else {
@@ -251,7 +249,7 @@ PERSONALITY CONSTANTS
     messages.add(greetingMessage);
 
     await _sendChatMessageWithRetry(
-      content: Content.text(S.current.initialGreeting),
+      text: S.current.initialGreeting,
       targetMessage: greetingMessage,
       isGreeting: true,
     );
@@ -275,7 +273,7 @@ PERSONALITY CONSTANTS
     _scrollToBottom();
 
     await _sendChatMessageWithRetry(
-      content: Content.text(text),
+      text: text,
       targetMessage: responseMessage,
     );
 
@@ -301,24 +299,20 @@ PERSONALITY CONSTANTS
     messages.add(responseMessage);
     _scrollToBottom();
 
-    final List<Content> chatHistory = [];
+    final List<ChatMessageEntity> historyEntities = [];
     for (int i = 0; i < index; i++) {
       final msg = messages[i];
       if (msg.hasError.value) continue;
-      if (msg.isUser) {
-        chatHistory.add(Content.text(msg.text.value));
-      } else {
-        chatHistory.add(Content.model([TextPart(msg.text.value)]));
-      }
+      historyEntities.add(msg.toEntity());
     }
 
-    _chatSession = _geminiService.startChat(
+    _chatRepository.initChatSession(
       systemInstruction: _buildSystemInstruction(),
-      history: chatHistory,
+      history: historyEntities,
     );
 
     await _sendChatMessageWithRetry(
-      content: Content.text(userMessage.text.value),
+      text: userMessage.text.value,
       targetMessage: responseMessage,
     );
 
@@ -340,7 +334,7 @@ PERSONALITY CONSTANTS
   }
 
   Future<void> _sendChatMessageWithRetry({
-    required Content content,
+    required String text,
     required ChatMessage targetMessage,
     bool isGreeting = false,
   }) async {
@@ -354,22 +348,13 @@ PERSONALITY CONSTANTS
       loadingMessage.value = '';
 
       try {
-        if (_chatSession == null) {
-          targetMessage.hasError.value = true;
-          if (!isGreeting) {
-            Get.snackbar(S.current.error, S.current.unexpectedError);
-          }
-          break;
-        }
-
-        final responseStream = _chatSession!.sendMessageStream(content);
+        final stream = _chatRepository.sendMessageStream(text);
 
         String accumulatedText = '';
         bool isFirstChunk = true;
 
-        await for (final chunk in responseStream) {
-          final chunkText = chunk.text;
-          if (chunkText != null && chunkText.isNotEmpty) {
+        await for (final chunkText in stream) {
+          if (chunkText.isNotEmpty) {
             if (isFirstChunk) {
               isLoading.value = false;
               isFirstChunk = false;
@@ -436,20 +421,8 @@ PERSONALITY CONSTANTS
 
   Future<void> _saveHistory() async {
     try {
-      final box = await _getHistoryBox();
-      // Keep only the last 10 messages
-      final start = messages.length > 10 ? messages.length - 10 : 0;
-      final listToSave = messages
-          .sublist(start)
-          .map(
-            (msg) => {
-              'text': msg.text.value,
-              'isUser': msg.isUser,
-              'hasError': msg.hasError.value,
-            },
-          )
-          .toList();
-      await box.put('history', listToSave);
+      final entities = messages.map((m) => m.toEntity()).toList();
+      await _saveChatHistoryUseCase(entities);
     } catch (e) {
       debugPrint('Error saving chat history: $e');
     }
@@ -470,8 +443,7 @@ PERSONALITY CONSTANTS
               Get.back();
               messages.clear();
               try {
-                final box = await _getHistoryBox();
-                await box.delete('history');
+                await _clearChatHistoryUseCase();
               } catch (e) {
                 debugPrint('Error clearing chat history: $e');
               }
