@@ -30,6 +30,8 @@ class HomeAppWidgetView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.maybeOf(context) ?? S.current;
+
     // Only display uncompleted habits
     final uncompletedHabits = habits.where((h) => !h.isCompleted).toList();
 
@@ -97,7 +99,7 @@ class HomeAppWidgetView extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      S.maybeOf(context)?.today ?? 'تقدم اليوم',
+                      s.today,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -119,8 +121,8 @@ class HomeAppWidgetView extends StatelessWidget {
                   ),
                   child: Text(
                     uncompletedHabits.isEmpty
-                        ? '✓ ${S.maybeOf(context)?.completedLabel ?? 'مكتمل'}'
-                        : '${uncompletedHabits.length} ${S.maybeOf(context)?.pending ?? 'قيد الانتظار'}',
+                        ? '✓ ${s.completedLabel}'
+                        : '${uncompletedHabits.length} ${s.pending}',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -190,7 +192,7 @@ class HomeAppWidgetView extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'تم إنجاز جميع العادات اليوم! 🎉',
+                      s.allHabitsCompletedToday,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -219,7 +221,7 @@ class HomeAppWidgetView extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 4, bottom: 2),
                 child: Center(
                   child: Text(
-                    '+${uncompletedHabits.length - 3} عادات أخرى...',
+                    s.moreHabitsCount(uncompletedHabits.length - 3),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
