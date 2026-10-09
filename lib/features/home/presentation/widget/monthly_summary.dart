@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
 import 'package:habit_tracker/core/theme/theme_utils.dart';
@@ -464,12 +465,6 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
       final Color startColor = Color.lerp(minStart, activeStart, t)!;
       final Color endColor = Color.lerp(minEnd, activeEnd, t)!;
 
-      // Drop glow scales proportionally with progress using theme's primary color
-      final double glowAlpha =
-          (isDark ? 0.12 : 0.08) + (progress * (isDark ? 0.15 : 0.10));
-      final double glowRadius = 3.5 + (progress * 6.5);
-      final double spread = progress >= 0.7 ? 1.0 : 0.0;
-
       decoration = BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
         gradient: LinearGradient(
@@ -485,21 +480,11 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
                     : Colors.white.withValues(alpha: 0.35 + (progress * 0.35))),
           width: widget.isToday ? 1.5 : 1.0,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: primary.withValues(alpha: glowAlpha),
-            blurRadius: glowRadius,
-            spreadRadius: spread,
-            offset: const Offset(0, 1),
-          ),
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.35)
-                : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
-            offset: const Offset(1, 2),
-            blurRadius: 3,
-          ),
-        ],
+        boxShadow: AppShadows.heatMapTile(
+          primary: primary,
+          isDark: isDark,
+          progress: progress,
+        ),
       );
 
       final Color textColor = isDark
@@ -514,14 +499,6 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
         fontWeight: progress >= 0.5 ? FontWeight.bold : FontWeight.w600,
       );
     } else {
-      final Color lightShadow = isDark
-          ? Colors.white.withValues(alpha: 0.025)
-          : Colors.white.withValues(alpha: 0.85);
-
-      final Color darkShadow = isDark
-          ? Colors.black.withValues(alpha: 0.45)
-          : const Color(0xFFA3B1C6).withValues(alpha: 0.30);
-
       decoration = BoxDecoration(
         color: inactiveBase,
         borderRadius: BorderRadius.circular(10.0),
@@ -533,24 +510,12 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
                     : Colors.white.withValues(alpha: 0.65)),
           width: widget.isToday ? 1.5 : 0.8,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: lightShadow,
-            offset: const Offset(-1.5, -1.5),
-            blurRadius: 2.5,
-          ),
-          BoxShadow(
-            color: darkShadow,
-            offset: const Offset(1.5, 1.5),
-            blurRadius: 3.5,
-          ),
-          if (widget.isToday)
-            BoxShadow(
-              color: primary.withValues(alpha: 0.25),
-              blurRadius: 6,
-              spreadRadius: 0.5,
-            ),
-        ],
+        boxShadow: widget.isToday
+            ? AppShadows.heatMapTodayHighlight(
+                primary: primary,
+                isDark: isDark,
+              )
+            : AppShadows.dotIndicator(isDark: isDark),
       );
       textStyle = TextStyle(
         color: widget.isToday
