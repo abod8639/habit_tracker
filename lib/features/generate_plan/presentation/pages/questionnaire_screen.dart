@@ -23,8 +23,8 @@ class QuestionnaireScreen extends StatelessWidget {
           () => myAppBar(
             title: controller.selectedCategory.value?.displayName ?? '',
             context: context,
-            onBack: controller.previous,
-            showLeading: !controller.isFirstQuestion,
+            // onBack: controller.previous,
+            // showLeading: !controller.isFirstQuestion,
           ),
         ),
       ),
