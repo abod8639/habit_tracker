@@ -300,9 +300,20 @@ class HabitLocalDataSource {
   }
 
   void addLocalTombstone(String id) {
+    addLocalTombstones([id]);
+  }
+
+  void addLocalTombstones(List<String> ids) {
+    if (ids.isEmpty) return;
     final tombstones = getLocalTombstones();
-    if (!tombstones.contains(id)) {
-      tombstones.add(id);
+    bool changed = false;
+    for (final id in ids) {
+      if (!tombstones.contains(id)) {
+        tombstones.add(id);
+        changed = true;
+      }
+    }
+    if (changed) {
       _myBox.put('local_tombstones', tombstones);
     }
   }
