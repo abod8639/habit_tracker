@@ -308,5 +308,14 @@
     }
   },
   "dailyReminderAllCompleted": "Awesome! You have completed all your tasks for today.",
-  "dailyReminderNoTasks": "No tasks registered yet. Start adding your daily habits today."
+  "dailyReminderNoTasks": "No tasks registered yet. Start adding your daily habits today.",
+  "allHabitsCompletedToday": "All habits completed today! 🎉",
+  "moreHabitsCount": "+{count} more habits...",
+  "@moreHabitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
