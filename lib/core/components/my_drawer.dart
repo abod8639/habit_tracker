@@ -99,7 +99,7 @@ class _DrawerListState extends State<DrawerList> {
                 ),
           onTap:()=> _isScanning ? null : AiGuard.protect(
               context,
-              onValid: () =>  _handleScanImage,
+              onValid: _handleScanImage,
           ),
           title: S.current.scanImage,
         ),
