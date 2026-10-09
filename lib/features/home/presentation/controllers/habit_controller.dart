@@ -26,6 +26,7 @@ import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/notification_controller.dart';
+import 'package:habit_tracker/core/services/home_widget_service.dart';
 
 class HabitController extends GetxController {
   // Use Cases
@@ -95,6 +96,7 @@ class HabitController extends GetxController {
 
       _setupHabitResetChecking();
       _syncReminder();
+      _updateHomeWidget();
 
       isInitialized.value = true;
     } catch (e) {
@@ -320,6 +322,7 @@ class HabitController extends GetxController {
     // 1.1 Optimistic Heatmap update
     _updateOptimisticHeatmap();
     _syncReminder();
+    _updateHomeWidget();
 
     // 2. Perform background update
     final result = await _toggleHabitUseCase(id, value);
@@ -331,6 +334,7 @@ class HabitController extends GetxController {
         habits.refresh();
         _updateOptimisticHeatmap();
         _syncReminder();
+        _updateHomeWidget();
         _showError(failure.message);
       },
       (_) async {
@@ -490,6 +494,16 @@ class HabitController extends GetxController {
     await _loadHabits();
     await _loadHeatmap();
     _syncReminder();
+    _updateHomeWidget();
+  }
+
+  void _updateHomeWidget() {
+    if (Get.isRegistered<HomeWidgetService>()) {
+      Get.find<HomeWidgetService>().updateWidget(
+        habits: habits.toList(),
+        heatmapData: heatmapDateSet,
+      );
+    }
   }
 
   void _syncReminder() {
