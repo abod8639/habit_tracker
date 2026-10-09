@@ -97,7 +97,7 @@ class HomeAppWidgetView extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      S.of(context).today,
+                      S.maybeOf(context)?.today ?? 'تقدم اليوم',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -119,8 +119,8 @@ class HomeAppWidgetView extends StatelessWidget {
                   ),
                   child: Text(
                     uncompletedHabits.isEmpty
-                        ? '✓ ${S.of(context).completedLabel}'
-                        : '${uncompletedHabits.length} ${S.of(context).pending}',
+                        ? '✓ ${S.maybeOf(context)?.completedLabel ?? 'مكتمل'}'
+                        : '${uncompletedHabits.length} ${S.maybeOf(context)?.pending ?? 'قيد الانتظار'}',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -208,6 +208,7 @@ class HomeAppWidgetView extends StatelessWidget {
                 habitName: habit.name,
                 habitCompleted: false,
                 colorValue: habit.colorValue,
+                enableSlidable: false,
                 onChanged: (_) {},
                 onDelete: (_) {},
                 onEdit: (_) {},
