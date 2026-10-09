@@ -47,16 +47,19 @@ class HomeWidgetService extends GetxService {
           : false;
 
       final themeData = isDark
-          ? (themeController?.darkTheme.value ?? ThemeData.dark())
+          ? (themeController.darkTheme.value)
           : (themeController?.lightTheme.value ?? ThemeData.light());
 
       final effectiveLocale =
-          langController?.effectiveLocale ?? const Locale('ar');
+          langController?.effectiveLocale ?? const Locale('en');
+
+      // Ensure active localization messages are fully loaded for effectiveLocale
+      await S.load(effectiveLocale);
 
       final widgetToRender = Directionality(
-        textDirection: effectiveLocale.languageCode == 'ar'
-            ? TextDirection.rtl
-            : TextDirection.ltr,
+        textDirection: effectiveLocale.languageCode == 'en'
+            ? TextDirection.ltr
+            : TextDirection.rtl,
         child: Theme(
           data: themeData,
           child: Material(
@@ -89,7 +92,7 @@ class HomeWidgetService extends GetxService {
       await HomeWidget.renderFlutterWidget(
         widgetToRender,
         key: habitWidgetImageKey,
-        logicalSize: const Size(380, 480),
+        logicalSize: const Size(480, 380),
       );
 
       await HomeWidget.updateWidget(
