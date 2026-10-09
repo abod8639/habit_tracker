@@ -45,12 +45,20 @@ Automatically extract habits from physical notes, diet sheets, or invoices.
 - **Dynamic Heatmap Synchronization**: Unique reactive keys guarantee immediate visual updates across monthly summaries and calendar heatmaps.
 - **Interactive Bar Charts & Stats**: Visualize completion trends, streak badges, and goal attainment rates with dynamic theming.
 
+### 📱 Android Home Screen Widget (Powered by `home_widget`)
+Track your progress and stay on top of your daily routines directly from your device's home screen.
+- **Live Habit Heatmap**: Displays your real-time progress using an integrated, compact calendar heatmap.
+- **Pending Habits at a Glance**: Shows only unfinished daily habits with tactile Neumorphic styling; completed habits automatically disappear upon completion.
+- **Instant Synchronization**: Automatically re-renders and refreshes whenever habits are checked off, added, or edited in the app.
+- **One-Tap App Launch**: Tap anywhere on the widget to open the app directly.
+
 ---
 
 ##  Highlights
 
 -  **Create & manage daily habits** with a smooth user experience  
 -  **Track your progress** with simple checkmarks and visual feedback  
+-  **Home screen widget** to view pending daily habits and live heatmap progress directly from your phone's home screen  
 -  **View rich statistics** with animated and interactive charts  
 -  **Weekly & monthly summaries** to visualize your growth over time  
 -  **Multiple beautiful themes** with support for dark/light modes and custom color pickers  
@@ -132,6 +140,7 @@ flutter run
 - **GetX** for state management & routing
 
 ### Key Packages
+- [`home_widget`](https://pub.dev/packages/home_widget) — Android Home Screen Widget for quick access and live progress tracking  
 - [`google_generative_ai`](https://pub.dev/packages/google_generative_ai) — Google Gemini AI SDK for chat & smart scanning  
 - [`fl_chart`](https://pub.dev/packages/fl_chart) — Responsive and animated charts  
 - [`flutter_heatmap_calendar`](https://pub.dev/packages/flutter_heatmap_calendar) — Visual heatmap for habits  
