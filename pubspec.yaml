@@ -11,7 +11,7 @@ dependencies:
   flutter_dotenv: ^6.0.0
 
   catppuccin_flutter: ^1.0.0
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^2.0.0
   fl_chart: ^1.0.0
   flutter:
     sdk: flutter
