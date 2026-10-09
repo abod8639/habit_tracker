@@ -47,31 +47,40 @@ class HomeWidgetService extends GetxService {
           : false;
 
       final themeData = isDark
-          ? (themeController.darkTheme.value)
+          ? (themeController?.darkTheme.value ?? ThemeData.dark())
           : (themeController?.lightTheme.value ?? ThemeData.light());
 
       final effectiveLocale =
           langController?.effectiveLocale ?? const Locale('ar');
 
-      final widgetToRender = MaterialApp(
-        debugShowCheckedModeBanner: false,
-        locale: effectiveLocale,
-        localizationsDelegates: const [
-          S.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: S.delegate.supportedLocales,
-        theme: themeData,
-        home: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: HomeAppWidgetView(
-              habits: habits,
-              heatmapDatasets: heatmapData,
-              isDark: isDark,
-              primaryColor: themeData.colorScheme.primary,
+      final widgetToRender = Directionality(
+        textDirection: effectiveLocale.languageCode == 'ar'
+            ? TextDirection.rtl
+            : TextDirection.ltr,
+        child: Theme(
+          data: themeData,
+          child: Material(
+            color: Colors.transparent,
+            child: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(380, 480),
+                devicePixelRatio: 2.0,
+              ),
+              child: Localizations(
+                locale: effectiveLocale,
+                delegates: const [
+                  S.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                child: HomeAppWidgetView(
+                  habits: habits,
+                  heatmapDatasets: heatmapData,
+                  isDark: isDark,
+                  primaryColor: themeData.colorScheme.primary,
+                ),
+              ),
             ),
           ),
         ),
@@ -80,7 +89,7 @@ class HomeWidgetService extends GetxService {
       await HomeWidget.renderFlutterWidget(
         widgetToRender,
         key: habitWidgetImageKey,
-        logicalSize: const Size(380, 420),
+        logicalSize: const Size(380, 480),
       );
 
       await HomeWidget.updateWidget(
@@ -88,8 +97,8 @@ class HomeWidgetService extends GetxService {
         androidName: appWidgetProviderName,
         qualifiedAndroidName: androidQualifiedName,
       );
-    } catch (e) {
-      debugPrint('Error updating home_widget: $e');
+    } catch (e, stack) {
+      debugPrint('Error updating home_widget: $e\n$stack');
     } finally {
       _isRendering = false;
     }
