@@ -165,4 +165,51 @@ class ThemeUtils {
     }
     return Colors.grey;
   }
+
+  // ── Unified Neumorphic Lighting & Surface Utilities ────────────────────────
+
+  /// Calculates top-left light highlight tone for convex Neumorphic surfaces.
+  static Color surfaceGradientStart(Color baseColor, bool isDark) {
+    return isDark
+        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
+        : (Color.lerp(baseColor, Colors.white, 0.40) ?? baseColor);
+  }
+
+  /// Calculates bottom-right depth shadow tone for convex Neumorphic surfaces.
+  static Color surfaceGradientEnd(Color baseColor, bool isDark) {
+    return isDark
+        ? (Color.lerp(baseColor, Colors.black, 0.16) ?? baseColor)
+        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.09) ?? baseColor);
+  }
+
+  /// Returns a pre-configured [LinearGradient] for tactile Neumorphic cards and buttons.
+  static LinearGradient softGradient({
+    required Color baseColor,
+    required bool isDark,
+    AlignmentGeometry begin = Alignment.topLeft,
+    AlignmentGeometry end = Alignment.bottomRight,
+  }) {
+    return LinearGradient(
+      begin: begin,
+      end: end,
+      colors: [
+        surfaceGradientStart(baseColor, isDark),
+        surfaceGradientEnd(baseColor, isDark),
+      ],
+    );
+  }
+
+  /// Unified crisp hairline border color for tactile Neumorphic edges.
+  static Color subtleBorderColor(bool isDark, {bool isPressed = false}) {
+    return isDark
+        ? Colors.white.withValues(alpha: isPressed ? 0.03 : 0.06)
+        : Colors.white.withValues(alpha: isPressed ? 0.35 : 0.82);
+  }
+
+  /// Recessed/debossed inner surface color for well containers and inputs.
+  static Color debossedSurfaceColor(Color baseColor, bool isDark) {
+    return isDark
+        ? (Color.lerp(baseColor, Colors.black, 0.28) ?? baseColor)
+        : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.35) ?? baseColor);
+  }
 }
