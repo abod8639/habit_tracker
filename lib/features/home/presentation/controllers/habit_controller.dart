@@ -6,6 +6,7 @@ import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/domain/usecases/add_habit_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/add_multiple_habits_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/delete_habit_usecase.dart';
+import 'package:habit_tracker/features/home/domain/usecases/delete_multiple_habits_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/edit_habit_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/get_habits_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/get_heatmap_data_usecase.dart';
@@ -33,6 +34,7 @@ class HabitController extends GetxController {
   final AddMultipleHabitsUseCase _addMultipleHabitsUseCase = Get.find();
   final EditHabitUseCase _editHabitUseCase = Get.find();
   final DeleteHabitUseCase _deleteHabitUseCase = Get.find();
+  final DeleteMultipleHabitsUseCase _deleteMultipleHabitsUseCase = Get.find();
   final ToggleHabitUseCase _toggleHabitUseCase = Get.find();
   final GetHeatmapDataUseCase _getHeatmapDataUseCase = Get.find();
   final IsUserLoggedInUseCase _isUserLoggedInUseCase = Get.find();
@@ -417,10 +419,47 @@ class HabitController extends GetxController {
   void clearSelection() => selectedHabitIds.clear();
 
   Future<void> deleteSelectedHabits() async {
-    for (final id in List.from(selectedHabitIds)) {
-      await deleteHabit(id);
-    }
+    if (selectedHabitIds.isEmpty) return;
+
+    final idsToDelete = List<String>.from(selectedHabitIds);
     clearSelection();
+
+    // 1. Optimistic UI update: Remove all selected habits immediately
+    final removedHabitsWithIndices = <int, HabitEntity>{};
+    for (int i = 0; i < habits.length; i++) {
+      if (idsToDelete.contains(habits[i].id)) {
+        removedHabitsWithIndices[i] = habits[i];
+      }
+    }
+
+    habits.removeWhere((h) => idsToDelete.contains(h.id));
+    _updateOptimisticHeatmap();
+    _syncReminder();
+
+    // 2. Perform background batch delete
+    final result = await _deleteMultipleHabitsUseCase(idsToDelete);
+
+    result.fold(
+      (failure) {
+        // 3. Rollback on failure
+        final sortedIndices = removedHabitsWithIndices.keys.toList()..sort();
+        for (final index in sortedIndices) {
+          final habit = removedHabitsWithIndices[index]!;
+          if (index <= habits.length) {
+            habits.insert(index, habit);
+          } else {
+            habits.add(habit);
+          }
+        }
+        _updateOptimisticHeatmap();
+        _syncReminder();
+        _showError(failure.message);
+      },
+      (_) async {
+        // 4. Background refresh once for all deleted items
+        await refreshData();
+      },
+    );
   }
 
   Future<void> updateSelectedHabitsColor(Color color) async {
