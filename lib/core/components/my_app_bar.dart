@@ -6,6 +6,9 @@ PreferredSizeWidget myAppBar({
   required String title,
   required BuildContext context,
   List<Widget>? actions,
+  Widget? leading,
+  VoidCallback? onBack,
+  bool showLeading = true,
 }) {
   ThemeData theme = Theme.of(context);
   return AppBar(
@@ -13,19 +16,23 @@ PreferredSizeWidget myAppBar({
     elevation: 0,
     scrolledUnderElevation: 0,
     leadingWidth: 56,
-    leading: Center(
-      child: NeumorphicIconButton.square(
-        size: 40,
-        iconSize: 18,
-        icon: Icons.arrow_back_ios_new_rounded,
-        accentColor: theme.colorScheme.onSurface,
-        onPressed: () {
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
-          }
-        },
-      ),
-    ),
+    leading: showLeading
+        ? (leading ??
+            Center(
+              child: NeumorphicIconButton.square(
+                size: 40,
+                iconSize: 18,
+                icon: Icons.arrow_back_ios_new_rounded,
+                accentColor: theme.colorScheme.onSurface,
+                onPressed: onBack ??
+                    () {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+              ),
+            ))
+        : null,
     title: Text(
       title,
       style: theme.textTheme.titleMedium?.copyWith(
