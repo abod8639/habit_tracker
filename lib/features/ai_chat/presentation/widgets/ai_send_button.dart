@@ -129,15 +129,15 @@ class _AiSendButtonState extends State<AiSendButton>
                       color: isDark
                           ? Colors.white.withValues(alpha: 0.035)
                           : Colors.white.withValues(alpha: 0.9),
-                      offset: const Offset(-2, -2),
-                      blurRadius: 4,
+                      offset: const Offset(-1, -1),
+                      blurRadius: 2,
                     ),
                     BoxShadow(
                       color: isDark
                           ? Colors.black.withValues(alpha: 0.4)
                           : const Color(0xFFA3B1C6).withValues(alpha: 0.28),
-                      offset: const Offset(2, 2),
-                      blurRadius: 4,
+                      offset: const Offset(1, 1),
+                      blurRadius: 2,
                     ),
                   ],
           ),
