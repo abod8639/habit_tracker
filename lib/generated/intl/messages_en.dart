@@ -40,15 +40,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m8(minutes) => "${minutes} minutes ago";
 
-  static String m9(count) => "${count} habits added to your tracker.";
+  static String m9(count) => "+${count} more habits...";
 
-  static String m10(time) => "Reminder set for ${time}";
+  static String m10(count) => "${count} habits added to your tracker.";
 
-  static String m11(streak) => "Day ${streak}";
+  static String m11(time) => "Reminder set for ${time}";
 
-  static String m12(category) => "Your ${category} Plan";
+  static String m12(streak) => "Day ${streak}";
 
-  static String m13(count) => "+${count} more habits...";
+  static String m13(category) => "Your ${category} Plan";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -61,8 +61,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "addNewHabit": MessageLookupByLibrary.simpleMessage("Add new Habit..."),
         "addedSelectedHabitsSuccess": MessageLookupByLibrary.simpleMessage(
             "Added the selected habits successfully."),
-        "allHabitsCompletedToday": MessageLookupByLibrary.simpleMessage(
-            "All habits completed today! 🎉"),
         "aiApiKeySubtitle": MessageLookupByLibrary.simpleMessage(
             "Custom Gemini API key for AI features"),
         "aiApiKeyTitle": MessageLookupByLibrary.simpleMessage("AI API Key"),
@@ -71,6 +69,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "I\'m here to support you in your journey towards your goals."),
         "aiServiceUnavailableTitle":
             MessageLookupByLibrary.simpleMessage("AI Service Unavailable"),
+        "allHabitsCompletedToday": MessageLookupByLibrary.simpleMessage(
+            "All habits completed today! 🎉"),
         "alreadyHaveAccount":
             MessageLookupByLibrary.simpleMessage("Already have an account?"),
         "answerRequired":
@@ -272,7 +272,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Logout from your account"),
         "minutesAgo": m8,
         "monthly": MessageLookupByLibrary.simpleMessage("Monthly Progress"),
-        "moreHabitsCount": m13,
+        "moreHabitsCount": m9,
         "name": MessageLookupByLibrary.simpleMessage("Name"),
         "nameRequired":
             MessageLookupByLibrary.simpleMessage("Please enter your name"),
@@ -303,7 +303,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "pending": MessageLookupByLibrary.simpleMessage("Pending"),
         "pieChartIsEmpty":
             MessageLookupByLibrary.simpleMessage("No habits to display"),
-        "planActivatedDesc": m9,
+        "planActivatedDesc": m10,
         "planActivatedTitle":
             MessageLookupByLibrary.simpleMessage("🎉 Plan activated!"),
         "planGenerationFailed": MessageLookupByLibrary.simpleMessage(
@@ -312,7 +312,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Please answer this question to continue."),
         "ratepagetitle":
             MessageLookupByLibrary.simpleMessage("Habit Statistics"),
-        "reminderSetFor": m10,
+        "reminderSetFor": m11,
         "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
             "You will receive daily habit checks."),
         "remindersEnabledTitle":
@@ -354,7 +354,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "somethingWentWrong":
             MessageLookupByLibrary.simpleMessage("Something went wrong"),
         "streak": MessageLookupByLibrary.simpleMessage("Streak"),
-        "streakDay": m11,
+        "streakDay": m12,
         "success": MessageLookupByLibrary.simpleMessage("Habit Success"),
         "summary": MessageLookupByLibrary.simpleMessage("Habit Summary"),
         "syncError": MessageLookupByLibrary.simpleMessage("Sync failed"),
@@ -390,6 +390,6 @@ class MessageLookup extends MessageLookupByLibrary {
             "An unexpected error occurred."),
         "user": MessageLookupByLibrary.simpleMessage("User"),
         "weekly": MessageLookupByLibrary.simpleMessage("weekly Progress"),
-        "yourPlanTitle": m12
+        "yourPlanTitle": m13
       };
 }
