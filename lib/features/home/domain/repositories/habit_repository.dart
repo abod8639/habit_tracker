@@ -8,6 +8,7 @@ abstract class HabitRepository {
   Future<Either<Failure, void>> addMultipleHabits(List<String> names);
   Future<Either<Failure, void>> editHabit(String id, String newName);
   Future<Either<Failure, void>> deleteHabit(String id);
+  Future<Either<Failure, void>> deleteMultipleHabits(List<String> ids);
   Future<Either<Failure, void>> toggleHabit(String id, bool isCompleted);
   Future<Either<Failure, void>> reorderHabits(int oldIndex, int newIndex);
   Future<Either<Failure, Map<DateTime, int>>> getHeatmapData();
