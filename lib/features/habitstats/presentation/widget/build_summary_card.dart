@@ -48,7 +48,7 @@ class SummaryCard extends StatelessWidget {
                 const CompletionPieChartCard.compact(),
                 StatItem(
                   title: S.current.streak,
-                  value: stats.completedHabits.toString(),
+                  value: stats.streak.toString(),
                   icon: Icons.local_fire_department_rounded,
                   color: const Color(0xFFFF9800),
                 ),
