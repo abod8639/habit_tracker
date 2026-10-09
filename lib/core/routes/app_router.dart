@@ -9,10 +9,10 @@ import 'package:habit_tracker/features/ai_chat/presentation/pages/ai_chat_page.d
 import 'package:habit_tracker/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:habit_tracker/features/auth/presentation/pages/login_page.dart';
 import 'package:habit_tracker/features/auth/presentation/widgets/auth_wrapper.dart';
-import 'package:habit_tracker/features/enerate_plan/presentation/controllers/plan_generator_controller.dart';
-import 'package:habit_tracker/features/enerate_plan/presentation/pages/category_selection_screen.dart';
-import 'package:habit_tracker/features/enerate_plan/presentation/pages/plan_result_screen.dart';
-import 'package:habit_tracker/features/enerate_plan/presentation/pages/questionnaire_screen.dart';
+import 'package:habit_tracker/features/generate_plan/presentation/controllers/plan_generator_controller.dart';
+import 'package:habit_tracker/features/generate_plan/presentation/pages/category_selection_screen.dart';
+import 'package:habit_tracker/features/generate_plan/presentation/pages/plan_result_screen.dart';
+import 'package:habit_tracker/features/generate_plan/presentation/pages/questionnaire_screen.dart';
 import 'package:habit_tracker/features/habitstats/presentation/controllers/habitstats_binding.dart';
 import 'package:habit_tracker/features/habitstats/presentation/controllers/habitstats_controller.dart';
 import 'package:habit_tracker/features/habitstats/presentation/pages/habit_stats_page.dart';

@@ -5,8 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:habit_tracker/features/enerate_plan/domain/entities/category_entity.dart';
-import 'package:habit_tracker/features/enerate_plan/domain/entities/plan_suggestion.dart';
+import 'package:habit_tracker/features/generate_plan/domain/entities/category_entity.dart';
+import 'package:habit_tracker/features/generate_plan/domain/entities/plan_suggestion.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 
