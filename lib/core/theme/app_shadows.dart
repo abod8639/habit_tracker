@@ -297,4 +297,41 @@ abstract final class AppShadows {
       ),
     ];
   }
+
+  /// HeatMap / calendar day tile shadows for completed progress.
+  /// Combines a dynamic radiant bloom scaled by completion strength with a tactile inset depth shadow.
+  static List<BoxShadow> heatMapTile({
+    required Color primary,
+    required bool isDark,
+    double progress = 1.0,
+  }) {
+    final double glowAlpha =
+        (isDark ? 0.12 : 0.08) + (progress * (isDark ? 0.15 : 0.10));
+    final double glowRadius = 3.5 + (progress * 6.5);
+    final double spread = progress >= 0.7 ? 1.0 : 0.0;
+
+    return [
+      BoxShadow(
+        color: primary.withValues(alpha: glowAlpha),
+        blurRadius: glowRadius,
+        spreadRadius: spread,
+        offset: const Offset(0, 1.0),
+      ),
+      ...insetWell(isDark: isDark),
+    ];
+  }
+
+  /// HeatMap / calendar day tile shadow for today's active focus ring.
+  static List<BoxShadow> heatMapTodayHighlight({
+    required Color primary,
+    required bool isDark,
+  }) {
+    return bloom(
+      color: primary,
+      isDark: isDark,
+      blur: 6.0,
+      spread: 0.5,
+      offset: Offset.zero,
+    );
+  }
 }
