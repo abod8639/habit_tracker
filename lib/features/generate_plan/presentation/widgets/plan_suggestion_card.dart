@@ -42,18 +42,8 @@ class PlanSuggestionCard extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                selected
-                    ? Color.alphaBlend(
-                        color.withValues(alpha: isDark ? 0.14 : 0.08),
-                        surfaceGradientStart,
-                      )
-                    : surfaceGradientStart,
-                selected
-                    ? Color.alphaBlend(
-                        color.withValues(alpha: isDark ? 0.20 : 0.12),
-                        surfaceGradientEnd,
-                      )
-                    : surfaceGradientEnd,
+                 surfaceGradientStart,
+                 surfaceGradientEnd,
               ],
             ),
             border: Border.all(
