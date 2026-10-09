@@ -107,8 +107,8 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
                         ...AppShadows.bloom(
                           color: primaryColor,
                           isDark: isDark,
-                          blur: 6,
-                          offset: const Offset(0, 2),
+                          blur: 3,
+                          offset: const Offset(0, 1),
                         ),
                       ]
                     : [
@@ -116,8 +116,8 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
                         ...AppShadows.bloom(
                           color: primaryColor,
                           isDark: isDark,
-                          blur: 6,
-                          offset: const Offset(0, 2),
+                          blur: 3,
+                          offset: const Offset(0, 1),
                         ),
                       ],
               ),
