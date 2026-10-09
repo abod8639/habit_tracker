@@ -9,6 +9,7 @@ import 'package:habit_tracker/features/ai_chat/presentation/pages/ai_chat_page.d
 import 'package:habit_tracker/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:habit_tracker/features/auth/presentation/pages/login_page.dart';
 import 'package:habit_tracker/features/auth/presentation/widgets/auth_wrapper.dart';
+import 'package:habit_tracker/features/generate_plan/presentation/controllers/plan_generator_binding.dart';
 import 'package:habit_tracker/features/generate_plan/presentation/controllers/plan_generator_controller.dart';
 import 'package:habit_tracker/features/generate_plan/presentation/pages/category_selection_screen.dart';
 import 'package:habit_tracker/features/generate_plan/presentation/pages/plan_result_screen.dart';
@@ -99,10 +100,7 @@ class AppRouter {
           name: AppRoutes.categorySelection,
           builder: (context, state) {
             if (!Get.isRegistered<PlanGeneratorController>()) {
-              Get.lazyPut<PlanGeneratorController>(
-                () => PlanGeneratorController(),
-                fenix: true,
-              );
+              PlanGeneratorBinding().dependencies();
             }
             return const CategorySelectionScreen();
           },
@@ -112,10 +110,7 @@ class AppRouter {
           name: AppRoutes.questionnaire,
           builder: (context, state) {
             if (!Get.isRegistered<PlanGeneratorController>()) {
-              Get.lazyPut<PlanGeneratorController>(
-                () => PlanGeneratorController(),
-                fenix: true,
-              );
+              PlanGeneratorBinding().dependencies();
             }
             return const QuestionnaireScreen();
           },
@@ -125,10 +120,7 @@ class AppRouter {
           name: AppRoutes.result,
           builder: (context, state) {
             if (!Get.isRegistered<PlanGeneratorController>()) {
-              Get.lazyPut<PlanGeneratorController>(
-                () => PlanGeneratorController(),
-                fenix: true,
-              );
+              PlanGeneratorBinding().dependencies();
             }
             return const PlanResultScreen();
           },
