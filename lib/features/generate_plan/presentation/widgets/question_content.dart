@@ -54,6 +54,25 @@ class QuestionContent extends StatelessWidget {
 
           if (!question.isRequired) ...[
             const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: AppRadius.smRadius,
+                    boxShadow: AppShadows.badge(isDark: isDark),
+                  ),
+                  child: Text(
+                    S.current.optional,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: theme.hintColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
@@ -61,14 +80,19 @@ class QuestionContent extends StatelessWidget {
                 borderRadius: AppRadius.smRadius,
                 boxShadow: AppShadows.badge(isDark: isDark),
               ),
-              child: Text(
-                S.current.optional,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: theme.hintColor,
-                  fontWeight: FontWeight.w500,
+              child: TextButton(
+                onPressed: controller.next,
+                child: Text(
+                  S.current.skipNow,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: theme.hintColor,
+                    fontWeight: FontWeight.w500,
+                ),
                 ),
               ),
+            ),
+              ],
             ),
           ],
 
