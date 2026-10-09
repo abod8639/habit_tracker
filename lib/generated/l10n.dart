@@ -2231,6 +2231,26 @@ class S {
       args: [],
     );
   }
+
+  /// `All habits completed today! 🎉`
+  String get allHabitsCompletedToday {
+    return Intl.message(
+      'All habits completed today! 🎉',
+      name: 'allHabitsCompletedToday',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `+{count} more habits...`
+  String moreHabitsCount(int count) {
+    return Intl.message(
+      '+$count more habits...',
+      name: 'moreHabitsCount',
+      desc: '',
+      args: [count],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
