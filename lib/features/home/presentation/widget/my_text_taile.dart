@@ -22,6 +22,7 @@ class MyTextTaile extends StatefulWidget {
   final bool isSelected;
   final bool isSelectionMode;
   final int? colorValue;
+  final bool enableSlidable;
 
   const MyTextTaile({
     required this.habitName,
@@ -34,6 +35,7 @@ class MyTextTaile extends StatefulWidget {
     this.isSelected = false,
     this.isSelectionMode = false,
     this.colorValue,
+    this.enableSlidable = true,
     super.key,
   });
 
@@ -139,6 +141,54 @@ class _MyTextTaileState extends State<MyTextTaile>
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
 
+    final tileContent = ScaleTransition(
+      scale: _scaleAnimation,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: AppRadius.cardRadius,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          onTapDown: (_) {
+            if (!widget.isSelectionMode) {
+              _pressController.forward();
+            }
+          },
+          onTapUp: (_) {
+            if (!widget.isSelectionMode) {
+              _pressController.reverse();
+            }
+          },
+          onTapCancel: () {
+            if (!widget.isSelectionMode) {
+              _pressController.reverse();
+            }
+          },
+          onTap: _handleTap,
+          onLongPress: widget.onLongPress,
+          onHover: (hovered) {
+            if (_isHovered != hovered) {
+              setState(() => _isHovered = hovered);
+            }
+          },
+          child: _buildNeumorphicTile(
+            theme,
+            themeColors,
+            textTheme,
+            isDark,
+          ),
+        ),
+      ),
+    );
+
+    if (!widget.enableSlidable) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5.5),
+        child: tileContent,
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5.5),
       child: Slidable(
@@ -159,46 +209,7 @@ class _MyTextTaileState extends State<MyTextTaile>
           isDark: isDark,
           onPressed: widget.onEdit,
         ),
-        child: ScaleTransition(
-          scale: _scaleAnimation,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: AppRadius.cardRadius,
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              hoverColor: Colors.transparent,
-              onTapDown: (_) {
-                if (!widget.isSelectionMode) {
-                  _pressController.forward();
-                }
-              },
-              onTapUp: (_) {
-                if (!widget.isSelectionMode) {
-                  _pressController.reverse();
-                }
-              },
-              onTapCancel: () {
-                if (!widget.isSelectionMode) {
-                  _pressController.reverse();
-                }
-              },
-              onTap: _handleTap,
-              onLongPress: widget.onLongPress,
-              onHover: (hovered) {
-                if (_isHovered != hovered) {
-                  setState(() => _isHovered = hovered);
-                }
-              },
-              child: _buildNeumorphicTile(
-                theme,
-                themeColors,
-                textTheme,
-                isDark,
-              ),
-            ),
-          ),
-        ),
+        child: tileContent,
       ),
     );
   }
