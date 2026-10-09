@@ -4,11 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:habit_tracker/features/generate_plan/domain/entities/category_entity.dart';
-import 'package:habit_tracker/features/generate_plan/domain/entities/plan_suggestion.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 
 // ── CUSTOM GEMINI EXCEPTIONS ──────────────────────────────────────────────────
 abstract class GeminiException implements Exception {
@@ -120,6 +116,24 @@ class GeminiService {
     final key = currentApiKey;
     if (key.isEmpty) return false;
     return validateApiKey(key);
+  }
+
+  /// Creates a configured [GenerativeModel] instance with the current active API key.
+  GenerativeModel createModel({
+    String model = modelName,
+    GenerationConfig? generationConfig,
+    Content? systemInstruction,
+  }) {
+    final apiKey = _apiKey;
+    if (apiKey.isEmpty) {
+      throw ApiKeyMissingException();
+    }
+    return GenerativeModel(
+      model: model,
+      apiKey: apiKey,
+      generationConfig: generationConfig,
+      systemInstruction: systemInstruction,
+    );
   }
 
   /// Lazy getter for standard GenerativeModel instance
@@ -254,7 +268,7 @@ class GeminiService {
   }
 
   /// Centralized exception analyzer mapping errors to custom GeminiExceptions.
-  Never _handleException(Object e, String action) {
+  static Never handleException(Object e, String action) {
     if (e is GeminiException) {
       throw e;
     }
@@ -296,118 +310,5 @@ class GeminiService {
     );
   }
 
-  /// Generates a list of [PlanSuggestion] tailored to the user's answers.
-  Future<List<PlanSuggestion>> generatePlan({
-    required PlanCategory category,
-    required Map<String, String> userAnswers,
-  }) async {
-    final prompt = _buildPlanPrompt(category, userAnswers);
-    try {
-      final response = await _model.generateContent([Content.text(prompt)]);
-      final text = response.text ?? '';
-      return _parsePlanResponse(text, category);
-    } on GenerativeAIException catch (e) {
-      _handleException(e, 'generating plan');
-    } catch (e) {
-      _handleException(e, 'generating plan');
-    }
-  }
-
-  /// Builds a structured prompt that instructs Gemini to return strict JSON.
-  String _buildPlanPrompt(
-    PlanCategory category,
-    Map<String, String> answers,
-  ) {
-    final answersBlock = answers.entries
-        .map((e) => '  - ${e.key.replaceAll("_", " ")}: ${e.value}')
-        .join('\n');
-
-    final isArabic = Get.isRegistered<LangController>()
-        ? Get.find<LangController>().isArabic
-        : ((Get.locale?.languageCode ?? Intl.getCurrentLocale()).startsWith(
-            'ar',
-          ));
-
-    final languageInstruction = isArabic
-        ? 'LANGUAGE REQUIREMENT: Generate all habit "name" and "description" fields in natural, high-quality Arabic (اللغة العربية). The "frequency" field must also be in Arabic (e.g. "يومياً" or "3 مرات في الأسبوع").'
-        : 'LANGUAGE REQUIREMENT: Generate all habit "name", "description", and "frequency" fields in English.';
-
-    return '''
-You are a ${category.coachRole}. A user is setting up a habit tracker and needs a personalised action plan.
-
-CATEGORY: ${category.displayName}
-
-USER PROFILE:
-$answersBlock
-
-YOUR TASK:
-Generate between 5 and 8 specific, measurable, and achievable daily/weekly habits tailored to this exact user profile. Each habit should directly address their stated goal and personal context.
-
-STRICT OUTPUT FORMAT — return ONLY a raw JSON array, no markdown, no explanation, no text before or after the array:
-[
-  {
-    "name": "Short habit name (max 7 words)",
-    "description": "1-2 sentences explaining why this specific habit helps THIS user reach their goal.",
-    "frequency": "daily OR X times per week",
-    "category": "${category.name}"
-  }
-]
-
-RULES:
-- $languageInstruction
-- Habits must be actionable and time-bound where possible (e.g., "Drink 500ml water every morning" not "Drink more water").
-- Tailor every habit to the user's answers — do NOT produce generic habits.
-- If the user has restrictions or limitations, respect them completely.
-- Frequency must be realistic given the user's available time/days.
-- Do not include any text, code fences, or explanations outside the JSON array.
-''';
-  }
-
-  /// Parses the raw Gemini response text into a list of [PlanSuggestion].
-  List<PlanSuggestion> _parsePlanResponse(
-    String responseText,
-    PlanCategory category,
-  ) {
-    try {
-      // Strip potential markdown code fences from the model output
-      String cleaned = responseText
-          .replaceAll(RegExp(r'```json\s*'), '')
-          .replaceAll(RegExp(r'```\s*'), '')
-          .trim();
-
-      // Extract the JSON array boundaries
-      final start = cleaned.indexOf('[');
-      final end = cleaned.lastIndexOf(']');
-
-      if (start == -1 || end == -1 || end <= start) {
-        throw const FormatException(
-          'No valid JSON array found in AI response.',
-        );
-      }
-
-      cleaned = cleaned.substring(start, end + 1);
-
-      final List<dynamic> jsonList = json.decode(cleaned) as List<dynamic>;
-
-      if (jsonList.isEmpty) {
-        throw const FormatException('AI returned an empty habit list.');
-      }
-
-      return jsonList
-          .whereType<Map<String, dynamic>>()
-          .map(PlanSuggestion.fromJson)
-          .where((s) => s.name.isNotEmpty) // Guard against empty entries
-          .toList();
-    } on FormatException catch (e) {
-      throw GeminiInvalidResponseException(
-        'Could not parse AI response.',
-        details: e.message,
-      );
-    } catch (e) {
-      throw GeminiUnknownException(
-        'Unexpected error parsing plan.',
-        originalError: e,
-      );
-    }
-  }
+  Never _handleException(Object e, String action) => handleException(e, action);
 }
