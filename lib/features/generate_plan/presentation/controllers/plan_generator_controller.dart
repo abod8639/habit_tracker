@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../domain/entities/category_entity.dart';
-import '../../domain/entities/question_entity.dart';
-import '../../domain/entities/plan_suggestion.dart';
-import '../../data/datasources/questions_datasource.dart';
-
-import 'package:habit_tracker/core/services/gemini_service.dart';
-import '../../../home/presentation/controllers/habit_controller.dart';
-import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/routes/app_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
+import '../../../home/presentation/controllers/habit_controller.dart';
+import '../../domain/entities/category_entity.dart';
+import '../../domain/entities/plan_suggestion.dart';
+import '../../domain/entities/question_entity.dart';
+import '../../domain/usecases/generate_plan_usecase.dart';
+import '../../domain/usecases/get_questions_usecase.dart';
+import '../../domain/usecases/save_plan_habits_usecase.dart';
 
 enum PlanGeneratorStatus { idle, loading, success, error }
 
 class PlanGeneratorController extends GetxController {
-  final GeminiService _geminiService = GeminiService();
+  final GetQuestionsUseCase _getQuestionsUseCase;
+  final GeneratePlanUseCase _generatePlanUseCase;
+  final SavePlanHabitsUseCase _savePlanHabitsUseCase;
+
+  PlanGeneratorController({
+    GetQuestionsUseCase? getQuestionsUseCase,
+    GeneratePlanUseCase? generatePlanUseCase,
+    SavePlanHabitsUseCase? savePlanHabitsUseCase,
+  })  : _getQuestionsUseCase =
+            getQuestionsUseCase ?? Get.find<GetQuestionsUseCase>(),
+        _generatePlanUseCase =
+            generatePlanUseCase ?? Get.find<GeneratePlanUseCase>(),
+        _savePlanHabitsUseCase =
+            savePlanHabitsUseCase ?? Get.find<SavePlanHabitsUseCase>();
 
   // ── State ────────────────────────────────────────────────────────────────
   final Rx<PlanCategory?> selectedCategory = Rx<PlanCategory?>(null);
@@ -51,7 +63,7 @@ class PlanGeneratorController extends GetxController {
   void selectCategory(PlanCategory category) {
     selectedCategory.value = category;
     questions.value = List<QuestionEntity>.from(
-      QuestionsDataSource.forCategory(category),
+      _getQuestionsUseCase(category),
     );
     answers.clear();
     currentIndex.value = 0;
@@ -127,19 +139,24 @@ class PlanGeneratorController extends GetxController {
 
     status.value = PlanGeneratorStatus.loading;
 
-    try {
-      final result = await _geminiService.generatePlan(
-        category: category,
-        userAnswers: answers.map((k, v) => MapEntry(k, v.toString())),
-      );
-      suggestions.value = result;
+    final result = await _generatePlanUseCase(
+      category: category,
+      userAnswers: answers,
+    );
 
-      status.value = PlanGeneratorStatus.success;
-      AppRouter.router.push(AppRoutes.result);
-    } catch (e) {
-      status.value = PlanGeneratorStatus.error;
-      errorMessage.value = S.current.planGenerationFailed;
-    }
+    result.fold(
+      (failure) {
+        status.value = PlanGeneratorStatus.error;
+        errorMessage.value = failure.message.isNotEmpty
+            ? failure.message
+            : S.current.planGenerationFailed;
+      },
+      (generatedSuggestions) {
+        suggestions.value = generatedSuggestions;
+        status.value = PlanGeneratorStatus.success;
+        AppRouter.router.push(AppRoutes.result);
+      },
+    );
   }
 
   // ── Suggestion selection ──────────────────────────────────────────────────
@@ -168,33 +185,37 @@ class PlanGeneratorController extends GetxController {
     status.value = PlanGeneratorStatus.loading;
 
     try {
-      final HabitController habitController =
-          Get.isRegistered<HabitController>()
-          ? Get.find<HabitController>()
-          : Get.put(HabitController());
-
       final habitNames = selectedSuggestions.map((s) => s.name).toList();
-      final bool success = await habitController.addMultipleHabits(habitNames);
+      final result = await _savePlanHabitsUseCase(habitNames);
 
-      if (!success) {
-        status.value = PlanGeneratorStatus.error;
-        errorMessage.value = S.current.unexpectedError;
-        return;
-      }
+      result.fold(
+        (failure) {
+          status.value = PlanGeneratorStatus.error;
+          errorMessage.value = failure.message.isNotEmpty
+              ? failure.message
+              : S.current.unexpectedError;
+        },
+        (_) async {
+          // If HabitController is loaded, notify it to refresh
+          if (Get.isRegistered<HabitController>()) {
+            await Get.find<HabitController>().refreshData();
+          }
 
-      status.value = PlanGeneratorStatus.idle;
-      final count = selectedCount;
-      reset();
+          status.value = PlanGeneratorStatus.idle;
+          final count = selectedCount;
+          reset();
 
-      AppRouter.router.go(AppRoutes.home);
+          AppRouter.router.go(AppRoutes.home);
 
-      Get.snackbar(
-        S.current.planActivatedTitle,
-        S.current.planActivatedDesc(count),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF10B981),
-        colorText: const Color(0xFFFFFFFF),
-        duration: const Duration(seconds: 3),
+          Get.snackbar(
+            S.current.planActivatedTitle,
+            S.current.planActivatedDesc(count),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: const Color(0xFF10B981),
+            colorText: const Color(0xFFFFFFFF),
+            duration: const Duration(seconds: 3),
+          );
+        },
       );
     } catch (e, stack) {
       debugPrint('Error in addSelectedHabits: $e\n$stack');
@@ -213,45 +234,4 @@ class PlanGeneratorController extends GetxController {
     status.value = PlanGeneratorStatus.idle;
     errorMessage.value = '';
   }
-
-  // ── Mock data (remove in production) ─────────────────────────────────────
-  // List<PlanSuggestion> _mockSuggestions(PlanCategory category) {
-  //   return [
-  //     PlanSuggestion(
-  //       name: 'Morning hydration ritual',
-  //       description:
-  //           'Drink 500ml of water immediately after waking up. Rehydrates your body after sleep and kickstarts metabolism.',
-  //       frequency: 'daily',
-  //       category: category.name,
-  //     ),
-  //     PlanSuggestion(
-  //       name: 'Eat a protein-rich breakfast',
-  //       description:
-  //           'Include at least 20g of protein in your first meal. Reduces cravings and supports muscle retention.',
-  //       frequency: 'daily',
-  //       category: category.name,
-  //     ),
-  //     PlanSuggestion(
-  //       name: 'No screen 30 min before bed',
-  //       description:
-  //           'Reduce blue light exposure before sleep to improve sleep quality and recovery.',
-  //       frequency: 'daily',
-  //       category: category.name,
-  //     ),
-  //     PlanSuggestion(
-  //       name: 'Meal prep session',
-  //       description:
-  //           'Prepare healthy meals in advance. Eliminates last-minute unhealthy food decisions.',
-  //       frequency: '2 times per week',
-  //       category: category.name,
-  //     ),
-  //     PlanSuggestion(
-  //       name: 'Track daily food intake',
-  //       description:
-  //           'Log everything you eat. Awareness is the first step to behavior change.',
-  //       frequency: 'daily',
-  //       category: category.name,
-  //     ),
-  //   ];
-  // }
 }
