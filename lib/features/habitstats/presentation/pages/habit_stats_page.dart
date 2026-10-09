@@ -174,16 +174,16 @@ class _NeumorphicAiFabState extends State<_NeumorphicAiFab> {
                   ...AppShadows.bloom(
                     color: primary,
                     isDark: isDark,
-                    blur: 14.0,
-                    spread: 1.0,
-                    offset: const Offset(0, 5),
+                    blur: 3.0,
+                    // spread: 3.0,
+                    offset: const Offset(0, 1),
                   ),
                   BoxShadow(
                     color: isDark
                         ? Colors.white.withValues(alpha: 0.05)
                         : Colors.white.withValues(alpha: 0.80),
-                    offset: const Offset(-2, -2),
-                    blurRadius: 5,
+                    offset: const Offset(-1, -1),
+                    blurRadius: 2,
                   ),
                 ],
         ),
