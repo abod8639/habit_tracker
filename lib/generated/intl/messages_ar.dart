@@ -40,15 +40,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m8(minutes) => "منذ ${minutes} دقيقة";
 
-  static String m9(count) => "تمت إضافة ${count} عادات إلى متتبعك بنجاح.";
+  static String m9(count) => "+${count} عادات أخرى...";
 
-  static String m10(time) => "تم ضبط التذكير في ${time}";
+  static String m10(count) => "تمت إضافة ${count} عادات إلى متتبعك بنجاح.";
 
-  static String m11(streak) => "يوم ${streak}";
+  static String m11(time) => "تم ضبط التذكير في ${time}";
 
-  static String m12(category) => "خطتك في ${category}";
+  static String m12(streak) => "يوم ${streak}";
 
-  static String m13(count) => "+${count} عادات أخرى...";
+  static String m13(category) => "خطتك في ${category}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -62,8 +62,6 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("إضافة عادة جديدة..."),
         "addedSelectedHabitsSuccess": MessageLookupByLibrary.simpleMessage(
             "تمت إضافة العادات المحددة بنجاح."),
-        "allHabitsCompletedToday": MessageLookupByLibrary.simpleMessage(
-            "تم إنجاز جميع العادات اليوم! 🎉"),
         "aiApiKeySubtitle": MessageLookupByLibrary.simpleMessage(
             "مفتاح Gemini مخصص لميزات الذكاء الاصطناعي"),
         "aiApiKeyTitle":
@@ -73,6 +71,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "أنا هنا لدعمك في رحلتك نحو أهدافك."),
         "aiServiceUnavailableTitle":
             MessageLookupByLibrary.simpleMessage("خدمة الذكاء الاصطناعي"),
+        "allHabitsCompletedToday": MessageLookupByLibrary.simpleMessage(
+            "تم إنجاز جميع العادات اليوم! 🎉"),
         "alreadyHaveAccount":
             MessageLookupByLibrary.simpleMessage("لديك حساب بالفعل؟"),
         "answerRequired":
@@ -276,7 +276,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("الخروج من حسابك"),
         "minutesAgo": m8,
         "monthly": MessageLookupByLibrary.simpleMessage("تقدم الشهري"),
-        "moreHabitsCount": m13,
+        "moreHabitsCount": m9,
         "name": MessageLookupByLibrary.simpleMessage("الاسم"),
         "nameRequired":
             MessageLookupByLibrary.simpleMessage("يرجى إدخال الاسم"),
@@ -309,7 +309,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "pending": MessageLookupByLibrary.simpleMessage("قيد الانتظار"),
         "pieChartIsEmpty":
             MessageLookupByLibrary.simpleMessage("لا توجد عادات لعرضها"),
-        "planActivatedDesc": m9,
+        "planActivatedDesc": m10,
         "planActivatedTitle":
             MessageLookupByLibrary.simpleMessage("🎉 تم تفعيل الخطة!"),
         "planGenerationFailed": MessageLookupByLibrary.simpleMessage(
@@ -318,7 +318,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "يرجى الإجابة عن هذا السؤال للمتابعة."),
         "ratepagetitle":
             MessageLookupByLibrary.simpleMessage("إحصائيات العادات"),
-        "reminderSetFor": m10,
+        "reminderSetFor": m11,
         "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
             "ستصلك إشعارات متابعة عاداتك اليومية."),
         "remindersEnabledTitle":
@@ -346,7 +346,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "scanImage": MessageLookupByLibrary.simpleMessage("مسح الصورة"),
         "selectAll": MessageLookupByLibrary.simpleMessage("تحديد الكل"),
         "selectAtLeastOneHabit":
-    lib/features/home/presentation/widget/home_app_widget_view.dart        MessageLookupByLibrary.simpleMessage("اختر عادة واحدة على الأقل"),
+            MessageLookupByLibrary.simpleMessage("اختر عادة واحدة على الأقل"),
         "sendResetLink":
             MessageLookupByLibrary.simpleMessage("إرسال رابط إعادة التعيين"),
         "setDailyReminder":
@@ -361,7 +361,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "somethingWentWrong":
             MessageLookupByLibrary.simpleMessage("حدث خطأ ما"),
         "streak": MessageLookupByLibrary.simpleMessage("الاستمرارية"),
-        "streakDay": m11,
+        "streakDay": m12,
         "success": MessageLookupByLibrary.simpleMessage("معدل النجاح"),
         "summary": MessageLookupByLibrary.simpleMessage("ملخص العادات"),
         "syncError": MessageLookupByLibrary.simpleMessage("فشلت المزامنة"),
@@ -396,6 +396,6 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("حدث خطأ غير متوقع."),
         "user": MessageLookupByLibrary.simpleMessage("مستخدم"),
         "weekly": MessageLookupByLibrary.simpleMessage("تقدم الأسبوعي"),
-        "yourPlanTitle": m12
+        "yourPlanTitle": m13
       };
 }
