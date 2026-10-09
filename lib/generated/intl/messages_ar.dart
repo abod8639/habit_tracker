@@ -48,6 +48,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m12(category) => "خطتك في ${category}";
 
+  static String m13(count) => "+${count} عادات أخرى...";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "about": MessageLookupByLibrary.simpleMessage("حول التطبيق"),
@@ -60,6 +62,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("إضافة عادة جديدة..."),
         "addedSelectedHabitsSuccess": MessageLookupByLibrary.simpleMessage(
             "تمت إضافة العادات المحددة بنجاح."),
+        "allHabitsCompletedToday": MessageLookupByLibrary.simpleMessage(
+            "تم إنجاز جميع العادات اليوم! 🎉"),
         "aiApiKeySubtitle": MessageLookupByLibrary.simpleMessage(
             "مفتاح Gemini مخصص لميزات الذكاء الاصطناعي"),
         "aiApiKeyTitle":
@@ -272,6 +276,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("الخروج من حسابك"),
         "minutesAgo": m8,
         "monthly": MessageLookupByLibrary.simpleMessage("تقدم الشهري"),
+        "moreHabitsCount": m13,
         "name": MessageLookupByLibrary.simpleMessage("الاسم"),
         "nameRequired":
             MessageLookupByLibrary.simpleMessage("يرجى إدخال الاسم"),
@@ -341,7 +346,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "scanImage": MessageLookupByLibrary.simpleMessage("مسح الصورة"),
         "selectAll": MessageLookupByLibrary.simpleMessage("تحديد الكل"),
         "selectAtLeastOneHabit":
-            MessageLookupByLibrary.simpleMessage("اختر عادة واحدة على الأقل"),
+    lib/features/home/presentation/widget/home_app_widget_view.dart        MessageLookupByLibrary.simpleMessage("اختر عادة واحدة على الأقل"),
         "sendResetLink":
             MessageLookupByLibrary.simpleMessage("إرسال رابط إعادة التعيين"),
         "setDailyReminder":
