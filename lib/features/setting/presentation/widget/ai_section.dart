@@ -82,14 +82,7 @@ class AiSection extends StatelessWidget {
                   baseSurface,
                 ),
                 borderRadius: AppRadius.badgeRadius,
-                boxShadow: keyStatus == ApiKeyStatus.valid || isCustom
-                    ? AppShadows.bloom(
-                        color: statusColor,
-                        isDark: isDark,
-                        blur: 6,
-                        offset: const Offset(0, 2),
-                      )
-                    : AppShadows.dotIndicator(isDark: isDark),
+                boxShadow: AppShadows.dotIndicator(isDark: isDark),
                 border: Border.all(
                   color: statusColor.withValues(alpha: isDark ? 0.35 : 0.25),
                   width: 1,
