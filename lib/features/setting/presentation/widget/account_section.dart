@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/animated_setting_tile.dart';
@@ -112,7 +113,7 @@ Widget buildAnimatedUserCard(
                     radius: 36,
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     backgroundImage: photoUrl != null
-                        ? NetworkImage(photoUrl)
+                        ? CachedNetworkImageProvider(photoUrl)
                         : null,
                     onBackgroundImageError: photoUrl != null
                         ? (exception, stackTrace) {
