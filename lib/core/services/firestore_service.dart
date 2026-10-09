@@ -99,8 +99,8 @@ class FirestoreService {
       final String? finalStartDay = cloudStartDay ?? localStartDay;
 
       // 2. Process Deletions (Tombstones)
-      for (var id in localTombstones) {
-        await deleteHabit(id);
+      if (localTombstones.isNotEmpty) {
+        await deleteHabits(localTombstones);
       }
 
       // 3. Parallel Download (Habits and Deleted Tombstones)
@@ -151,20 +151,27 @@ class FirestoreService {
     }
   }
 
-  // Delete a habit from Firestore (with Tombstone)
-  Future<void> deleteHabit(String habitId) async {
-    if (!isUserLoggedIn) return;
+  // Delete multiple habits from Firestore (with Tombstones) in a single batch
+  Future<void> deleteHabits(List<String> habitIds) async {
+    if (!isUserLoggedIn || habitIds.isEmpty) return;
 
     try {
       final batch = _firestore.batch();
-      batch.delete(_habitsCollection!.doc(habitId));
-      batch.set(_deletedHabitsCollection!.doc(habitId), {
-        'deletedAt': FieldValue.serverTimestamp(),
-      });
+      for (final habitId in habitIds) {
+        batch.delete(_habitsCollection!.doc(habitId));
+        batch.set(_deletedHabitsCollection!.doc(habitId), {
+          'deletedAt': FieldValue.serverTimestamp(),
+        });
+      }
       await batch.commit();
     } catch (e) {
       // Ignored
     }
+  }
+
+  // Delete a habit from Firestore (with Tombstone)
+  Future<void> deleteHabit(String habitId) async {
+    await deleteHabits([habitId]);
   }
 
   // Upload habit history (Heatmap data)
