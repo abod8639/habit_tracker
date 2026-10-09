@@ -319,11 +319,7 @@ class _MyalartdState extends State<MyalartDialog>
                       ),
                       boxShadow: AppShadows.wellDual(isDark: isDark),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 2,
-                    ),
-                    child: TextFormField(
+                    child: TextFormField(     
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 15.5,
@@ -506,8 +502,9 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
           children: [
             Icon(
               widget.icon,
-              size: 17,
+              size: 20,
               color: iconColor,
+              shadows:AppShadows.buttonPressed(isDark: isDark) ,
             ),
             const SizedBox(width: 7),
             Text(
