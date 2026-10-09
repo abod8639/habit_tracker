@@ -292,88 +292,99 @@ class _ThemeCardState extends State<ThemeCard>
                             ],
                           ),
                         ),
-                        if (widget.isSelected)
-                          Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color.alphaBlend(
-                                    Colors.white.withValues(alpha: 0.25),
-                                    primary,
+
+                        Row(
+                          children: [
+                            if (widget.colors['primary'] != null)
+                              _buildColorIndicator(
+                                widget.colors['primary']!,
+                                isCardDark,
+                              ),
+                            if (widget.colors['secondary'] != null)
+                              _buildColorIndicator(
+                                widget.colors['secondary']!,
+                                isCardDark,
+                              ),
+                            if (widget.colors['surface'] != null)
+                              _buildColorIndicator(
+                                widget.colors['surface']!,
+                                isCardDark,
+                              ),
+                            if (widget.colors['background'] != null)
+                              _buildColorIndicator(
+                                widget.colors['background']!,
+                                isCardDark,
+                              ),
+                            if (widget.colors['onPrimary'] != null)
+                              _buildColorIndicator(
+                                widget.colors['onPrimary']!,
+                                isCardDark,
+                              ),
+                            if (widget.colors['onSecondary'] != null)
+                              _buildColorIndicator(
+                                widget.colors['onSecondary']!,
+                                isCardDark,
+                              ),
+                            if (widget.colors['error'] != null)
+                              _buildColorIndicator(
+                                widget.colors['error']!,
+                                isCardDark,
+                              ),
+                          ],
+                        ),
+                        widget.isSelected
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                ),
+                                child: Container(
+                                  width: 34,
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color.alphaBlend(
+                                          Colors.white.withValues(alpha: 0.25),
+                                          primary,
+                                        ),
+                                        primary,
+                                      ],
+                                    ),
+                                    boxShadow: [
+                                      ...AppShadows.bloom(
+                                        color: primary,
+                                        isDark: isCardDark,
+                                        blur: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                      BoxShadow(
+                                        color: isCardDark
+                                            ? Colors.white.withValues(
+                                                alpha: 0.1,
+                                              )
+                                            : Colors.white.withValues(
+                                                alpha: 0.7,
+                                              ),
+                                        offset: const Offset(-2, -2),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
                                   ),
-                                  primary,
-                                ],
-                              ),
-                              boxShadow: [
-                                ...AppShadows.bloom(
-                                  color: primary,
-                                  isDark: isCardDark,
-                                  blur: 8,
-                                  offset: const Offset(0, 3),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.check_rounded,
+                                      color:
+                                          widget.colors['onPrimary'] ??
+                                          Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
                                 ),
-                                BoxShadow(
-                                  color: isCardDark
-                                      ? Colors.white.withValues(alpha: 0.1)
-                                      : Colors.white.withValues(alpha: 0.7),
-                                  offset: const Offset(-2, -2),
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.check_rounded,
-                                color:
-                                    widget.colors['onPrimary'] ?? Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          )
-                        else
-                          Row(
-                            children: [
-                              if (widget.colors['primary'] != null)
-                                _buildColorIndicator(
-                                  widget.colors['primary']!,
-                                  isCardDark,
-                                ),
-                              if (widget.colors['secondary'] != null)
-                                _buildColorIndicator(
-                                  widget.colors['secondary']!,
-                                  isCardDark,
-                                ),
-                              if (widget.colors['surface'] != null)
-                                _buildColorIndicator(
-                                  widget.colors['surface']!,
-                                  isCardDark,
-                                ),
-                              if (widget.colors['background'] != null)
-                                _buildColorIndicator(
-                                  widget.colors['background']!,
-                                  isCardDark,
-                                ),
-                              if (widget.colors['onPrimary'] != null)
-                                _buildColorIndicator(
-                                  widget.colors['onPrimary']!,
-                                  isCardDark,
-                                ),
-                              if (widget.colors['onSecondary'] != null)
-                                _buildColorIndicator(
-                                  widget.colors['onSecondary']!,
-                                  isCardDark,
-                                ),
-                              if (widget.colors['error'] != null)
-                                _buildColorIndicator(
-                                  widget.colors['error']!,
-                                  isCardDark,
-                                ),
-                            ],
-                          ),
+                              )
+                            : SizedBox.shrink(),
                       ],
                     ),
                   ),
