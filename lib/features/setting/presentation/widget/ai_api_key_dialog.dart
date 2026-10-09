@@ -360,12 +360,7 @@ class AiApiKeyDialog extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: primaryColor,
                           borderRadius: AppRadius.mdRadius,
-                          boxShadow: AppShadows.bloom(
-                            color: primaryColor,
-                            isDark: isDark,
-                            blur: 8,
-                            offset: const Offset(0, 3),
-                          ),
+                          boxShadow: AppShadows.buttonResting(isDark: isDark),
                         ),
                         child: isValidating
                             ? Row(
