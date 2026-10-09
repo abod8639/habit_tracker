@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-import 'package:habit_tracker/features/categorys/data/datasources/questions_datasource.dart';
-import 'package:habit_tracker/features/categorys/domain/entities/category_entity.dart';
+import 'package:habit_tracker/features/enerate_plan/data/datasources/questions_datasource.dart';
+import 'package:habit_tracker/features/enerate_plan/domain/entities/category_entity.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 void main() {
