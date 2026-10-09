@@ -89,3 +89,4 @@ app.*.map.json
 lib/firebase_options.dart
 firebase_options.dart
 .env
+TODO.md
