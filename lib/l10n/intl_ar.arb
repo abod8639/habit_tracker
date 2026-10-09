@@ -224,5 +224,14 @@
     }
   },
   "dailyReminderAllCompleted": "رائع جداً! لقد أكملت جميع مهامك اليوم بنجاح.",
-  "dailyReminderNoTasks": "لا توجد مهام مسجلة بعد، ابدأ بإضافة عاداتك اليومية."
+  "dailyReminderNoTasks": "لا توجد مهام مسجلة بعد، ابدأ بإضافة عاداتك اليومية.",
+  "allHabitsCompletedToday": "تم إنجاز جميع العادات اليوم! 🎉",
+  "moreHabitsCount": "+{count} عادات أخرى...",
+  "@moreHabitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
