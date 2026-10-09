@@ -104,17 +104,29 @@ class HabitRepositoryImpl implements HabitRepository {
 
   @override
   Future<Either<Failure, void>> deleteHabit(String id) async {
+    return deleteMultipleHabits([id]);
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteMultipleHabits(List<String> ids) async {
     try {
+      if (ids.isEmpty) return const Right(null);
+
+      final idSet = ids.toSet();
       final models = List<HabitModel>.from(localDataSource.loadHabits());
-      models.removeWhere((m) => m.id == id);
+      models.removeWhere((m) => idSet.contains(m.id));
 
       await localDataSource.saveHabits(models);
       _cachedHeatmapData = null;
-      localDataSource.addLocalTombstone(id);
+      localDataSource.addLocalTombstones(ids);
 
       if (firestoreService.isUserLoggedIn) {
-        await firestoreService.deleteHabit(id);
-        await firestoreService.uploadHabits(models);
+        try {
+          await firestoreService.deleteHabits(ids);
+          await firestoreService.uploadHabits(models);
+        } catch (e) {
+          debugPrint('Cloud sync error (habits deleted locally): $e');
+        }
       }
 
       return const Right(null);
