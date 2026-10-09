@@ -261,4 +261,40 @@ abstract final class AppShadows {
       ),
     ];
   }
+
+  /// Dual lighting shadows for interactive Neumorphic tiles (choice options, list items).
+  static List<BoxShadow> tileResting({required bool isDark}) {
+    return [
+      BoxShadow(
+        color: lightShadowColor(isDark),
+        offset: const Offset(-2, -2),
+        blurRadius: 4,
+      ),
+      BoxShadow(
+        color: darkShadowColor(isDark),
+        offset: const Offset(2.5, 2.5),
+        blurRadius: 5,
+      ),
+    ];
+  }
+
+  /// Recessed inset shadow specifically tuned for text inputs, number inputs, and search fields.
+  static List<BoxShadow> insetInput({required bool isDark}) {
+    return [
+      BoxShadow(
+        color: isDark
+            ? Colors.black.withValues(alpha: 0.45)
+            : const Color(0xFFA3B1C6).withValues(alpha: 0.30),
+        offset: const Offset(1.5, 1.5),
+        blurRadius: 3.0,
+      ),
+      BoxShadow(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.03)
+            : Colors.white.withValues(alpha: 0.85),
+        offset: const Offset(-1.0, -1.0),
+        blurRadius: 2.0,
+      ),
+    ];
+  }
 }
