@@ -48,6 +48,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m12(category) => "Your ${category} Plan";
 
+  static String m13(count) => "+${count} more habits...";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "about": MessageLookupByLibrary.simpleMessage("About"),
@@ -59,6 +61,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "addNewHabit": MessageLookupByLibrary.simpleMessage("Add new Habit..."),
         "addedSelectedHabitsSuccess": MessageLookupByLibrary.simpleMessage(
             "Added the selected habits successfully."),
+        "allHabitsCompletedToday": MessageLookupByLibrary.simpleMessage(
+            "All habits completed today! 🎉"),
         "aiApiKeySubtitle": MessageLookupByLibrary.simpleMessage(
             "Custom Gemini API key for AI features"),
         "aiApiKeyTitle": MessageLookupByLibrary.simpleMessage("AI API Key"),
@@ -268,6 +272,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Logout from your account"),
         "minutesAgo": m8,
         "monthly": MessageLookupByLibrary.simpleMessage("Monthly Progress"),
+        "moreHabitsCount": m13,
         "name": MessageLookupByLibrary.simpleMessage("Name"),
         "nameRequired":
             MessageLookupByLibrary.simpleMessage("Please enter your name"),
