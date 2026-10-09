@@ -168,15 +168,9 @@ class _AppConfirmationDialogState extends State<AppConfirmationDialog>
                             : Colors.white.withValues(alpha: 0.90),
                         width: 1.0,
                       ),
-                      boxShadow: [
-                        ...AppShadows.badge(isDark: isDark),
-                        ...AppShadows.bloom(
-                          color: primaryColor,
-                          isDark: isDark,
-                          blur: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      boxShadow: AppShadows.activeDot(
+                        color: primaryColor,
+                      ),
                     ),
                     child: Center(
                       child: Icon(
@@ -319,22 +313,7 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
     if (_isPressed) {
       shadows = AppShadows.buttonPressed(isDark: isDark);
     } else if (widget.isPrimary) {
-      shadows = [
-        ...AppShadows.bloom(
-          color: primaryColor,
-          isDark: isDark,
-          blur: 10,
-          spread: 0.5,
-          offset: const Offset(0, 3),
-        ),
-        BoxShadow(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.white.withValues(alpha: 0.85),
-          offset: const Offset(-2, -2),
-          blurRadius: 5,
-        ),
-      ];
+      shadows = AppShadows.buttonResting(isDark: isDark);
     } else {
       shadows = AppShadows.buttonResting(isDark: isDark);
     }
