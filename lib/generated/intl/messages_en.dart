@@ -237,6 +237,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "What do you want\nto work on?"),
         "getKeyInfo": MessageLookupByLibrary.simpleMessage(
             "Get a free API key from Google AI Studio"),
+        "habitNameTooLong": MessageLookupByLibrary.simpleMessage(
+            "Habit name cannot exceed 100 characters"),
         "habitsGeneratedCount": m5,
         "hambitstate": MessageLookupByLibrary.simpleMessage("Habit State"),
         "hoursAgo": m6,
