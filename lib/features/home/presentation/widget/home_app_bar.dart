@@ -74,40 +74,43 @@ class HomeAppBar extends StatelessWidget {
               ),
             ),
           ),
-          title: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: Color.alphaBlend(
-                colorScheme.primary.withValues(alpha: isDark ? 0.16 : 0.10),
-                baseColor,
-              ),
-              borderRadius: AppRadius.badgeRadius,
-              border: Border.all(
-                color: colorScheme.primary.withValues(
-                  alpha: isDark ? 0.30 : 0.20,
+          title: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Color.alphaBlend(
+                  colorScheme.primary.withValues(alpha: isDark ? 0.16 : 0.10),
+                  baseColor,
                 ),
-                width: 1.0,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.check_circle_outline_rounded,
-                  size: 16,
-                  color: colorScheme.primary,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  S.current.itemsSelected(controller.selectedHabitIds.length),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.primary,
-                    letterSpacing: 0.2,
+                borderRadius: AppRadius.badgeRadius,
+                border: Border.all(
+                  color: colorScheme.primary.withValues(
+                    alpha: isDark ? 0.30 : 0.20,
                   ),
+                  width: 1.0,
                 ),
-              ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.check_circle_outline_rounded,
+                    size: 16,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    S.current.itemsSelected(controller.selectedHabitIds.length),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.primary,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
