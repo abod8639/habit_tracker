@@ -47,15 +47,12 @@ class HomeAppWidgetView extends StatelessWidget {
       10: primaryColor,
     };
 
-    final cardBgColor = isDark
-        ? const Color(0xFF1B1D22)
-        : const Color(0xFFF4F6FA);
 
     return Container(
       width: 380,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: cardBgColor,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isDark
