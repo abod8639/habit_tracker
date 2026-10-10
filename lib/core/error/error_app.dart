@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/routes/app_router.dart';
-import 'package:habit_tracker/core/routes/app_routes.dart';
 
 class ErrorApp extends StatelessWidget {
   final String error;
+  final VoidCallback? onRestart;
 
-  const ErrorApp({super.key, this.error = 'Failed to initialize app'});
+  const ErrorApp({
+    super.key,
+    this.error = 'Failed to initialize app',
+    this.onRestart,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +39,7 @@ class ErrorApp extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => AppRouter.router.go(AppRoutes.home),
+                onPressed: onRestart,
                 child: const Text("Restart"),
               ),
             ],
