@@ -244,7 +244,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Import previously exported data"),
         "incomplete": MessageLookupByLibrary.simpleMessage("Incomplete"),
         "initialGreeting": MessageLookupByLibrary.simpleMessage(
-            "Hello. Please introduce yourself briefly as my AI coach and comment on my habit progress today."),
+            "Hello. Please introduce yourself briefly as my AI coach and comment on my habit progress and streak today."),
         "invalidApiKeyFormat": MessageLookupByLibrary.simpleMessage(
             "Please enter a valid API key"),
         "isEmpty":
