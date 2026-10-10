@@ -32,7 +32,10 @@ class Tablet extends StatelessWidget {
         }
 
         if (controller.errorMessage.value.isNotEmpty) {
-          return buildErrorScreen();
+          return ErrorView(
+            errorMessage: controller.errorMessage.value,
+            onRetry: controller.retry,
+          );
         }
 
         return Stack(
