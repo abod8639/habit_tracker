@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/core/utils/click_throttler.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/presentation/widget/myalart_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -18,7 +19,7 @@ void addHabit(BuildContext context) {
           if (habitName.isNotEmpty) {
             await c.addHabit(habitName);
             if (context.mounted) {
-              Navigator.of(context).pop();
+              Navigator.of(context).canPop();
             }
           } else {
             Get.snackbar(
@@ -29,7 +30,7 @@ void addHabit(BuildContext context) {
               colorText: Colors.white,
             );
           }
-        },
+        }.throttle(),
       );
     },
   );
