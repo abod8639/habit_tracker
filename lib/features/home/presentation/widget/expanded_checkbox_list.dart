@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/presentation/widget/my_text_taile.dart';
-import 'package:habit_tracker/core/functions/edit_habit.dart';
+import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 
 class CheckboxList extends StatelessWidget {
   const CheckboxList({super.key});
@@ -45,7 +45,11 @@ class CheckboxList extends StatelessWidget {
                   onTap: () =>
                       controller.toggleHabit(habit.id, !habit.isCompleted),
                   onDelete: (context) => controller.deleteHabit(habit.id),
-                  onEdit: (context) => editHabit(habit.id, habit.name, context),
+                  onEdit: (context) => HabitDialogs.showEdit(
+                    context,
+                    id: habit.id,
+                    currentName: habit.name,
+                  ),
                   onChanged: (value) =>
                       controller.toggleHabit(habit.id, value ?? false),
                 ),
