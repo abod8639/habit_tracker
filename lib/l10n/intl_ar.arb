@@ -44,6 +44,7 @@
   "cancel": "إلغاء",
   "add": "إضافة عادة جديدة",
   "theFieldCantBeEmpty": "لا يمكن ترك الحقل فارغاً",
+  "habitNameTooLong": "لا يمكن أن يتجاوز اسم العادة 100 حرف",
   "addNewHabit": "إضافة عادة جديدة...",
   "editThisHabit": "تعديل هذه العادة",
   "error": "خطأ",
