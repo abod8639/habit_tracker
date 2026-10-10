@@ -233,10 +233,10 @@ class _MyTextTaileState extends State<MyTextTaile>
           child: Tooltip(
             message: tooltip,
             child: Container(
-              width: 50 * 1.6,
-              height: 65,
+              width: 50 * 1.7,
+              height: 60,
               decoration: BoxDecoration(
-                borderRadius: AppRadius.mdRadius,
+                borderRadius: AppRadius.badgeRadius,
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -253,14 +253,9 @@ class _MyTextTaileState extends State<MyTextTaile>
                     )!,
                   ],
                 ),
-                boxShadow: [
-                  ...AppShadows.buttonResting(isDark: isDark),
-                  BoxShadow(
-                    color: baseColor.withValues(alpha: isDark ? 0.35 : 0.20),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
+                boxShadow: 
+                  AppShadows.buttonResting(isDark: isDark),
+               
                 border: Border.all(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.12)
