@@ -48,7 +48,10 @@ class _PhoneState extends State<Phone> {
           }
 
           if (controller.errorMessage.value.isNotEmpty) {
-            return buildErrorScreen();
+            return ErrorView(
+              errorMessage: controller.errorMessage.value,
+              onRetry: controller.retry,
+            );
           }
 
           return CustomScrollView(
