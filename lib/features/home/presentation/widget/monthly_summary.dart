@@ -259,7 +259,7 @@ class _MonthlySummaryState extends State<MonthlySummary>
         child: SoftCard(
           borderRadius: 28.0,
           margin: EdgeInsets.zero,
-          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
           // Force LTR directionality so calendar consistently flows from past (left) to present (right)
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,6 +380,7 @@ class _MonthlySummaryState extends State<MonthlySummary>
                           );
                         }),
                       ),
+                      SizedBox(height: _tileGap *1.5),
                     ],
                   ),
                 ),
