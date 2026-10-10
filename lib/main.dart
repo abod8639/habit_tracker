@@ -21,9 +21,11 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
 
       if (!kIsWeb &&
           (defaultTargetPlatform == TargetPlatform.android ||
@@ -41,7 +43,12 @@ Future<void> main() async {
     },
     (error, stack) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        runApp(ErrorApp(error: error.toString()));
+        runApp(
+          ErrorApp(
+            error: error.toString(),
+            onRestart: () => main(),
+          ),
+        );
       });
     },
   );
