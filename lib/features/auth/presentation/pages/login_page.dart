@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/core/functions/perform_sync.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
@@ -24,7 +23,7 @@ class LoginPage extends StatelessWidget {
   }) async {
     final success = await authController.signInWithGoogle();
     if (success) {
-      await performSync(syncController, habitController);
+      await syncController.syncHabits(habitController);
       if (context.mounted) {
         context.go(AppRoutes.home);
       }
