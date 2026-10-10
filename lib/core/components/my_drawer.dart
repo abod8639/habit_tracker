@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import 'package:habit_tracker/core/functions/ai_guard.dart';
+import 'package:habit_tracker/core/guards/ai_guard.dart';
 import 'my_drawer_list_tile.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/presentation/widget/image_scanner_bottom_sheet.dart';
