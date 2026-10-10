@@ -45,6 +45,7 @@
   "cancel": "Cancel",
   "add": "Add new habit",
   "theFieldCantBeEmpty": "The field can't be empty :)",
+  "habitNameTooLong": "Habit name cannot exceed 100 characters",
   "addNewHabit": "Add new Habit...",
   "editThisHabit": "Edit This Habit",
   "error": "Error",
