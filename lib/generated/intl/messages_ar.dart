@@ -241,6 +241,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("ما الذي تريد\nالعمل عليه؟"),
         "getKeyInfo": MessageLookupByLibrary.simpleMessage(
             "احصل على مفتاح مجاني من Google AI Studio"),
+        "habitNameTooLong": MessageLookupByLibrary.simpleMessage(
+            "لا يمكن أن يتجاوز اسم العادة 100 حرف"),
         "habitsGeneratedCount": m5,
         "hambitstate": MessageLookupByLibrary.simpleMessage("حالة العادة"),
         "hoursAgo": m6,
