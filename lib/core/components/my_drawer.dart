@@ -126,10 +126,16 @@ class _DrawerListState extends State<DrawerList> {
         MyDrawerListTile(
           icon: const Icon(color: Colors.purpleAccent, Icons.psychology),
           onTap: () {
-            Navigator.of(context).pop();
+            final navigator = Navigator.of(context);
+            final router = GoRouter.of(context);
             AiGuard.protect(
               context,
-              onValid: () => context.push(AppRoutes.aiCoach),
+              onValid: () {
+                if (navigator.canPop()) {
+                  navigator.pop();
+                }
+                router.push(AppRoutes.aiCoach);
+              },
             );
           },
           title: S.current.aiCoach,
