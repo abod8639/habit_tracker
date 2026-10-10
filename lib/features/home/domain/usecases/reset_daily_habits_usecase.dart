@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:habit_tracker/core/error/failures.dart';
-import 'package:habit_tracker/core/functions/habit_utils.dart';
 import '../repositories/habit_repository.dart';
+import '../utils/habit_date_utils.dart';
 
 class ResetDailyHabitsUseCase {
   final HabitRepository repository;
@@ -14,7 +14,7 @@ class ResetDailyHabitsUseCase {
     return dateResult.fold(
       (failure) => Left(failure),
       (lastResetDate) async {
-        if (shouldResetHabits(lastResetDate)) {
+        if (HabitDateUtils.shouldResetHabits(lastResetDate)) {
           // 1. Get current habits to save to history
           final habitsResult = await repository.getHabits();
 
