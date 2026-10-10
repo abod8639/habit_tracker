@@ -1230,10 +1230,10 @@ class S {
     );
   }
 
-  /// `Hello. Please introduce yourself briefly as my AI coach and comment on my habit progress today.`
+  /// `Hello. Please introduce yourself briefly as my AI coach and comment on my habit progress and streak today.`
   String get initialGreeting {
     return Intl.message(
-      'Hello. Please introduce yourself briefly as my AI coach and comment on my habit progress today.',
+      'Hello. Please introduce yourself briefly as my AI coach and comment on my habit progress and streak today.',
       name: 'initialGreeting',
       desc: '',
       args: [],
