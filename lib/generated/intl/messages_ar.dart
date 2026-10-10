@@ -248,7 +248,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "استيراد بيانات محفوظة مسبقاً"),
         "incomplete": MessageLookupByLibrary.simpleMessage("غير مكتمل"),
         "initialGreeting": MessageLookupByLibrary.simpleMessage(
-            "مرحبا. يرجى التعريف بنفسك باختصار كمدرب ذكاء اصطناعي خاص بي والتعليق على تقدم عاداتي اليوم."),
+            "مرحبا. يرجى التعريف بنفسك باختصار كمدرب ذكاء اصطناعي خاص بي والتعليق على تقدم عاداتي والستريك اليوم."),
         "invalidApiKeyFormat":
             MessageLookupByLibrary.simpleMessage("يرجى إدخال مفتاح API صالح"),
         "isEmpty":
