@@ -78,6 +78,11 @@ class HabitController extends GetxController {
     _setupAuthListener();
   }
 
+  /// Retries the initialization and loads habit data again
+  Future<void> retry() async {
+    await _initialize();
+  }
+
   Future<void> _initialize() async {
     try {
       isLoading.value = true;
@@ -234,6 +239,86 @@ class HabitController extends GetxController {
 
     return storedStartDay;
   }
+
+  /// Calculates the current active streak (consecutive days of habit completion).
+  int calculateStreak() {
+    final heatmap = heatmapDateSet;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final completedCount = habits.where((h) => h.isCompleted).length;
+
+    int streak = 0;
+    // 1. If today has completed habits or recorded completion in heatmap
+    final bool isTodayCompleted =
+        completedCount > 0 || (heatmap[today] ?? 0) > 0;
+    if (isTodayCompleted) {
+      streak++;
+    }
+
+    // 2. Count consecutive previous calendar days
+    int daysBack = 1;
+    while (true) {
+      final checkDay = DateTime(
+        today.year,
+        today.month,
+        today.day - daysBack,
+      );
+      final strength = heatmap[checkDay] ?? 0;
+      if (strength > 0) {
+        streak++;
+        daysBack++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  /// Calculates the all-time best streak (maximum consecutive days of completion).
+  int calculateBestStreak() {
+    final heatmap = heatmapDateSet;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final completedCount = habits.where((h) => h.isCompleted).length;
+
+    final activeDates = <DateTime>{};
+    heatmap.forEach((date, strength) {
+      if (strength > 0) {
+        activeDates.add(DateTime(date.year, date.month, date.day));
+      }
+    });
+    if (completedCount > 0) {
+      activeDates.add(today);
+    }
+
+    if (activeDates.isEmpty) return 0;
+
+    final sortedDates = activeDates.toList()..sort();
+    int maxStreak = 0;
+    int currentRun = 0;
+    DateTime? prevDate;
+
+    for (final date in sortedDates) {
+      if (prevDate == null) {
+        currentRun = 1;
+      } else {
+        final nextDay = DateTime(prevDate.year, prevDate.month, prevDate.day + 1);
+        if (date.isAtSameMomentAs(nextDay)) {
+          currentRun++;
+        } else if (date.isAfter(nextDay)) {
+          currentRun = 1;
+        }
+      }
+      if (currentRun > maxStreak) {
+        maxStreak = currentRun;
+      }
+      prevDate = date;
+    }
+    return maxStreak;
+  }
+
+  int get streak => calculateStreak();
+  int get bestStreak => calculateBestStreak();
 
   Future<void> incrementDayCount() async {
     await _incrementDayCountUseCase();
