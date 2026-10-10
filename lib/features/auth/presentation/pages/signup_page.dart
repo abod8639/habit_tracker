@@ -5,7 +5,6 @@
 // import 'package:habit_tracker/features/auth/presentation/widgets/fade_slide_transition.dart';
 // import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 // import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
-// import 'package:habit_tracker/core/functions/perform_sync.dart';
 
 // class SignUpPage extends StatefulWidget {
 //   const SignUpPage({super.key});
