@@ -187,19 +187,7 @@ class ColorCoin extends StatelessWidget {
             color: Colors.white.withValues(alpha: isDark ? 0.35 : 0.65),
             width: 1.5,
           ),
-          boxShadow: [
-            ...AppShadows.bloom(
-              color: color,
-              isDark: isDark,
-              blur: 6,
-              offset: const Offset(0, 3),
-            ),
-            BoxShadow(
-              color: Colors.white.withValues(alpha: 0.60),
-              offset: const Offset(-1.5, -1.5),
-              blurRadius: 3,
-            ),
-          ],
+          boxShadow: AppShadows.buttonResting(isDark: isDark),
         ),
       ),
     );
