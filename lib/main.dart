@@ -7,7 +7,7 @@ import 'package:habit_tracker/core/bindings/initial_binding.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 import 'package:habit_tracker/features/theme/presentation/controllers/theme_controller.dart';
 import 'package:habit_tracker/firebase_options.dart';
-import 'package:habit_tracker/core/functions/initialize_app.dart';
+import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/core/utils/restart_widget.dart';
 import 'package:habit_tracker/core/error/error_app.dart';
@@ -35,7 +35,7 @@ Future<void> main() async {
         );
       }
 
-      await initializeApp();
+      await AppInitializer.init();
 
       InitialBinding().dependencies();
 
