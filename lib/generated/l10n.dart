@@ -500,6 +500,16 @@ class S {
     );
   }
 
+  /// `Habit name cannot exceed 100 characters`
+  String get habitNameTooLong {
+    return Intl.message(
+      'Habit name cannot exceed 100 characters',
+      name: 'habitNameTooLong',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Add new Habit...`
   String get addNewHabit {
     return Intl.message(
