@@ -27,14 +27,14 @@ abstract final class AppShadows {
     return [
       BoxShadow(
         color: lightShadowColor(isDark),
-        offset: const Offset(-3, -3),
-        blurRadius: 6,
+        offset: const Offset(-1, -1),
+        blurRadius: 3,
         spreadRadius: 0,
       ),
       BoxShadow(
         color: darkShadowColor(isDark),
-        offset: const Offset(4, 4),
-        blurRadius: 7,
+        offset: const Offset(2, 2),
+        blurRadius: 3,
         spreadRadius: 0,
       ),
     ];
