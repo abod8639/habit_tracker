@@ -16,17 +16,17 @@ class AiEmptyState extends StatelessWidget {
     final isArabic = Get.locale?.languageCode == 'ar';
     if (isArabic) {
       return const [
+        '🔥 كيف وضعي مع الستريك اليوم؟',
         '⚡ كيف أحافظ على استمرارية عاداتي؟',
         '🎯 ساعدني في ترتيب أولويات اليوم',
         '💪 أحتاج جرعة تحفيز سريعة',
-        '🧠 كيف أتغلب على التسويف والمماطلة؟',
       ];
     }
     return const [
+      '🔥 How is my streak and momentum today?',
       '⚡ How do I stay consistent with my habits?',
       '🎯 Help me organize today\'s priorities',
       '💪 I need a quick motivation boost',
-      '🧠 How do I overcome procrastination?',
     ];
   }
 
