@@ -16,12 +16,7 @@ void addHabit(BuildContext context) {
         controller: c.habitTextController,
         onSave: () async {
           final String habitName = c.habitTextController.text.trim();
-          if (habitName.isNotEmpty) {
-            await c.addHabit(habitName);
-            if (context.mounted) {
-              Navigator.of(context).canPop();
-            }
-          } else {
+          if (habitName.isEmpty) {
             Get.snackbar(
               S.current.error,
               S.current.theFieldCantBeEmpty,
@@ -29,6 +24,21 @@ void addHabit(BuildContext context) {
               backgroundColor: Colors.red.withValues(alpha: 0.7),
               colorText: Colors.white,
             );
+          } else if (habitName.length > 100) {
+            Get.snackbar(
+              S.current.error,
+              Get.locale?.languageCode == 'ar'
+                  ? 'لا يمكن أن يتجاوز اسم العادة 100 حرف'
+                  : 'Habit name cannot exceed 100 characters',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red.withValues(alpha: 0.7),
+              colorText: Colors.white,
+            );
+          } else {
+            await c.addHabit(habitName);
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
           }
         }.throttle(),
       );
