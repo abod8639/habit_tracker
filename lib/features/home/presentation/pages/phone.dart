@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/build_error_screen.dart';
 import 'package:habit_tracker/core/components/build_loading_screen.dart';
 import 'package:habit_tracker/core/components/my_drawer.dart';
-import 'package:habit_tracker/core/functions/add_habit.dart';
+import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/presentation/widget/habit_list.dart';
 import 'package:habit_tracker/features/home/presentation/widget/home_app_bar.dart';
@@ -38,7 +38,7 @@ class _PhoneState extends State<Phone> {
         () => controller.isSelectionMode
             ? const SizedBox.shrink()
             : MyfloatingActionButton(
-                onPressed: () => addHabit(context),
+                onPressed: () => HabitDialogs.showAdd(context),
               ),
       ),
       body: SafeArea(
