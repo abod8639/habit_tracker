@@ -437,23 +437,6 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
     final List<BoxShadow> shadows;
     if (_isPressed) {
       shadows = AppShadows.buttonPressed(isDark: isDark);
-    } else if (widget.isPrimary) {
-      shadows = [
-        ...AppShadows.bloom(
-          color: primaryColor,
-          isDark: isDark,
-          blur: 10,
-          spread: 0.5,
-          offset: const Offset(0, 3),
-        ),
-        BoxShadow(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.white.withValues(alpha: 0.85),
-          offset: const Offset(-2, -2),
-          blurRadius: 5,
-        ),
-      ];
     } else {
       shadows = AppShadows.buttonResting(isDark: isDark);
     }
