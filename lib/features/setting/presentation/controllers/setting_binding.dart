@@ -18,6 +18,9 @@ import '../../domain/usecases/clear_all_data_usecase.dart';
 import '../../domain/usecases/get_custom_api_key_usecase.dart';
 import '../../domain/usecases/save_custom_api_key_usecase.dart';
 import '../../domain/usecases/clear_custom_api_key_usecase.dart';
+import 'package:habit_tracker/core/guards/ai_guard.dart';
+import 'package:habit_tracker/core/services/gemini_service.dart';
+import '../widget/ai_api_key_dialog.dart';
 import 'lang_controller.dart';
 import 'notification_controller.dart';
 import 'sync_controller.dart';
@@ -72,5 +75,30 @@ class SettingBinding extends Bindings {
       ),
       fenix: true,
     );
+
+    // Wire up AiGuard handlers via DIP
+    AiGuard.registerConfigHandler((context) async {
+      final controller = Get.isRegistered<AiSettingsController>()
+          ? Get.find<AiSettingsController>()
+          : Get.put(
+              AiSettingsController(
+                getCustomApiKeyUseCase: Get.find(),
+                saveCustomApiKeyUseCase: Get.find(),
+                clearCustomApiKeyUseCase: Get.find(),
+              ),
+            );
+      AiApiKeyDialog.show(context, controller);
+    });
+
+    AiGuard.registerHealthCheckHandler(() async {
+      if (Get.isRegistered<AiSettingsController>()) {
+        final controller = Get.find<AiSettingsController>();
+        if (controller.apiKeyStatus.value == ApiKeyStatus.valid) {
+          return true;
+        }
+        return await controller.checkKeyHealth();
+      }
+      return await GeminiService.isCurrentKeyValid();
+    });
   }
 }
