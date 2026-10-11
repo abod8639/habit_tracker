@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/core/components/animated_setting_tile.dart';
-import 'package:habit_tracker/core/functions/clear_all_habit_data.dart';
+import 'package:habit_tracker/features/setting/presentation/dialogs/clear_data_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class DataSection extends StatelessWidget {
@@ -21,7 +21,7 @@ class DataSection extends StatelessWidget {
           title: s.clearAllData,
           subtitle: s.deleteAllHabitsAndSettings,
           textColor: Colors.red,
-          onTap: () => clearAppDataAndRestart(context),
+          onTap: () => ClearDataDialog.show(context),
         ),
       ],
     );
