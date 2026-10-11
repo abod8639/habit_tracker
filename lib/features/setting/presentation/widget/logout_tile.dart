@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/animated_setting_tile.dart';
 import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:habit_tracker/core/functions/show_logout_dialog.dart';
+import 'package:habit_tracker/features/auth/presentation/dialogs/logout_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class LogoutTile extends StatelessWidget {
@@ -27,7 +27,7 @@ class LogoutTile extends StatelessWidget {
       title: S.current.logout,
       subtitle: S.current.logoutFromAccount,
       textColor: themeColors.error,
-      onTap: () => showLogoutDialog(authController, context),
+      onTap: () => LogoutDialog.show(context, authController),
     );
   }
 }
