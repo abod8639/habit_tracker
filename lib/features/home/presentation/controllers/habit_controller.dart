@@ -20,7 +20,6 @@ import 'package:habit_tracker/features/home/domain/usecases/clear_local_habits_u
 import 'package:habit_tracker/features/home/domain/usecases/get_start_date_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/increment_day_count_usecase.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
-import 'package:habit_tracker/core/functions/check_and_reset_habits.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
@@ -206,11 +205,23 @@ class HabitController extends GetxController {
     }
   }
 
+  Future<void> checkAndResetDailyHabits() async {
+    try {
+      final result = await _resetDailyHabitsUseCase();
+      result.fold(
+        (_) => null,
+        (_) async {
+          await refreshData();
+        },
+      );
+    } catch (_) {}
+  }
+
   void _setupHabitResetChecking() {
     _resetCheckTimer?.cancel();
     _resetCheckTimer = Timer.periodic(
       const Duration(minutes: 15),
-      (_) => checkAndResetHabits(),
+      (_) => checkAndResetDailyHabits(),
     );
   }
 
