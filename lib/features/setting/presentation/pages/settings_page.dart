@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
-import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
+import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/about_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/account_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/ai_section.dart';
@@ -43,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage>
     return KeyboardListener(
       autofocus: true,
       focusNode: FocusNode(),
-      onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
+      onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
         appBar: myAppBar(
           context: context,
