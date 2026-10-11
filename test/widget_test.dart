@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habit_tracker/core/functions/habit_utils.dart';
+import 'package:habit_tracker/features/home/domain/utils/habit_date_utils.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
@@ -50,19 +50,19 @@ void main() {
       expect(reconstructedModel.isCompleted, model.isCompleted);
     });
 
-    test('shouldResetHabits detects new day correctly', () {
+    test('HabitDateUtils.shouldResetHabits detects new day correctly', () {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final yesterday = today.subtract(const Duration(days: 1));
 
       // Null last reset date should trigger reset
-      expect(shouldResetHabits(null), true);
+      expect(HabitDateUtils.shouldResetHabits(null), true);
 
       // Past day should trigger reset
-      expect(shouldResetHabits(yesterday), true);
+      expect(HabitDateUtils.shouldResetHabits(yesterday), true);
 
       // Same day should not trigger reset
-      expect(shouldResetHabits(today), false);
+      expect(HabitDateUtils.shouldResetHabits(today), false);
     });
 
     test(
