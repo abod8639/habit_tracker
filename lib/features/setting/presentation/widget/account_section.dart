@@ -3,16 +3,26 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/animated_setting_tile.dart';
-import 'package:habit_tracker/core/functions/navigate_tologin.dart';
+import 'package:habit_tracker/core/routes/app_router.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class AccountSection extends StatelessWidget {
   final AnimationController animationController;
 
   const AccountSection({super.key, required this.animationController});
+
+  Future<void> _navigateToLogin() async {
+    final settingsStorage = Get.isRegistered<SettingsStorage>()
+        ? Get.find<SettingsStorage>()
+        : SettingsStorage();
+    await settingsStorage.setSkippedLogin(false);
+    AppRouter.router.go(AppRoutes.login);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +51,7 @@ class AccountSection extends StatelessWidget {
               icon: Icons.login_rounded,
               title: S.current.loginToAccount,
               subtitle: S.current.loginToEnableSync,
-              onTap: () => navigateToLogin(),
+              onTap: _navigateToLogin,
             ),
           ],
         );
