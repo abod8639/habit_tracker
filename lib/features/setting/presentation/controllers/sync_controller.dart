@@ -43,6 +43,17 @@ class SyncController extends GetxController {
     );
   }
 
+  /// Synchronizes all habits from [habitController] with Firestore and refreshes local state.
+  Future<void> syncHabits(HabitController habitController) async {
+    final habitsModels = habitController.habits
+        .map((e) => HabitModel.fromEntity(e))
+        .toList();
+    final result = await manualSync(habitsModels);
+    if (result != null) {
+      await habitController.refreshData();
+    }
+  }
+
   Future<List<HabitModel>?> manualSync(List<HabitModel> localHabits) async {
     if (!_firestoreService.isUserLoggedIn) {
       Get.snackbar(
