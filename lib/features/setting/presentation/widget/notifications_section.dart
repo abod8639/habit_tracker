@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/animated_setting_tile.dart';
 import 'package:habit_tracker/core/components/neumorphic_switch.dart';
-import 'package:habit_tracker/core/functions/handle_notification_toggle.dart';
-import 'package:habit_tracker/core/functions/my_show_time_picker.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/notification_controller.dart';
+import 'package:habit_tracker/features/setting/presentation/dialogs/notification_dialogs.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class NotificationsSection extends StatelessWidget {
@@ -42,7 +41,10 @@ class NotificationsSection extends StatelessWidget {
           children: [
             if (isEnabled && time != null) ...[
               GestureDetector(
-                onTap: () => myShowTimePicker(notificationController, context),
+                onTap: () => NotificationDialogs.showReminderTimePicker(
+                  context,
+                  notificationController,
+                ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 9,
@@ -89,15 +91,18 @@ class NotificationsSection extends StatelessWidget {
             ],
             NeumorphicSwitch(
               value: isEnabled,
-              onChanged: (value) => handleNotificationToggle(
+              onChanged: (value) => NotificationDialogs.handleToggle(
+                context,
                 notificationController,
                 value,
-                context,
               ),
             ),
           ],
         ),
-        onTap: () => myShowTimePicker(notificationController, context),
+        onTap: () => NotificationDialogs.showReminderTimePicker(
+          context,
+          notificationController,
+        ),
       );
     });
   }
