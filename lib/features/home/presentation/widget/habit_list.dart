@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/presentation/widget/no_habits_yet.dart';
 import 'package:habit_tracker/features/home/presentation/widget/my_text_taile.dart';
-import 'package:habit_tracker/core/functions/edit_habit.dart';
+import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 
 class HabitList extends StatelessWidget {
   const HabitList({super.key});
@@ -57,7 +57,11 @@ class HabitList extends StatelessWidget {
                   }
                 },
                 onDelete: (context) => controller.deleteHabit(habit.id),
-                onEdit: (context) => editHabit(habit.id, habit.name, context),
+                onEdit: (context) => HabitDialogs.showEdit(
+                  context,
+                  id: habit.id,
+                  currentName: habit.name,
+                ),
                 onChanged: (value) =>
                     controller.toggleHabit(habit.id, value ?? false),
                 onLongPress: isSelectionMode
