@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/services/notification_service.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
-import 'package:habit_tracker/core/functions/get_smart_notification_content.dart';
+import 'package:habit_tracker/features/setting/domain/entities/smart_notification_content.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/domain/usecases/get_habits_usecase.dart';
 import 'package:habit_tracker/generated/l10n.dart';
