@@ -1,12 +1,12 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
-import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
+import 'package:habit_tracker/core/guards/ai_guard.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:go_router/go_router.dart';
-import 'package:habit_tracker/core/routes/app_routes.dart';
-import 'package:habit_tracker/core/functions/ai_guard.dart';
+import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/habitstats_controller.dart';
 import '../widget/fade_animation_summary_card.dart';
@@ -44,7 +44,7 @@ class _HabitStatsPageState extends State<HabitStatsPage>
     return KeyboardListener(
       autofocus: true,
       focusNode: FocusNode(),
-      onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
+      onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: myAppBar(
