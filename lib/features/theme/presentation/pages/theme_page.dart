@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/components/section_title.dart';
-import 'package:habit_tracker/core/functions/keyboard_shortcuts.dart';
+import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../controllers/theme_controller.dart';
@@ -18,7 +18,7 @@ class ThemePage extends StatelessWidget {
     return KeyboardListener(
       autofocus: true,
       focusNode: FocusNode(),
-      onKeyEvent: (KeyEvent event) => keyboardShortCutsPages(event),
+      onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
         appBar: myAppBar(
           context: context,
