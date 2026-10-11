@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
-import 'package:habit_tracker/core/functions/add_habit.dart';
+import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 import 'package:habit_tracker/features/home/presentation/widget/drawer_menu_button.dart';
 import 'package:habit_tracker/features/home/presentation/widget/expanded_checkbox_list.dart';
 import 'package:habit_tracker/features/home/presentation/widget/no_habits_yet.dart';
@@ -24,7 +24,7 @@ class Tablet extends StatelessWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: MyfloatingActionButton(
-        onPressed: () => addHabit(context),
+        onPressed: () => HabitDialogs.showAdd(context),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
