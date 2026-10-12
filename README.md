@@ -2,7 +2,7 @@
 
 A **beautiful**, **responsive**, and **intuitive** habit tracking app built with Flutter — designed to help you build positive daily routines with ease.
 
-[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://raw.githubusercontent.com/abod8639/habit_tracker/main/APK/app-release.apk)
+[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk)
 [![Latest Release](https://img.shields.io/github/v/release/abod8639/habit_tracker?style=for-the-badge&logo=github&color=blue)](https://github.com/abod8639/habit_tracker/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 <!-- 
@@ -94,13 +94,13 @@ Track your progress and stay on top of your daily routines directly from your de
 You can download and install the app directly on your Android device without building from source:
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/abod8639/flutter_habit_tracker/main/APK/app-release.apk">
+  <a href="https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk">
     <img src="https://img.shields.io/badge/Direct_Download-Android_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" height="42" />
   </a>
 </p>
 
 ### Quick Installation Steps:
-1. Tap the **Download Android APK** button above (or download directly from [`APK/app-release.apk`](https://raw.githubusercontent.com/abod8639/flutter_habit_tracker/main/APK/app-release.apk)).
+1. Tap the **Download Android APK** button above (or download directly from [`APK/app-release.apk`](https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk)).
 2. Once the download completes, open `app-release.apk` on your Android device.
 3. If prompted, grant permission to **"Install unknown apps"** in your device settings.
 4. Tap **Install** and launch the app.
