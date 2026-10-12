@@ -2,6 +2,8 @@
 
 A **beautiful**, **responsive**, and **intuitive** habit tracking app built with Flutter — designed to help you build positive daily routines with ease.
 
+ <a href="assets/image/Habit tracker7.png"><img src="assets/image/Habit tracker5.png" width="500" alt="Habit Management" /></a> 
+
 [![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk)
 [![Latest Release](https://img.shields.io/github/v/release/abod8639/habit_tracker?style=for-the-badge&logo=github&color=blue)](https://github.com/abod8639/habit_tracker/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -73,17 +75,12 @@ Track your progress and stay on top of your daily routines directly from your de
 
 <div align="center">
 
-| | |
-| :---: | :---: |
-| <a href="assets/image/Habit tracker.png"><img src="assets/image/Habit tracker7.png" width="450" alt="Home Dashboard" /></a> | <a href="assets/image/Habit tracker7.png"><img src="assets/image/Habit tracker5.png" width="450" alt="Habit Management" /></a> |
 
 |  |  |
 | :---: | :---: |
 | <a href="assets/image/Habit tracker4.png"><img src="assets/image/Habit tracker4.png" width="450" alt="Theme Customization" /></a> | <a href="assets/image/Habit tracker9.png"><img src="assets/image/Habit tracker9.png" width="450" alt="Statistics & Analytics" /></a> |
 
-| <p align="center"> **Choose the theme that you feel comfortable with**</p> |
-| :---: |
-| <a href="assets/image/Habit tracker10.png"><img src="assets/image/Habit tracker10.png" width="800" alt="Detailed Monthly Progress" /></a> |
+ <a href="assets/image/Habit tracker10.png"><img src="assets/image/Habit tracker10.png" width="800" alt="Detailed Monthly Progress" /></a> 
 
 </div>
 
