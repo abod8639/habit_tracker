@@ -73,13 +73,17 @@ Track your progress and stay on top of your daily routines directly from your de
 
 <div align="center">
 
- <a href="assets/image/Habit tracker7.png"><img src="assets/image/Habit tracker5.png" width="450" alt="Habit Management" /></a> 
+| | |
+| :---: | :---: |
+| <a href="assets/image/Habit tracker.png"><img src="assets/image/Habit tracker7.png" width="450" alt="Home Dashboard" /></a> | <a href="assets/image/Habit tracker7.png"><img src="assets/image/Habit tracker5.png" width="450" alt="Habit Management" /></a> |
 
 |  |  |
 | :---: | :---: |
 | <a href="assets/image/Habit tracker4.png"><img src="assets/image/Habit tracker4.png" width="450" alt="Theme Customization" /></a> | <a href="assets/image/Habit tracker9.png"><img src="assets/image/Habit tracker9.png" width="450" alt="Statistics & Analytics" /></a> |
 
- <a href="assets/image/Habit tracker10.png"><img src="assets/image/Habit tracker10.png" width="800" alt="Detailed Monthly Progress" /></a> 
+| <p align="center"> **Choose the theme that you feel comfortable with**</p> |
+| :---: |
+| <a href="assets/image/Habit tracker10.png"><img src="assets/image/Habit tracker10.png" width="800" alt="Detailed Monthly Progress" /></a> |
 
 </div>
 
