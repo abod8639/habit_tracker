@@ -69,21 +69,17 @@ Track your progress and stay on top of your daily routines directly from your de
 
 ---
 
-## Screenshots
+## Screenshots and components
 
 <div align="center">
 
-|**Home Dashboard** | **Habit Management** |
-| :---: | :---: |
-| <a href="assets/image/Habit tracker.png"><img src="assets/image/Habit tracker7.png" width="450" alt="Home Dashboard" /></a> | <a href="assets/image/Habit tracker7.png"><img src="assets/image/Habit tracker5.png" width="450" alt="Habit Management" /></a> |
+ <a href="assets/image/Habit tracker7.png"><img src="assets/image/Habit tracker5.png" width="450" alt="Habit Management" /></a> 
 
-| **Theme Customization** | **Statistics & Analytics** |
+|  |  |
 | :---: | :---: |
 | <a href="assets/image/Habit tracker4.png"><img src="assets/image/Habit tracker4.png" width="450" alt="Theme Customization" /></a> | <a href="assets/image/Habit tracker9.png"><img src="assets/image/Habit tracker9.png" width="450" alt="Statistics & Analytics" /></a> |
 
-| <p align="center"> **Detailed Monthly Progress**</p> |
-| :---: |
-| <a href="assets/image/Habit tracker10.png"><img src="assets/image/Habit tracker10.png" width="600" alt="Detailed Monthly Progress" /></a> |
+ <a href="assets/image/Habit tracker10.png"><img src="assets/image/Habit tracker10.png" width="800" alt="Detailed Monthly Progress" /></a> 
 
 </div>
 
