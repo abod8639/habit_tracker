@@ -363,27 +363,15 @@ class AiApiKeyDialog extends StatelessWidget {
                           boxShadow: AppShadows.buttonResting(isDark: isDark),
                         ),
                         child: isValidating
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
+                            ? 
                                   const SizedBox(
-                                    width: 14,
-                                    height: 14,
+                                    width: 23,
+                                    height: 23,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       color: Colors.white,
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    s.apiKeyValidating,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                              
                               )
                             : Text(
                                 s.save,
