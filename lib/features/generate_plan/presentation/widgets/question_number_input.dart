@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/neumorphic_input.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 import '../../domain/entities/question_entity.dart';
 import '../controllers/plan_generator_controller.dart';
 
@@ -34,22 +37,90 @@ class _QuestionNumberInputState extends State<QuestionNumberInput> {
     super.dispose();
   }
 
+  void _onChanged(String value) {
+    if (value.isNotEmpty && widget.question.maxValue != null) {
+      final parsed = num.tryParse(value);
+      if (parsed != null && parsed > widget.question.maxValue!) {
+        final clamped = widget.question.maxValue!.toString();
+        _textController.value = TextEditingValue(
+          text: clamped,
+          selection: TextSelection.collapsed(offset: clamped.length),
+        );
+        widget.controller.setAnswer(widget.question.id, clamped);
+        return;
+      }
+    }
+    widget.controller.setAnswer(widget.question.id, value);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final color = widget.controller.selectedCategory.value?.color;
+    final isArabic = Get.isRegistered<LangController>()
+        ? Get.find<LangController>().isArabic
+        : true;
 
-    return NeumorphicInput(
-      controller: _textController,
-      onChanged: (v) => widget.controller.setAnswer(widget.question.id, v),
-      hintText: widget.question.hint ?? '0',
-      unit: widget.question.unit,
-      accentColor: color,
-      isNumber: true,
-      autofocus: true,
-      textAlign: TextAlign.center,
-      fontSize: 32,
-      fontWeight: FontWeight.bold,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        NeumorphicInput(
+          controller: _textController,
+          onChanged: _onChanged,
+          hintText: widget.question.hint ?? '0',
+          unit: widget.question.unit,
+          accentColor: color,
+          isNumber: true,
+          autofocus: true,
+          textAlign: TextAlign.center,
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            if (widget.question.maxValue != null)
+              _MaxNumberInputFormatter(widget.question.maxValue!),
+          ],
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        ),
+        if (widget.question.maxValue != null) ...[
+          const SizedBox(height: 10),
+          Text(
+            isArabic
+                ? 'الحد الأقصى: ${widget.question.maxValue} ${widget.question.unit ?? ''}'.trim()
+                : 'Maximum: ${widget.question.maxValue} ${widget.question.unit ?? ''}'.trim(),
+            style: TextStyle(
+              fontSize: 13,
+              color: theme.hintColor.withValues(alpha: 0.75),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
+
+class _MaxNumberInputFormatter extends TextInputFormatter {
+  final num maxValue;
+
+  const _MaxNumberInputFormatter(this.maxValue);
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) return newValue;
+    final parsed = num.tryParse(newValue.text);
+    if (parsed == null) return oldValue;
+    if (parsed > maxValue) {
+      final clamped = maxValue.toString();
+      return TextEditingValue(
+        text: clamped,
+        selection: TextSelection.collapsed(offset: clamped.length),
+      );
+    }
+    return newValue;
+  }
+}
+
