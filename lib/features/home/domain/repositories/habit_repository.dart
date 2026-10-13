@@ -37,4 +37,11 @@ abstract class HabitRepository {
   );
   String getStartDate();
   Future<Either<Failure, void>> clearLocalData({String? earliestDateStr});
+
+  // Offline Vault & Safe Storage methods
+  Future<Either<Failure, void>> backupToVault({String? userId});
+  Future<Either<Failure, bool>> restoreFromVault({String? userId});
+  Future<Either<Failure, bool>> hasPendingVaultData({String? userId});
+  Future<Either<Failure, void>> markVaultSynced({String? userId});
+  Future<Either<Failure, void>> clearVault({String? userId});
 }
