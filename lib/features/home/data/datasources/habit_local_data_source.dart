@@ -1,12 +1,15 @@
+import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
+import 'package:habit_tracker/features/home/data/models/habit_vault_data.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:hive/hive.dart';
 
 class HabitLocalDataSource {
   final Box _myBox;
+  final HabitOfflineVaultDataSource? vaultDataSource;
 
-  HabitLocalDataSource(this._myBox);
+  HabitLocalDataSource(this._myBox, {this.vaultDataSource});
 
   // Helper to get monthly box name
   String _getMonthlyBoxName(String yyyymmdd) {
@@ -442,7 +445,78 @@ class HabitLocalDataSource {
     _myBox.delete('local_tombstones');
   }
 
-  Future<void> clearAllData({String? earliestDateStr}) async {
+  void setLastUserId(String uid) {
+    _myBox.put('last_user_id', uid);
+  }
+
+  String? getLastUserId() {
+    return _myBox.get('last_user_id');
+  }
+
+  /// Creates a snapshot of all current habits, strengths, and metadata for offline vaulting.
+  Future<HabitVaultData> createSnapshot({required String userId}) async {
+    final habits = loadHabits();
+    final strengths = await getAllHabitStrengths();
+    final startDay = getStartDate();
+    final rawDayCount = _myBox.get(HabitStorage.dayCountKey);
+    final dayCount = rawDayCount is int ? rawDayCount : 1;
+    final lastReset = await getLastResetDate();
+    final tombstones = getLocalTombstones();
+
+    return HabitVaultData(
+      userId: userId,
+      habits: habits,
+      habitStrengths: strengths,
+      startDay: startDay,
+      dayCount: dayCount,
+      lastResetDate: lastReset?.toIso8601String(),
+      tombstones: tombstones,
+      backedUpAt: DateTime.now(),
+      isSynced: false,
+    );
+  }
+
+  /// Restores habit data and metadata from a vaulted snapshot into active boxes.
+  Future<void> restoreFromSnapshot(HabitVaultData data) async {
+    // 1. Restore habits
+    if (data.habits.isNotEmpty) {
+      await saveHabits(data.habits);
+    }
+    // 2. Restore strengths
+    if (data.habitStrengths.isNotEmpty) {
+      await saveAllHabitStrengths(data.habitStrengths);
+    }
+    // 3. Restore startDay
+    if (data.startDay.isNotEmpty) {
+      updateStartDate(data.startDay);
+    }
+    // 4. Restore dayCount & reset date
+    await _myBox.put(HabitStorage.dayCountKey, data.dayCount);
+    if (data.lastResetDate != null) {
+      await saveLastResetDate(DateTime.parse(data.lastResetDate!));
+    }
+    // 5. Restore tombstones
+    if (data.tombstones.isNotEmpty) {
+      addLocalTombstones(data.tombstones);
+    }
+  }
+
+  Future<void> clearAllData({
+    String? earliestDateStr,
+    bool backupBeforeClear = true,
+    String? userId,
+  }) async {
+    // Safeguard: Before clearing active boxes, store snapshot in offline vault
+    if (backupBeforeClear && vaultDataSource != null) {
+      final habits = loadHabits();
+      if (habits.isNotEmpty) {
+        final effectiveUserId =
+            userId ?? getLastUserId() ?? 'offline_user';
+        final snapshot = await createSnapshot(userId: effectiveUserId);
+        await vaultDataSource!.saveBackup(snapshot);
+      }
+    }
+
     // 1. Iterate and clear monthly history boxes
     DateTime startDate;
     if (earliestDateStr != null && earliestDateStr.isNotEmpty) {
