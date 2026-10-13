@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:get/get.dart';
@@ -43,8 +44,54 @@ class GeminiUnknownException extends GeminiException {
 class GeminiService {
   GenerativeModel? _modelInstance;
   String? _lastApiKey;
+  String? _lastModelName;
 
-  static const String modelName = 'gemini-2.5-flash-lite';
+  static const String defaultModelName = 'gemini-2.5-flash-lite';
+
+  /// Ordered list of candidate models to try for maximum compatibility across accounts
+  static const List<String> supportedCandidateModels = [
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
+    'gemini-2.0-flash',
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash',
+    'gemini-1.5-pro',
+  ];
+
+  static String? _resolvedModelName;
+
+  /// Backward-compatible alias for the active model name
+  static String get modelName => effectiveModelName;
+
+  /// Returns the dynamically resolved working model for the current API key
+  static String get effectiveModelName {
+    if (_resolvedModelName != null && _resolvedModelName!.isNotEmpty) {
+      return _resolvedModelName!;
+    }
+    try {
+      if (Get.isRegistered<SettingsStorage>()) {
+        final savedModel = Get.find<SettingsStorage>().customGeminiModel;
+        if (savedModel != null && savedModel.trim().isNotEmpty) {
+          _resolvedModelName = savedModel.trim();
+          return _resolvedModelName!;
+        }
+      }
+    } catch (_) {}
+    return defaultModelName;
+  }
+
+  /// Cleans and sanitizes raw API key strings (strips whitespace, quotes, prefixes)
+  static String sanitizeApiKey(String rawKey) {
+    var key = rawKey.trim();
+    if (key.contains('=')) {
+      key = key.split('=').last.trim();
+    }
+    if ((key.startsWith('"') && key.endsWith('"')) ||
+        (key.startsWith("'") && key.endsWith("'"))) {
+      key = key.substring(1, key.length - 1).trim();
+    }
+    return key;
+  }
 
   static String get _apiKey {
     // 1. Check custom user-defined API key first
@@ -52,18 +99,19 @@ class GeminiService {
       if (Get.isRegistered<SettingsStorage>()) {
         final customKey = Get.find<SettingsStorage>().customGeminiApiKey;
         if (customKey != null && customKey.trim().isNotEmpty) {
-          return customKey.trim();
+          return sanitizeApiKey(customKey);
         }
       }
     } catch (_) {}
 
     // 2. Fallback to compile-time environment variable
     const envKey = String.fromEnvironment('GEMINI_API_KEY');
-    if (envKey.isNotEmpty) return envKey;
+    if (envKey.isNotEmpty) return sanitizeApiKey(envKey);
 
     // 3. Fallback to .env file
     if (dotenv.isInitialized) {
-      return dotenv.env['GEMINI_API_KEY'] ?? '';
+      final key = dotenv.env['GEMINI_API_KEY'] ?? '';
+      return sanitizeApiKey(key);
     }
     return '';
   }
@@ -82,33 +130,117 @@ class GeminiService {
   /// Returns the current active API key (or empty string)
   static String get currentApiKey => _apiKey;
 
-  /// Validates whether an API key is valid and working with the Gemini model
-  static Future<bool> validateApiKey(String apiKey) async {
-    final trimmed = apiKey.trim();
-    if (trimmed.isEmpty) return false;
+  static void _saveResolvedModel(String model) {
     try {
-      final model = GenerativeModel(
-        model: modelName,
-        apiKey: trimmed,
+      if (Get.isRegistered<SettingsStorage>()) {
+        Get.find<SettingsStorage>().setCustomGeminiModel(model);
+      }
+    } catch (_) {}
+  }
+
+  /// Resets in-memory cached model instance and resolved model name
+  static void resetModelInstance() {
+    _resolvedModelName = null;
+    try {
+      if (Get.isRegistered<SettingsStorage>()) {
+        Get.find<SettingsStorage>().setCustomGeminiModel(null);
+      }
+    } catch (_) {}
+  }
+
+  /// Validates whether an API key is valid and working with Gemini models.
+  /// Dynamically detects the best supported model for this specific key.
+  static Future<bool> validateApiKey(String apiKey) async {
+    final cleaned = sanitizeApiKey(apiKey);
+    if (cleaned.isEmpty) return false;
+
+    // 1. Fast check against Google AI models endpoint (discovers all accessible models)
+    try {
+      final url = Uri.parse(
+        'https://generativelanguage.googleapis.com/v1beta/models?key=$cleaned',
       );
-      final countResult = await model.countTokens([
-        Content.text('test'),
-      ]).timeout(const Duration(seconds: 8));
-      return countResult.totalTokens > 0;
-    } catch (e) {
-      try {
-        final model = GenerativeModel(
-          model: modelName,
-          apiKey: trimmed,
-        );
-        final response = await model.generateContent([
-          Content.text('ping'),
-        ]).timeout(const Duration(seconds: 8));
-        return response.text != null && response.text!.isNotEmpty;
-      } catch (err) {
+      final response = await http
+          .get(url, headers: {'Content-Type': 'application/json'})
+          .timeout(const Duration(seconds: 7));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic> && decoded.containsKey('models')) {
+          final modelsList = decoded['models'] as List<dynamic>? ?? [];
+          final supported = <String>[];
+          for (final item in modelsList) {
+            if (item is Map<String, dynamic>) {
+              final name = (item['name'] as String? ?? '').replaceFirst('models/', '');
+              final methods = (item['supportedGenerationMethods'] as List<dynamic>? ?? [])
+                  .map((e) => e.toString())
+                  .toList();
+              if (methods.contains('generateContent')) {
+                supported.add(name);
+              }
+            }
+          }
+
+          // Pick the best model available from supported list matching candidates
+          String? selected;
+          for (final candidate in supportedCandidateModels) {
+            if (supported.contains(candidate)) {
+              selected = candidate;
+              break;
+            }
+          }
+
+          // If no candidate directly matched, pick the first flash or gemini model that supports generateContent
+          if (selected == null && supported.isNotEmpty) {
+            selected = supported.firstWhere(
+              (m) => m.contains('flash'),
+              orElse: () => supported.firstWhere(
+                (m) => m.contains('gemini'),
+                orElse: () => supported.first,
+              ),
+            );
+          }
+
+          if (selected != null) {
+            _resolvedModelName = selected;
+            _saveResolvedModel(selected);
+          }
+
+          return true;
+        }
+      } else if (response.statusCode == 400 || response.statusCode == 403) {
+        // Explicit invalid key or API blocked
         return false;
       }
+    } catch (_) {
+      // Network hiccup or test environment, fallback to direct candidate probing
     }
+
+    // 2. Direct candidate probing fallback: try each candidate model with countTokens
+    for (final candidate in supportedCandidateModels) {
+      try {
+        final model = GenerativeModel(
+          model: candidate,
+          apiKey: cleaned,
+        );
+        final countResult = await model.countTokens([
+          Content.text('test'),
+        ]).timeout(const Duration(seconds: 4));
+
+        if (countResult.totalTokens > 0) {
+          _resolvedModelName = candidate;
+          _saveResolvedModel(candidate);
+          return true;
+        }
+      } catch (e) {
+        final errStr = e.toString().toLowerCase();
+        if (errStr.contains('api key not valid') ||
+            errStr.contains('api_key_invalid')) {
+          return false;
+        }
+      }
+    }
+
+    return false;
   }
 
   /// Checks if the current active API key is valid and operational
@@ -120,7 +252,7 @@ class GeminiService {
 
   /// Creates a configured [GenerativeModel] instance with the current active API key.
   GenerativeModel createModel({
-    String model = modelName,
+    String? model,
     GenerationConfig? generationConfig,
     Content? systemInstruction,
   }) {
@@ -129,7 +261,7 @@ class GeminiService {
       throw ApiKeyMissingException();
     }
     return GenerativeModel(
-      model: model,
+      model: model ?? effectiveModelName,
       apiKey: apiKey,
       generationConfig: generationConfig,
       systemInstruction: systemInstruction,
@@ -143,13 +275,18 @@ class GeminiService {
       throw ApiKeyMissingException();
     }
 
-    if (_modelInstance != null && _lastApiKey == apiKey) {
+    final targetModel = effectiveModelName;
+
+    if (_modelInstance != null &&
+        _lastApiKey == apiKey &&
+        _lastModelName == targetModel) {
       return _modelInstance!;
     }
 
     _lastApiKey = apiKey;
+    _lastModelName = targetModel;
     _modelInstance = GenerativeModel(
-      model: modelName,
+      model: targetModel,
       apiKey: apiKey,
       generationConfig: GenerationConfig(
         responseMimeType: 'application/json',
@@ -158,7 +295,46 @@ class GeminiService {
     return _modelInstance!;
   }
 
-  /// Evaluates an image using Gemini Pro Vision and extracts distinct habits/tasks.
+  static bool _isModelNotFoundError(Object e) {
+    final msg = e.toString().toLowerCase();
+    return msg.contains('not found') ||
+        msg.contains('not supported') ||
+        msg.contains('404') ||
+        msg.contains('is not found');
+  }
+
+  Future<bool> _trySwitchToWorkingModel() async {
+    final currentKey = _apiKey;
+    if (currentKey.isEmpty) return false;
+    for (final candidate in supportedCandidateModels) {
+      if (candidate == effectiveModelName) continue;
+      try {
+        final testModel = GenerativeModel(
+          model: candidate,
+          apiKey: currentKey,
+        );
+        final result = await testModel.countTokens([
+          Content.text('test'),
+        ]).timeout(const Duration(seconds: 4));
+        if (result.totalTokens > 0) {
+          _resolvedModelName = candidate;
+          _lastModelName = candidate;
+          _saveResolvedModel(candidate);
+          _modelInstance = GenerativeModel(
+            model: candidate,
+            apiKey: currentKey,
+            generationConfig: GenerationConfig(
+              responseMimeType: 'application/json',
+            ),
+          );
+          return true;
+        }
+      } catch (_) {}
+    }
+    return false;
+  }
+
+  /// Evaluates an image using Gemini and extracts distinct habits/tasks.
   Future<List<String>> extractHabitsFromImage(XFile imageFile) async {
     try {
       final bytes = await imageFile.readAsBytes();
@@ -180,9 +356,25 @@ class GeminiService {
 
       final imagePart = DataPart(imageFile.mimeType ?? 'image/jpeg', bytes);
 
-      final response = await _model.generateContent([
-        Content.multi([prompt, imagePart]),
-      ]);
+      GenerateContentResponse response;
+      try {
+        response = await _model.generateContent([
+          Content.multi([prompt, imagePart]),
+        ]);
+      } catch (e) {
+        if (_isModelNotFoundError(e)) {
+          final switched = await _trySwitchToWorkingModel();
+          if (switched) {
+            response = await _model.generateContent([
+              Content.multi([prompt, imagePart]),
+            ]);
+          } else {
+            rethrow;
+          }
+        } else {
+          rethrow;
+        }
+      }
 
       if (response.text == null || response.text!.isEmpty) {
         throw GeminiInvalidResponseException(
@@ -223,7 +415,7 @@ class GeminiService {
       }
 
       final chatModel = GenerativeModel(
-        model: modelName,
+        model: effectiveModelName,
         apiKey: apiKey,
         systemInstruction: systemInstruction != null
             ? Content.system(systemInstruction)
