@@ -98,6 +98,7 @@ class SyncController extends GetxController {
         (mergedHabits) {
           if (Get.isRegistered<HabitRepository>()) {
             Get.find<HabitRepository>().clearLocalTombstones();
+            Get.find<HabitRepository>().markVaultSynced();
           }
           lastSyncTime.value = DateTime.now();
           syncStatus.value = SyncStatus.success;
@@ -107,10 +108,12 @@ class SyncController extends GetxController {
       return syncResult;
     } catch (e) {
       syncStatus.value = SyncStatus.error;
-      errorMessage.value = e.toString();
+      errorMessage.value = failureToString(e);
       return null;
     }
   }
+
+  String failureToString(dynamic e) => e.toString();
 
   Future<List<HabitModel>?> autoSync(List<HabitModel> localHabits) async {
     if (!isAutoSyncEnabled.value || !_firestoreService.isUserLoggedIn) {
@@ -144,6 +147,7 @@ class SyncController extends GetxController {
         (mergedHabits) {
           if (Get.isRegistered<HabitRepository>()) {
             Get.find<HabitRepository>().clearLocalTombstones();
+            Get.find<HabitRepository>().markVaultSynced();
           }
           lastSyncTime.value = DateTime.now();
           syncStatus.value = SyncStatus.success;
