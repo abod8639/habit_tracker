@@ -17,6 +17,8 @@ abstract class AiChatRemoteDataSource {
 class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
   final GeminiService geminiService;
   ChatSession? _chatSession;
+  String? _lastSystemInstruction;
+  List<ChatMessageEntity> _lastHistory = const [];
 
   AiChatRemoteDataSourceImpl({required this.geminiService});
 
@@ -25,6 +27,8 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
     required String systemInstruction,
     required List<ChatMessageEntity> history,
   }) {
+    _lastSystemInstruction = systemInstruction;
+    _lastHistory = List.from(history);
     final validHistory = history
         .where((msg) => !msg.hasError)
         .map((msg) {
@@ -48,12 +52,36 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
       throw GeminiUnknownException('Chat session is not initialized.');
     }
 
-    final responseStream = _chatSession!.sendMessageStream(Content.text(message));
-    await for (final chunk in responseStream) {
-      final chunkText = chunk.text;
-      if (chunkText != null && chunkText.isNotEmpty) {
-        yield chunkText;
+    try {
+      final responseStream =
+          _chatSession!.sendMessageStream(Content.text(message));
+      await for (final chunk in responseStream) {
+        final chunkText = chunk.text;
+        if (chunkText != null && chunkText.isNotEmpty) {
+          yield chunkText;
+        }
       }
+    } catch (e) {
+      if (GeminiService.isModelUnavailableError(e)) {
+        final newModel = await GeminiService.trySwitchToWorkingModel();
+        if (newModel != null && _lastSystemInstruction != null) {
+          startChatSession(
+            systemInstruction: _lastSystemInstruction!,
+            history: _lastHistory,
+          );
+          final retryStream =
+              _chatSession!.sendMessageStream(Content.text(message));
+          await for (final chunk in retryStream) {
+            final chunkText = chunk.text;
+            if (chunkText != null && chunkText.isNotEmpty) {
+              yield chunkText;
+            }
+          }
+          return;
+        }
+      }
+      rethrow;
     }
   }
 }
+
