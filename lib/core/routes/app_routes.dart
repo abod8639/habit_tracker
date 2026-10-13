@@ -10,4 +10,5 @@ abstract class AppRoutes {
   static const categorySelection = '/plan-category';
   static const questionnaire = '/plan-questionnaire';
   static const result = '/plan-result';
+  static const about = '/about';
 }
