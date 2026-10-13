@@ -33,27 +33,18 @@ class ResetDailyHabitsUseCase {
 
               final daysDiff = today.difference(lastDay).inDays;
 
-              // 2. Save last active day's habit completion status
-              for (var habit in habits) {
-                await repository.saveHabitCompletionToHistory(
-                  habit.id,
-                  habit.isCompleted,
-                  lastDay,
-                  habitName: habit.name,
+              // 2. Save last active day's habit completion status concurrently
+              if (habits.isNotEmpty) {
+                await Future.wait(
+                  habits.map(
+                    (habit) => repository.saveHabitCompletionToHistory(
+                      habit.id,
+                      habit.isCompleted,
+                      lastDay,
+                      habitName: habit.name,
+                    ),
+                  ),
                 );
-              }
-
-              // 2.1 If intermediate days were missed, record them as false
-              for (int d = 1; d < daysDiff; d++) {
-                final missedDate = lastDay.add(Duration(days: d));
-                for (var habit in habits) {
-                  await repository.saveHabitCompletionToHistory(
-                    habit.id,
-                    false,
-                    missedDate,
-                    habitName: habit.name,
-                  );
-                }
               }
 
               // 3. Reset completion status
