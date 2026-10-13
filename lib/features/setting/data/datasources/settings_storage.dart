@@ -57,7 +57,18 @@ class SettingsStorage {
     await _box.delete(_customGeminiModelKey);
   }
 
-  String? get customGeminiModel => _box.get(_customGeminiModelKey);
+  String? get customGeminiModel {
+    final model = _box.get(_customGeminiModelKey);
+    if (model == null) return null;
+    final modelStr = model.toString().trim();
+    if (modelStr.contains('2.5') ||
+        modelStr.contains('2.0') ||
+        modelStr.contains('1.5')) {
+      _box.delete(_customGeminiModelKey);
+      return null;
+    }
+    return modelStr;
+  }
 
   Future<void> setCustomGeminiModel(String? model) async {
     if (model == null || model.trim().isEmpty) {
