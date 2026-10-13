@@ -234,9 +234,8 @@ class _MyTextTaileState extends State<MyTextTaile>
             message: tooltip,
             child: Container(
               width: 50 * 1.7,
-              height: 60,
               decoration: BoxDecoration(
-                borderRadius: AppRadius.badgeRadius,
+                borderRadius: AppRadius.cardRadius,
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
