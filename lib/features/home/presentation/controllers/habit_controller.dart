@@ -19,6 +19,8 @@ import 'package:habit_tracker/features/home/domain/usecases/update_habit_order_u
 import 'package:habit_tracker/features/home/domain/usecases/clear_local_habits_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/get_start_date_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/increment_day_count_usecase.dart';
+import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
+import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -112,24 +114,69 @@ class HabitController extends GetxController {
 
   void _setupAuthListener() {
     bool wasLoggedIn = FirebaseAuth.instance.currentUser != null;
+    String? lastActiveUserId = FirebaseAuth.instance.currentUser?.uid;
+
     _authSubscription = FirebaseAuth.instance.authStateChanges().listen((
       user,
     ) async {
       if (user != null && isInitialized.value) {
         wasLoggedIn = true;
-        _syncOnLogin();
+        lastActiveUserId = user.uid;
+        await _restoreAndSyncOnLogin(user.uid);
       } else if (user == null && wasLoggedIn && isInitialized.value) {
         wasLoggedIn = false;
-        await resetToDefaultState();
+        await _handleSessionDisconnect(lastActiveUserId);
       }
     });
   }
 
+  /// Handles when Firebase auth transitions to null (session expiry, offline mode, or logout)
+  Future<void> _handleSessionDisconnect(String? lastUserId) async {
+    // 1. Immediately create a safe backup in the offline vault so no data is ever lost
+    if (Get.isRegistered<HabitRepository>()) {
+      await Get.find<HabitRepository>().backupToVault(userId: lastUserId);
+    }
+
+    // 2. Check if this is an explicit logout requested by the user
+    final bool isExplicitLogout = Get.isRegistered<AuthController>() &&
+        Get.find<AuthController>().isExplicitSignOut.value;
+
+    if (isExplicitLogout) {
+      Get.find<AuthController>().isExplicitSignOut.value = false;
+      await resetToDefaultState(backupFirst: false);
+    } else {
+      // Token Expiry or offline session disconnect:
+      // DO NOT wipe the active database or screen! Keep user data intact locally.
+      debugPrint(
+        'HabitController: Session disconnected or token expired while offline. Data safely vaulted and preserved on device.',
+      );
+    }
+  }
+
+  /// Restores vaulted data if available and synchronizes on login
+  Future<void> _restoreAndSyncOnLogin(String userId) async {
+    if (Get.isRegistered<HabitRepository>()) {
+      final repo = Get.find<HabitRepository>();
+      final hasVault = await repo.hasPendingVaultData(userId: userId);
+      final shouldRestore = hasVault.getOrElse(() => false);
+      if (shouldRestore) {
+        await repo.restoreFromVault(userId: userId);
+        await refreshData();
+      }
+    }
+    await _syncOnLogin();
+  }
+
   /// Resets all habit data and heatmap state to default
-  Future<void> resetToDefaultState() async {
+  Future<void> resetToDefaultState({bool backupFirst = true}) async {
     try {
       isLoading.value = true;
       final earliestDate = getStartDay();
+
+      // Safeguard: Always backup to vault before wiping
+      if (backupFirst && Get.isRegistered<HabitRepository>()) {
+        await Get.find<HabitRepository>().backupToVault();
+      }
 
       // 1. Clear in-memory observables
       remoteHeatmapDateSet.clear();
@@ -157,6 +204,9 @@ class HabitController extends GetxController {
       habits.map((e) => HabitModel.fromEntity(e)).toList(),
     );
     if (result != null) {
+      if (Get.isRegistered<HabitRepository>()) {
+        await Get.find<HabitRepository>().markVaultSynced();
+      }
       await refreshData();
     }
   }
