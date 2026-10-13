@@ -10,6 +10,7 @@ import '../../domain/entities/question_entity.dart';
 import '../../domain/usecases/generate_plan_usecase.dart';
 import '../../domain/usecases/get_questions_usecase.dart';
 import '../../domain/usecases/save_plan_habits_usecase.dart';
+import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 
 enum PlanGeneratorStatus { idle, loading, success, error }
 
@@ -99,22 +100,49 @@ class PlanGeneratorController extends GetxController {
   }
 
   // ── Validation ────────────────────────────────────────────────────────────
-  bool _isCurrentAnswerValid() {
+  String? _validateCurrentAnswer() {
     final q = currentQuestion;
-    if (q == null || !q.isRequired) return true;
+    if (q == null) return null;
     final answer = answers[q.id];
-    if (answer == null) return false;
-    if (answer is String && answer.trim().isEmpty) return false;
-    if (answer is List && answer.isEmpty) return false;
-    return true;
+    if (q.isRequired) {
+      if (answer == null) return S.current.pleaseAnswerToContinue;
+      if (answer is String && answer.trim().isEmpty) {
+        return S.current.pleaseAnswerToContinue;
+      }
+      if (answer is List && answer.isEmpty) {
+        return S.current.pleaseAnswerToContinue;
+      }
+    }
+    if (answer != null && q.isNumeric) {
+      final parsed = num.tryParse(answer.toString().trim());
+      if (parsed != null) {
+        final isArabic = Get.isRegistered<LangController>()
+            ? Get.find<LangController>().isArabic
+            : true;
+        if (q.maxValue != null && parsed > q.maxValue!) {
+          return isArabic
+              ? 'الحد الأقصى المسموح به هو ${q.maxValue}'
+              : 'Maximum allowed value is ${q.maxValue}';
+        }
+        if (q.minValue != null && parsed < q.minValue!) {
+          return isArabic
+              ? 'الحد الأدنى المسموح به هو ${q.minValue}'
+              : 'Minimum allowed value is ${q.minValue}';
+        }
+      }
+    }
+    return null;
   }
+
+  bool _isCurrentAnswerValid() => _validateCurrentAnswer() == null;
 
   // ── Navigation ────────────────────────────────────────────────────────────
   void next() {
-    if (!_isCurrentAnswerValid()) {
+    final validationError = _validateCurrentAnswer();
+    if (validationError != null) {
       Get.snackbar(
         S.current.answerRequired,
-        S.current.pleaseAnswerToContinue,
+        validationError,
         snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 2),
       );
