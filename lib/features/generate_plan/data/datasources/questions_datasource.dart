@@ -50,6 +50,7 @@ class QuestionsDataSource {
       type: QuestionType.number,
       hint: '25',
       unit: 'سنة',
+      maxValue: 120,
     ),
     QuestionEntity(
       id: 'weight',
@@ -57,6 +58,7 @@ class QuestionsDataSource {
       type: QuestionType.number,
       hint: '75',
       unit: 'كجم',
+      maxValue: 200,
     ),
     QuestionEntity(
       id: 'height',
@@ -129,6 +131,7 @@ class QuestionsDataSource {
       type: QuestionType.number,
       hint: '25',
       unit: 'years',
+      maxValue: 120,
     ),
     QuestionEntity(
       id: 'weight',
@@ -136,6 +139,7 @@ class QuestionsDataSource {
       type: QuestionType.number,
       hint: '75',
       unit: 'kg',
+      maxValue: 200,
     ),
     QuestionEntity(
       id: 'height',
@@ -208,6 +212,7 @@ class QuestionsDataSource {
       type: QuestionType.number,
       hint: '25',
       unit: 'سنة',
+      maxValue: 120,
     ),
     QuestionEntity(
       id: 'fitness_level',
@@ -280,6 +285,7 @@ class QuestionsDataSource {
       type: QuestionType.number,
       hint: '25',
       unit: 'years',
+      maxValue: 120,
     ),
     QuestionEntity(
       id: 'fitness_level',
