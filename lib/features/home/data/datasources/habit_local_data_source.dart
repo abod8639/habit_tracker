@@ -186,13 +186,95 @@ class HabitLocalDataSource {
   }
 
   Future<void> saveHabitCompletionHistory(
-    String habitName,
-    bool isCompleted,
-  ) async {
+    String habitId,
+    bool isCompleted, {
+    String? habitName,
+  }) async {
     final String today = todaysDateFormatted();
     final historyBox = await _openMonthlyBox(today);
-    final String historyKey = "${habitName}_$today";
-    await historyBox.put(historyKey, isCompleted);
+    await historyBox.put("${habitId}_$today", isCompleted);
+    if (habitName != null && habitName != habitId) {
+      await historyBox.put("${habitName}_$today", isCompleted);
+    }
+  }
+
+  Future<void> renameHabitHistory(
+    String habitId,
+    String oldName,
+    String newName,
+  ) async {
+    final startDateStr = getStartDate();
+    final startDate = createDateTimeObject(startDateStr);
+    final now = DateTime.now();
+
+    var current = DateTime(startDate.year, startDate.month);
+    while (current.isBefore(now) ||
+        (current.year == now.year && current.month == now.month)) {
+      final monthStr = convertDateTimeToString(current).substring(0, 6);
+      final boxName = "${HabitStorage.boxName}_history_$monthStr";
+
+      final Box historyBox;
+      if (Hive.isBoxOpen(boxName)) {
+        historyBox = Hive.box(boxName);
+      } else {
+        historyBox = await Hive.openBox(boxName);
+      }
+
+      final Map<String, dynamic> updates = {};
+      final List<dynamic> keysToDelete = [];
+
+      final oldPrefix = "${oldName}_";
+      final idPrefix = "${habitId}_";
+
+      for (var key in historyBox.keys) {
+        final keyStr = key.toString();
+
+        if (keyStr.startsWith(oldPrefix)) {
+          final dateSuffix = keyStr.substring(oldName.length);
+          final val = historyBox.get(key);
+          updates["$habitId$dateSuffix"] = val;
+          updates["$newName$dateSuffix"] = val;
+          keysToDelete.add(key);
+        } else if (keyStr.startsWith(idPrefix)) {
+          final dateSuffix = keyStr.substring(habitId.length);
+          final val = historyBox.get(key);
+          updates["$newName$dateSuffix"] = val;
+        } else if (keyStr.length == 8 && int.tryParse(keyStr) != null) {
+          final dailyData = historyBox.get(key);
+          if (dailyData is List) {
+            bool listChanged = false;
+            final updatedList = dailyData.map((item) {
+              if (item is HabitModel && item.id == habitId) {
+                listChanged = true;
+                return HabitModel(
+                  id: item.id,
+                  name: newName,
+                  isCompleted: item.isCompleted,
+                  createdAt: item.createdAt,
+                  completedAt: item.completedAt,
+                  colorValue: item.colorValue,
+                  index: item.index,
+                  updatedAt: DateTime.now(),
+                );
+              }
+              return item;
+            }).toList();
+            if (listChanged) {
+              updates[keyStr] = updatedList;
+            }
+          }
+        }
+      }
+
+      if (updates.isNotEmpty) {
+        await historyBox.putAll(updates);
+      }
+      for (var k in keysToDelete) {
+        await historyBox.delete(k);
+      }
+
+      current = DateTime(current.year, current.month + 1);
+    }
   }
 
   void setStartDate() {
@@ -437,9 +519,11 @@ class HabitLocalDataSource {
     final now = DateTime.now();
     final habits = loadHabits();
 
-    // Create map for each habit keyed by name for display compatibility
+    // Map each habit by BOTH its id and its name to support decoupling
     for (var habit in habits) {
-      historyMap[habit.name] = {};
+      final habitDates = <DateTime, bool>{};
+      historyMap[habit.id] = habitDates;
+      historyMap[habit.name] = habitDates;
     }
 
     // Pre-cache open monthly boxes (at most 2 boxes for 30 days)
@@ -465,7 +549,7 @@ class HabitLocalDataSource {
             historyBox.get(idKey) ?? historyBox.get(nameKey);
 
         if (isCompleted != null) {
-          historyMap[habit.name]![normalizedDate] = isCompleted;
+          historyMap[habit.id]![normalizedDate] = isCompleted;
         }
       }
     }
