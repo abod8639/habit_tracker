@@ -30,6 +30,7 @@ class NotificationController extends GetxController {
 
   var isNotificationEnabled = false.obs;
   var notificationTime = Rxn<TimeOfDay>();
+  var isBatteryOptimizationIgnored = true.obs;
 
   String? get fcmToken =>
       Get.isRegistered<FcmService>() ? FcmService.to.fcmToken.value : null;
@@ -38,6 +39,28 @@ class NotificationController extends GetxController {
   void onInit() {
     super.onInit();
     _loadSettings();
+  }
+
+  Future<void> checkBatteryOptimization() async {
+    isBatteryOptimizationIgnored.value =
+        await _notificationService.isIgnoringBatteryOptimizations();
+  }
+
+  Future<void> requestBatteryOptimization() async {
+    await _notificationService.requestIgnoreBatteryOptimizations();
+    await checkBatteryOptimization();
+    if (isBatteryOptimizationIgnored.value) {
+      Get.snackbar(
+        S.current.success,
+        S.current.batteryOptimizationExemptSuccess,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
+    }
+  }
+
+  Future<void> openBatterySettings() async {
+    await _notificationService.openBatteryOptimizationSettings();
   }
 
   Future<void> _loadSettings() async {
@@ -54,6 +77,8 @@ class NotificationController extends GetxController {
           debugPrint('Error loading notification time: ${failure.message}'),
       (time) => notificationTime.value = time,
     );
+
+    await checkBatteryOptimization();
 
     if (isNotificationEnabled.value && notificationTime.value != null) {
       await _scheduleNotification(notificationTime.value!);
@@ -83,7 +108,10 @@ class NotificationController extends GetxController {
 
   Future<void> toggleNotification(bool enabled) async {
     if (enabled) {
-      await _notificationService.requestPermissions();
+      await _notificationService.requestPermissions(
+        requestBatteryExemption: true,
+      );
+      await checkBatteryOptimization();
     }
 
     isNotificationEnabled.value = enabled;
