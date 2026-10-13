@@ -1,4 +1,5 @@
 /// Utility functions for numeral normalization and parsing across locales.
+library;
 
 /// Normalizes Eastern Arabic (٠-٩) and Persian (۰-۹) numerals to Western digits (0-9).
 String normalizeArabicDigits(String input) {
