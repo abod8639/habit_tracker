@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,54 @@ class FirestoreService {
   // Get deleted habits collection reference
   CollectionReference? get _deletedHabitsCollection {
     return _userDoc?.collection('deleted_habits');
+  }
+
+  // Tombstone retention window (30 days) to prevent unbounded accumulation
+  static const Duration tombstoneRetentionPeriod = Duration(days: 30);
+
+  // Fetch only active tombstones within the retention window
+  Future<QuerySnapshot?> _fetchActiveTombstones({
+    Duration retention = tombstoneRetentionPeriod,
+  }) async {
+    if (!isUserLoggedIn || _deletedHabitsCollection == null) return null;
+
+    try {
+      final cutoff = Timestamp.fromDate(DateTime.now().subtract(retention));
+      return await _deletedHabitsCollection!
+          .where('deletedAt', isGreaterThanOrEqualTo: cutoff)
+          .get();
+    } catch (_) {
+      try {
+        return await _deletedHabitsCollection!.get();
+      } catch (_) {
+        return null;
+      }
+    }
+  }
+
+  /// Garbage collection: Purges tombstones older than the retention period from Firestore
+  Future<void> cleanupExpiredTombstones({
+    Duration retention = tombstoneRetentionPeriod,
+  }) async {
+    if (!isUserLoggedIn || _deletedHabitsCollection == null) return;
+
+    try {
+      final cutoff = Timestamp.fromDate(DateTime.now().subtract(retention));
+      final expiredSnapshot = await _deletedHabitsCollection!
+          .where('deletedAt', isLessThan: cutoff)
+          .limit(100)
+          .get();
+
+      if (expiredSnapshot.docs.isNotEmpty) {
+        final batch = _firestore.batch();
+        for (var doc in expiredSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      }
+    } catch (e) {
+      debugPrint('Error cleaning up expired tombstones: $e');
+    }
   }
 
   // Upload habits and metadata to Firestore
@@ -103,17 +152,18 @@ class FirestoreService {
         await deleteHabits(localTombstones);
       }
 
-      // 3. Parallel Download (Habits and Deleted Tombstones)
+      // 3. Parallel Download (Habits and Active Deleted Tombstones)
       final results = await Future.wait([
         downloadHabits(),
-        _deletedHabitsCollection!.get(),
+        _fetchActiveTombstones(),
       ]);
 
       final List<HabitModel> cloudHabits = results[0] as List<HabitModel>;
-      final QuerySnapshot deletedSnapshot = results[1] as QuerySnapshot;
+      final QuerySnapshot? deletedSnapshot = results[1] as QuerySnapshot?;
 
       final deletedHabitsMap = {
-        for (var doc in deletedSnapshot.docs) doc.id: true,
+        if (deletedSnapshot != null)
+          for (var doc in deletedSnapshot.docs) doc.id: true,
       };
       final localMap = {for (var h in localHabits) h.id: h};
       final cloudMap = {for (var h in cloudHabits) h.id: h};
@@ -144,6 +194,9 @@ class FirestoreService {
 
       // 5. Final State Upload
       await uploadHabits(mergedHabits, startDay: finalStartDay);
+
+      // 6. Asynchronous Garbage Collection for expired tombstones (non-blocking)
+      unawaited(cleanupExpiredTombstones());
 
       return mergedHabits;
     } catch (e) {
