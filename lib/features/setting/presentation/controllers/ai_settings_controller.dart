@@ -114,8 +114,8 @@ class AiSettingsController extends GetxController {
   }
 
   Future<bool> saveApiKey(String rawKey) async {
-    final trimmedKey = rawKey.trim();
-    if (trimmedKey.isEmpty) {
+    final sanitizedKey = GeminiService.sanitizeApiKey(rawKey);
+    if (sanitizedKey.isEmpty) {
       _showNotification(
         _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
         _getString(
@@ -132,7 +132,7 @@ class AiSettingsController extends GetxController {
 
     // 1. Verify key before persisting
     final validator = apiKeyValidator ?? GeminiService.validateApiKey;
-    final isValid = await validator(trimmedKey);
+    final isValid = await validator(sanitizedKey);
 
     if (!isValid) {
       isLoading.value = false;
@@ -150,7 +150,7 @@ class AiSettingsController extends GetxController {
     }
 
     // 2. Persist key
-    final result = await saveCustomApiKeyUseCase(trimmedKey);
+    final result = await saveCustomApiKeyUseCase(sanitizedKey);
     isLoading.value = false;
     isValidating.value = false;
 
@@ -164,10 +164,11 @@ class AiSettingsController extends GetxController {
         return false;
       },
       (_) {
-        customApiKey.value = trimmedKey;
+        customApiKey.value = sanitizedKey;
         isCustom.value = true;
         apiKeyStatus.value = ApiKeyStatus.valid;
-        keyInputController.text = trimmedKey;
+        keyInputController.text = sanitizedKey;
+        GeminiService.resetModelInstance();
         _showNotification(
           _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
           _getString(
@@ -198,6 +199,7 @@ class AiSettingsController extends GetxController {
         customApiKey.value = '';
         isCustom.value = false;
         keyInputController.text = '';
+        GeminiService.resetModelInstance();
         checkKeyHealth(force: true);
         _showNotification(
           _getString(() => S.current.aiApiKeyTitle, 'AI API Key'),
