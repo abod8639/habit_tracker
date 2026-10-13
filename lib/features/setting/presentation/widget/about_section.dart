@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/components/animated_setting_tile.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class AboutSection extends StatelessWidget {
@@ -20,7 +22,7 @@ class AboutSection extends StatelessWidget {
           title: s.about,
           subtitle: s.appVersionAndInformation,
           onTap: () {
-            // TODO: Implement about dialog/page
+            context.push(AppRoutes.about);
           },
         ),
       ],
