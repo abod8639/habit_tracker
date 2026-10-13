@@ -129,7 +129,8 @@ class HabitStatsLocalDataSource {
           (historyMap) async {
             for (var habit in habits) {
               final List<FlSpot> spots = [];
-              final habitHistory = historyMap[habit.name] ?? {};
+              final habitHistory =
+                  historyMap[habit.id] ?? historyMap[habit.name] ?? {};
 
               for (int i = 0; i < days; i++) {
                 final normalizedDate = DateTime(
