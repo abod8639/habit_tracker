@@ -14,6 +14,8 @@ class QuestionEntity {
   final String? hint;
   final String? unit; // e.g., "kg", "cm", "years"
   final bool isRequired;
+  final num? minValue;
+  final num? maxValue;
 
   const QuestionEntity({
     required this.id,
@@ -24,6 +26,8 @@ class QuestionEntity {
     this.hint,
     this.unit,
     this.isRequired = true,
+    this.minValue,
+    this.maxValue,
   });
 
   /// Human-readable label for prompt construction
