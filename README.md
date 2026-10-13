@@ -39,12 +39,13 @@ Full flexibility and control over your AI quota and capabilities.
 - **Custom Key Configuration**: Switch seamlessly between the built-in default Gemini key and your personal API key in Settings.
 - **Universal Key Acceptance**: Accepts any valid Gemini API key generated from [Google AI Studio](https://aistudio.google.com/app/apikey) with automatic sanitization (stripping accidental quotes, whitespace, and variable prefixes).
 - **Supported Gemini Models (Automatic Priority Order)**:
-  - **`gemini-2.5-flash`** — Recommended multimodal model with balanced speed and enhanced reasoning.
-  - **`gemini-2.5-flash-lite`** — Ultra low-latency, budget-friendly workhorse model (default).
-  - **`gemini-2.0-flash`** / **`gemini-2.0-flash-lite`** — High-speed conversational and plan extraction models.
-  - **`gemini-1.5-flash`** / **`gemini-1.5-pro`** — Extended context and structured task planning models.
+  - **`gemini-3-flash-preview`** — High-speed conversational and plan extraction model with verified availability (default).
+  - **`gemini-3.8-flash`** / **`gemini-3.7-flash`** — Cutting-edge flash models with enhanced reasoning and high throughput.
+  - **`gemini-3.6-flash`** / **`gemini-3.5-flash`** — Balanced multimodal models optimized for daily habit coaching.
+  - **`gemini-3.5-flash-lite`** — Low-latency, budget-friendly chat & scanner model.
+  - **`gemini-flash-latest`** / **`gemini-flash-lite-latest`** — Automatic alias tracking Google's latest stable Flash releases.
   - *Dynamic Forward-Compatibility*: Automatically queries Google's `/v1beta/models` endpoint for your key and activates any newer Gemini model supporting `generateContent`.
-- **Self-Healing Fallback Architecture**: If a specific model is deprecated or restricted on a user's Google Cloud project, the app seamlessly cascades to the next working model with zero disruption to the user experience.
+- **Self-Healing Fallback Architecture**: If a specific model is deprecated or restricted on a user's Google Cloud project (e.g. legacy 2.5 or 2.0 models), the app seamlessly cascades to the next working model with zero disruption to the user experience.
 - **Direct Google AI Studio Link**: Open Google AI Studio with one click via `url_launcher` to generate your free key.
 - **Privacy & Masking**: Masked key display ensuring credentials remain protected on-screen.
 
