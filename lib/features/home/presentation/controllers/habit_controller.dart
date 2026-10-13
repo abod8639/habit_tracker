@@ -196,7 +196,11 @@ class HabitController extends GetxController {
           final mm = int.parse(entry.key.substring(4, 6));
           final dd = int.parse(entry.key.substring(6, 8));
           final strength = double.tryParse(entry.value) ?? 0.0;
-          parsed[DateTime(yyyy, mm, dd)] = (strength * 10).toInt();
+          int parsedStrength = (strength * 10).toInt();
+          if (parsedStrength == 0 && strength > 0) {
+            parsedStrength = 1;
+          }
+          parsed[DateTime(yyyy, mm, dd)] = parsedStrength;
         }
       }
       remoteHeatmapDateSet.assignAll(parsed);
