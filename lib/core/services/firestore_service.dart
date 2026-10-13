@@ -200,7 +200,7 @@ class FirestoreService {
       for (var doc in snapshot.docs) {
         final data = doc.data();
         final date = data['date'] as String?;
-        final rate = data['completionRate'] as String?;
+        final rate = data['completionRate']?.toString();
         if (date != null && rate != null) {
           history[date] = rate;
         }
@@ -290,10 +290,25 @@ class FirestoreService {
 
     try {
       final cloudHistory = await downloadHabitHistory();
-      final mergedHistory = {...localHistory, ...cloudHistory};
+      final mergedHistory = Map<String, String>.from(localHistory);
 
-      for (var entry in localHistory.entries) {
-        if (!cloudHistory.containsKey(entry.key)) {
+      for (var entry in cloudHistory.entries) {
+        if (!mergedHistory.containsKey(entry.key)) {
+          mergedHistory[entry.key] = entry.value;
+        } else {
+          final localVal =
+              double.tryParse(mergedHistory[entry.key] ?? '') ?? 0.0;
+          final cloudVal = double.tryParse(entry.value) ?? 0.0;
+          if (cloudVal > localVal) {
+            mergedHistory[entry.key] = entry.value;
+          }
+        }
+      }
+
+      for (var entry in mergedHistory.entries) {
+        final cloudVal = double.tryParse(cloudHistory[entry.key] ?? '') ?? 0.0;
+        final mergedVal = double.tryParse(entry.value) ?? 0.0;
+        if (!cloudHistory.containsKey(entry.key) || mergedVal > cloudVal) {
           await uploadHabitHistory(entry.key, entry.value);
         }
       }
