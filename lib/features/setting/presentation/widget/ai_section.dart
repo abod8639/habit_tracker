@@ -31,7 +31,7 @@ class AiSection extends StatelessWidget {
 
       switch (keyStatus) {
         case ApiKeyStatus.valid:
-          statusColor = Colors.teal;
+          statusColor = theme.primaryColor;
           statusIcon = Icons.check_circle_rounded;
           badgeText = s.apiKeyValid;
           subtitleText = isCustom
@@ -39,7 +39,7 @@ class AiSection extends StatelessWidget {
               : '${s.defaultApiKeyActive} • ${s.apiKeyValid}';
           break;
         case ApiKeyStatus.invalid:
-          statusColor = Colors.redAccent;
+          statusColor = theme.colorScheme.error;
           statusIcon = Icons.error_outline_rounded;
           badgeText = s.apiKeyNotWorking;
           subtitleText = isCustom
@@ -47,7 +47,7 @@ class AiSection extends StatelessWidget {
               : s.apiKeyRequired;
           break;
         case ApiKeyStatus.validating:
-          statusColor = Colors.amber;
+          statusColor = theme.colorScheme.secondary;
           statusIcon = Icons.sync_rounded;
           badgeText = s.apiKeyChecking;
           subtitleText = s.apiKeyChecking;
