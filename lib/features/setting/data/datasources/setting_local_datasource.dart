@@ -83,14 +83,24 @@ class SettingLocalDataSourceImpl implements SettingLocalDataSource {
   Future<void> saveCustomGeminiApiKey(String? key) async {
     if (key == null || key.trim().isEmpty) {
       await _settingsBox.delete('custom_gemini_api_key');
+      await _settingsBox.delete('custom_gemini_model');
     } else {
-      await _settingsBox.put('custom_gemini_api_key', key.trim());
+      var sanitized = key.trim();
+      if (sanitized.contains('=')) {
+        sanitized = sanitized.split('=').last.trim();
+      }
+      if ((sanitized.startsWith('"') && sanitized.endsWith('"')) ||
+          (sanitized.startsWith("'") && sanitized.endsWith("'"))) {
+        sanitized = sanitized.substring(1, sanitized.length - 1).trim();
+      }
+      await _settingsBox.put('custom_gemini_api_key', sanitized);
     }
   }
 
   @override
   Future<void> clearCustomGeminiApiKey() async {
     await _settingsBox.delete('custom_gemini_api_key');
+    await _settingsBox.delete('custom_gemini_model');
   }
 
   @override
