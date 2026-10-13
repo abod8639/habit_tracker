@@ -35,6 +35,7 @@ dependencies:
   google_sign_in: ^7.2.0
   cloud_firestore: ^6.1.1
   google_generative_ai: ^0.4.6
+  http: ^1.2.0
   image_picker: ^1.1.2
   equatable: ^2.0.8
   dartz: ^0.10.1
