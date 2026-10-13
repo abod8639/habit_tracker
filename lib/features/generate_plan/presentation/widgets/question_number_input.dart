@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/neumorphic_input.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
+import 'package:habit_tracker/core/utils/number_utils.dart';
 import '../../domain/entities/question_entity.dart';
 import '../controllers/plan_generator_controller.dart';
 
@@ -39,7 +40,7 @@ class _QuestionNumberInputState extends State<QuestionNumberInput> {
 
   void _onChanged(String value) {
     if (value.isNotEmpty && widget.question.maxValue != null) {
-      final parsed = num.tryParse(value);
+      final parsed = tryParseNormalizedNum(value);
       if (parsed != null && parsed > widget.question.maxValue!) {
         final clamped = widget.question.maxValue!.toString();
         _textController.value = TextEditingValue(
@@ -76,7 +77,7 @@ class _QuestionNumberInputState extends State<QuestionNumberInput> {
           fontSize: 32,
           fontWeight: FontWeight.bold,
           inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9٠-٩۰-۹]')),
             if (widget.question.maxValue != null)
               _MaxNumberInputFormatter(widget.question.maxValue!),
           ],
@@ -111,7 +112,7 @@ class _MaxNumberInputFormatter extends TextInputFormatter {
     TextEditingValue newValue,
   ) {
     if (newValue.text.isEmpty) return newValue;
-    final parsed = num.tryParse(newValue.text);
+    final parsed = tryParseNormalizedNum(newValue.text);
     if (parsed == null) return oldValue;
     if (parsed > maxValue) {
       final clamped = maxValue.toString();
