@@ -11,6 +11,7 @@ import '../../domain/usecases/generate_plan_usecase.dart';
 import '../../domain/usecases/get_questions_usecase.dart';
 import '../../domain/usecases/save_plan_habits_usecase.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
+import 'package:habit_tracker/core/utils/number_utils.dart';
 
 enum PlanGeneratorStatus { idle, loading, success, error }
 
@@ -114,11 +115,19 @@ class PlanGeneratorController extends GetxController {
       }
     }
     if (answer != null && q.isNumeric) {
-      final parsed = num.tryParse(answer.toString().trim());
-      if (parsed != null) {
+      final rawStr = answer.toString().trim();
+      if (rawStr.isNotEmpty) {
+        final parsed = tryParseNormalizedNum(rawStr);
         final isArabic = Get.isRegistered<LangController>()
             ? Get.find<LangController>().isArabic
             : true;
+
+        if (parsed == null) {
+          return isArabic
+              ? 'يرجى إدخال رقم صحيح'
+              : 'Please enter a valid number';
+        }
+
         if (q.maxValue != null && parsed > q.maxValue!) {
           return isArabic
               ? 'الحد الأقصى المسموح به هو ${q.maxValue}'
@@ -129,6 +138,9 @@ class PlanGeneratorController extends GetxController {
               ? 'الحد الأدنى المسموح به هو ${q.minValue}'
               : 'Minimum allowed value is ${q.minValue}';
         }
+
+        // Store clean normalized number for downstream AI prompt
+        answers[q.id] = parsed;
       }
     }
     return null;
