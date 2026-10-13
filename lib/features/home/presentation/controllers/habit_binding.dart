@@ -19,6 +19,7 @@ import 'package:habit_tracker/features/home/domain/usecases/update_habit_order_u
 import 'package:habit_tracker/features/home/domain/usecases/get_start_date_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/clear_local_habits_usecase.dart';
 import 'package:habit_tracker/features/home/domain/usecases/increment_day_count_usecase.dart';
+import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:hive/hive.dart';
 import '../controllers/habit_controller.dart';
@@ -29,7 +30,14 @@ class HabitBinding extends Bindings {
   void dependencies() {
     // Data Sources
     final box = Hive.box(HabitStorage.boxName);
-    Get.lazyPut(() => HabitLocalDataSource(box));
+    final vaultBox = Hive.isBoxOpen(HabitStorage.backupVaultBox)
+        ? Hive.box(HabitStorage.backupVaultBox)
+        : box;
+    final vaultDataSource = HabitOfflineVaultDataSource(vaultBox);
+    Get.lazyPut(() => vaultDataSource);
+    Get.lazyPut(
+      () => HabitLocalDataSource(box, vaultDataSource: vaultDataSource),
+    );
     Get.lazyPut(() => FirestoreService());
 
     // Repository
@@ -37,6 +45,7 @@ class HabitBinding extends Bindings {
       () => HabitRepositoryImpl(
         localDataSource: Get.find(),
         firestoreService: Get.find(),
+        vaultDataSource: Get.find(),
       ),
     );
 
