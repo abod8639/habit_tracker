@@ -318,5 +318,10 @@
         "type": "int"
       }
     }
-  }
+  },
+  "batteryOptimizationWarningTitle": "Battery Optimization Active",
+  "batteryOptimizationWarningSubtitle": "OEM battery savers (Samsung, Xiaomi) may silence your alarms. Tap to exempt the app from power restrictions.",
+  "batteryOptimizationExemptAction": "Fix Alarms",
+  "batteryOptimizationExemptSuccess": "Battery optimization exempted. Alarms will trigger reliably on time.",
+  "reliableAlarmsActive": "Reliable alarms active"
 }
