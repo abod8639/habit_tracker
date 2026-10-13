@@ -2261,6 +2261,56 @@ class S {
       args: [count],
     );
   }
+
+  /// `Battery Optimization Active`
+  String get batteryOptimizationWarningTitle {
+    return Intl.message(
+      'Battery Optimization Active',
+      name: 'batteryOptimizationWarningTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `OEM battery savers (Samsung, Xiaomi) may silence your alarms. Tap to exempt the app from power restrictions.`
+  String get batteryOptimizationWarningSubtitle {
+    return Intl.message(
+      'OEM battery savers (Samsung, Xiaomi) may silence your alarms. Tap to exempt the app from power restrictions.',
+      name: 'batteryOptimizationWarningSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fix Alarms`
+  String get batteryOptimizationExemptAction {
+    return Intl.message(
+      'Fix Alarms',
+      name: 'batteryOptimizationExemptAction',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Battery optimization exempted. Alarms will trigger reliably on time.`
+  String get batteryOptimizationExemptSuccess {
+    return Intl.message(
+      'Battery optimization exempted. Alarms will trigger reliably on time.',
+      name: 'batteryOptimizationExemptSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reliable alarms active`
+  String get reliableAlarmsActive {
+    return Intl.message(
+      'Reliable alarms active',
+      name: 'reliableAlarmsActive',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
