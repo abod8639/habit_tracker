@@ -39,18 +39,32 @@ class HabitRepositoryImpl implements HabitRepository {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       final now = DateTime.now();
 
+      final existingNames =
+          models.map((m) => m.name.trim().toLowerCase()).toSet();
+      int addedCount = 0;
+
       for (final name in names) {
-        if (name.trim().isEmpty) continue;
+        final trimmedName = name.trim();
+        if (trimmedName.isEmpty) continue;
+
+        final normalizedName = trimmedName.toLowerCase();
+        if (existingNames.contains(normalizedName)) continue;
+        existingNames.add(normalizedName);
 
         final newModel = HabitModel(
-          id: "${now.microsecondsSinceEpoch}_${name.hashCode}_${models.length}",
-          name: name,
+          id: "${now.microsecondsSinceEpoch}_${trimmedName.hashCode}_${models.length}",
+          name: trimmedName,
           isCompleted: false,
           createdAt: now,
           updatedAt: now,
           index: models.length,
         );
         models.add(newModel);
+        addedCount++;
+      }
+
+      if (addedCount == 0) {
+        return const Right(null);
       }
 
       await localDataSource.saveHabits(models);
