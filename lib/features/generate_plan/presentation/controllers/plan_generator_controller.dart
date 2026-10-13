@@ -134,7 +134,7 @@ class PlanGeneratorController extends GetxController {
     return null;
   }
 
-  bool _isCurrentAnswerValid() => _validateCurrentAnswer() == null;
+  // bool _isCurrentAnswerValid() => _validateCurrentAnswer() == null;
 
   // ── Navigation ────────────────────────────────────────────────────────────
   void next() {
