@@ -13,6 +13,7 @@ import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
+import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
 import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
 
 class AuthController extends GetxController {
@@ -31,6 +32,7 @@ class AuthController extends GetxController {
 
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
+  final RxBool isExplicitSignOut = false.obs;
 
   @override
   void onInit() {
@@ -143,18 +145,29 @@ class AuthController extends GetxController {
   Future<void> signOut() async {
     try {
       isLoading.value = true;
+      isExplicitSignOut.value = true;
+
+      // 1. Vault all current data before clearing so offline/unsynced work is safe
+      if (Get.isRegistered<HabitRepository>()) {
+        final currentUid = currentUser?.uid ?? 'offline_user';
+        await Get.find<HabitRepository>().backupToVault(userId: currentUid);
+      }
 
       // Reset skip login status so they see login screen again
       await _setSkipLoginUseCase(false);
 
       // Clear FCM token in Firestore before signing out
       if (Get.isRegistered<FcmService>()) {
-        await Get.find<FcmService>().clearTokenFromFirestore();
+        try {
+          await Get.find<FcmService>().clearTokenFromFirestore();
+        } catch (_) {}
       }
 
-      // Reset habit data to default state
+      // Reset habit data to default state for next user
       if (Get.isRegistered<HabitController>()) {
-        await Get.find<HabitController>().resetToDefaultState();
+        await Get.find<HabitController>().resetToDefaultState(
+          backupFirst: false,
+        );
       } else if (Get.isRegistered<HabitLocalDataSource>()) {
         await Get.find<HabitLocalDataSource>().clearAllData();
       }
