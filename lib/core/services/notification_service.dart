@@ -3,6 +3,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 class NotificationService {
@@ -14,6 +16,12 @@ class NotificationService {
   }
 
   NotificationService._internal();
+
+  static const MethodChannel _defaultBatteryChannel = MethodChannel(
+    'com.example.habit_tracker/battery_optimization',
+  );
+
+  MethodChannel batteryChannel = _defaultBatteryChannel;
 
   final fln.FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       fln.FlutterLocalNotificationsPlugin();
@@ -105,7 +113,58 @@ class NotificationService {
     _isInitialized = true;
   }
 
-  Future<bool> requestPermissions() async {
+  /// Checks if the application is exempted from battery optimizations on Android.
+  /// On other platforms, returns true.
+  Future<bool> isIgnoringBatteryOptimizations() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      return true;
+    }
+    try {
+      final result = await batteryChannel.invokeMethod<bool>(
+        'isIgnoringBatteryOptimizations',
+      );
+      return result ?? true;
+    } catch (e) {
+      debugPrint('NotificationService: Failed to check battery optimizations: $e');
+      return true;
+    }
+  }
+
+  /// Requests direct battery optimization exemption dialog (ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).
+  Future<bool> requestIgnoreBatteryOptimizations() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      return true;
+    }
+    try {
+      final result = await batteryChannel.invokeMethod<bool>(
+        'requestIgnoreBatteryOptimizations',
+      );
+      return result ?? false;
+    } catch (e) {
+      debugPrint(
+        'NotificationService: Failed to request battery optimization exemption: $e',
+      );
+      return false;
+    }
+  }
+
+  /// Opens system battery optimization settings for manual user review/exemption.
+  Future<bool> openBatteryOptimizationSettings() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      return true;
+    }
+    try {
+      final result = await batteryChannel.invokeMethod<bool>(
+        'openBatteryOptimizationSettings',
+      );
+      return result ?? false;
+    } catch (e) {
+      debugPrint('NotificationService: Failed to open battery settings: $e');
+      return false;
+    }
+  }
+
+  Future<bool> requestPermissions({bool requestBatteryExemption = true}) async {
     bool granted = false;
 
     final androidPlugin = flutterLocalNotificationsPlugin
@@ -117,6 +176,15 @@ class NotificationService {
       final notifGranted = await androidPlugin.requestNotificationsPermission();
       final alarmGranted = await androidPlugin.requestExactAlarmsPermission();
       granted = (notifGranted ?? false) || (alarmGranted ?? false);
+
+      if (requestBatteryExemption &&
+          !kIsWeb &&
+          defaultTargetPlatform == TargetPlatform.android) {
+        final ignoring = await isIgnoringBatteryOptimizations();
+        if (!ignoring) {
+          await requestIgnoreBatteryOptimizations();
+        }
+      }
     }
 
     final iosPlugin = flutterLocalNotificationsPlugin
@@ -210,6 +278,15 @@ class NotificationService {
     debugPrint(
       'NotificationService: Scheduling alarm for $scheduledDate (tz: ${tz.local.name})',
     );
+
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      final isIgnoring = await isIgnoringBatteryOptimizations();
+      if (!isIgnoring) {
+        debugPrint(
+          'NotificationService: Battery optimization is active. Exact alarms may be suppressed by OEM systems (Samsung OneUI/Xiaomi HyperOS).',
+        );
+      }
+    }
 
     const notificationDetails = fln.NotificationDetails(
       android: fln.AndroidNotificationDetails(
