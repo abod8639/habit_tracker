@@ -31,6 +31,7 @@ class AppInitializer {
 
       // 2. Open necessary Hive boxes with corruption recovery
       await _openBoxSafely(HabitStorage.boxName);
+      await _openBoxSafely(HabitStorage.backupVaultBox);
       await _openBoxSafely(ThemeStorageService.themeBox);
       await _openBoxSafely(LangStorage.boxName);
       await _openBoxSafely(SettingsStorage.boxName);
