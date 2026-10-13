@@ -122,6 +122,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "backupData": MessageLookupByLibrary.simpleMessage("Backup Data"),
         "barChartIsEmpty":
             MessageLookupByLibrary.simpleMessage("No habit data available"),
+        "batteryOptimizationExemptAction":
+            MessageLookupByLibrary.simpleMessage("Fix Alarms"),
+        "batteryOptimizationExemptSuccess": MessageLookupByLibrary.simpleMessage(
+            "Battery optimization exempted. Alarms will trigger reliably on time."),
+        "batteryOptimizationWarningSubtitle": MessageLookupByLibrary.simpleMessage(
+            "OEM battery savers (Samsung, Xiaomi) may silence your alarms. Tap to exempt the app from power restrictions."),
+        "batteryOptimizationWarningTitle":
+            MessageLookupByLibrary.simpleMessage("Battery Optimization Active"),
         "camera": MessageLookupByLibrary.simpleMessage("Camera"),
         "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
         "categoryLearning":
@@ -314,6 +322,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Please answer this question to continue."),
         "ratepagetitle":
             MessageLookupByLibrary.simpleMessage("Habit Statistics"),
+        "reliableAlarmsActive":
+            MessageLookupByLibrary.simpleMessage("Reliable alarms active"),
         "reminderSetFor": m11,
         "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
             "You will receive daily habit checks."),
