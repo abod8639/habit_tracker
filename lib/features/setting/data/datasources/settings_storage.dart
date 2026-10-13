@@ -39,11 +39,14 @@ class SettingsStorage {
     await _box.put(_hasSkippedLoginKey, skipped);
   }
 
+  static const String _customGeminiModelKey = 'custom_gemini_model';
+
   String? get customGeminiApiKey => _box.get(_customGeminiApiKeyKey);
 
   Future<void> setCustomGeminiApiKey(String? key) async {
     if (key == null || key.trim().isEmpty) {
       await _box.delete(_customGeminiApiKeyKey);
+      await _box.delete(_customGeminiModelKey);
     } else {
       await _box.put(_customGeminiApiKeyKey, key.trim());
     }
@@ -51,5 +54,16 @@ class SettingsStorage {
 
   Future<void> clearCustomGeminiApiKey() async {
     await _box.delete(_customGeminiApiKeyKey);
+    await _box.delete(_customGeminiModelKey);
+  }
+
+  String? get customGeminiModel => _box.get(_customGeminiModelKey);
+
+  Future<void> setCustomGeminiModel(String? model) async {
+    if (model == null || model.trim().isEmpty) {
+      await _box.delete(_customGeminiModelKey);
+    } else {
+      await _box.put(_customGeminiModelKey, model.trim());
+    }
   }
 }
