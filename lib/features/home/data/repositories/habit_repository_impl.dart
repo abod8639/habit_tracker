@@ -78,6 +78,7 @@ class HabitRepositoryImpl implements HabitRepository {
 
       if (index != -1) {
         final m = models[index];
+        final oldName = m.name;
         models[index] = HabitModel(
           id: m.id,
           name: newName,
@@ -90,6 +91,11 @@ class HabitRepositoryImpl implements HabitRepository {
         );
 
         await localDataSource.saveHabits(models);
+
+        if (oldName != newName) {
+          await localDataSource.renameHabitHistory(id, oldName, newName);
+          _cachedHeatmapData = null;
+        }
 
         if (firestoreService.isUserLoggedIn) {
           await firestoreService.uploadHabits(models);
@@ -156,7 +162,11 @@ class HabitRepositoryImpl implements HabitRepository {
 
         await localDataSource.saveHabits(models);
         _cachedHeatmapData = null;
-        await localDataSource.saveHabitCompletionHistory(m.name, isCompleted);
+        await localDataSource.saveHabitCompletionHistory(
+          m.id,
+          isCompleted,
+          habitName: m.name,
+        );
 
         final completedCount = models.where((m) => m.isCompleted).length;
         final completionRate = models.isEmpty
