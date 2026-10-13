@@ -5,16 +5,20 @@ import 'package:habit_tracker/features/home/data/datasources/habit_local_data_so
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
+import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
 import '../models/date_time.dart';
 
 class HabitRepositoryImpl implements HabitRepository {
   final HabitLocalDataSource localDataSource;
   final FirestoreService firestoreService;
+  final HabitOfflineVaultDataSource? vaultDataSource;
 
   HabitRepositoryImpl({
     required this.localDataSource,
     required this.firestoreService,
+    this.vaultDataSource,
   });
 
   @override
@@ -493,6 +497,111 @@ class HabitRepositoryImpl implements HabitRepository {
     try {
       await localDataSource.clearAllData(earliestDateStr: earliestDateStr);
       _cachedHeatmapData = null;
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> backupToVault({String? userId}) async {
+    try {
+      String? authUid;
+      try {
+        if (firestoreService.isUserLoggedIn) {
+          authUid = FirebaseAuth.instance.currentUser?.uid;
+        }
+      } catch (_) {}
+
+      final effectiveUid = userId ??
+          authUid ??
+          localDataSource.getLastUserId() ??
+          'offline_user';
+
+      final snapshot =
+          await localDataSource.createSnapshot(userId: effectiveUid);
+      final vault = vaultDataSource ?? localDataSource.vaultDataSource;
+      if (vault != null) {
+        await vault.saveBackup(snapshot);
+      }
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Failed to backup habits to vault: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> restoreFromVault({String? userId}) async {
+    try {
+      final vault = vaultDataSource ?? localDataSource.vaultDataSource;
+      if (vault == null) return const Right(false);
+
+      String? authUid;
+      try {
+        if (firestoreService.isUserLoggedIn) {
+          authUid = FirebaseAuth.instance.currentUser?.uid;
+        }
+      } catch (_) {}
+
+      final effectiveUid = userId ?? authUid;
+
+      final snapshot = effectiveUid != null
+          ? vault.getBackup(effectiveUid)
+          : vault.getLatestBackup();
+
+      if (snapshot != null) {
+        await localDataSource.restoreFromSnapshot(snapshot);
+        _cachedHeatmapData = null;
+        return const Right(true);
+      }
+      return const Right(false);
+    } catch (e) {
+      return Left(CacheFailure('Failed to restore habits from vault: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> hasPendingVaultData({String? userId}) async {
+    try {
+      final vault = vaultDataSource ?? localDataSource.vaultDataSource;
+      if (vault == null) return const Right(false);
+      return Right(vault.hasUnsyncedBackup(userId: userId));
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> markVaultSynced({String? userId}) async {
+    try {
+      final vault = vaultDataSource ?? localDataSource.vaultDataSource;
+      if (vault != null) {
+        String? authUid;
+        try {
+          if (firestoreService.isUserLoggedIn) {
+            authUid = FirebaseAuth.instance.currentUser?.uid;
+          }
+        } catch (_) {}
+
+        final effectiveUid = userId ??
+            authUid ??
+            localDataSource.getLastUserId() ??
+            'offline_user';
+        await vault.markBackupSynced(effectiveUid);
+      }
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> clearVault({String? userId}) async {
+    try {
+      final vault = vaultDataSource ?? localDataSource.vaultDataSource;
+      if (vault != null && userId != null) {
+        await vault.clearBackup(userId);
+      }
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
