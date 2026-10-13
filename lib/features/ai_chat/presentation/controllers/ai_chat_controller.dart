@@ -439,15 +439,42 @@ TONE & EMOTION DETECTION
             errorStr.contains('429') ||
             errorStr.contains('resource exhausted');
 
-        if (isRateLimit && attempt < maxAttempts) {
+        final isModelError = GeminiService.isModelUnavailableError(e);
+
+        final isTransientServiceUnavailable =
+            errorStr.contains('503') ||
+            errorStr.contains('unavailable') ||
+            errorStr.contains('high demand');
+
+        if (isModelError && attempt < maxAttempts) {
+          final isArabic = Get.locale?.languageCode == 'ar';
+          loadingMessage.value = isArabic
+              ? 'جاري الاتصال بنموذج ذكاء اصطناعي بديل...'
+              : 'Connecting to alternative AI model...';
+          final switched = await GeminiService.trySwitchToWorkingModel();
+          if (switched != null) {
+            _chatRepository.initChatSession(
+              systemInstruction: _buildSystemInstruction(),
+              history: messages.map((m) => m.toEntity()).toList(),
+            );
+            continue;
+          }
+        }
+
+        if ((isRateLimit || isTransientServiceUnavailable) &&
+            attempt < maxAttempts) {
           double? retrySeconds = _extractRetrySeconds(e);
-          retrySeconds ??= (4.0 * attempt);
+          retrySeconds ??= (3.0 * attempt);
 
           for (int sec = retrySeconds.ceil(); sec > 0; sec--) {
             final isArabic = Get.locale?.languageCode == 'ar';
             loadingMessage.value = isArabic
-                ? 'تم تجاوز حد الطلبات. جاري إعادة المحاولة خلال $sec ثانية...'
-                : 'Rate limit exceeded. Retrying in $sec seconds...';
+                ? (isRateLimit
+                    ? 'تم تجاوز حد الطلبات. جاري إعادة المحاولة خلال $sec ثانية...'
+                    : 'الخدمة مشغولة مؤقتاً. جاري إعادة المحاولة خلال $sec ثانية...')
+                : (isRateLimit
+                    ? 'Rate limit exceeded. Retrying in $sec seconds...'
+                    : 'Service temporarily busy. Retrying in $sec seconds...');
             await Future.delayed(const Duration(seconds: 1));
           }
           continue;
