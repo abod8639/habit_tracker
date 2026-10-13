@@ -253,7 +253,45 @@ class HabitLocalDataSource {
           if (date.startsWith('_')) {
             date = date.substring(1);
           }
-          final strength = historyBox.get(key).toString();
+          var strength = historyBox.get(key).toString();
+
+          // Self-heal: If strength was stored as "0.0" or "0" due to rounding bug,
+          // check if any habits were actually completed on that date in history
+          final parsedStrength = double.tryParse(strength) ?? 0.0;
+          if (parsedStrength == 0.0) {
+            bool hasCompletedHabit = false;
+            final dailyList = historyBox.get(date);
+            if (dailyList is List) {
+              for (var item in dailyList) {
+                if (item is HabitModel && item.isCompleted) {
+                  hasCompletedHabit = true;
+                  break;
+                } else if (item is Map &&
+                    (item['isCompleted'] == true ||
+                        item['isCompleted'] == 1)) {
+                  hasCompletedHabit = true;
+                  break;
+                }
+              }
+            }
+            if (!hasCompletedHabit) {
+              for (var k in historyBox.keys) {
+                final kStr = k.toString();
+                if (kStr.endsWith('_$date') &&
+                    !kStr.startsWith(HabitStorage.habitStrengthPrefix)) {
+                  if (historyBox.get(k) == true) {
+                    hasCompletedHabit = true;
+                    break;
+                  }
+                }
+              }
+            }
+            if (hasCompletedHabit) {
+              strength = "0.1";
+              historyBox.put(key, "0.1");
+            }
+          }
+
           allHistory[date] = strength;
         }
       }
