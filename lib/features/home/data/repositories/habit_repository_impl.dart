@@ -164,14 +164,14 @@ class HabitRepositoryImpl implements HabitRepository {
             : completedCount / models.length;
         await localDataSource.saveHabitStrength(
           todaysDateFormatted(),
-          completionRate.toStringAsFixed(1),
+          completionRate.toString(),
         );
 
         if (firestoreService.isUserLoggedIn) {
           await firestoreService.uploadHabits(models);
           await firestoreService.uploadHabitHistory(
             todaysDateFormatted(),
-            completionRate.toStringAsFixed(1),
+            completionRate.toString(),
           );
         }
       }
