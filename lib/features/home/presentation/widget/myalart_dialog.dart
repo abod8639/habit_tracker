@@ -319,7 +319,8 @@ class _MyalartdState extends State<MyalartDialog>
                       ),
                       boxShadow: AppShadows.wellDual(isDark: isDark),
                     ),
-                    child: TextFormField(     
+                    child: TextFormField(  
+                      maxLength: 100,   
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 15.5,
@@ -329,6 +330,7 @@ class _MyalartdState extends State<MyalartDialog>
                       minLines: 1,
                       maxLines: 4,
                       decoration: InputDecoration(
+                        hintMaxLines: 100,
                         hintText: widget.hintText,
                         hintStyle: TextStyle(
                           color: colorScheme.onSurfaceVariant.withValues(
