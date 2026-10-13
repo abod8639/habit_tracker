@@ -154,32 +154,33 @@ class AboutPage extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                               ClipRRect(
+                          ClipRRect(
                             borderRadius: AppRadius.pillRadius,
-                            child: 
-                          CachedNetworkImage(
-                            width: 90,
-                            imageUrl: "https://avatars.githubusercontent.com/u/108903062?v=4",
+                            child: CachedNetworkImage(
+                              width: 90,
+                              imageUrl:
+                                  "https://avatars.githubusercontent.com/u/108903062?v=4",
+                            ),
                           ),
-                               ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Dexter (abot8639)',
+                                  'Dexter (abod8639)',
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isArabic?"صنع هذا التطبيق بكل حب واهتمام بواسطة Dexter ":"this app made with care and love by Dexter",
-                                  // s.appVersionAndInformation,
+                                  isArabic
+                                      ? 'صُنع هذا التطبيق بكل حب واهتمام بواسطة Dexter'
+                                      : 'This app was made with care and love by Dexter',
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: colorScheme.onSurface.withValues(
-                                      alpha : 0.65,
+                                      alpha: 0.65,
                                     ),
                                   ),
                                 ),
@@ -206,26 +207,25 @@ class AboutPage extends StatelessWidget {
 
                   const SizedBox(height: 18),
 
+                  // ── TESTER CARD ──────────────────────────────────────────────
                   _buildSectionCard(
                     context: context,
                     isDark: isDark,
                     baseSurface: baseSurface,
                     primaryColor: primaryColor,
-                    title: isArabic ? 'المختبر' : 'Tester',
+                    title: isArabic ? 'المختبِر' : 'Tester',
                     icon: Icons.verified_user_rounded,
                     children: [
                       Row(
                         children: [
-                          //cercel image
                           ClipRRect(
                             borderRadius: AppRadius.pillRadius,
                             child: CachedNetworkImage(
                               width: 90,
-                              imageUrl: "https://styles.redditmedia.com/t5_ek4gzo/styles/profileIcon_0xqopel8y2sh1.jpeg?frame=1&auto=webp&crop=256%3A256%2Csmart&s=bacfd55489e45363009d86f33b46525d49ef87d0",
-                              // imageUrl: "https://i.redd.it/7v8swqvgqwuh1.gif",
+                              imageUrl:
+                                  "https://styles.redditmedia.com/t5_ek4gzo/styles/profileIcon_0xqopel8y2sh1.jpeg?frame=1&auto=webp&crop=256%3A256%2Csmart&s=bacfd55489e45363009d86f33b46525d49ef87d0",
+                            ),
                           ),
-                          ),
-
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -239,8 +239,9 @@ class AboutPage extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isArabic?"هذا التطبيق تم اختباره بواسطة أفضل مختبر في العالم" :"This app was tested by the best tester in the world",
-                                  // s.appVersionAndInformation,
+                                  isArabic
+                                      ? 'تم اختبار هذا التطبيق بعناية فائقة بواسطة أفضل مختبِر في العالم'
+                                      : 'This app was tested with great care by the best tester in the world',
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: colorScheme.onSurface.withValues(
                                       alpha: 0.65,
@@ -257,18 +258,16 @@ class AboutPage extends StatelessWidget {
                         spacing: 6,
                         runSpacing: 6,
                         children: [
-                          _buildTechChip(context, 'Cyber Security', isDark),
+                          _buildTechChip(context, 'Cybersecurity', isDark),
                           _buildTechChip(context, 'Ethical Hacking', isDark),
                           _buildTechChip(context, 'Testing', isDark),
                           _buildTechChip(context, 'Bug Bounty', isDark),
                           _buildTechChip(context, 'AI', isDark),
-
-                                  ],
+                        ],
                       ),
                     ],
                   ),
 
-                  // ── DEVELOPER CARD ───────────────────────────────────────────
                   const SizedBox(height: 18),
 
                   // ── KEY FEATURES ──────────────────────────────────────────────
@@ -396,7 +395,7 @@ class AboutPage extends StatelessWidget {
                   // ── FOOTER ────────────────────────────────────────────────────
                   Center(
                     child: Text(
-                      'Habit Tracker • Built with Flutter and Dart \n© 2026 Dexter',
+                      'Habit Tracker • Built with Flutter and Dart\n© 2026 Dexter',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurface.withValues(alpha: 0.45),
