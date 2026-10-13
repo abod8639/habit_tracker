@@ -6,8 +6,9 @@ import 'package:hive/hive.dart';
 
 /// Storage constants and helper methods for the Habit Tracker app
 class HabitStorage {
-  // Box name
+  // Box names
   static const String boxName = "Habit_db";
+  static const String backupVaultBox = "Habit_vault_db";
 
   // Storage keys
   static const String habitListKey = "TODOLIST";
