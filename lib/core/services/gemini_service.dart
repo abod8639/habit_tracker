@@ -46,12 +46,25 @@ class GeminiService {
   String? _lastApiKey;
   String? _lastModelName;
 
-  static const String defaultModelName = 'gemini-2.5-flash-lite';
+  static const String defaultModelName = 'gemini-3-flash-preview';
 
   /// Ordered list of candidate models to try for maximum compatibility across accounts
   static const List<String> supportedCandidateModels = [
-    'gemini-2.5-flash',
+    'gemini-3-flash-preview',
+    'gemini-3.8-flash',
+    'gemini-3.7-flash',
+    'gemini-3.6-flash',
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-flash-latest',
+    'gemini-flash-lite-latest',
+  ];
+
+  /// Models known to be sunset or deprecated for new Gemini accounts
+  static const List<String> deprecatedModels = [
     'gemini-2.5-flash-lite',
+    'gemini-2.5-flash',
+    'gemini-2.5-pro',
     'gemini-2.0-flash',
     'gemini-2.0-flash-lite',
     'gemini-1.5-flash',
@@ -65,13 +78,17 @@ class GeminiService {
 
   /// Returns the dynamically resolved working model for the current API key
   static String get effectiveModelName {
-    if (_resolvedModelName != null && _resolvedModelName!.isNotEmpty) {
+    if (_resolvedModelName != null &&
+        _resolvedModelName!.isNotEmpty &&
+        !deprecatedModels.contains(_resolvedModelName)) {
       return _resolvedModelName!;
     }
     try {
       if (Get.isRegistered<SettingsStorage>()) {
         final savedModel = Get.find<SettingsStorage>().customGeminiModel;
-        if (savedModel != null && savedModel.trim().isNotEmpty) {
+        if (savedModel != null &&
+            savedModel.trim().isNotEmpty &&
+            !deprecatedModels.contains(savedModel.trim())) {
           _resolvedModelName = savedModel.trim();
           return _resolvedModelName!;
         }
@@ -138,8 +155,13 @@ class GeminiService {
     } catch (_) {}
   }
 
-  /// Resets in-memory cached model instance and resolved model name
+  /// Resets in-memory cached model instance without wiping persistent storage
   static void resetModelInstance() {
+    _resolvedModelName = null;
+  }
+
+  /// Explicitly clears the custom resolved model from persistent storage
+  static void clearCustomModel() {
     _resolvedModelName = null;
     try {
       if (Get.isRegistered<SettingsStorage>()) {
@@ -155,6 +177,7 @@ class GeminiService {
     if (cleaned.isEmpty) return false;
 
     // 1. Fast check against Google AI models endpoint (discovers all accessible models)
+    final supportedFromApi = <String>[];
     try {
       final url = Uri.parse(
         'https://generativelanguage.googleapis.com/v1beta/models?key=$cleaned',
@@ -167,45 +190,20 @@ class GeminiService {
         final decoded = jsonDecode(response.body);
         if (decoded is Map<String, dynamic> && decoded.containsKey('models')) {
           final modelsList = decoded['models'] as List<dynamic>? ?? [];
-          final supported = <String>[];
           for (final item in modelsList) {
             if (item is Map<String, dynamic>) {
-              final name = (item['name'] as String? ?? '').replaceFirst('models/', '');
-              final methods = (item['supportedGenerationMethods'] as List<dynamic>? ?? [])
-                  .map((e) => e.toString())
-                  .toList();
-              if (methods.contains('generateContent')) {
-                supported.add(name);
+              final name =
+                  (item['name'] as String? ?? '').replaceFirst('models/', '');
+              final methods =
+                  (item['supportedGenerationMethods'] as List<dynamic>? ?? [])
+                      .map((e) => e.toString())
+                      .toList();
+              if (methods.contains('generateContent') &&
+                  !deprecatedModels.contains(name)) {
+                supportedFromApi.add(name);
               }
             }
           }
-
-          // Pick the best model available from supported list matching candidates
-          String? selected;
-          for (final candidate in supportedCandidateModels) {
-            if (supported.contains(candidate)) {
-              selected = candidate;
-              break;
-            }
-          }
-
-          // If no candidate directly matched, pick the first flash or gemini model that supports generateContent
-          if (selected == null && supported.isNotEmpty) {
-            selected = supported.firstWhere(
-              (m) => m.contains('flash'),
-              orElse: () => supported.firstWhere(
-                (m) => m.contains('gemini'),
-                orElse: () => supported.first,
-              ),
-            );
-          }
-
-          if (selected != null) {
-            _resolvedModelName = selected;
-            _saveResolvedModel(selected);
-          }
-
-          return true;
         }
       } else if (response.statusCode == 400 || response.statusCode == 403) {
         // Explicit invalid key or API blocked
@@ -215,8 +213,24 @@ class GeminiService {
       // Network hiccup or test environment, fallback to direct candidate probing
     }
 
-    // 2. Direct candidate probing fallback: try each candidate model with countTokens
+    // 2. Prepare ordered probe candidates: prioritize modern models verified by the API
+    final probeList = <String>[];
     for (final candidate in supportedCandidateModels) {
+      if (supportedFromApi.isEmpty || supportedFromApi.contains(candidate)) {
+        probeList.add(candidate);
+      }
+    }
+    for (final model in supportedFromApi) {
+      if (!probeList.contains(model)) {
+        probeList.add(model);
+      }
+    }
+    if (probeList.isEmpty) {
+      probeList.addAll(supportedCandidateModels);
+    }
+
+    // 3. Direct candidate probing: try each candidate model with countTokens
+    for (final candidate in probeList) {
       try {
         final model = GenerativeModel(
           model: candidate,
@@ -237,7 +251,19 @@ class GeminiService {
             errStr.contains('api_key_invalid')) {
           return false;
         }
+        // If candidate is unavailable or experiencing spike, try next candidate
       }
+    }
+
+    // 4. Fallback if countTokens timed out but endpoint returned valid models
+    if (supportedFromApi.isNotEmpty) {
+      final selected = supportedFromApi.firstWhere(
+        (m) => supportedCandidateModels.contains(m),
+        orElse: () => defaultModelName,
+      );
+      _resolvedModelName = selected;
+      _saveResolvedModel(selected);
+      return true;
     }
 
     return false;
@@ -295,17 +321,24 @@ class GeminiService {
     return _modelInstance!;
   }
 
-  static bool _isModelNotFoundError(Object e) {
+  /// Checks whether an exception indicates the model is unavailable, deprecated, or not found.
+  static bool isModelUnavailableError(Object e) {
     final msg = e.toString().toLowerCase();
     return msg.contains('not found') ||
         msg.contains('not supported') ||
         msg.contains('404') ||
-        msg.contains('is not found');
+        msg.contains('is not found') ||
+        msg.contains('no longer available') ||
+        msg.contains('not available to new users') ||
+        msg.contains('not available') ||
+        msg.contains('deprecated');
   }
 
-  Future<bool> _trySwitchToWorkingModel() async {
-    final currentKey = _apiKey;
-    if (currentKey.isEmpty) return false;
+  /// Automatically tries each alternative candidate model until one succeeds.
+  static Future<String?> trySwitchToWorkingModel({String? apiKey}) async {
+    final currentKey = apiKey ?? _apiKey;
+    if (currentKey.isEmpty) return null;
+
     for (final candidate in supportedCandidateModels) {
       if (candidate == effectiveModelName) continue;
       try {
@@ -318,20 +351,27 @@ class GeminiService {
         ]).timeout(const Duration(seconds: 4));
         if (result.totalTokens > 0) {
           _resolvedModelName = candidate;
-          _lastModelName = candidate;
           _saveResolvedModel(candidate);
-          _modelInstance = GenerativeModel(
-            model: candidate,
-            apiKey: currentKey,
-            generationConfig: GenerationConfig(
-              responseMimeType: 'application/json',
-            ),
-          );
-          return true;
+          resetModelInstance();
+          return candidate;
         }
-      } catch (_) {}
+      } catch (e) {
+        if (!isModelUnavailableError(e)) {
+          // If not explicit unavailable (e.g. temporary timeout), candidate might still work
+        }
+      }
     }
-    return false;
+
+    // If probing had temporary timeouts, switch to the next candidate model
+    for (final candidate in supportedCandidateModels) {
+      if (candidate != effectiveModelName) {
+        _resolvedModelName = candidate;
+        _saveResolvedModel(candidate);
+        resetModelInstance();
+        return candidate;
+      }
+    }
+    return null;
   }
 
   /// Evaluates an image using Gemini and extracts distinct habits/tasks.
@@ -362,9 +402,9 @@ class GeminiService {
           Content.multi([prompt, imagePart]),
         ]);
       } catch (e) {
-        if (_isModelNotFoundError(e)) {
-          final switched = await _trySwitchToWorkingModel();
-          if (switched) {
+        if (isModelUnavailableError(e)) {
+          final switchedModel = await trySwitchToWorkingModel();
+          if (switchedModel != null) {
             response = await _model.generateContent([
               Content.multi([prompt, imagePart]),
             ]);
