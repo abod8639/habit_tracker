@@ -262,9 +262,9 @@ void main() {
 
     test('SettingsStorage correctly saves, retrieves, and clears custom Gemini model', () async {
       expect(settingsStorage.customGeminiModel, isNull);
-      await settingsStorage.setCustomGeminiModel('gemini-2.5-flash');
-      expect(settingsStorage.customGeminiModel, 'gemini-2.5-flash');
-      expect(GeminiService.effectiveModelName, 'gemini-2.5-flash');
+      await settingsStorage.setCustomGeminiModel('gemini-3.8-flash');
+      expect(settingsStorage.customGeminiModel, 'gemini-3.8-flash');
+      expect(GeminiService.effectiveModelName, 'gemini-3.8-flash');
 
       // Clearing custom API key also clears model
       await settingsStorage.clearCustomGeminiApiKey();
