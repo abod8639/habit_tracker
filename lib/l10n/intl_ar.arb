@@ -234,5 +234,10 @@
         "type": "int"
       }
     }
-  }
+  },
+  "batteryOptimizationWarningTitle": "تحسين البطارية مفعل",
+  "batteryOptimizationWarningSubtitle": "أنظمة توفير الطاقة (Samsung و Xiaomi) قد توقف التنبيهات في الخلفية. انقر لاستثناء التطبيق وضمان وصولها.",
+  "batteryOptimizationExemptAction": "إصلاح التنبيهات",
+  "batteryOptimizationExemptSuccess": "تم استثناء تحسين البطارية بنجاح. ستصلك التنبيهات في موعدها المحدد بدقة.",
+  "reliableAlarmsActive": "التنبيهات الدقيقة مفعلة بنجاح"
 }
