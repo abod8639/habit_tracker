@@ -251,5 +251,26 @@ void main() {
       expect(controller.apiKeyStatus.value, ApiKeyStatus.valid);
       expect(controller.isKeyWorking, isTrue);
     });
+
+    test('GeminiService.sanitizeApiKey cleans quotes, prefixes, and whitespaces', () {
+      expect(GeminiService.sanitizeApiKey('  AIzaSyCleanKey  '), 'AIzaSyCleanKey');
+      expect(GeminiService.sanitizeApiKey('"AIzaSyQuotedKey"'), 'AIzaSyQuotedKey');
+      expect(GeminiService.sanitizeApiKey("'AIzaSySingleQuote'"), 'AIzaSySingleQuote');
+      expect(GeminiService.sanitizeApiKey('GEMINI_API_KEY=AIzaSyAssigned'), 'AIzaSyAssigned');
+      expect(GeminiService.sanitizeApiKey('api_key="AIzaSyAssignedQuoted"'), 'AIzaSyAssignedQuoted');
+    });
+
+    test('SettingsStorage correctly saves, retrieves, and clears custom Gemini model', () async {
+      expect(settingsStorage.customGeminiModel, isNull);
+      await settingsStorage.setCustomGeminiModel('gemini-2.5-flash');
+      expect(settingsStorage.customGeminiModel, 'gemini-2.5-flash');
+      expect(GeminiService.effectiveModelName, 'gemini-2.5-flash');
+
+      // Clearing custom API key also clears model
+      await settingsStorage.clearCustomGeminiApiKey();
+      expect(settingsStorage.customGeminiModel, isNull);
+      GeminiService.resetModelInstance();
+      expect(GeminiService.effectiveModelName, GeminiService.defaultModelName);
+    });
   });
 }
