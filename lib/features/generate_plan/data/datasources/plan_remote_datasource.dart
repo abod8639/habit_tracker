@@ -63,6 +63,24 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
       final text = response.text ?? '';
       return _parsePlanResponse(text, category);
     } catch (e) {
+      if (GeminiService.isModelUnavailableError(e)) {
+        final switched = await GeminiService.trySwitchToWorkingModel();
+        if (switched != null) {
+          try {
+            final fallbackModel = geminiService.createModel(
+              systemInstruction: Content.system(systemInstruction),
+              generationConfig: GenerationConfig(
+                responseMimeType: 'application/json',
+                temperature: 0.4,
+              ),
+            );
+            final response =
+                await fallbackModel.generateContent([Content.text(prompt)]);
+            final text = response.text ?? '';
+            return _parsePlanResponse(text, category);
+          } catch (_) {}
+        }
+      }
       GeminiService.handleException(e, 'generating plan');
     }
   }
