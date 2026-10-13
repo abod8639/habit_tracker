@@ -66,6 +66,7 @@ class QuestionsDataSource {
       type: QuestionType.number,
       hint: '175',
       unit: 'سم',
+      maxValue: 220,
     ),
     QuestionEntity(
       id: 'goal',
@@ -147,6 +148,7 @@ class QuestionsDataSource {
       type: QuestionType.number,
       hint: '175',
       unit: 'cm',
+      maxValue: 220,
     ),
     QuestionEntity(
       id: 'goal',
