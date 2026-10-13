@@ -5,13 +5,35 @@ import 'package:flutter/material.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore? _firestoreInstance;
+  final FirebaseAuth? _authInstance;
 
-  String? get _userId => _auth.currentUser?.uid;
+  FirestoreService({
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+  })  : _firestoreInstance = firestore,
+        _authInstance = auth;
+
+  FirebaseFirestore get _firestore =>
+      _firestoreInstance ?? FirebaseFirestore.instance;
+  FirebaseAuth get _auth => _authInstance ?? FirebaseAuth.instance;
+
+  String? get _userId {
+    try {
+      return _auth.currentUser?.uid;
+    } catch (_) {
+      return null;
+    }
+  }
 
   // Check if user is logged in
-  bool get isUserLoggedIn => _userId != null;
+  bool get isUserLoggedIn {
+    try {
+      return _userId != null;
+    } catch (_) {
+      return false;
+    }
+  }
 
   // Get user document reference
   DocumentReference? get _userDoc {
