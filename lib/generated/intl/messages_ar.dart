@@ -125,6 +125,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "backupData": MessageLookupByLibrary.simpleMessage("نسخ احتياطي"),
         "barChartIsEmpty":
             MessageLookupByLibrary.simpleMessage("لا توجد بيانات متاحة"),
+        "batteryOptimizationExemptAction":
+            MessageLookupByLibrary.simpleMessage("إصلاح التنبيهات"),
+        "batteryOptimizationExemptSuccess": MessageLookupByLibrary.simpleMessage(
+            "تم استثناء تحسين البطارية بنجاح. ستصلك التنبيهات في موعدها المحدد بدقة."),
+        "batteryOptimizationWarningSubtitle": MessageLookupByLibrary.simpleMessage(
+            "أنظمة توفير الطاقة (Samsung و Xiaomi) قد توقف التنبيهات في الخلفية. انقر لاستثناء التطبيق وضمان وصولها."),
+        "batteryOptimizationWarningTitle":
+            MessageLookupByLibrary.simpleMessage("تحسين البطارية مفعل"),
         "camera": MessageLookupByLibrary.simpleMessage("الكاميرا"),
         "cancel": MessageLookupByLibrary.simpleMessage("إلغاء"),
         "categoryLearning":
@@ -320,6 +328,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "يرجى الإجابة عن هذا السؤال للمتابعة."),
         "ratepagetitle":
             MessageLookupByLibrary.simpleMessage("إحصائيات العادات"),
+        "reliableAlarmsActive": MessageLookupByLibrary.simpleMessage(
+            "التنبيهات الدقيقة مفعلة بنجاح"),
         "reminderSetFor": m11,
         "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
             "ستصلك إشعارات متابعة عاداتك اليومية."),
