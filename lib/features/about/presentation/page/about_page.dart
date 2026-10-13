@@ -154,10 +154,14 @@ class AboutPage extends StatelessWidget {
                     children: [
                       Row(
                         children: [
+                               ClipRRect(
+                            borderRadius: AppRadius.pillRadius,
+                            child: 
                           CachedNetworkImage(
-                            width: 80,
+                            width: 90,
                             imageUrl: "https://avatars.githubusercontent.com/u/108903062?v=4",
                           ),
+                               ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -207,14 +211,19 @@ class AboutPage extends StatelessWidget {
                     isDark: isDark,
                     baseSurface: baseSurface,
                     primaryColor: primaryColor,
-                    title: isArabic ? 'المطور' : 'Developer',
-                    icon: Icons.code_rounded,
+                    title: isArabic ? 'المختبر' : 'Tester',
+                    icon: Icons.verified_user_rounded,
                     children: [
                       Row(
                         children: [
-                          CachedNetworkImage(
-                            width: 80,
-                            imageUrl: "https://i.redd.it/7v8swqvgqwuh1.gif",
+                          //cercel image
+                          ClipRRect(
+                            borderRadius: AppRadius.pillRadius,
+                            child: CachedNetworkImage(
+                              width: 90,
+                              imageUrl: "https://styles.redditmedia.com/t5_ek4gzo/styles/profileIcon_0xqopel8y2sh1.jpeg?frame=1&auto=webp&crop=256%3A256%2Csmart&s=bacfd55489e45363009d86f33b46525d49ef87d0",
+                              // imageUrl: "https://i.redd.it/7v8swqvgqwuh1.gif",
+                          ),
                           ),
 
                           const SizedBox(width: 12),
@@ -223,14 +232,14 @@ class AboutPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'The_Ultimate_TanMan',
+                                  'Yassin Omara',
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isArabic?"هذا التطبيق صنع بواسطة أفضل مختبر في العالم" :"this app made with the best tester in the world",
+                                  isArabic?"هذا التطبيق تم اختباره بواسطة أفضل مختبر في العالم" :"This app was tested by the best tester in the world",
                                   // s.appVersionAndInformation,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: colorScheme.onSurface.withValues(
@@ -414,6 +423,7 @@ class AboutPage extends StatelessWidget {
     required String title,
     required IconData icon,
     required List<Widget> children,
+
   }) {
     final theme = Theme.of(context);
 
