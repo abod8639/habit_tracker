@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/animated_setting_tile.dart';
 import 'package:habit_tracker/core/utils/restart_widget.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
+import 'package:habit_tracker/features/setting/presentation/providers/lang_providers.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_lang.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
-class AppearanceSection extends StatelessWidget {
+class AppearanceSection extends ConsumerWidget {
   final AnimationController animationController;
 
   const AppearanceSection({super.key, required this.animationController});
 
   @override
-  Widget build(BuildContext context) {
-    final langController = Get.find<LangController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final languageCode = ref.watch(
+      langNotifierProvider.select((state) => state.languageCode),
+    );
+    final langNotifier = ref.read(langNotifierProvider.notifier);
     final s = S.of(context);
 
     return Column(
@@ -28,31 +31,29 @@ class AppearanceSection extends StatelessWidget {
           subtitle: s.changeAppTheme,
           onTap: () => context.push(AppRoutes.theme),
         ),
-        Obx(
-          () => buildAnimatedSettingLang(
-            context,
-            icon: Icons.language_rounded,
-            currentValue: langController.language.value,
-            entries: [
-              DropdownMenuEntry(
-                value: "sys",
-                label: "  ${S.of(context).systemLanguage}  ",
-              ),
-              const DropdownMenuEntry(value: "ar", label: "  العربية "),
-              const DropdownMenuEntry(value: "en", label: "  English  "),
-            ],
-            onChanged: (value) async {
-              if (value != null) {
-                await langController.changeLanguage(value);
-                if (context.mounted) {
-                  RestartWidget.restartApp(context);
-                }
+        buildAnimatedSettingLang(
+          context,
+          icon: Icons.language_rounded,
+          currentValue: languageCode,
+          entries: [
+            DropdownMenuEntry(
+              value: "sys",
+              label: "  ${S.of(context).systemLanguage}  ",
+            ),
+            const DropdownMenuEntry(value: "ar", label: "  العربية "),
+            const DropdownMenuEntry(value: "en", label: "  English  "),
+          ],
+          onChanged: (value) async {
+            if (value != null) {
+              await langNotifier.changeLanguage(value);
+              if (context.mounted) {
+                RestartWidget.restartApp(context);
               }
-            },
-            textColor: Theme.of(context).colorScheme.onSurface,
-            animationController: animationController,
-            index: 6,
-          ),
+            }
+          },
+          textColor: Theme.of(context).colorScheme.onSurface,
+          animationController: animationController,
+          index: 6,
         ),
       ],
     );
