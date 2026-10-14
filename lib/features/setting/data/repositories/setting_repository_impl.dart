@@ -5,7 +5,7 @@ import 'package:dartz/dartz.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
-import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
+import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_source.dart';
 import '../../domain/repositories/setting_repository.dart';
 import '../datasources/setting_local_datasource.dart';
 import '../datasources/setting_remote_datasource.dart';
@@ -13,7 +13,7 @@ import '../datasources/setting_remote_datasource.dart';
 class SettingRepositoryImpl implements SettingRepository {
   final SettingLocalDataSource localDataSource;
   final SettingRemoteDataSource remoteDataSource;
-  final HabitLocalDataSource habitLocalDataSource;
+  final IHabitLocalDataSource habitLocalDataSource;
 
   SettingRepositoryImpl({
     required this.localDataSource,
