@@ -2,11 +2,13 @@ import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault
 import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/data/models/habit_vault_data.dart';
+import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_source.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:hive/hive.dart';
 
-class HabitLocalDataSource {
+class HabitLocalDataSource implements IHabitLocalDataSource {
   final Box _myBox;
+  @override
   final HabitOfflineVaultDataSource? vaultDataSource;
 
   HabitLocalDataSource(this._myBox, {this.vaultDataSource});
@@ -24,6 +26,7 @@ class HabitLocalDataSource {
     return await Hive.openBox(boxName);
   }
 
+  @override
   List<HabitModel> loadHabits() {
     if (_myBox.get(HabitStorage.habitListKey) != null) {
       final data = _myBox.get(HabitStorage.habitListKey);
@@ -36,6 +39,7 @@ class HabitLocalDataSource {
     return [];
   }
 
+  @override
   Future<void> saveHabits(List<HabitModel> habits) async {
     _myBox.put(HabitStorage.habitListKey, habits);
 
@@ -77,6 +81,7 @@ class HabitLocalDataSource {
     return [];
   }
 
+  @override
   Future<Map<String, int>> getCompletionStatusForDate(DateTime date) async {
     final localDate = date.isUtc ? date.toLocal() : date;
     final normalizedDate = DateTime(
@@ -188,6 +193,7 @@ class HabitLocalDataSource {
     };
   }
 
+  @override
   Future<void> saveHabitCompletionHistory(
     String habitId,
     bool isCompleted, {
@@ -201,6 +207,7 @@ class HabitLocalDataSource {
     }
   }
 
+  @override
   Future<void> renameHabitHistory(
     String habitId,
     String oldName,
@@ -284,6 +291,7 @@ class HabitLocalDataSource {
     _myBox.put(HabitStorage.startDayKey, todaysDateFormatted());
   }
 
+  @override
   String getStartDate() {
     return _myBox.get(
       HabitStorage.startDayKey,
@@ -291,10 +299,12 @@ class HabitLocalDataSource {
     );
   }
 
+  @override
   void updateStartDate(String date) {
     _myBox.put(HabitStorage.startDayKey, date);
   }
 
+  @override
   Future<void> saveHabitStrength(String date, String strength) async {
     final historyBox = await _openMonthlyBox(date);
     final dateKey = "${HabitStorage.habitStrengthPrefix}$date";
@@ -307,6 +317,7 @@ class HabitLocalDataSource {
         as String?;
   }
 
+  @override
   Future<Map<String, String>> getAllHabitStrengths() async {
     final Map<String, String> allHistory = {};
 
@@ -425,6 +436,7 @@ class HabitLocalDataSource {
     return allHistory;
   }
 
+  @override
   Future<void> saveAllHabitStrengths(Map<String, String> history) async {
     for (var entry in history.entries) {
       await saveHabitStrength(entry.key, entry.value);
@@ -451,6 +463,7 @@ class HabitLocalDataSource {
     await _myBox.put('last_sync', DateTime.now().toIso8601String());
   }
 
+  @override
   List<String> getLocalTombstones() {
     final data = _myBox.get('local_tombstones');
     if (data is List) {
@@ -463,6 +476,7 @@ class HabitLocalDataSource {
     addLocalTombstones([id]);
   }
 
+  @override
   void addLocalTombstones(List<String> ids) {
     if (ids.isEmpty) return;
     final tombstones = getLocalTombstones();
@@ -478,6 +492,7 @@ class HabitLocalDataSource {
     }
   }
 
+  @override
   void clearLocalTombstones() {
     _myBox.delete('local_tombstones');
   }
@@ -486,11 +501,13 @@ class HabitLocalDataSource {
     _myBox.put('last_user_id', uid);
   }
 
+  @override
   String? getLastUserId() {
     return _myBox.get('last_user_id');
   }
 
   /// Creates a snapshot of all current habits, strengths, and metadata for offline vaulting.
+  @override
   Future<HabitVaultData> createSnapshot({required String userId}) async {
     final habits = loadHabits();
     final strengths = await getAllHabitStrengths();
@@ -514,6 +531,7 @@ class HabitLocalDataSource {
   }
 
   /// Restores habit data and metadata from a vaulted snapshot into active boxes.
+  @override
   Future<void> restoreFromSnapshot(HabitVaultData data) async {
     // 1. Restore habits
     if (data.habits.isNotEmpty) {
@@ -538,6 +556,7 @@ class HabitLocalDataSource {
     }
   }
 
+  @override
   Future<void> clearAllData({
     String? earliestDateStr,
     bool backupBeforeClear = true,
@@ -597,20 +616,24 @@ class HabitLocalDataSource {
     setStartDate();
   }
 
+  @override
   Future<DateTime?> getLastResetDate() async {
     final String? dateStr = _myBox.get(HabitStorage.lastResetDateKey);
     return dateStr != null ? DateTime.parse(dateStr) : null;
   }
 
+  @override
   Future<void> saveLastResetDate(DateTime date) async {
     await _myBox.put(HabitStorage.lastResetDateKey, date.toIso8601String());
   }
 
+  @override
   Future<void> incrementDayCount([int amount = 1]) async {
     int currentCount = _myBox.get(HabitStorage.dayCountKey) ?? 1;
     await _myBox.put(HabitStorage.dayCountKey, currentCount + amount);
   }
 
+  @override
   Future<void> saveHabitCompletionToHistory(
     String habitIdOrName,
     bool isCompleted,
@@ -637,6 +660,7 @@ class HabitLocalDataSource {
     return null;
   }
 
+  @override
   Future<Map<String, Map<DateTime, bool>>> getHabitHistoryMap(int days) async {
     final Map<String, Map<DateTime, bool>> historyMap = {};
     final now = DateTime.now();
@@ -724,5 +748,29 @@ class HabitLocalDataSource {
     }
 
     return historyMap;
+  }
+
+  @override
+  Future<Map<DateTime, int>> getHeatmapData() async {
+    final rawHistory = await getAllHabitStrengths();
+    final Map<DateTime, int> heatmapData = {};
+    for (var entry in rawHistory.entries) {
+      try {
+        String yyyymmdd = entry.key;
+        if (yyyymmdd.length > 8) {
+          yyyymmdd = yyyymmdd.substring(yyyymmdd.length - 8);
+        }
+        if (yyyymmdd.length != 8) continue;
+        final yyyy = int.parse(yyyymmdd.substring(0, 4));
+        final mm = int.parse(yyyymmdd.substring(4, 6));
+        final dd = int.parse(yyyymmdd.substring(6, 8));
+        final date = DateTime(yyyy, mm, dd);
+        final doubleStrength = double.tryParse(entry.value) ?? 0.0;
+        int strength = (doubleStrength * 10).toInt();
+        if (strength == 0 && doubleStrength > 0) strength = 1;
+        heatmapData[date] = strength;
+      } catch (_) {}
+    }
+    return heatmapData;
   }
 }
