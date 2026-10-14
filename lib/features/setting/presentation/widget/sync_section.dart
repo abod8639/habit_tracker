@@ -12,13 +12,15 @@ class SyncSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authNotifierProvider).user;
+    final user = ref.watch(
+      authNotifierProvider.select((state) => state.user),
+    );
     if (user == null) {
       return const SizedBox.shrink();
     }
 
     final syncState = ref.watch(syncNotifierProvider);
-    final syncNotifier = ref.read(syncNotifierProvider.notifier);
+    final syncNotifier = ref.watch(syncNotifierProvider.notifier);
 
     return Column(
       children: [
