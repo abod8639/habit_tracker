@@ -4,7 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import 'package:get/get.dart';
+import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 
 // ── CUSTOM GEMINI EXCEPTIONS ──────────────────────────────────────────────────
@@ -84,14 +84,12 @@ class GeminiService {
       return _resolvedModelName!;
     }
     try {
-      if (Get.isRegistered<SettingsStorage>()) {
-        final savedModel = Get.find<SettingsStorage>().customGeminiModel;
-        if (savedModel != null &&
-            savedModel.trim().isNotEmpty &&
-            !deprecatedModels.contains(savedModel.trim())) {
-          _resolvedModelName = savedModel.trim();
-          return _resolvedModelName!;
-        }
+      final savedModel = AppInitializer.settingsStorage.customGeminiModel;
+      if (savedModel != null &&
+          savedModel.trim().isNotEmpty &&
+          !deprecatedModels.contains(savedModel.trim())) {
+        _resolvedModelName = savedModel.trim();
+        return _resolvedModelName!;
       }
     } catch (_) {}
     return defaultModelName;
@@ -113,11 +111,9 @@ class GeminiService {
   static String get _apiKey {
     // 1. Check custom user-defined API key first
     try {
-      if (Get.isRegistered<SettingsStorage>()) {
-        final customKey = Get.find<SettingsStorage>().customGeminiApiKey;
-        if (customKey != null && customKey.trim().isNotEmpty) {
-          return sanitizeApiKey(customKey);
-        }
+      final customKey = AppInitializer.settingsStorage.customGeminiApiKey;
+      if (customKey != null && customKey.trim().isNotEmpty) {
+        return sanitizeApiKey(customKey);
       }
     } catch (_) {}
 
@@ -136,10 +132,8 @@ class GeminiService {
   /// Whether a custom user-defined API key is currently active
   static bool get hasCustomApiKey {
     try {
-      if (Get.isRegistered<SettingsStorage>()) {
-        final customKey = Get.find<SettingsStorage>().customGeminiApiKey;
-        return customKey != null && customKey.trim().isNotEmpty;
-      }
+      final customKey = AppInitializer.settingsStorage.customGeminiApiKey;
+      return customKey != null && customKey.trim().isNotEmpty;
     } catch (_) {}
     return false;
   }
@@ -149,9 +143,7 @@ class GeminiService {
 
   static void _saveResolvedModel(String model) {
     try {
-      if (Get.isRegistered<SettingsStorage>()) {
-        Get.find<SettingsStorage>().setCustomGeminiModel(model);
-      }
+      AppInitializer.settingsStorage.setCustomGeminiModel(model);
     } catch (_) {}
   }
 
@@ -164,9 +156,7 @@ class GeminiService {
   static void clearCustomModel() {
     _resolvedModelName = null;
     try {
-      if (Get.isRegistered<SettingsStorage>()) {
-        Get.find<SettingsStorage>().setCustomGeminiModel(null);
-      }
+      AppInitializer.settingsStorage.setCustomGeminiModel(null);
     } catch (_) {}
   }
 
