@@ -105,6 +105,15 @@ void main() {
       await db.habitHistoryDao.recordCompletion('h_test', date1Str, true);
       await db.habitHistoryDao.recordCompletion('h_test', date2Str, false);
 
+      // Verify that re-recording for the same habit and date (upsert) succeeds without UNIQUE constraint violation
+      await db.habitHistoryDao.recordCompletion('h_test', date1Str, false);
+      var statusUpdated = await dataSource.getCompletionStatusForDate(date1);
+      expect(statusUpdated['completed'], 0);
+      expect(statusUpdated['total'], 1);
+
+      // Toggle back to true
+      await db.habitHistoryDao.recordCompletion('h_test', date1Str, true);
+
       final heatmap = await dataSource.getHeatmapData();
       expect(heatmap[date1], 10); // 100% completed = strength 10
       expect(heatmap[date2], 0); // 0% completed = strength 0
