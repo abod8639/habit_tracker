@@ -1,16 +1,16 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/utils/responsive_utils.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import '../controllers/habitstats_controller.dart';
+import '../providers/habitstats_providers.dart';
 import 'stats_neumorphic_utils.dart';
 
 /// Completion rate pie chart widget.
 /// Supports both full card view (for charts section) and compact well item (for summary card row).
-class CompletionPieChartCard extends StatelessWidget {
+class CompletionPieChartCard extends ConsumerWidget {
   final bool isCompact;
 
   const CompletionPieChartCard({
@@ -23,11 +23,8 @@ class CompletionPieChartCard extends StatelessWidget {
   }) : isCompact = true;
 
   @override
-  Widget build(BuildContext context) {
-    final HabitStatsController controller = Get.find<HabitStatsController>();
-
-    return Obx(() {
-      final stats = controller.stats.value;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stats = ref.watch(habitStatsNotifierProvider).stats;
       final theme = Theme.of(context);
       final colorScheme = theme.colorScheme;
       final textTheme = theme.textTheme;
@@ -359,7 +356,6 @@ class CompletionPieChartCard extends StatelessWidget {
           ],
         ),
       );
-    });
   }
 }
 
