@@ -78,16 +78,7 @@ class SettingBinding extends Bindings {
 
     // Wire up AiGuard handlers via DIP
     AiGuard.registerConfigHandler((context) async {
-      final controller = Get.isRegistered<AiSettingsController>()
-          ? Get.find<AiSettingsController>()
-          : Get.put(
-              AiSettingsController(
-                getCustomApiKeyUseCase: Get.find(),
-                saveCustomApiKeyUseCase: Get.find(),
-                clearCustomApiKeyUseCase: Get.find(),
-              ),
-            );
-      AiApiKeyDialog.show(context, controller);
+      AiApiKeyDialog.show(context);
     });
 
     AiGuard.registerHealthCheckHandler(() async {
