@@ -128,6 +128,8 @@ class LineChartBox extends ConsumerWidget {
               right: BorderSide.none,
             ),
           ),
+          minX: 0,
+          maxX: (state.daysPeriod - 1).toDouble(),
           minY: -0.05,
           maxY: 1.10,
 
