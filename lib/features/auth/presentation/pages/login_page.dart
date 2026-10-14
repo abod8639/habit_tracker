@@ -20,11 +20,8 @@ class LoginPage extends ConsumerWidget {
   }) async {
     final success =
         await ref.read(authNotifierProvider.notifier).signInWithGoogle();
-    if (success) {
-      await ref.read(syncNotifierProvider.notifier).syncHabits();
-      if (context.mounted) {
-        context.go(AppRoutes.home);
-      }
+    if (success && context.mounted) {
+      context.go(AppRoutes.home);
     }
   }
 
