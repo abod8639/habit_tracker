@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:habit_tracker/features/theme/presentation/providers/theme_providers.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/features/auth/domain/entities/auth_entity.dart';
 import 'package:habit_tracker/features/auth/domain/repositories/auth_repository.dart';
@@ -68,6 +70,14 @@ class MockAuthRepository implements AuthRepository {
 class FakeFirestoreService implements FirestoreService {
   @override
   bool get isUserLoggedIn => true;
+
+  Map<String, dynamic>? cloudTheme;
+
+  @override
+  Future<Map<String, dynamic>?> downloadTheme() async => cloudTheme;
+
+  @override
+  Future<void> uploadTheme(dynamic themeName, dynamic mode, dynamic useCustomBg, dynamic customBgColor) async {}
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -252,5 +262,27 @@ void main() {
 
     // Should only have triggered sync once because state was syncing
     expect(fakeSettingRepo.syncCallCount, 1);
+  });
+
+  test('Signing in with Google immediately synchronizes and applies cloud theme without restart',
+      () async {
+    fakeFirestore.cloudTheme = {
+      'themeName': 'github',
+      'themeMode': ThemeMode.light.index,
+      'useCustomBg': false,
+    };
+
+    final container = createContainer();
+    final authNotifier = container.read(authNotifierProvider.notifier);
+
+    // Initial theme before login is default
+    expect(container.read(themeNotifierProvider).currentTheme, 'github_dark_green');
+
+    final success = await authNotifier.signInWithGoogle();
+
+    expect(success, true);
+    // Theme is immediately updated to the Google account's stored theme
+    expect(container.read(themeNotifierProvider).currentTheme, 'github');
+    expect(container.read(themeNotifierProvider).themeMode, ThemeMode.light);
   });
 }
