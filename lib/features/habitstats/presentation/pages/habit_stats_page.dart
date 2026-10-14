@@ -172,23 +172,8 @@ class _NeumorphicAiFabState extends State<_NeumorphicAiFab> {
             width: 1.2,
           ),
           boxShadow: _isPressed
-              ? AppShadows.buttonPressed(isDark: isDark)
-              : [
-                  ...AppShadows.bloom(
-                    color: primary,
-                    isDark: isDark,
-                    blur: 3.0,
-                    // spread: 3.0,
-                    offset: const Offset(0, 1),
-                  ),
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.white.withValues(alpha: 0.80),
-                    offset: const Offset(-1, -1),
-                    blurRadius: 2,
-                  ),
-                ],
+              ? AppShadows.buttonResting(isDark: isDark)
+              : AppShadows.buttonPressed(isDark: isDark),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
