@@ -191,7 +191,14 @@ class SyncNotifier extends Notifier<SyncState> {
   }
 
   Future<void> syncHabits() async {
-    final habits = ref.read(habitNotifierProvider).habits;
+    if (state.syncStatus == SyncStatus.syncing) return;
+    state = state.copyWith(syncStatus: SyncStatus.syncing, errorMessage: '');
+    final habitRepo = ref.read(habitRepositoryProvider);
+    final localResult = await habitRepo.getHabits();
+    final habits = localResult.fold(
+      (_) => ref.read(habitNotifierProvider).habits,
+      (list) => list,
+    );
     final habitsModels = habits.map((e) => HabitModel.fromEntity(e)).toList();
     final result = await manualSync(habitsModels);
     if (result != null) {
