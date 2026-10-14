@@ -18,7 +18,7 @@ class AppearanceSection extends ConsumerWidget {
     final languageCode = ref.watch(
       langNotifierProvider.select((state) => state.languageCode),
     );
-    final langNotifier = ref.read(langNotifierProvider.notifier);
+    final langNotifier = ref.watch(langNotifierProvider.notifier);
     final s = S.of(context);
 
     return Column(
