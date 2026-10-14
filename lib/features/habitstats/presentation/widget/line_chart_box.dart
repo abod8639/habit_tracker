@@ -1,149 +1,158 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../controllers/habitstats_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/habitstats_providers.dart';
 import 'my_line_chart_bar_data.dart';
 import 'build_trend_chart.dart';
 
-class LineChartBox extends GetView<HabitStatsController> {
+class LineChartBox extends ConsumerWidget {
   const LineChartBox({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(habitStatsNotifierProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
+    final Map<String, List<FlSpot>> progression = state.individualTrends;
+
+    final now = DateTime.now();
+    final List<String> trendLabels = List.generate(
+      state.daysPeriod,
+      (index) {
+        final date = now.subtract(
+          Duration(days: state.daysPeriod - 1 - index),
+        );
+        return '${date.day}/${date.month}';
+      },
+    );
+
     return SizedBox(
       height: 240,
-      child: Obx(() {
-        final Map<String, List<FlSpot>> progression =
-            controller.individualTrends;
-
-        final now = DateTime.now();
-        final List<String> trendLabels = List.generate(
-          controller.daysPeriod.value,
-          (index) {
-            final date = now.subtract(
-              Duration(days: controller.daysPeriod.value - 1 - index),
-            );
-            return '${date.day}/${date.month}';
-          },
-        );
-
-        return LineChart(
-          LineChartData(
-            gridData: FlGridData(
-              show: true,
-              drawVerticalLine: false,
-              horizontalInterval: 0.25,
-              getDrawingHorizontalLine: (value) {
-                return FlLine(
-                  color: colorScheme.outlineVariant.withValues(
-                    alpha: isDark ? 0.12 : 0.22,
-                  ),
-                  strokeWidth: 0.8,
-                  dashArray: [4, 4],
-                );
-              },
-            ),
-
-            titlesData: FlTitlesData(
-              show: true,
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    if (index >= 0 && index < trendLabels.length) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 6.0),
-                        child: Text(
-                          trendLabels[index],
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 10,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                  reservedSize: 24,
-                  interval: controller.isWeeklyView.value ? 1 : 5,
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: 0.25,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: colorScheme.outlineVariant.withValues(
+                  alpha: isDark ? 0.12 : 0.22,
                 ),
-              ),
+                strokeWidth: 0.8,
+                dashArray: [4, 4],
+              );
+            },
+          ),
 
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  interval: 0.25,
-                  getTitlesWidget: (value, meta) {
-                    if (value < 0.0 || value > 1.0) {
-                      return const SizedBox.shrink();
-                    }
+          titlesData: FlTitlesData(
+            show: true,
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  if (index >= 0 && index < trendLabels.length) {
                     return Padding(
-                      padding: const EdgeInsets.only(right: 6.0),
+                      padding: const EdgeInsets.only(top: 6.0),
                       child: Text(
-                        '${(value * 100).toInt()}%',
+                        trendLabels[index],
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
                           fontSize: 10,
-                          color: colorScheme.outline,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.50)
+                              : const Color(0xFF64748B),
                         ),
-                        textAlign: TextAlign.right,
                       ),
                     );
-                  },
-                  reservedSize: 34,
-                ),
-              ),
-
-              rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-
-              topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
+                  }
+                  return const SizedBox();
+                },
+                reservedSize: 28,
+                interval: (state.daysPeriod / 7).ceilToDouble(),
               ),
             ),
-
-            borderData: FlBorderData(show: false),
-
-            clipData: const FlClipData.all(),
-            minX: 0.0,
-            maxX: (trendLabels.length - 1).toDouble().clamp(
-              1.0,
-              double.infinity,
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  if (value == 0 ||
+                      value == 0.25 ||
+                      value == 0.5 ||
+                      value == 0.75 ||
+                      value == 1.0) {
+                    return Text(
+                      '${(value * 100).toInt()}%',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.45)
+                            : const Color(0xFF64748B),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
+                reservedSize: 34,
+                interval: 0.25,
+              ),
             ),
-            minY: -0.05,
-            maxY: 1.10,
-
-            lineBarsData: _buildLineBarsData(
-              context: context,
-              controller: controller,
-              progression: progression,
-              trendLabels: trendLabels,
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
             ),
           ),
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeInOutCubic,
-        );
-      }),
+
+          borderData: FlBorderData(
+            show: true,
+            border: Border(
+              bottom: BorderSide(
+                color: colorScheme.outlineVariant.withValues(
+                  alpha: isDark ? 0.20 : 0.35,
+                ),
+                width: 1,
+              ),
+              left: BorderSide(
+                color: colorScheme.outlineVariant.withValues(
+                  alpha: isDark ? 0.20 : 0.35,
+                ),
+                width: 1,
+              ),
+              top: BorderSide.none,
+              right: BorderSide.none,
+            ),
+          ),
+          minY: -0.05,
+          maxY: 1.10,
+
+          lineBarsData: _buildLineBarsData(
+            context: context,
+            state: state,
+            progression: progression,
+            trendLabels: trendLabels,
+          ),
+        ),
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOutCubic,
+      ),
     );
   }
 
   List<LineChartBarData> _buildLineBarsData({
     required BuildContext context,
-    required HabitStatsController controller,
+    required HabitStatsState state,
     required Map<String, List<FlSpot>> progression,
     required List<String> trendLabels,
   }) {
     final List<LineChartBarData> lineBars = [];
 
-    if (controller.showAllHabits.value) {
+    if (state.showAllHabits) {
       lineBars.add(
         myLineChartBarData(
           color: Theme.of(context).colorScheme.secondary,
@@ -151,13 +160,13 @@ class LineChartBox extends GetView<HabitStatsController> {
           color2: Theme.of(
             context,
           ).colorScheme.secondary.withValues(alpha: 0.1),
-          spots: controller.overallTrend,
+          spots: state.overallTrend,
           label: 'Overall',
         ),
       );
     } else {
-      for (int i = 0; i < controller.habitNames.length; i++) {
-        final habitName = controller.habitNames[i];
+      for (int i = 0; i < state.habitNames.length; i++) {
+        final habitName = state.habitNames[i];
 
         if (progression.containsKey(habitName)) {
           final spots = progression[habitName];
@@ -168,7 +177,7 @@ class LineChartBox extends GetView<HabitStatsController> {
                 spots: spots,
                 color1: _getHabitColor(i, context).withValues(alpha: 0.05),
                 color2: _getHabitColor(i, context).withValues(alpha: 0.07),
-                label: _getHabitLabel(habitName, controller.isWeeklyView.value),
+                label: _getHabitLabel(habitName, state.isWeeklyView),
               ),
             );
           }
