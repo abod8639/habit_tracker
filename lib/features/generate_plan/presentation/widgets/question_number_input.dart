@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/neumorphic_input.dart';
 import 'package:habit_tracker/core/utils/number_utils.dart';
 import '../../domain/entities/question_entity.dart';
-import '../controllers/plan_generator_controller.dart';
+import '../providers/plan_generator_providers.dart';
 
-class QuestionNumberInput extends StatefulWidget {
+class QuestionNumberInput extends ConsumerStatefulWidget {
   final QuestionEntity question;
-  final PlanGeneratorController controller;
 
   const QuestionNumberInput({
     super.key,
     required this.question,
-    required this.controller,
   });
 
   @override
-  State<QuestionNumberInput> createState() => _QuestionNumberInputState();
+  ConsumerState<QuestionNumberInput> createState() => _QuestionNumberInputState();
 }
 
-class _QuestionNumberInputState extends State<QuestionNumberInput> {
+class _QuestionNumberInputState extends ConsumerState<QuestionNumberInput> {
   late final TextEditingController _textController;
 
   @override
   void initState() {
     super.initState();
+    final initialAnswer =
+        ref.read(planGeneratorNotifierProvider).getAnswer(widget.question.id);
     _textController = TextEditingController(
-      text: widget.controller.getAnswer(widget.question.id)?.toString() ?? '',
+      text: initialAnswer?.toString() ?? '',
     );
   }
 
@@ -45,17 +46,21 @@ class _QuestionNumberInputState extends State<QuestionNumberInput> {
           text: clamped,
           selection: TextSelection.collapsed(offset: clamped.length),
         );
-        widget.controller.setAnswer(widget.question.id, clamped);
+        ref
+            .read(planGeneratorNotifierProvider.notifier)
+            .setAnswer(widget.question.id, clamped);
         return;
       }
     }
-    widget.controller.setAnswer(widget.question.id, value);
+    ref
+        .read(planGeneratorNotifierProvider.notifier)
+        .setAnswer(widget.question.id, value);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = widget.controller.selectedCategory.value?.color;
+    final color = ref.watch(planGeneratorNotifierProvider).selectedCategory?.color;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return Column(
@@ -120,4 +125,3 @@ class _MaxNumberInputFormatter extends TextInputFormatter {
     return newValue;
   }
 }
-
