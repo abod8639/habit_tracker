@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/core/utils/click_throttler.dart';
-import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/presentation/widget/myalart_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -39,10 +37,6 @@ class HabitDialogs {
                 await container.read(habitNotifierProvider.notifier).addHabit(habitName);
               } catch (_) {}
 
-              if (Get.isRegistered<HabitController>()) {
-                await Get.find<HabitController>().addHabit(habitName);
-              }
-
               if (dialogContext.mounted) {
                 Navigator.of(dialogContext).pop();
               }
@@ -74,10 +68,6 @@ class HabitDialogs {
                 final container = ProviderScope.containerOf(context);
                 await container.read(habitNotifierProvider.notifier).editHabit(id, habitName);
               } catch (_) {}
-
-              if (Get.isRegistered<HabitController>()) {
-                await Get.find<HabitController>().editHabit(id, habitName);
-              }
 
               if (dialogContext.mounted) {
                 Navigator.of(dialogContext).pop();
