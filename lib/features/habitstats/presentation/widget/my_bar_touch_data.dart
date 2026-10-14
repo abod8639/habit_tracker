@@ -1,12 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 BarTouchData myBarTouchData(
   BuildContext context,
-  List<Map<String, dynamic>> chartData,
+  List<HabitEntity> chartData,
 ) {
-
   return BarTouchData(
     enabled: true,
     touchTooltipData: BarTouchTooltipData(
@@ -14,11 +14,10 @@ BarTouchData myBarTouchData(
       fitInsideVertically: true,
       tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       tooltipMargin: 8,
-      // tooltipRoundedRadius: 10,
       getTooltipColor: (group) =>
           Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF1E222D)
-          : const Color(0xFFF0F3F8),
+              ? const Color(0xFF1E222D)
+              : const Color(0xFFF0F3F8),
       tooltipBorder: BorderSide(
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.white.withValues(alpha: 0.12)
@@ -28,9 +27,9 @@ BarTouchData myBarTouchData(
       getTooltipItem: (group, groupIndex, rod, rodIndex) {
         if (groupIndex < 0 || groupIndex >= chartData.length) return null;
 
-        final Map<String, dynamic> habit = chartData[groupIndex];
-        final String name = habit['habit'] ?? 'Unnamed';
-        final bool completed = habit['completed'] ?? false;
+        final HabitEntity habit = chartData[groupIndex];
+        final String name = habit.name;
+        final bool completed = habit.isCompleted;
 
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
