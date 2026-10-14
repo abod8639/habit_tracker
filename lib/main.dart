@@ -14,6 +14,7 @@ import 'package:habit_tracker/core/error/error_app.dart';
 import 'package:habit_tracker/core/routes/app_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
 
 Future<void> main() async {
@@ -39,7 +40,13 @@ Future<void> main() async {
 
       InitialBinding().dependencies();
 
-      runApp(RestartWidget(child: const MyApp()));
+      runApp(
+        RestartWidget(
+          child: const ProviderScope(
+            child: MyApp(),
+          ),
+        ),
+      );
     },
     (error, stack) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
