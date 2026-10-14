@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
@@ -59,6 +60,7 @@ class ThemeNotifier extends Notifier<ThemeState> {
 
   final Map<String, ThemeData> _lightThemeCache = {};
   final Map<String, ThemeData> _darkThemeCache = {};
+  Timer? _homeWidgetDebounceTimer;
 
   @override
   ThemeState build() {
@@ -104,6 +106,10 @@ class ThemeNotifier extends Notifier<ThemeState> {
     if (firestore.isUserLoggedIn) {
       Future.microtask(() => syncWithCloud());
     }
+
+    ref.onDispose(() {
+      _homeWidgetDebounceTimer?.cancel();
+    });
 
     return initialState;
   }
@@ -175,20 +181,23 @@ class ThemeNotifier extends Notifier<ThemeState> {
   }
 
   void _updateHomeWidget() {
-    try {
-      final homeWidget = ref.read(homeWidgetServiceProvider);
-      final habitState = ref.read(habitNotifierProvider);
-      final isDark = state.themeMode == ThemeMode.dark;
-      final activeTheme = isDark ? state.darkTheme : state.lightTheme;
-      homeWidget.updateWidget(
-        habits: habitState.habits,
-        heatmapData: habitState.heatmapDateSet,
-        overrideTheme: activeTheme,
-        overrideIsDark: isDark,
-      );
-    } catch (e) {
-      debugPrint('Error updating home widget on theme change: $e');
-    }
+    _homeWidgetDebounceTimer?.cancel();
+    _homeWidgetDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+      try {
+        final homeWidget = ref.read(homeWidgetServiceProvider);
+        final habitState = ref.read(habitNotifierProvider);
+        final isDark = state.themeMode == ThemeMode.dark;
+        final activeTheme = isDark ? state.darkTheme : state.lightTheme;
+        homeWidget.updateWidget(
+          habits: habitState.habits,
+          heatmapData: habitState.heatmapDateSet,
+          overrideTheme: activeTheme,
+          overrideIsDark: isDark,
+        );
+      } catch (e) {
+        debugPrint('Error updating home widget on theme change: $e');
+      }
+    });
   }
 
   void changeThemeMode(ThemeMode mode) {
