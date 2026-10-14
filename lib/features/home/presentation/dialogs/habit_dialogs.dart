@@ -13,11 +13,16 @@ class HabitDialogs {
   static void showAdd(BuildContext context, {WidgetRef? ref}) {
     final textController = TextEditingController();
 
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
     showDialog(
       context: context,
       builder: (dialogContext) {
         return MyalartDialog(
+          title: isAr ? 'إضافة عادة' : 'Add Habit',
           hintText: S.current.addNewHabit,
+          actionButtonText: isAr ? 'إضافة' : 'Add',
+          isEditing: false,
           controller: textController,
           onSave: () async {
             final String habitName = textController.text.trim();
