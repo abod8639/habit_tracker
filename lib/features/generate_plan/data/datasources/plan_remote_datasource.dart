@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 import '../../domain/entities/category_entity.dart';
 import '../models/plan_suggestion_model.dart';
 
@@ -105,11 +103,7 @@ CORE BEHAVIORAL PRINCIPLES:
     PlanCategory category,
     Map<String, String> answers,
   ) {
-    final isArabic = Get.isRegistered<LangController>()
-        ? Get.find<LangController>().isArabic
-        : ((Get.locale?.languageCode ?? Intl.getCurrentLocale()).startsWith(
-            'ar',
-          ));
+    final isArabic = Intl.getCurrentLocale().startsWith('ar');
 
     final answersBlock = answers.entries
         .map((e) => '  - ${e.key.replaceAll("_", " ")}: ${e.value}')
