@@ -1,4 +1,6 @@
-import 'package:fl_chart/fl_chart.dart';
+import 'package:dartz/dartz.dart';
+import 'package:habit_tracker/core/error/failures.dart';
+import '../entities/trend_point_entity.dart';
 import '../repositories/habit_stats_repository.dart';
 
 class GetIndividualHabitTrendsUseCase {
@@ -6,7 +8,7 @@ class GetIndividualHabitTrendsUseCase {
 
   GetIndividualHabitTrendsUseCase(this.repository);
 
-  Future<Map<String, List<FlSpot>>?> call(int days) async {
-    return repository.getIndividualHabitTrends(days);
+  Future<Either<Failure, Map<String, List<TrendPointEntity>>>> call(int days) async {
+    return await repository.getIndividualHabitTrends(days);
   }
 }
