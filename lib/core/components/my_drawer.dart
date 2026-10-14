@@ -33,10 +33,7 @@ class DrawerList extends StatefulWidget {
 class _DrawerListState extends State<DrawerList> {
   bool _isScanning = false;
 
-  Future<void> _handleScanImage() async {
-    final canProceed = await AiGuard.protect(context, onValid: () {});
-    if (!canProceed) return;
-
+  void _handleScanImage() {
     if (!mounted) return;
     showModalBottomSheet(
       context: context,
