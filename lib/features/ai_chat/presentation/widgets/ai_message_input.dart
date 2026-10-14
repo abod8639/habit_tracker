@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'ai_send_button.dart';
 import 'ai_text_input_field.dart';
 
@@ -8,7 +7,7 @@ import 'ai_text_input_field.dart';
 /// a unified, high-performance input dock.
 class AiMessageInput extends StatelessWidget {
   final TextEditingController textController;
-  final RxBool isLoading;
+  final bool isLoading;
   final VoidCallback onSend;
 
   const AiMessageInput({
@@ -61,11 +60,9 @@ class AiMessageInput extends StatelessWidget {
             const SizedBox(width: 10),
 
             // 3D Convex Neumorphic send button
-            Obx(
-              () => AiSendButton(
-                isLoading: isLoading.value,
-                onPressed: onSend,
-              ),
+            AiSendButton(
+              isLoading: isLoading,
+              onPressed: onSend,
             ),
           ],
         ),
