@@ -4,6 +4,7 @@ import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
 import 'package:habit_tracker/core/theme/theme_utils.dart';
+import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -54,14 +55,17 @@ class _MonthlySummaryState extends ConsumerState<MonthlySummary>
     super.dispose();
   }
 
-  int _getStrength(DateTime normalizedDate, DateTime today) {
-    // 1. Live status for today directly from controller so today's progress updates immediately!
+  int _getStrength(
+    DateTime normalizedDate,
+    DateTime today,
+    List<HabitEntity> habits,
+  ) {
+    // 1. Live status for today directly from habits state so today's progress updates immediately!
     final bool isToday =
         normalizedDate.year == today.year &&
         normalizedDate.month == today.month &&
         normalizedDate.day == today.day;
     if (isToday) {
-      final habits = ref.read(habitNotifierProvider).habits;
       if (habits.isNotEmpty) {
         final completed = habits.where((h) => h.isCompleted).length;
         if (completed > 0) {
@@ -184,10 +188,14 @@ class _MonthlySummaryState extends ConsumerState<MonthlySummary>
       currentWeekSunday.day + 7,
     );
 
+    final habits = ref.watch(
+      habitNotifierProvider.select((s) => s.habits),
+    );
+
     DateTime startDateTime;
     try {
       startDateTime = createDateTimeObject(
-        ref.read(habitNotifierProvider.notifier).getStartDay(),
+        ref.watch(habitNotifierProvider.notifier).getStartDay(),
       );
     } catch (_) {
       startDateTime = DateTime(today.year, today.month, today.day - 49);
@@ -357,6 +365,7 @@ class _MonthlySummaryState extends ConsumerState<MonthlySummary>
                                 final strength = _getStrength(
                                   normalizedDay,
                                   today,
+                                  habits,
                                 );
 
                                 return Container(
