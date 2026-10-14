@@ -18,7 +18,7 @@ class Tablet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitState = ref.watch(habitNotifierProvider);
-    final habitNotifier = ref.read(habitNotifierProvider.notifier);
+    final habitNotifier = ref.watch(habitNotifierProvider.notifier);
 
     return Scaffold(
       drawer: const MyDrawer(),
