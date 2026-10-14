@@ -82,11 +82,7 @@ class _ThemeCardState extends State<ThemeCard>
 
   void _handleTap() {
     if (widget.isSelected) return;
-    _pressController.forward().then((_) {
-      if (mounted) {
-        _pressController.reverse();
-      }
-    });
+    _pressController.reverse();
     widget.onTap();
   }
 
@@ -112,6 +108,22 @@ class _ThemeCardState extends State<ThemeCard>
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (_) {
+            if (!widget.isSelected) {
+              _pressController.forward();
+            }
+          },
+          onTapUp: (_) {
+            if (!widget.isSelected) {
+              _pressController.reverse();
+            }
+          },
+          onTapCancel: () {
+            if (!widget.isSelected) {
+              _pressController.reverse();
+            }
+          },
           onTap: _handleTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -186,22 +198,24 @@ class _ThemeCardState extends State<ThemeCard>
                         boxShadow: AppShadows.insetWell(isDark: isCardDark),
                       ),
                       child: Center(
-                        child: HeatMap(
-                          startDate: _startDate,
-                          endDate: _endDate,
-                          datasets: _dummyData,
-                          colorMode: ColorMode.color,
-                          defaultColor: isCardDark
-                              ? Colors.white.withValues(alpha: 0.06)
-                              : Colors.black.withValues(alpha: 0.05),
-                          textColor: isCardDark
-                              ? Colors.white.withValues(alpha: 0.5)
-                              : Colors.black.withValues(alpha: 0.45),
-                          showColorTip: false,
-                          showText: false,
-                          scrollable: false,
-                          size: 16,
-                          colorsets: _activeColorSet,
+                        child: IgnorePointer(
+                          child: HeatMap(
+                            startDate: _startDate,
+                            endDate: _endDate,
+                            datasets: _dummyData,
+                            colorMode: ColorMode.color,
+                            defaultColor: isCardDark
+                                ? Colors.white.withValues(alpha: 0.06)
+                                : Colors.black.withValues(alpha: 0.05),
+                            textColor: isCardDark
+                                ? Colors.white.withValues(alpha: 0.5)
+                                : Colors.black.withValues(alpha: 0.45),
+                            showColorTip: false,
+                            showText: false,
+                            scrollable: false,
+                            size: 16,
+                            colorsets: _activeColorSet,
+                          ),
                         ),
                       ),
                     ),
