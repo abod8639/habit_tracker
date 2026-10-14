@@ -1,8 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
-import 'package:habit_tracker/core/services/firestore_service.dart';
+import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/core/services/notification_service.dart';
 
 /// Top-level background message handler required by Firebase Messaging.
@@ -17,12 +16,12 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint('Handling background FCM message: ${message.messageId}');
 }
 
-class FcmService extends GetxService {
-  static FcmService get to => Get.find<FcmService>();
+class FcmService {
+  static FcmService get to => AppInitializer.fcmService ?? FcmService();
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  final RxnString fcmToken = RxnString();
-  final RxBool hasPermission = false.obs;
+  String? fcmToken;
+  bool hasPermission = false;
 
   Future<FcmService> init() async {
     // Only proceed on supported platforms (Android, iOS, Web, macOS)
@@ -45,7 +44,7 @@ class FcmService extends GetxService {
         provisional: false,
       );
 
-      hasPermission.value =
+      hasPermission =
           settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional;
 
@@ -59,14 +58,14 @@ class FcmService extends GetxService {
       // 3. Get FCM token
       final token = await _messaging.getToken();
       if (token != null) {
-        fcmToken.value = token;
+        fcmToken = token;
         debugPrint('FCM Token: $token');
         await syncTokenToFirestore(token);
       }
 
       // 4. Listen for token refresh
       _messaging.onTokenRefresh.listen((newToken) async {
-        fcmToken.value = newToken;
+        fcmToken = newToken;
         debugPrint('FCM Token refreshed: $newToken');
         await syncTokenToFirestore(newToken);
       });
@@ -116,15 +115,13 @@ class FcmService extends GetxService {
 
   /// Syncs FCM Token to Firestore under the current user's profile
   Future<void> syncTokenToFirestore([String? tokenToSync]) async {
-    final token = tokenToSync ?? fcmToken.value;
+    final token = tokenToSync ?? fcmToken;
     if (token == null) return;
 
     try {
-      if (Get.isRegistered<FirestoreService>()) {
-        final firestoreService = Get.find<FirestoreService>();
-        if (firestoreService.isUserLoggedIn) {
-          await firestoreService.saveFcmToken(token);
-        }
+      final firestoreService = AppInitializer.firestoreService;
+      if (firestoreService.isUserLoggedIn) {
+        await firestoreService.saveFcmToken(token);
       }
     } catch (e) {
       debugPrint('Failed to sync FCM token to Firestore: $e');
@@ -134,11 +131,9 @@ class FcmService extends GetxService {
   /// Removes FCM Token on logout
   Future<void> clearTokenFromFirestore() async {
     try {
-      if (Get.isRegistered<FirestoreService>()) {
-        final firestoreService = Get.find<FirestoreService>();
-        if (firestoreService.isUserLoggedIn) {
-          await firestoreService.removeFcmToken();
-        }
+      final firestoreService = AppInitializer.firestoreService;
+      if (firestoreService.isUserLoggedIn) {
+        await firestoreService.removeFcmToken();
       }
     } catch (e) {
       debugPrint('Failed to clear FCM token from Firestore: $e');
