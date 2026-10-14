@@ -1,42 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
-import '../controllers/habitstats_controller.dart';
+import '../providers/habitstats_providers.dart';
 import 'build_trend_chart.dart';
 import 'stats_neumorphic_utils.dart';
 
 /// Wrap layout displaying legend chips for all active habits in trend charts.
-class WarpHabitNames extends StatelessWidget {
+class WarpHabitNames extends ConsumerWidget {
   const WarpHabitNames({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<HabitStatsController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final habitNames = ref.watch(habitStatsNotifierProvider.select((s) => s.habitNames));
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    return Obx(() {
-      final List<String> habitNames = controller.habitNames;
-      if (habitNames.isEmpty) {
-        return const SizedBox.shrink();
-      }
+    if (habitNames.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-      return Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          for (int i = 0; i < habitNames.length; i++)
-            _HabitLegendChip(
-              name: habitNames[i],
-              color: lineColors[i % lineColors.length],
-              textColor: colorScheme.onSurface,
-              textStyle: textTheme.labelMedium,
-            ),
-        ],
-      );
-    });
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (int i = 0; i < habitNames.length; i++)
+          _HabitLegendChip(
+            name: habitNames[i],
+            color: lineColors[i % lineColors.length],
+            textColor: colorScheme.onSurface,
+            textStyle: textTheme.labelMedium,
+          ),
+      ],
+    );
   }
 }
 
