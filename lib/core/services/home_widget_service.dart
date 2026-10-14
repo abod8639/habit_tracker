@@ -6,8 +6,9 @@ import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home_app_widget/home_app_widget_view.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
-import 'package:habit_tracker/features/theme/presentation/controllers/theme_controller.dart';
+import 'package:habit_tracker/core/init/app_initializer.dart';
+import 'package:habit_tracker/core/theme/theme_utils.dart';
+import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Service responsible for managing and synchronizing the mobile home screen widget
@@ -35,23 +36,29 @@ class HomeWidgetService extends GetxService {
     _isRendering = true;
 
     try {
-      final themeController = Get.isRegistered<ThemeController>()
-          ? Get.find<ThemeController>()
+      final themeStorage = AppInitializer.themeStorage;
+      final langStorage = AppInitializer.langStorage;
+      final isDark = themeStorage.getThemeMode() == ThemeMode.dark;
+      final themeName = themeStorage.getThemeName('github_dark_green');
+      final customBg = themeStorage.getUseCustomBackground()
+          ? themeStorage.getCustomBackgroundColor()
           : null;
-      final langController = Get.isRegistered<LangController>()
-          ? Get.find<LangController>()
-          : null;
-
-      final isDark = themeController != null
-          ? (themeController.themeMode.value == ThemeMode.dark)
-          : false;
-
-      final themeData = isDark
-          ? (themeController.darkTheme.value)
-          : (themeController?.lightTheme.value ?? ThemeData.light());
-
-      final effectiveLocale =
-          langController?.effectiveLocale ?? const Locale('en');
+      final colors =
+          themeColors[themeName] ?? themeColors['github_dark_green']!;
+      final themeData = ThemeUtils.buildThemeData(
+        forceDark: isDark,
+        colors: colors,
+        isDarkTheme: isDark,
+        customBackground: customBg,
+      );
+      final langCode = langStorage.getCurrentLanguage();
+      final effectiveLocale = (langCode == 'ar')
+          ? const Locale('ar')
+          : (langCode == 'en'
+              ? const Locale('en')
+              : (PlatformDispatcher.instance.locale.languageCode == 'ar'
+                  ? const Locale('ar')
+                  : const Locale('en')));
 
       // Ensure active localization messages are fully loaded for effectiveLocale
       await S.load(effectiveLocale);
