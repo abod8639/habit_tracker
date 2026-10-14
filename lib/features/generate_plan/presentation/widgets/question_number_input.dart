@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/neumorphic_input.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 import 'package:habit_tracker/core/utils/number_utils.dart';
 import '../../domain/entities/question_entity.dart';
 import '../controllers/plan_generator_controller.dart';
@@ -58,9 +56,7 @@ class _QuestionNumberInputState extends State<QuestionNumberInput> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = widget.controller.selectedCategory.value?.color;
-    final isArabic = Get.isRegistered<LangController>()
-        ? Get.find<LangController>().isArabic
-        : true;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return Column(
       mainAxisSize: MainAxisSize.min,
