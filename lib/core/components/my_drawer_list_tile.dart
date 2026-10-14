@@ -49,11 +49,12 @@ class _MyDrawerListTileState extends State<MyDrawerListTile>
     super.dispose();
   }
 
-  void _handleTap() async {
-    await _pressController.forward();
-    if (mounted) {
-      await _pressController.reverse();
-    }
+  void _handleTap() {
+    _pressController.forward().then((_) {
+      if (mounted) {
+        _pressController.reverse();
+      }
+    });
     widget.onTap?.call();
   }
 
