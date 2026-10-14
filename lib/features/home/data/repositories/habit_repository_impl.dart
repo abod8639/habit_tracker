@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:habit_tracker/core/error/failures.dart';
-import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
+import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_source.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
@@ -11,7 +11,7 @@ import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault
 import '../models/date_time.dart';
 
 class HabitRepositoryImpl implements HabitRepository {
-  final HabitLocalDataSource localDataSource;
+  final IHabitLocalDataSource localDataSource;
   final FirestoreService firestoreService;
   final HabitOfflineVaultDataSource? vaultDataSource;
 
