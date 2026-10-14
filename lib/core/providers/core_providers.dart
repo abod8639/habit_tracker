@@ -31,8 +31,12 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
 });
 
 /// Theme storage service provider (Hive)
-final themeStorageServiceProvider = Provider<ThemeStorageService>((ref) {
-  return AppInitializer.themeStorage;
+final themeStorageServiceProvider = Provider<ThemeStorageService?>((ref) {
+  try {
+    return AppInitializer.themeStorage;
+  } catch (_) {
+    return null;
+  }
 });
 
 /// Settings storage service provider (Hive)
