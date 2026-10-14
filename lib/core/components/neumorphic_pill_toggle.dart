@@ -209,34 +209,7 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
                         ),
                         width: 1.0,
                       ),
-                      boxShadow: [
-                        // Top-left physical specular highlight reflection
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.12)
-                              : Colors.white.withValues(alpha: 0.85),
-                          offset: const Offset(-1.5, -1.5),
-                          blurRadius: 3.0,
-                        ),
-                        // Bottom-right physical extruded cast shadow
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.black.withValues(alpha: 0.65)
-                              : const Color(0xFFA3B1C6).withValues(alpha: 0.50),
-                          offset: const Offset(2.0, 2.5),
-                          blurRadius: 5.0,
-                          spreadRadius: 0.2,
-                        ),
-                        // Radiant accent color bloom
-                        BoxShadow(
-                          color: primary.withValues(
-                            alpha: isDark ? 0.45 : 0.32,
-                          ),
-                          blurRadius: 9.0,
-                          offset: const Offset(0, 2.5),
-                          spreadRadius: 0.5,
-                        ),
-                      ],
+                      boxShadow: AppShadows.softCard(isDark: isDark),
                     ),
                   ),
                 ),
@@ -305,20 +278,10 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
                               curve: Curves.easeInOut,
                               style: textStyle.copyWith(
                                 fontWeight: isSelected
-                                    ? FontWeight.w700
+                                    ? FontWeight.w800
                                     : FontWeight.w600,
                                 color: targetTextColor,
-                                shadows: isSelected
-                                    ? [
-                                        Shadow(
-                                          color: Colors.black.withValues(
-                                            alpha: isDark ? 0.35 : 0.20,
-                                          ),
-                                          offset: const Offset(0, 1.0),
-                                          blurRadius: .5,
-                                        ),
-                                      ]
-                                    : null,
+                                
                               ),
                               child: Text(
                                 widget.options[index],
