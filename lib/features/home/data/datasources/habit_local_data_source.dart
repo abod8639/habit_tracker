@@ -56,7 +56,7 @@ class HabitLocalDataSource {
   Future<List<HabitModel>> getHabitsForDate(String dateStr) async {
     try {
       final historyBox = await _openMonthlyBox(dateStr);
-      final data = historyBox.get(dateStr);
+      final data = historyBox.get(dateStr) ?? _myBox.get(dateStr);
 
       if (data != null && data is List) {
         final List<HabitModel> result = [];
@@ -310,7 +310,21 @@ class HabitLocalDataSource {
   Future<Map<String, String>> getAllHabitStrengths() async {
     final Map<String, String> allHistory = {};
 
-    // We need to iterate through all months since start date
+    // 1. Scan legacy _myBox for habit strengths stored before monthly partitioning
+    for (var key in _myBox.keys) {
+      if (key.toString().startsWith(HabitStorage.habitStrengthPrefix)) {
+        String date = key.toString().replaceFirst(
+          HabitStorage.habitStrengthPrefix,
+          '',
+        );
+        if (date.startsWith('_')) {
+          date = date.substring(1);
+        }
+        allHistory[date] = _myBox.get(key).toString();
+      }
+    }
+
+    // 2. We need to iterate through all months since start date
     final startDateStr = getStartDate();
     final startDate = createDateTimeObject(startDateStr);
     final now = DateTime.now();
@@ -345,7 +359,7 @@ class HabitLocalDataSource {
           final parsedStrength = double.tryParse(strength) ?? 0.0;
           if (parsedStrength == 0.0) {
             bool hasCompletedHabit = false;
-            final dailyList = historyBox.get(date);
+            final dailyList = historyBox.get(date) ?? _myBox.get(date);
             if (dailyList is List) {
               for (var item in dailyList) {
                 if (item is HabitModel && item.isCompleted) {
@@ -364,7 +378,8 @@ class HabitLocalDataSource {
                 final kStr = k.toString();
                 if (kStr.endsWith('_$date') &&
                     !kStr.startsWith(HabitStorage.habitStrengthPrefix)) {
-                  if (historyBox.get(k) == true) {
+                  final dynamic val = historyBox.get(k);
+                  if (val == true || val == 1 || val == "true") {
                     hasCompletedHabit = true;
                     break;
                   }
@@ -378,6 +393,28 @@ class HabitLocalDataSource {
           }
 
           allHistory[date] = strength;
+        }
+      }
+
+      // 3. Self-heal: Check for dates with habit snapshot lists where TODAY_HABIT is absent
+      for (var key in historyBox.keys) {
+        final kStr = key.toString();
+        if (kStr.length == 8 && int.tryParse(kStr) != null && !allHistory.containsKey(kStr)) {
+          final dailyList = historyBox.get(key) ?? _myBox.get(key);
+          if (dailyList is List && dailyList.isNotEmpty) {
+            int completed = 0;
+            for (var item in dailyList) {
+              if (item is HabitModel && item.isCompleted) {
+                completed++;
+              } else if (item is Map &&
+                  (item['isCompleted'] == true || item['isCompleted'] == 1)) {
+                completed++;
+              }
+            }
+            if (completed > 0) {
+              allHistory[kStr] = (completed / dailyList.length).toString();
+            }
+          }
         }
       }
 
@@ -588,6 +625,18 @@ class HabitLocalDataSource {
     }
   }
 
+  bool? _parseNullableBool(dynamic val) {
+    if (val == null) return null;
+    if (val is bool) return val;
+    if (val is num) return val != 0;
+    if (val is String) {
+      final lower = val.toLowerCase().trim();
+      if (lower == 'true' || lower == '1') return true;
+      if (lower == 'false' || lower == '0') return false;
+    }
+    return null;
+  }
+
   Future<Map<String, Map<DateTime, bool>>> getHabitHistoryMap(int days) async {
     final Map<String, Map<DateTime, bool>> historyMap = {};
     final now = DateTime.now();
@@ -612,18 +661,64 @@ class HabitLocalDataSource {
 
       Box? historyBox = openBoxes[monthStr];
       if (historyBox == null) {
-        historyBox = await _openMonthlyBox(dateStr);
-        openBoxes[monthStr] = historyBox;
+        try {
+          historyBox = await _openMonthlyBox(dateStr);
+          openBoxes[monthStr] = historyBox;
+        } catch (_) {
+          // Fallback gracefully if monthly box fails to open
+        }
+      }
+
+      // Check for daily snapshot list in historyBox or _myBox
+      Map<String, bool>? snapshotHabitCompletions;
+      final dailyListRaw = historyBox?.get(dateStr) ??
+          _myBox.get(dateStr) ??
+          _myBox.get("${HabitStorage.habitListKey}_$dateStr");
+
+      if (dailyListRaw is List && dailyListRaw.isNotEmpty) {
+        snapshotHabitCompletions = {};
+        for (final item in dailyListRaw) {
+          if (item is HabitModel) {
+            snapshotHabitCompletions[item.id] = item.isCompleted;
+            snapshotHabitCompletions[item.name] = item.isCompleted;
+          } else if (item is Map) {
+            final id = item['id']?.toString() ?? '';
+            final name = (item['name'] ?? item['habit'] ?? item['title'])?.toString() ?? '';
+            final isComp = _parseNullableBool(item['isCompleted'] ?? item['completed']);
+            if (isComp != null) {
+              if (id.isNotEmpty) snapshotHabitCompletions[id] = isComp;
+              if (name.isNotEmpty) snapshotHabitCompletions[name] = isComp;
+            }
+          }
+        }
       }
 
       for (var habit in habits) {
         final idKey = "${habit.id}_$dateStr";
         final nameKey = "${habit.name}_$dateStr";
-        final bool? isCompleted =
-            historyBox.get(idKey) ?? historyBox.get(nameKey);
+
+        dynamic rawVal;
+        if (historyBox != null) {
+          rawVal = historyBox.get(idKey) ?? historyBox.get(nameKey);
+        }
+        rawVal ??= _myBox.get(idKey) ?? _myBox.get(nameKey);
+
+        bool? isCompleted = _parseNullableBool(rawVal);
+
+        // Fallback to daily snapshot list if not found as direct key
+        if (isCompleted == null && snapshotHabitCompletions != null) {
+          isCompleted = snapshotHabitCompletions[habit.id] ??
+              snapshotHabitCompletions[habit.name];
+        }
+
+        // Fallback for today if still not explicitly recorded
+        if (isCompleted == null && i == 0) {
+          isCompleted = habit.isCompleted;
+        }
 
         if (isCompleted != null) {
           historyMap[habit.id]![normalizedDate] = isCompleted;
+          historyMap[habit.name]![normalizedDate] = isCompleted;
         }
       }
     }
