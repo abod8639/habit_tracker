@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
-import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
@@ -29,6 +28,10 @@ import 'package:habit_tracker/features/home/domain/usecases/update_habit_color_u
 import 'package:habit_tracker/features/home/domain/usecases/update_habit_order_usecase.dart';
 import 'habit_state.dart';
 
+import 'package:habit_tracker/core/database/database_provider.dart';
+import 'package:habit_tracker/features/home/data/datasources/habit_sql_local_data_source.dart';
+import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_source.dart';
+
 // Data Sources
 final habitVaultDataSourceProvider = Provider<HabitOfflineVaultDataSource>((ref) {
   final vaultBox = Hive.isBoxOpen(HabitStorage.backupVaultBox)
@@ -37,10 +40,14 @@ final habitVaultDataSourceProvider = Provider<HabitOfflineVaultDataSource>((ref)
   return HabitOfflineVaultDataSource(vaultBox);
 });
 
-final habitLocalDataSourceProvider = Provider<HabitLocalDataSource>((ref) {
-  final box = Hive.box(HabitStorage.boxName);
+final habitSqlLocalDataSourceProvider = Provider<HabitSqlLocalDataSource>((ref) {
+  final db = ref.watch(appDatabaseProvider);
   final vaultDataSource = ref.watch(habitVaultDataSourceProvider);
-  return HabitLocalDataSource(box, vaultDataSource: vaultDataSource);
+  return HabitSqlLocalDataSource(db, vaultDataSource: vaultDataSource);
+});
+
+final habitLocalDataSourceProvider = Provider<IHabitLocalDataSource>((ref) {
+  return ref.watch(habitSqlLocalDataSourceProvider);
 });
 
 // Repository
