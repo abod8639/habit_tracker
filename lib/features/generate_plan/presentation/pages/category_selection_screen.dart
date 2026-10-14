@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../../domain/entities/category_entity.dart';
-import '../controllers/plan_generator_controller.dart';
+import '../providers/plan_generator_providers.dart';
 import '../widgets/category_card.dart';
 
-class CategorySelectionScreen extends StatelessWidget {
+class CategorySelectionScreen extends ConsumerWidget {
   const CategorySelectionScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<PlanGeneratorController>();
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -63,7 +62,9 @@ class CategorySelectionScreen extends StatelessWidget {
                         (category) => CategoryCard(
                           category: category,
                           onTap: () {
-                            controller.selectCategory(category);
+                            ref
+                                .read(planGeneratorNotifierProvider.notifier)
+                                .selectCategory(category);
                             context.push(AppRoutes.questionnaire);
                           },
                         ),
