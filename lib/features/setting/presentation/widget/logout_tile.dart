@@ -12,7 +12,9 @@ class LogoutTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authNotifierProvider).user;
+    final user = ref.watch(
+      authNotifierProvider.select((state) => state.user),
+    );
     if (user == null) {
       return const SizedBox.shrink();
     }
