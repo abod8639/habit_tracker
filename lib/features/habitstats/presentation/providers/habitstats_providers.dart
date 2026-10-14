@@ -176,11 +176,11 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
   void togglePeriod() async {
     final newIsWeekly = !state.isWeeklyView;
     final newDays = newIsWeekly ? 7 : 30;
-    state = state.copyWith(isWeeklyView: newIsWeekly, daysPeriod: newDays);
 
     try {
       final getOverallTrend = ref.read(getOverallTrendUseCaseProvider);
-      final getIndividualTrends = ref.read(getIndividualHabitTrendsUseCaseProvider);
+      final getIndividualTrends =
+          ref.read(getIndividualHabitTrendsUseCaseProvider);
 
       final results = await Future.wait([
         getOverallTrend(newDays),
@@ -189,11 +189,15 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
       final trends = results[1] as Map<String, List<FlSpot>>?;
 
       state = state.copyWith(
+        isWeeklyView: newIsWeekly,
+        daysPeriod: newDays,
         overallTrend: results[0] as List<FlSpot>,
         individualTrends: trends ?? const {},
         habitNames: trends?.keys.toList() ?? const [],
       );
-    } catch (_) {}
+    } catch (_) {
+      state = state.copyWith(isWeeklyView: newIsWeekly, daysPeriod: newDays);
+    }
   }
 
   void toggleShowAllHabits() {
