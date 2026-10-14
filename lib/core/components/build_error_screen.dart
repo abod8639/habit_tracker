@@ -12,8 +12,10 @@ class ErrorView extends StatelessWidget {
     this.onRetry,
   });
 
+
   @override
   Widget build(BuildContext context) {
+    debugPrint(errorMessage);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
