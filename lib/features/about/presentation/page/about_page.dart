@@ -7,14 +7,27 @@ import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AboutPage extends StatelessWidget {
+class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
 
+  @override
+  State<AboutPage> createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
   static const String _githubRepoUrl =
       'https://github.com/abod8639/flutter_habit_tracker';
   static const String _downloadApkUrl =
       'https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk';
   static const String _appVersion = '1.0.0+1';
+
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   Future<void> _openUrl(String url) async {
     final uri = Uri.parse(url);
@@ -38,7 +51,7 @@ class AboutPage extends StatelessWidget {
 
     return KeyboardListener(
       autofocus: true,
-      focusNode: FocusNode(),
+      focusNode: _focusNode,
       onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
         appBar: myAppBar(
