@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
 import 'package:habit_tracker/core/theme/theme_utils.dart';
-import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Neumorphic / Soft UI Habit Matrix heatmap summary widget.
 /// Displays a weekly-aligned calendar grid with debossed/recessed tiles
 /// for inactive days and glowing gradient pills for completed days tailored to the active theme.
-class MonthlySummary extends StatefulWidget {
+class MonthlySummary extends ConsumerStatefulWidget {
   final Map<DateTime, int> datasets;
 
   const MonthlySummary({super.key, required this.datasets});
 
   @override
-  State<MonthlySummary> createState() => _MonthlySummaryState();
+  ConsumerState<MonthlySummary> createState() => _MonthlySummaryState();
 }
 
-class _MonthlySummaryState extends State<MonthlySummary>
+class _MonthlySummaryState extends ConsumerState<MonthlySummary>
     with SingleTickerProviderStateMixin {
-  late HabitController habitController;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   final ScrollController _scrollController = ScrollController();
@@ -35,7 +34,6 @@ class _MonthlySummaryState extends State<MonthlySummary>
   @override
   void initState() {
     super.initState();
-    habitController = Get.find<HabitController>();
 
     _animationController = AnimationController(
       vsync: this,
@@ -63,7 +61,7 @@ class _MonthlySummaryState extends State<MonthlySummary>
         normalizedDate.month == today.month &&
         normalizedDate.day == today.day;
     if (isToday) {
-      final habits = habitController.habits;
+      final habits = ref.read(habitNotifierProvider).habits;
       if (habits.isNotEmpty) {
         final completed = habits.where((h) => h.isCompleted).length;
         if (completed > 0) {
@@ -106,9 +104,9 @@ class _MonthlySummaryState extends State<MonthlySummary>
   ) async {
     final messenger = ScaffoldMessenger.of(context);
     final themeColors = Theme.of(context).colorScheme;
-    final status = await habitController.getCompletionStatusForDate(
-      normalizedDate,
-    );
+    final status = await ref
+        .read(habitNotifierProvider.notifier)
+        .getCompletionStatusForDate(normalizedDate);
     final int completed = status['completed'] ?? 0;
     final int total = status['total'] ?? 0;
 
@@ -188,7 +186,9 @@ class _MonthlySummaryState extends State<MonthlySummary>
 
     DateTime startDateTime;
     try {
-      startDateTime = createDateTimeObject(habitController.getStartDay());
+      startDateTime = createDateTimeObject(
+        ref.read(habitNotifierProvider.notifier).getStartDay(),
+      );
     } catch (_) {
       startDateTime = DateTime(today.year, today.month, today.day - 49);
     }
