@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:habit_tracker/core/services/notification_service.dart';
@@ -19,6 +18,7 @@ import 'package:path_provider/path_provider.dart';
 class AppInitializer {
   AppInitializer._();
 
+  static late final FirestoreService firestoreService;
   static late final ThemeStorageService themeStorage;
   static late final SettingsStorage settingsStorage;
   static late final LangStorage langStorage;
@@ -49,24 +49,20 @@ class AppInitializer {
         // .env is optional
       }
 
-      // 4. Initialize and register infrastructure services
-      Get.put(FirestoreService());
+      // 4. Initialize infrastructure services
+      firestoreService = FirestoreService();
 
       themeStorage = await ThemeStorageService.init();
-      Get.put(themeStorage);
 
       settingsStorage = SettingsStorage();
       await settingsStorage.init();
-      Get.put(settingsStorage);
 
       langStorage = LangStorage(Hive.box(LangStorage.boxName));
-      Get.put(langStorage);
 
       try {
         final notif = NotificationService();
         await notif.init();
         notificationService = notif;
-        Get.put<NotificationService>(notif, permanent: true);
       } catch (e) {
         debugPrint('NotificationService initialization error: $e');
       }
@@ -75,7 +71,6 @@ class AppInitializer {
         final fcm = FcmService();
         await fcm.init();
         fcmService = fcm;
-        Get.put<FcmService>(fcm, permanent: true);
       } catch (e) {
         debugPrint('FcmService initialization error: $e');
       }
