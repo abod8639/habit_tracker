@@ -1,11 +1,10 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'ai_avatar.dart';
 
 /// Neumorphic recessed typing indicator with animated bouncing dots.
 class AiTypingIndicator extends StatelessWidget {
-  final RxString loadingMessage;
+  final String loadingMessage;
 
   const AiTypingIndicator({
     super.key,
@@ -63,20 +62,17 @@ class AiTypingIndicator extends StatelessWidget {
                 ),
               ],
             ),
-            child: Obx(() {
-              final msg = loadingMessage.value;
-              if (msg.isNotEmpty) {
-                return Text(
-                  msg,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                    fontWeight: FontWeight.w500,
-                  ),
-                );
-              }
-              return const _TypingDots();
-            }),
+            child: loadingMessage.isNotEmpty
+                ? Text(
+                    loadingMessage,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )
+                : const _TypingDots(),
           ),
         ],
       ),
