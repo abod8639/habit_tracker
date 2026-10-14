@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_storage.dart';
 import '../models/theme_model.dart';
 
@@ -8,16 +9,23 @@ abstract class ThemeLocalDataSource {
 }
 
 class ThemeLocalDataSourceImpl implements ThemeLocalDataSource {
-  final ThemeStorageService storageService;
+  final ThemeStorageService? storageService;
 
   ThemeLocalDataSourceImpl(this.storageService);
 
   @override
   ThemeModel getCachedThemeSettings() {
-    final themeName = storageService.getThemeName('github_dark_green');
-    final themeMode = storageService.getThemeMode();
-    final useCustomBg = storageService.getUseCustomBackground();
-    final customBgColor = storageService.getCustomBackgroundColor();
+    if (storageService == null) {
+      return const ThemeModel(
+        themeName: 'github_dark_green',
+        themeMode: ThemeMode.dark,
+        useCustomBackground: false,
+      );
+    }
+    final themeName = storageService!.getThemeName('github_dark_green');
+    final themeMode = storageService!.getThemeMode();
+    final useCustomBg = storageService!.getUseCustomBackground();
+    final customBgColor = storageService!.getCustomBackgroundColor();
 
     return ThemeModel(
       themeName: themeName,
@@ -34,7 +42,8 @@ class ThemeLocalDataSourceImpl implements ThemeLocalDataSource {
 
   @override
   Future<void> saveThemeSettings(ThemeModel settings) async {
-    await storageService.saveThemeSettings(
+    if (storageService == null) return;
+    await storageService!.saveThemeSettings(
       themeName: settings.themeName,
       mode: settings.themeMode,
       useCustomBg: settings.useCustomBackground,
