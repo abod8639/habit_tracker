@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/core/bindings/initial_binding.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
-import 'package:habit_tracker/features/theme/presentation/controllers/theme_controller.dart';
+import 'package:habit_tracker/features/setting/presentation/providers/lang_providers.dart';
+import 'package:habit_tracker/features/theme/presentation/providers/theme_providers.dart';
 import 'package:habit_tracker/firebase_options.dart';
 import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -61,31 +60,29 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final LangController controllerLanguage = Get.find<LangController>();
-    final ThemeController themeController = Get.find<ThemeController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final langState = ref.watch(langNotifierProvider);
+    final themeState = ref.watch(themeNotifierProvider);
 
-    return Obx(() {
-      return MaterialApp.router(
-        routerConfig: AppRouter.router,
-        locale: controllerLanguage.effectiveLocale,
-        localizationsDelegates: const [
-          S.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: S.delegate.supportedLocales,
-        debugShowCheckedModeBanner: false,
-        title: 'Habit Tracker',
-        theme: themeController.lightTheme.value,
-        darkTheme: themeController.darkTheme.value,
-        themeMode: themeController.themeMode.value,
-      );
-    });
+    return MaterialApp.router(
+      routerConfig: AppRouter.router,
+      locale: langState.effectiveLocale,
+      localizationsDelegates: const [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: S.delegate.supportedLocales,
+      debugShowCheckedModeBanner: false,
+      title: 'Habit Tracker',
+      theme: themeState.lightTheme,
+      darkTheme: themeState.darkTheme,
+      themeMode: themeState.themeMode,
+    );
   }
 }
