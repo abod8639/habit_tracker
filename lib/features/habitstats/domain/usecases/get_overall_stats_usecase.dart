@@ -1,4 +1,6 @@
-import '../entities/habit_stats_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:habit_tracker/core/error/failures.dart';
+import '../../domain/entities/habit_stats_entity.dart';
 import '../repositories/habit_stats_repository.dart';
 
 class GetOverallStatsUseCase {
@@ -6,7 +8,7 @@ class GetOverallStatsUseCase {
 
   GetOverallStatsUseCase(this.repository);
 
-  Future<HabitStatsEntity> call() async {
-    return repository.getOverallStats();
+  Future<Either<Failure, HabitStatsEntity>> call() async {
+    return await repository.getOverallStats();
   }
 }
