@@ -88,6 +88,7 @@ class AuthState {
   });
 
   bool get isLoggedIn => currentUser != null;
+  AuthEntity? get user => currentUser;
 
   AuthState copyWith({
     AuthEntity? currentUser,
