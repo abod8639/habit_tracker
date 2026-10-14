@@ -31,10 +31,15 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
     _animationController.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(habitStatsNotifierProvider.notifier).refreshStats();
+      }
+    });
   }
 
   @override
@@ -80,33 +85,39 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
               );
             }
 
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
+            return RefreshIndicator(
+              onRefresh: () =>
+                  ref.read(habitStatsNotifierProvider.notifier).refreshStats(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FadeAnimationSummaryCard(
-                      animationController: _animationController,
-                    ),
-                    const SizedBox(height: 16),
-                    FadeAnimationChartsSection(
-                      animationController: _animationController,
-                    ),
-                    const SizedBox(height: 16),
-                    FadeAnimationTrendChart(
-                      animationController: _animationController,
-                    ),
-                    const SizedBox(height: 16),
-                    FadeAnimationHabitListCard(
-                      animationController: _animationController,
-                    ),
-                    const SizedBox(height: 84), // extra padding for FAB
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FadeAnimationSummaryCard(
+                        animationController: _animationController,
+                      ),
+                      const SizedBox(height: 16),
+                      FadeAnimationChartsSection(
+                        animationController: _animationController,
+                      ),
+                      const SizedBox(height: 16),
+                      FadeAnimationTrendChart(
+                        animationController: _animationController,
+                      ),
+                      const SizedBox(height: 16),
+                      FadeAnimationHabitListCard(
+                        animationController: _animationController,
+                      ),
+                      const SizedBox(height: 84), // extra padding for FAB
+                    ],
+                  ),
                 ),
               ),
             );
