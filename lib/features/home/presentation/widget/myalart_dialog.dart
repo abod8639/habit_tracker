@@ -14,11 +14,17 @@ import 'package:habit_tracker/generated/l10n.dart';
 class MyalartDialog extends StatefulWidget {
   final Function()? onSave;
   final String? hintText;
+  final String? title;
+  final String? actionButtonText;
+  final bool isEditing;
   final TextEditingController controller;
 
   const MyalartDialog({
     this.onSave,
     this.hintText,
+    this.title,
+    this.actionButtonText,
+    this.isEditing = false,
     required this.controller,
     super.key,
   });
@@ -159,6 +165,16 @@ class _MyalartdState extends State<MyalartDialog>
         ? (Color.lerp(baseColor, Colors.black, 0.22) ?? baseColor)
         : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.30) ?? baseColor);
 
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final String dialogTitle = widget.title ??
+        (widget.isEditing
+            ? S.current.editThisHabit
+            : (isAr ? 'إضافة عادة' : 'Add Habit'));
+    final String buttonLabel = widget.actionButtonText ??
+        (widget.isEditing
+            ? (isAr ? 'تعديل' : 'Edit')
+            : (isAr ? 'إضافة' : 'Add'));
+
     return ScaleTransition(
       scale: _scaleAnimation,
       child: FadeTransition(
@@ -217,14 +233,16 @@ class _MyalartdState extends State<MyalartDialog>
                             boxShadow: AppShadows.badge(isDark: isDark),
                           ),
                           child: Icon(
-                            Icons.add_task_rounded,
+                            widget.isEditing
+                                ? Icons.edit_rounded
+                                : Icons.add_task_rounded,
                             color: colorScheme.primary,
                             size: 22,
                           ),
                         ),
                         const SizedBox(width: 14),
                         Text(
-                          S.current.add,
+                          dialogTitle,
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.2,
@@ -252,7 +270,7 @@ class _MyalartdState extends State<MyalartDialog>
                               color: colorScheme.primary,
                             ),
                           )
-                        else
+                        else if (!widget.isEditing)
                           NeumorphicIconButton(
                             size: 40,
                             icon: Icons.document_scanner_rounded,
