@@ -10,7 +10,7 @@ class HabitDialogs {
   HabitDialogs._();
 
   /// Shows the dialog to create a new habit.
-  static void showAdd(BuildContext context) {
+  static void showAdd(BuildContext context, {WidgetRef? ref}) {
     final textController = TextEditingController();
 
     showDialog(
@@ -33,9 +33,16 @@ class HabitDialogs {
               );
             } else {
               try {
-                final container = ProviderScope.containerOf(context);
-                await container.read(habitNotifierProvider.notifier).addHabit(habitName);
-              } catch (_) {}
+                if (ref != null) {
+                  await ref.read(habitNotifierProvider.notifier).addHabit(habitName);
+                } else {
+                  final targetContext = dialogContext.mounted ? dialogContext : context;
+                  final container = ProviderScope.containerOf(targetContext);
+                  await container.read(habitNotifierProvider.notifier).addHabit(habitName);
+                }
+              } catch (e, st) {
+                debugPrint('Failed to add habit: $e\n$st');
+              }
 
               if (dialogContext.mounted) {
                 Navigator.of(dialogContext).pop();
@@ -52,6 +59,7 @@ class HabitDialogs {
     BuildContext context, {
     required String id,
     required String currentName,
+    WidgetRef? ref,
   }) {
     final textController = TextEditingController(text: currentName);
 
@@ -65,9 +73,16 @@ class HabitDialogs {
             final String habitName = textController.text.trim();
             if (habitName.isNotEmpty) {
               try {
-                final container = ProviderScope.containerOf(context);
-                await container.read(habitNotifierProvider.notifier).editHabit(id, habitName);
-              } catch (_) {}
+                if (ref != null) {
+                  await ref.read(habitNotifierProvider.notifier).editHabit(id, habitName);
+                } else {
+                  final targetContext = dialogContext.mounted ? dialogContext : context;
+                  final container = ProviderScope.containerOf(targetContext);
+                  await container.read(habitNotifierProvider.notifier).editHabit(id, habitName);
+                }
+              } catch (e, st) {
+                debugPrint('Failed to edit habit: $e\n$st');
+              }
 
               if (dialogContext.mounted) {
                 Navigator.of(dialogContext).pop();
