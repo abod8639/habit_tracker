@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:habit_tracker/core/routes/app_router.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/core/theme/theme_utils.dart';
@@ -46,7 +46,8 @@ class AppConfirmationDialog extends StatefulWidget {
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
   }) {
-    final targetContext = context ?? Get.overlayContext ?? Get.context;
+    final targetContext =
+        context ?? AppRouter.navigatorKey.currentContext;
     if (targetContext == null) return Future.value(false);
 
     return showDialog<bool>(
