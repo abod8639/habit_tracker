@@ -18,6 +18,7 @@ import 'package:habit_tracker/features/auth/domain/usecases/sign_in_with_google_
 import 'package:habit_tracker/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/sign_up_with_email_usecase.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
+import 'package:habit_tracker/features/habitstats/presentation/providers/habitstats_providers.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/features/theme/presentation/providers/theme_providers.dart';
 
@@ -132,13 +133,9 @@ class AuthNotifier extends Notifier<AuthState> {
         clearUser: user == null,
       );
       if (user != null) {
-        final fcm = ref.read(fcmServiceProvider);
-        fcm?.syncTokenToFirestore();
-
-        // Automatically sync cloud habits and theme on app startup / session restoration
+        // Automatically sync cloud habits, theme, and habitstats on app startup / session restoration
         if (previousUser?.uid != user.uid) {
-          unawaited(ref.read(syncNotifierProvider.notifier).syncHabits());
-          unawaited(ref.read(themeNotifierProvider.notifier).syncWithCloud());
+          unawaited(_syncUserDataAfterAuth());
         }
       }
     });
@@ -159,6 +156,27 @@ class AuthNotifier extends Notifier<AuthState> {
     return const AuthState();
   }
 
+  /// Synchronizes habits and theme from cloud, then refreshes habit statistics.
+  Future<void> _syncUserDataAfterAuth() async {
+    final fcm = ref.read(fcmServiceProvider);
+    fcm?.syncTokenToFirestore();
+
+    try {
+      await Future.wait([
+        ref.read(syncNotifierProvider.notifier).syncHabits(),
+        ref.read(themeNotifierProvider.notifier).syncWithCloud(),
+      ]);
+    } catch (e) {
+      debugPrint('Auto sync after authentication failed: $e');
+    } finally {
+      try {
+        await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
+      } catch (e) {
+        debugPrint('Failed to refresh habit stats after authentication: $e');
+      }
+    }
+  }
+
   Future<bool> signInWithEmail({
     required String email,
     required String password,
@@ -173,18 +191,7 @@ class AuthNotifier extends Notifier<AuthState> {
         return false;
       },
       (user) async {
-        final fcm = ref.read(fcmServiceProvider);
-        fcm?.syncTokenToFirestore();
-
-        try {
-          await Future.wait([
-            ref.read(syncNotifierProvider.notifier).syncHabits(),
-            ref.read(themeNotifierProvider.notifier).syncWithCloud(),
-          ]);
-        } catch (e) {
-          debugPrint('Auto sync after email sign-in failed: $e');
-        }
-
+        await _syncUserDataAfterAuth();
         state = state.copyWith(isLoading: false, currentUser: user);
         return true;
       },
@@ -206,18 +213,7 @@ class AuthNotifier extends Notifier<AuthState> {
         return false;
       },
       (user) async {
-        final fcm = ref.read(fcmServiceProvider);
-        fcm?.syncTokenToFirestore();
-
-        try {
-          await Future.wait([
-            ref.read(syncNotifierProvider.notifier).syncHabits(),
-            ref.read(themeNotifierProvider.notifier).syncWithCloud(),
-          ]);
-        } catch (e) {
-          debugPrint('Auto sync after email sign-up failed: $e');
-        }
-
+        await _syncUserDataAfterAuth();
         state = state.copyWith(isLoading: false, currentUser: user);
         return true;
       },
@@ -236,17 +232,7 @@ class AuthNotifier extends Notifier<AuthState> {
       },
       (user) async {
         if (user != null) {
-          final fcm = ref.read(fcmServiceProvider);
-          fcm?.syncTokenToFirestore();
-
-          try {
-            await Future.wait([
-              ref.read(syncNotifierProvider.notifier).syncHabits(),
-              ref.read(themeNotifierProvider.notifier).syncWithCloud(),
-            ]);
-          } catch (e) {
-            debugPrint('Auto sync after Google sign-in failed: $e');
-          }
+          await _syncUserDataAfterAuth();
         }
         state = state.copyWith(isLoading: false, currentUser: user);
         return user != null;
@@ -272,8 +258,9 @@ class AuthNotifier extends Notifier<AuthState> {
       final localData = ref.read(habitLocalDataSourceProvider);
       await localData.clearAllData();
 
-      // Refresh in-memory habit state so UI is immediately cleared
+      // Refresh in-memory habit state and stats so UI is immediately cleared
       await ref.read(habitNotifierProvider.notifier).refreshData();
+      await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
 
       final signOutUseCase = ref.read(signOutUseCaseProvider);
       await signOutUseCase();
