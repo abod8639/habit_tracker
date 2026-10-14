@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/core/utils/click_throttler.dart';
 import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/presentation/widget/myalart_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -11,39 +13,38 @@ class HabitDialogs {
 
   /// Shows the dialog to create a new habit.
   static void showAdd(BuildContext context) {
-    final controller = Get.find<HabitController>();
-    controller.habitTextController.clear();
+    final textController = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return MyalartDialog(
           hintText: S.current.addNewHabit,
-          controller: controller.habitTextController,
+          controller: textController,
           onSave: () async {
-            final String habitName = controller.habitTextController.text.trim();
+            final String habitName = textController.text.trim();
             if (habitName.isEmpty) {
-              Get.snackbar(
-                S.current.error,
-                S.current.theFieldCantBeEmpty,
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.red.withValues(alpha: 0.7),
-                colorText: Colors.white,
-              );
+              _showSnackBar(context, S.current.theFieldCantBeEmpty);
             } else if (habitName.length > 100) {
-              Get.snackbar(
-                S.current.error,
-                Get.locale?.languageCode == 'ar'
+              final isAr = Localizations.localeOf(context).languageCode == 'ar';
+              _showSnackBar(
+                context,
+                isAr
                     ? 'لا يمكن أن يتجاوز اسم العادة 100 حرف'
                     : 'Habit name cannot exceed 100 characters',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.red.withValues(alpha: 0.7),
-                colorText: Colors.white,
               );
             } else {
-              await controller.addHabit(habitName);
-              if (context.mounted) {
-                Navigator.of(context).pop();
+              try {
+                final container = ProviderScope.containerOf(context);
+                await container.read(habitNotifierProvider.notifier).addHabit(habitName);
+              } catch (_) {}
+
+              if (Get.isRegistered<HabitController>()) {
+                await Get.find<HabitController>().addHabit(habitName);
+              }
+
+              if (dialogContext.mounted) {
+                Navigator.of(dialogContext).pop();
               }
             }
           }.throttle(),
@@ -58,34 +59,45 @@ class HabitDialogs {
     required String id,
     required String currentName,
   }) {
-    final controller = Get.find<HabitController>();
-    controller.habitTextController.text = currentName;
+    final textController = TextEditingController(text: currentName);
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return MyalartDialog(
           hintText: S.current.editThisHabit,
-          controller: controller.habitTextController,
+          controller: textController,
           onSave: () async {
-            final String habitName = controller.habitTextController.text.trim();
+            final String habitName = textController.text.trim();
             if (habitName.isNotEmpty) {
-              await controller.editHabit(id, habitName);
-              if (context.mounted) {
-                Navigator.of(context).pop();
+              try {
+                final container = ProviderScope.containerOf(context);
+                await container.read(habitNotifierProvider.notifier).editHabit(id, habitName);
+              } catch (_) {}
+
+              if (Get.isRegistered<HabitController>()) {
+                await Get.find<HabitController>().editHabit(id, habitName);
+              }
+
+              if (dialogContext.mounted) {
+                Navigator.of(dialogContext).pop();
               }
             } else {
-              Get.snackbar(
-                S.current.error,
-                S.current.theFieldCantBeEmpty,
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.red.withValues(alpha: 0.7),
-                colorText: Colors.white,
-              );
+              _showSnackBar(context, S.current.theFieldCantBeEmpty);
             }
           },
         );
       },
+    );
+  }
+
+  static void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.withValues(alpha: 0.85),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 }
