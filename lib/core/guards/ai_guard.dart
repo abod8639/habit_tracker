@@ -24,20 +24,16 @@ class AiGuard {
     _healthCheckHandler = handler;
   }
 
-  /// Verifies if the AI API key is valid and working.
-  /// If valid, executes [onValid].
+  /// Verifies if the AI API key is configured and available.
+  /// If valid, executes [onValid] immediately without blocking navigation on slow network calls.
   /// If invalid or missing, prevents navigation and displays a localized dialog.
   static Future<bool> protect(
     BuildContext context, {
     required VoidCallback onValid,
   }) async {
-    bool isValid = false;
-
-    if (_healthCheckHandler != null) {
-      isValid = await _healthCheckHandler!();
-    } else {
-      isValid = await GeminiService.isCurrentKeyValid();
-    }
+    final bool isValid = _healthCheckHandler != null
+        ? await _healthCheckHandler!()
+        : GeminiService.hasValidKey;
 
     if (isValid) {
       onValid();
