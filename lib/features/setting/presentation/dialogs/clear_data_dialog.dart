@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/core/utils/restart_widget.dart';
-import 'package:habit_tracker/features/setting/domain/usecases/clear_all_data_usecase.dart';
+import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Presentation dialog for wiping all app data and restarting.
@@ -11,7 +11,7 @@ class ClearDataDialog {
 
   /// Shows confirmation, performs complete data wipe via [ClearAllDataUseCase],
   /// and restarts the application.
-  static Future<void> show(BuildContext context) async {
+  static Future<void> show(BuildContext context, WidgetRef ref) async {
     final bool? shouldClear = await _showConfirmationDialog(context);
 
     if (shouldClear != true || !context.mounted) {
@@ -21,7 +21,7 @@ class ClearDataDialog {
     try {
       _showLoadingDialog(context);
 
-      final clearAllDataUseCase = Get.find<ClearAllDataUseCase>();
+      final clearAllDataUseCase = ref.read(clearAllDataUseCaseProvider);
       final result = await clearAllDataUseCase();
 
       // Close loading dialog
