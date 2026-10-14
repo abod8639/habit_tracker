@@ -1,5 +1,5 @@
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/guards/ai_guard.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
@@ -8,21 +8,21 @@ import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import '../controllers/habitstats_controller.dart';
+import '../providers/habitstats_providers.dart';
 import '../widget/fade_animation_summary_card.dart';
 import '../widget/fade_animation_charts_section.dart';
 import '../widget/fade_animation_trend_chart.dart';
 import '../widget/fade_animation_habit_list_card.dart';
 import '../widget/stats_neumorphic_utils.dart';
 
-class HabitStatsPage extends StatefulWidget {
+class HabitStatsPage extends ConsumerStatefulWidget {
   const HabitStatsPage({super.key});
 
   @override
-  State<HabitStatsPage> createState() => _HabitStatsPageState();
+  ConsumerState<HabitStatsPage> createState() => _HabitStatsPageState();
 }
 
-class _HabitStatsPageState extends State<HabitStatsPage>
+class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
@@ -40,6 +40,7 @@ class _HabitStatsPageState extends State<HabitStatsPage>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final state = ref.watch(habitStatsNotifierProvider);
 
     return KeyboardListener(
       autofocus: true,
@@ -51,9 +52,9 @@ class _HabitStatsPageState extends State<HabitStatsPage>
           context: context,
           title: S.current.ratepagetitle,
         ),
-        body: GetX<HabitStatsController>(
-          builder: (controller) {
-            if (controller.stats.value == null && controller.isLoading.value) {
+        body: Builder(
+          builder: (context) {
+            if (state.stats == null && state.isLoading) {
               return Center(
                 child: Container(
                   width: 64,
