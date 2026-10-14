@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'ai_avatar.dart';
 
@@ -12,8 +11,8 @@ class AiEmptyState extends StatelessWidget {
     required this.onPromptSelected,
   });
 
-  List<String> _getSuggestions() {
-    final isArabic = Get.locale?.languageCode == 'ar';
+  List<String> _getSuggestions(BuildContext context) {
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     if (isArabic) {
       return const [
         '🔥 كيف وضعي مع الستريك اليوم؟',
@@ -35,7 +34,7 @@ class AiEmptyState extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final surface = theme.colorScheme.surface;
-    final suggestions = _getSuggestions();
+    final suggestions = _getSuggestions(context);
 
     return Center(
       child: SingleChildScrollView(
@@ -108,7 +107,7 @@ class AiEmptyState extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsetsDirectional.only(start: 6, bottom: 12),
                 child: Text(
-                  Get.locale?.languageCode == 'ar'
+                  Localizations.localeOf(context).languageCode == 'ar'
                       ? 'اقتراحات للبدء:'
                       : 'Suggested prompts:',
                   style: TextStyle(
