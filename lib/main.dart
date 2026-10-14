@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:habit_tracker/core/bindings/initial_binding.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/lang_providers.dart';
 import 'package:habit_tracker/features/theme/presentation/providers/theme_providers.dart';
 import 'package:habit_tracker/firebase_options.dart';
@@ -36,8 +35,6 @@ Future<void> main() async {
       }
 
       await AppInitializer.init();
-
-      InitialBinding().dependencies();
 
       runApp(
         RestartWidget(
