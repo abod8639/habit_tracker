@@ -22,10 +22,16 @@ import 'package:habit_tracker/features/setting/presentation/controllers/setting_
 import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
 import 'package:habit_tracker/features/setting/presentation/pages/settings_page.dart';
 import 'package:habit_tracker/features/theme/presentation/pages/theme_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/features/about/presentation/page/about_page.dart';
 
+final routerProvider = Provider<GoRouter>((ref) {
+  return AppRouter.router;
+});
+
 class AppRouter {
-  static final GlobalKey<NavigatorState> navigatorKey = Get.key;
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   static GoRouter? _router;
   static GoRouter get router => _router ??= _createRouter();
