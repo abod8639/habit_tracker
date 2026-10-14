@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
-class HabitConfirmationDialog extends StatefulWidget {
+class HabitConfirmationDialog extends ConsumerStatefulWidget {
   final List<String> extractedHabits;
 
   const HabitConfirmationDialog({required this.extractedHabits, super.key});
 
   @override
-  HabitConfirmationDialogState createState() => HabitConfirmationDialogState();
+  ConsumerState<HabitConfirmationDialog> createState() =>
+      _HabitConfirmationDialogState();
 }
 
-class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
+class _HabitConfirmationDialogState
+    extends ConsumerState<HabitConfirmationDialog> {
   final Map<int, bool> _selectedHabits = {};
 
   @override
@@ -25,7 +27,6 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
   }
 
   void _saveSelectedHabits() {
-    final c = Get.find<HabitController>();
     final selectedHabits = <String>[];
     for (int i = 0; i < widget.extractedHabits.length; i++) {
       if (_selectedHabits[i] == true) {
@@ -34,16 +35,18 @@ class HabitConfirmationDialogState extends State<HabitConfirmationDialog> {
     }
 
     if (selectedHabits.isNotEmpty) {
-      c.addMultipleHabits(selectedHabits);
+      ref
+          .read(habitNotifierProvider.notifier)
+          .addMultipleHabits(selectedHabits);
     }
 
-    Navigator.of(context).pop(); // Close the confirmation dialog
-    Get.snackbar(
-      S.current.success,
-      S.current.addedSelectedHabitsSuccess,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.shade600,
-      colorText: Colors.white,
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(S.of(context).addedSelectedHabitsSuccess),
+        backgroundColor: Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
