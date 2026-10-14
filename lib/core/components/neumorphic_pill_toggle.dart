@@ -315,7 +315,7 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
                                             alpha: isDark ? 0.35 : 0.20,
                                           ),
                                           offset: const Offset(0, 1.0),
-                                          blurRadius: 1.5,
+                                          blurRadius: .5,
                                         ),
                                       ]
                                     : null,
