@@ -3,14 +3,12 @@
 A **beautiful**, **responsive**, and **intuitive** habit tracking app built with Flutter — designed to help you build positive daily routines with ease.
 
 <div align="center">
-<a href="assets/image/Habit tracker7.png"><img src="assets/image/Habit tracker7.png" width="700" alt="Habit Management" /></a> 
+<a href="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker7.png"><img src="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker7.png" width="700" alt="Habit Management" /></a> 
 </div>
 
 <div align="center">
-<a href="https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk">
 
 [![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk)
-</a>
 
 [![Latest Release](https://img.shields.io/github/v/release/abod8639/habit_tracker?style=for-the-badge&logo=github&color=blue)](https://github.com/abod8639/habit_tracker/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -96,9 +94,9 @@ Track your progress and stay on top of your daily routines directly from your de
 
 |  |  |
 | :---: | :---: |
-| <a href="assets/image/Habit tracker4.png"><img src="assets/image/Habit tracker4.png" width="450" alt="Theme Customization" /></a> | <a href="assets/image/Habit tracker9.png"><img src="assets/image/Habit tracker9.png" width="450" alt="Statistics & Analytics" /></a> |
+| <a href="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker4.png"><img src="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker4.png" width="450" alt="Theme Customization" /></a> | <a href="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker9.png"><img src="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker9.png" width="450" alt="Statistics & Analytics" /></a> |
 
- <a href="assets/image/Habit tracker10.png"><img src="assets/image/Habit tracker10.png" width="800" alt="Detailed Monthly Progress" /></a> 
+ <a href="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker10.png"><img src="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker10.png" width="800" alt="Detailed Monthly Progress" /></a> 
 
 </div>
 
