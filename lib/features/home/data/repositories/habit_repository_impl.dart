@@ -116,7 +116,11 @@ class HabitRepositoryImpl implements HabitRepository {
         }
 
         if (firestoreService.isUserLoggedIn) {
-          await firestoreService.uploadHabits(models);
+          try {
+            await firestoreService.uploadHabits(models);
+          } catch (e) {
+            debugPrint('Cloud sync error (habits updated locally): $e');
+          }
         }
       }
 
