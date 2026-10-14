@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/core/init/app_initializer.dart';
-import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 
 // ── CUSTOM GEMINI EXCEPTIONS ──────────────────────────────────────────────────
 abstract class GeminiException implements Exception {
