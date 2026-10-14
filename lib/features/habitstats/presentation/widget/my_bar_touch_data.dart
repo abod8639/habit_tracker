@@ -1,11 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import '../controllers/habitstats_controller.dart';
 
-BarTouchData myBarTouchData(BuildContext context) {
-  final controller = Get.find<HabitStatsController>();
+BarTouchData myBarTouchData(
+  BuildContext context,
+  List<Map<String, dynamic>> chartData,
+) {
 
   return BarTouchData(
     enabled: true,
@@ -26,7 +26,6 @@ BarTouchData myBarTouchData(BuildContext context) {
         width: 1.0,
       ),
       getTooltipItem: (group, groupIndex, rod, rodIndex) {
-        final List<Map<String, dynamic>> chartData = controller.todaySummary;
         if (groupIndex < 0 || groupIndex >= chartData.length) return null;
 
         final Map<String, dynamic> habit = chartData[groupIndex];
