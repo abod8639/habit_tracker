@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -94,7 +93,9 @@ class _ThemeCardState extends State<ThemeCard>
   String _formatThemeName(String name) {
     return name
         .split('_')
-        .map((word) => word.capitalizeFirst ?? word)
+        .map((word) => word.isEmpty
+            ? ''
+            : '${word[0].toUpperCase()}${word.substring(1)}')
         .join(' ');
   }
 
