@@ -1,29 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/services/analytics_service.dart';
-import 'package:habit_tracker/features/ai_chat/presentation/controllers/ai_chat_binding.dart';
-import 'package:habit_tracker/features/ai_chat/presentation/controllers/ai_chat_controller.dart';
+import 'package:habit_tracker/features/about/presentation/page/about_page.dart';
 import 'package:habit_tracker/features/ai_chat/presentation/pages/ai_chat_page.dart';
 import 'package:habit_tracker/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:habit_tracker/features/auth/presentation/pages/login_page.dart';
 import 'package:habit_tracker/features/auth/presentation/widgets/auth_wrapper.dart';
-import 'package:habit_tracker/features/generate_plan/presentation/controllers/plan_generator_binding.dart';
-import 'package:habit_tracker/features/generate_plan/presentation/controllers/plan_generator_controller.dart';
 import 'package:habit_tracker/features/generate_plan/presentation/pages/category_selection_screen.dart';
 import 'package:habit_tracker/features/generate_plan/presentation/pages/plan_result_screen.dart';
 import 'package:habit_tracker/features/generate_plan/presentation/pages/questionnaire_screen.dart';
-import 'package:habit_tracker/features/habitstats/presentation/controllers/habitstats_binding.dart';
-import 'package:habit_tracker/features/habitstats/presentation/controllers/habitstats_controller.dart';
 import 'package:habit_tracker/features/habitstats/presentation/pages/habit_stats_page.dart';
 import 'package:habit_tracker/features/home/presentation/pages/home_screen.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/setting_binding.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
 import 'package:habit_tracker/features/setting/presentation/pages/settings_page.dart';
 import 'package:habit_tracker/features/theme/presentation/pages/theme_page.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:habit_tracker/features/about/presentation/page/about_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return AppRouter.router;
@@ -70,12 +62,7 @@ class AppRouter {
         GoRoute(
           path: AppRoutes.stats,
           name: AppRoutes.stats,
-          builder: (context, state) {
-            if (!Get.isRegistered<HabitStatsController>()) {
-              HabitStatsBinding().dependencies();
-            }
-            return const HabitStatsPage();
-          },
+          builder: (context, state) => const HabitStatsPage(),
         ),
         GoRoute(
           path: AppRoutes.theme,
@@ -85,52 +72,27 @@ class AppRouter {
         GoRoute(
           path: AppRoutes.aiCoach,
           name: AppRoutes.aiCoach,
-          builder: (context, state) {
-            if (!Get.isRegistered<AiChatController>()) {
-              AiChatBinding().dependencies();
-            }
-            return const AiChatPage();
-          },
+          builder: (context, state) => const AiChatPage(),
         ),
         GoRoute(
           path: AppRoutes.settings,
           name: AppRoutes.settings,
-          builder: (context, state) {
-            if (!Get.isRegistered<SyncController>()) {
-              SettingBinding().dependencies();
-            }
-            return const SettingsPage();
-          },
+          builder: (context, state) => const SettingsPage(),
         ),
         GoRoute(
           path: AppRoutes.categorySelection,
           name: AppRoutes.categorySelection,
-          builder: (context, state) {
-            if (!Get.isRegistered<PlanGeneratorController>()) {
-              PlanGeneratorBinding().dependencies();
-            }
-            return const CategorySelectionScreen();
-          },
+          builder: (context, state) => const CategorySelectionScreen(),
         ),
         GoRoute(
           path: AppRoutes.questionnaire,
           name: AppRoutes.questionnaire,
-          builder: (context, state) {
-            if (!Get.isRegistered<PlanGeneratorController>()) {
-              PlanGeneratorBinding().dependencies();
-            }
-            return const QuestionnaireScreen();
-          },
+          builder: (context, state) => const QuestionnaireScreen(),
         ),
         GoRoute(
           path: AppRoutes.result,
           name: AppRoutes.result,
-          builder: (context, state) {
-            if (!Get.isRegistered<PlanGeneratorController>()) {
-              PlanGeneratorBinding().dependencies();
-            }
-            return const PlanResultScreen();
-          },
+          builder: (context, state) => const PlanResultScreen(),
         ),
         GoRoute(
           path: AppRoutes.about,
