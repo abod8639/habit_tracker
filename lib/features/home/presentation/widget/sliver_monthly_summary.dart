@@ -13,7 +13,7 @@ class SliverMonthlySummary extends ConsumerWidget {
     final datasets = ref.watch(
       habitNotifierProvider.select((s) => s.heatmapDateSet),
     );
-    final habitNotifier = ref.read(habitNotifierProvider.notifier);
+    final habitNotifier = ref.watch(habitNotifierProvider.notifier);
     final startDay = habitNotifier.getStartDay();
 
     return SliverToBoxAdapter(
