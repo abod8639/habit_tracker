@@ -67,12 +67,16 @@ class HabitDialogs {
     WidgetRef? ref,
   }) {
     final textController = TextEditingController(text: currentName);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     showDialog(
       context: context,
       builder: (dialogContext) {
         return MyalartDialog(
+          title: S.current.editThisHabit,
           hintText: S.current.editThisHabit,
+          actionButtonText: isAr ? 'تعديل' : 'Edit',
+          isEditing: true,
           controller: textController,
           onSave: () async {
             final String habitName = textController.text.trim();
