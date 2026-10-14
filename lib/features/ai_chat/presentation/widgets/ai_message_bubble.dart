@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:habit_tracker/features/ai_chat/presentation/controllers/ai_chat_controller.dart';
+import 'package:habit_tracker/features/ai_chat/domain/entities/chat_message_entity.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'ai_avatar.dart';
 
 /// Neumorphic styled message bubble supporting user and AI responses with
 /// molded 3D dual shadows, soft convex gradients, and tactile feedback.
 class AiMessageBubble extends StatelessWidget {
-  final ChatMessage message;
+  final ChatMessageEntity message;
   final bool isLast;
   final VoidCallback onRetry;
 
@@ -24,20 +23,28 @@ class AiMessageBubble extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: text));
     HapticFeedback.lightImpact();
 
-    final isArabic = Get.locale?.languageCode == 'ar';
-    Get.rawSnackbar(
-      message: isArabic ? 'تم نسخ الرسالة' : 'Message copied to clipboard',
-      duration: const Duration(seconds: 2),
-      snackPosition: SnackPosition.BOTTOM,
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      borderRadius: 16,
-      backgroundColor: Theme.of(
-        context,
-      ).colorScheme.inverseSurface.withValues(alpha: 0.9),
-      icon: const Icon(
-        Icons.check_circle_outline,
-        color: Colors.greenAccent,
-        size: 20,
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.greenAccent,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(isArabic ? 'تم نسخ الرسالة' : 'Message copied to clipboard'),
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.inverseSurface.withValues(alpha: 0.9),
       ),
     );
   }
@@ -60,17 +67,13 @@ class AiMessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Retry button for user failed message
-          if (isUser) ...[
-            Obx(
-              () => message.hasError.value
-                  ? Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 8),
-                      child: _NeumorphicRetryButton(
-                        onPressed: onRetry,
-                        tooltip: S.of(context).retry,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
+          if (isUser && message.hasError) ...[
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8),
+              child: _NeumorphicRetryButton(
+                onPressed: onRetry,
+                tooltip: S.of(context).retry,
+              ),
             ),
           ],
 
@@ -83,7 +86,7 @@ class AiMessageBubble extends StatelessWidget {
           // Neumorphic message bubble container
           Flexible(
             child: GestureDetector(
-              onLongPress: () => _copyToClipboard(context, message.text.value),
+              onLongPress: () => _copyToClipboard(context, message.text),
               child: Container(
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.76,
@@ -219,18 +222,16 @@ class AiMessageBubble extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                     ],
-                    Obx(
-                      () => Text(
-                        message.text.value,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          height: 1.5,
-                          letterSpacing: -0.1,
-                          color: isUser
-                              ? theme.colorScheme.onPrimary
-                              : theme.colorScheme.onSurface,
-                        ),
+                    Text(
+                      message.text,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        height: 1.5,
+                        letterSpacing: -0.1,
+                        color: isUser
+                            ? theme.colorScheme.onPrimary
+                            : theme.colorScheme.onSurface,
                       ),
                     ),
                   ],
