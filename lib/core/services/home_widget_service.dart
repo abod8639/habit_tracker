@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:get/get.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home_app_widget/home_app_widget_view.dart';
@@ -14,7 +13,7 @@ import 'package:habit_tracker/generated/l10n.dart';
 /// Service responsible for managing and synchronizing the mobile home screen widget
 /// via `home_widget`. Renders off-screen snapshots of [HomeAppWidgetView] and triggers
 /// OS-level widget refreshes.
-class HomeWidgetService extends GetxService {
+class HomeWidgetService {
   static const String appWidgetProviderName = 'HabitAppWidgetProvider';
   static const String habitWidgetImageKey = 'habit_widget_image';
   static const String androidQualifiedName =
