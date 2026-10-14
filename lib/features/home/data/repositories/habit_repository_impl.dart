@@ -281,18 +281,11 @@ class HabitRepositoryImpl implements HabitRepository {
         return Right(cached);
       }
 
-      // 1. Get historical data from local storage
-      final rawHistory = await localDataSource.getAllHabitStrengths();
+      // 1. Get historical data directly from local storage
+      final rawHeatmap = await localDataSource.getHeatmapData();
+      final Map<DateTime, int> heatmapData = Map<DateTime, int>.from(rawHeatmap);
 
-      // 2. Compute heatmap directly for normal sizes to avoid isolate startup overhead
-      final Map<DateTime, int> heatmapData;
-      if (rawHistory.length >= 500) {
-        heatmapData = await compute(_processHeatmapData, rawHistory);
-      } else {
-        heatmapData = _processHeatmapData(rawHistory);
-      }
-
-      // 3. Recalculate TODAY's strength based on LIVE habits
+      // 2. Recalculate TODAY's strength based on LIVE habits
       heatmapData[normalizedToday] = todayStrength;
 
       _cachedHeatmapData = Map<DateTime, int>.from(heatmapData);
@@ -611,33 +604,4 @@ class HabitRepositoryImpl implements HabitRepository {
       return Left(CacheFailure(e.toString()));
     }
   }
-}
-
-// Top level function for compute - Must be outside the class
-Map<DateTime, int> _processHeatmapData(Map<String, String> rawData) {
-  final Map<DateTime, int> heatmapData = {};
-  for (var entry in rawData.entries) {
-    try {
-      // Safely extract the 8-digit date string (YYYYMMDD) even if prefixed
-      String yyyymmdd = entry.key;
-      if (yyyymmdd.length > 8) {
-        yyyymmdd = yyyymmdd.substring(yyyymmdd.length - 8);
-      }
-
-      if (yyyymmdd.length != 8) continue;
-
-      final yyyy = int.parse(yyyymmdd.substring(0, 4));
-      final mm = int.parse(yyyymmdd.substring(4, 6));
-      final dd = int.parse(yyyymmdd.substring(6, 8));
-
-      final date = DateTime(yyyy, mm, dd);
-      final doubleStrength = double.tryParse(entry.value) ?? 0.0;
-      int strength = (doubleStrength * 10).toInt();
-      if (strength == 0 && doubleStrength > 0) strength = 1;
-      heatmapData[date] = strength;
-    } catch (_) {
-      // Skip invalid entries
-    }
-  }
-  return heatmapData;
 }
