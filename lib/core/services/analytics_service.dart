@@ -1,8 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-class AnalyticsService extends GetxService {
+class AnalyticsService {
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   FirebaseAnalyticsObserver getObserver() {
