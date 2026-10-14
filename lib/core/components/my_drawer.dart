@@ -94,16 +94,18 @@ class _DrawerListState extends State<DrawerList> {
                   color: Colors.lightBlue,
                   Icons.document_scanner_rounded,
                 ),
-          onTap:()=> _isScanning ? null : AiGuard.protect(
-              context,
-              onValid: _handleScanImage,
-          ),
+          onTap: () => _isScanning
+              ? null
+              : AiGuard.protect(
+                  context,
+                  onValid: _handleScanImage,
+                ),
           title: S.current.scanImage,
         ),
         MyDrawerListTile(
           icon: const Icon(color: Colors.blueAccent, Icons.auto_graph_sharp),
           onTap: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).canPop();
             context.push(AppRoutes.stats);
           },
           title: S.current.drawerReat,
@@ -114,7 +116,7 @@ class _DrawerListState extends State<DrawerList> {
             Icons.color_lens_outlined,
           ),
           onTap: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).canPop();
             context.push(AppRoutes.theme);
           },
           title: S.current.drawerTheme,
@@ -128,9 +130,7 @@ class _DrawerListState extends State<DrawerList> {
             AiGuard.protect(
               context,
               onValid: () {
-                if (navigator.canPop()) {
-                  navigator.pop();
-                }
+                navigator.canPop();
                 router.push(AppRoutes.aiCoach);
               },
             );
@@ -140,7 +140,7 @@ class _DrawerListState extends State<DrawerList> {
         MyDrawerListTile(
           icon: const Icon(color: Colors.blueGrey, Icons.settings),
           onTap: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).canPop();
             context.push(AppRoutes.settings);
           },
           title: S.current.drawerSetting,
