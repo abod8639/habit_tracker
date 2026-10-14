@@ -19,6 +19,7 @@ import 'package:habit_tracker/features/auth/domain/usecases/sign_out_usecase.dar
 import 'package:habit_tracker/features/auth/domain/usecases/sign_up_with_email_usecase.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
+import 'package:habit_tracker/features/theme/presentation/providers/theme_providers.dart';
 
 // Data Sources
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
@@ -134,9 +135,10 @@ class AuthNotifier extends Notifier<AuthState> {
         final fcm = ref.read(fcmServiceProvider);
         fcm?.syncTokenToFirestore();
 
-        // Automatically sync cloud habits on app startup / session restoration
+        // Automatically sync cloud habits and theme on app startup / session restoration
         if (previousUser?.uid != user.uid) {
           unawaited(ref.read(syncNotifierProvider.notifier).syncHabits());
+          unawaited(ref.read(themeNotifierProvider.notifier).syncWithCloud());
         }
       }
     });
@@ -175,7 +177,10 @@ class AuthNotifier extends Notifier<AuthState> {
         fcm?.syncTokenToFirestore();
 
         try {
-          await ref.read(syncNotifierProvider.notifier).syncHabits();
+          await Future.wait([
+            ref.read(syncNotifierProvider.notifier).syncHabits(),
+            ref.read(themeNotifierProvider.notifier).syncWithCloud(),
+          ]);
         } catch (e) {
           debugPrint('Auto sync after email sign-in failed: $e');
         }
@@ -205,7 +210,10 @@ class AuthNotifier extends Notifier<AuthState> {
         fcm?.syncTokenToFirestore();
 
         try {
-          await ref.read(syncNotifierProvider.notifier).syncHabits();
+          await Future.wait([
+            ref.read(syncNotifierProvider.notifier).syncHabits(),
+            ref.read(themeNotifierProvider.notifier).syncWithCloud(),
+          ]);
         } catch (e) {
           debugPrint('Auto sync after email sign-up failed: $e');
         }
@@ -232,7 +240,10 @@ class AuthNotifier extends Notifier<AuthState> {
           fcm?.syncTokenToFirestore();
 
           try {
-            await ref.read(syncNotifierProvider.notifier).syncHabits();
+            await Future.wait([
+              ref.read(syncNotifierProvider.notifier).syncHabits(),
+              ref.read(themeNotifierProvider.notifier).syncWithCloud(),
+            ]);
           } catch (e) {
             debugPrint('Auto sync after Google sign-in failed: $e');
           }
