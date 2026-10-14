@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'stats_neumorphic_utils.dart';
 
 /// Sub-list widget rendering individual habit items within a status category.
 class HabitSubList extends StatelessWidget {
-  final List<Map<String, dynamic>> habits;
+  final List<HabitEntity> habits;
   final bool isCompleted;
 
   const HabitSubList({
@@ -22,8 +23,7 @@ class HabitSubList extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final Color statusColor = isCompleted
-        ? colorScheme
-              .primary // Emerald
+        ? colorScheme.primary
         : colorScheme.error;
 
     return Container(
@@ -49,7 +49,7 @@ class HabitSubList extends StatelessWidget {
         ),
         itemBuilder: (context, index) {
           final habit = habits[index];
-          final String name = habit['habit']?.toString() ?? '';
+          final String name = habit.name;
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
