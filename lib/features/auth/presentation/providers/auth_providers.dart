@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/features/auth/data/datasources/auth_local_datasource.dart';
@@ -5,6 +6,7 @@ import 'package:habit_tracker/features/auth/data/datasources/auth_local_datasour
 import 'package:habit_tracker/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:habit_tracker/features/auth/data/datasources/auth_remote_datasource_impl.dart';
 import 'package:habit_tracker/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:habit_tracker/features/auth/domain/entities/auth_entity.dart';
 import 'package:habit_tracker/features/auth/domain/repositories/auth_repository.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/get_auth_state_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/get_skip_login_status_usecase.dart';
@@ -14,6 +16,7 @@ import 'package:habit_tracker/features/auth/domain/usecases/sign_in_with_email_u
 import 'package:habit_tracker/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/sign_up_with_email_usecase.dart';
+import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 
 // Data Sources
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
@@ -66,4 +69,194 @@ final setSkipLoginUseCaseProvider = Provider<SetSkipLoginUseCase>((ref) {
 
 final getSkipLoginStatusUseCaseProvider = Provider<GetSkipLoginStatusUseCase>((ref) {
   return GetSkipLoginStatusUseCase(ref.watch(authRepositoryProvider));
+});
+
+// Auth State
+class AuthState {
+  final AuthEntity? currentUser;
+  final bool isLoading;
+  final String? errorMessage;
+  final bool hasSkippedLogin;
+  final bool isInitialized;
+
+  const AuthState({
+    this.currentUser,
+    this.isLoading = false,
+    this.errorMessage,
+    this.hasSkippedLogin = false,
+    this.isInitialized = false,
+  });
+
+  bool get isLoggedIn => currentUser != null;
+
+  AuthState copyWith({
+    AuthEntity? currentUser,
+    bool? isLoading,
+    String? errorMessage,
+    bool? hasSkippedLogin,
+    bool? isInitialized,
+    bool clearUser = false,
+  }) {
+    return AuthState(
+      currentUser: clearUser ? null : (currentUser ?? this.currentUser),
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage,
+      hasSkippedLogin: hasSkippedLogin ?? this.hasSkippedLogin,
+      isInitialized: isInitialized ?? this.isInitialized,
+    );
+  }
+}
+
+// Auth Notifier
+class AuthNotifier extends Notifier<AuthState> {
+  StreamSubscription<AuthEntity?>? _authSubscription;
+
+  @override
+  AuthState build() {
+    final getAuthState = ref.watch(getAuthStateUseCaseProvider);
+    final getSkipStatus = ref.watch(getSkipLoginStatusUseCaseProvider);
+
+    _authSubscription?.cancel();
+    _authSubscription = getAuthState().listen((user) {
+      state = state.copyWith(
+        currentUser: user,
+        clearUser: user == null,
+      );
+      if (user != null) {
+        final fcm = ref.read(fcmServiceProvider);
+        fcm?.syncTokenToFirestore();
+      }
+    });
+
+    ref.onDispose(() {
+      _authSubscription?.cancel();
+    });
+
+    // Check initial skip login status
+    Future.microtask(() async {
+      final result = await getSkipStatus();
+      result.fold(
+        (_) => state = state.copyWith(hasSkippedLogin: false, isInitialized: true),
+        (status) => state = state.copyWith(hasSkippedLogin: status, isInitialized: true),
+      );
+    });
+
+    return const AuthState();
+  }
+
+  Future<bool> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    final useCase = ref.read(signInWithEmailUseCaseProvider);
+    final result = await useCase(email, password);
+
+    return result.fold(
+      (failure) {
+        state = state.copyWith(isLoading: false, errorMessage: failure.message);
+        return false;
+      },
+      (user) {
+        state = state.copyWith(isLoading: false, currentUser: user);
+        return true;
+      },
+    );
+  }
+
+  Future<bool> signUpWithEmail({
+    required String email,
+    required String password,
+    String? displayName,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    final useCase = ref.read(signUpWithEmailUseCaseProvider);
+    final result = await useCase(email, password, displayName);
+
+    return result.fold(
+      (failure) {
+        state = state.copyWith(isLoading: false, errorMessage: failure.message);
+        return false;
+      },
+      (user) {
+        state = state.copyWith(isLoading: false, currentUser: user);
+        return true;
+      },
+    );
+  }
+
+  Future<bool> signInWithGoogle() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    final useCase = ref.read(signInWithGoogleUseCaseProvider);
+    final result = await useCase();
+
+    return result.fold(
+      (failure) {
+        state = state.copyWith(isLoading: false, errorMessage: failure.message);
+        return false;
+      },
+      (user) {
+        state = state.copyWith(isLoading: false, currentUser: user);
+        return user != null;
+      },
+    );
+  }
+
+  Future<void> signOut() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final currentUid = state.currentUser?.uid ?? 'offline_user';
+      final habitRepo = ref.read(habitRepositoryProvider);
+      await habitRepo.backupToVault(userId: currentUid);
+
+      final setSkip = ref.read(setSkipLoginUseCaseProvider);
+      await setSkip(false);
+
+      final fcm = ref.read(fcmServiceProvider);
+      try {
+        await fcm?.clearTokenFromFirestore();
+      } catch (_) {}
+
+      final localData = ref.read(habitLocalDataSourceProvider);
+      await localData.clearAllData();
+
+      final signOutUseCase = ref.read(signOutUseCaseProvider);
+      await signOutUseCase();
+
+      state = state.copyWith(
+        isLoading: false,
+        clearUser: true,
+        hasSkippedLogin: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<bool> resetPassword({required String email}) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    final useCase = ref.read(resetPasswordUseCaseProvider);
+    final result = await useCase(email);
+
+    return result.fold(
+      (failure) {
+        state = state.copyWith(isLoading: false, errorMessage: failure.message);
+        return false;
+      },
+      (_) {
+        state = state.copyWith(isLoading: false);
+        return true;
+      },
+    );
+  }
+
+  Future<void> setSkipLogin(bool skipped) async {
+    final useCase = ref.read(setSkipLoginUseCaseProvider);
+    await useCase(skipped);
+    state = state.copyWith(hasSkippedLogin: skipped);
+  }
+}
+
+final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(() {
+  return AuthNotifier();
 });
