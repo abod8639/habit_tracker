@@ -123,6 +123,7 @@ class AuthNotifier extends Notifier<AuthState> {
 
     _authSubscription?.cancel();
     _authSubscription = getAuthState().listen((user) {
+      if (!ref.mounted) return;
       if (state.isLoading) {
         // Explicit auth action in progress; it manages its own state and sync.
         return;
@@ -147,6 +148,7 @@ class AuthNotifier extends Notifier<AuthState> {
     // Check initial skip login status
     Future.microtask(() async {
       final result = await getSkipStatus();
+      if (!ref.mounted) return;
       result.fold(
         (_) => state = state.copyWith(hasSkippedLogin: false, isInitialized: true),
         (status) => state = state.copyWith(hasSkippedLogin: status, isInitialized: true),
@@ -158,21 +160,27 @@ class AuthNotifier extends Notifier<AuthState> {
 
   /// Synchronizes habits and theme from cloud, then refreshes habit statistics.
   Future<void> _syncUserDataAfterAuth() async {
+    if (!ref.mounted) return;
     final fcm = ref.read(fcmServiceProvider);
     fcm?.syncTokenToFirestore();
 
     try {
+      if (!ref.mounted) return;
+      final syncNotifier = ref.read(syncNotifierProvider.notifier);
+      final themeNotifier = ref.read(themeNotifierProvider.notifier);
       await Future.wait([
-        ref.read(syncNotifierProvider.notifier).syncHabits(),
-        ref.read(themeNotifierProvider.notifier).syncWithCloud(),
+        syncNotifier.syncHabits(),
+        themeNotifier.syncWithCloud(),
       ]);
     } catch (e) {
       debugPrint('Auto sync after authentication failed: $e');
     } finally {
-      try {
-        await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
-      } catch (e) {
-        debugPrint('Failed to refresh habit stats after authentication: $e');
+      if (ref.mounted) {
+        try {
+          await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
+        } catch (e) {
+          debugPrint('Failed to refresh habit stats after authentication: $e');
+        }
       }
     }
   }
@@ -191,7 +199,9 @@ class AuthNotifier extends Notifier<AuthState> {
         return false;
       },
       (user) async {
+        if (!ref.mounted) return false;
         await _syncUserDataAfterAuth();
+        if (!ref.mounted) return true;
         state = state.copyWith(isLoading: false, currentUser: user);
         return true;
       },
@@ -209,11 +219,14 @@ class AuthNotifier extends Notifier<AuthState> {
 
     return await result.fold(
       (failure) async {
+        if (!ref.mounted) return false;
         state = state.copyWith(isLoading: false, errorMessage: failure.message);
         return false;
       },
       (user) async {
+        if (!ref.mounted) return false;
         await _syncUserDataAfterAuth();
+        if (!ref.mounted) return true;
         state = state.copyWith(isLoading: false, currentUser: user);
         return true;
       },
@@ -227,13 +240,16 @@ class AuthNotifier extends Notifier<AuthState> {
 
     return await result.fold(
       (failure) async {
+        if (!ref.mounted) return false;
         state = state.copyWith(isLoading: false, errorMessage: failure.message);
         return false;
       },
       (user) async {
+        if (!ref.mounted) return false;
         if (user != null) {
           await _syncUserDataAfterAuth();
         }
+        if (!ref.mounted) return user != null;
         state = state.copyWith(isLoading: false, currentUser: user);
         return user != null;
       },
@@ -259,19 +275,27 @@ class AuthNotifier extends Notifier<AuthState> {
       await localData.clearAllData();
 
       // Refresh in-memory habit state and stats so UI is immediately cleared
-      await ref.read(habitNotifierProvider.notifier).refreshData();
-      await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
+      if (ref.mounted) {
+        await ref.read(habitNotifierProvider.notifier).refreshData();
+      }
+      if (ref.mounted) {
+        await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
+      }
 
       final signOutUseCase = ref.read(signOutUseCaseProvider);
       await signOutUseCase();
 
-      state = state.copyWith(
-        isLoading: false,
-        clearUser: true,
-        hasSkippedLogin: false,
-      );
+      if (ref.mounted) {
+        state = state.copyWith(
+          isLoading: false,
+          clearUser: true,
+          hasSkippedLogin: false,
+        );
+      }
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      if (ref.mounted) {
+        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      }
     }
   }
 
