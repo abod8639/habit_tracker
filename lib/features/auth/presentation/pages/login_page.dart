@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
-import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:habit_tracker/features/auth/presentation/providers/auth_providers.dart';
 import 'package:habit_tracker/features/auth/presentation/widgets/fade_slide_transition.dart';
 import 'package:habit_tracker/features/auth/presentation/widgets/login_page_icon.dart';
 import 'package:habit_tracker/features/auth/presentation/widgets/neumorphic_google_button.dart';
-import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/sync_controller.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
 
   Future<void> _handleGoogleSignIn({
     required BuildContext context,
-    required AuthController authController,
-    required SyncController syncController,
-    required HabitController habitController,
+    required WidgetRef ref,
   }) async {
-    final success = await authController.signInWithGoogle();
+    final success =
+        await ref.read(authNotifierProvider.notifier).signInWithGoogle();
     if (success) {
-      await syncController.syncHabits(habitController);
+      await ref.read(syncNotifierProvider.notifier).syncHabits();
       if (context.mounted) {
         context.go(AppRoutes.home);
       }
@@ -31,14 +29,16 @@ class LoginPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = theme.cardColor;
 
-    final AuthController authController = Get.find<AuthController>();
-    final HabitController habitController = Get.find<HabitController>();
-    final SyncController syncController = Get.find<SyncController>();
+    final authState = ref.watch(authNotifierProvider);
+    final syncState = ref.watch(syncNotifierProvider);
+    final bool isAuthLoading = authState.isLoading;
+    final bool isSyncing = syncState.syncStatus == SyncStatus.syncing;
+    final bool isLoading = isAuthLoading || isSyncing;
 
     const delayStep = Duration(milliseconds: 120);
 
@@ -63,7 +63,9 @@ class LoginPage extends StatelessWidget {
                     child: _NeumorphicSkipButton(
                       label: S.current.skipNow,
                       onPressed: () async {
-                        await authController.setSkipLogin(true);
+                        await ref
+                            .read(authNotifierProvider.notifier)
+                            .setSkipLogin(true);
                         if (context.mounted) {
                           context.go(AppRoutes.home);
                         }
@@ -135,27 +137,16 @@ class LoginPage extends StatelessWidget {
                         const SizedBox(height: 36),
 
                         // Google Sign-In Only
-                        Obx(() {
-                          final bool isAuthLoading =
-                              authController.isLoading.value;
-                          final bool isSyncing =
-                              syncController.syncStatus.value ==
-                              SyncStatus.syncing;
-                          final bool isLoading = isAuthLoading || isSyncing;
-
-                          return NeumorphicGoogleButton(
-                            label: S.current.signInWithGoogle,
-                            isLoading: isLoading,
-                            onPressed: isLoading
-                                ? null
-                                : () => _handleGoogleSignIn(
-                                      context: context,
-                                      authController: authController,
-                                      syncController: syncController,
-                                      habitController: habitController,
-                                    ),
-                          );
-                        }),
+                        NeumorphicGoogleButton(
+                          label: S.current.signInWithGoogle,
+                          isLoading: isLoading,
+                          onPressed: isLoading
+                              ? null
+                              : () => _handleGoogleSignIn(
+                                    context: context,
+                                    ref: ref,
+                                  ),
+                        ),
                       ],
                     ),
                   ),
