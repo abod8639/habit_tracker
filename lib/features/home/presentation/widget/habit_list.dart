@@ -17,7 +17,7 @@ class HabitList extends ConsumerWidget {
       habitNotifierProvider.select((s) => s.selectedHabitIds),
     );
     final isSelectionMode = selectedHabitIds.isNotEmpty;
-    final habitNotifier = ref.read(habitNotifierProvider.notifier);
+    final habitNotifier = ref.watch(habitNotifierProvider.notifier);
 
     if (habits.isEmpty) {
       return const SliverFillRemaining(
