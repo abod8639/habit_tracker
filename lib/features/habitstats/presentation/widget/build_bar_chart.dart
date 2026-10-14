@@ -1,25 +1,24 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import '../controllers/habitstats_controller.dart';
+import '../providers/habitstats_providers.dart';
 import 'my_bar_touch_data.dart';
 import 'stats_neumorphic_utils.dart';
 
-class TodayBarChartCard extends StatelessWidget {
+class TodayBarChartCard extends ConsumerWidget {
   const TodayBarChartCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final HabitStatsController controller = Get.find<HabitStatsController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(habitStatsNotifierProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Obx(() {
-      final List<Map<String, dynamic>> chartData = controller.todaySummary;
-      final int streak = controller.stats.value?.streak ?? 1;
+    final List<Map<String, dynamic>> chartData = state.todaySummary;
+    final int streak = state.stats?.streak ?? 1;
 
       if (chartData.isEmpty) {
         return SoftCard(
@@ -47,7 +46,7 @@ class TodayBarChartCard extends StatelessWidget {
               height: 210,
               child: BarChart(
                 BarChartData(
-                  barTouchData: myBarTouchData(context),
+                  barTouchData: myBarTouchData(context, chartData),
                   alignment: BarChartAlignment.spaceAround,
                   maxY: maxY,
                   titlesData: FlTitlesData(
@@ -165,6 +164,5 @@ class TodayBarChartCard extends StatelessWidget {
           ],
         ),
       );
-    });
   }
 }
