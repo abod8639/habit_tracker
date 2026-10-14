@@ -5,6 +5,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:habit_tracker/core/services/notification_service.dart';
+import 'package:habit_tracker/core/database/app_database.dart';
+import 'package:habit_tracker/core/database/migrators/hive_to_sql_migrator.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/setting/data/datasources/lang_storage.dart';
@@ -22,6 +24,7 @@ class AppInitializer {
   static late ThemeStorageService themeStorage;
   static late SettingsStorage settingsStorage;
   static late LangStorage langStorage;
+  static late AppDatabase database;
   static NotificationService? notificationService;
   static FcmService? fcmService;
 
@@ -42,14 +45,19 @@ class AppInitializer {
       await _openBoxSafely(LangStorage.boxName);
       await _openBoxSafely(SettingsStorage.boxName);
 
-      // 3. Load Environment variables
+      // 3. Initialize SQLite Drift Database & run migration from Hive if needed
+      database = AppDatabase();
+      final migrator = HiveToSqlMigrator(database);
+      await migrator.migrateIfNeeded();
+
+      // 4. Load Environment variables
       try {
         await dotenv.load(fileName: '.env');
       } catch (_) {
         // .env is optional
       }
 
-      // 4. Initialize infrastructure services
+      // 5. Initialize infrastructure services
       firestoreService = FirestoreService();
 
       themeStorage = await ThemeStorageService.init();
