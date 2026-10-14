@@ -12,6 +12,7 @@ import 'package:habit_tracker/features/theme/domain/usecases/get_theme_settings_
 import 'package:habit_tracker/features/theme/domain/usecases/save_theme_settings_usecase.dart';
 import 'package:habit_tracker/features/theme/domain/usecases/sync_theme_with_cloud_usecase.dart';
 import 'package:habit_tracker/features/theme/domain/usecases/upload_theme_settings_usecase.dart';
+import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'theme_state.dart';
 
 // Data Sources
@@ -146,9 +147,27 @@ class ThemeNotifier extends Notifier<ThemeState> {
             lightTheme: _buildThemeData(entity.themeName, false, customBg),
             darkTheme: _buildThemeData(entity.themeName, true, customBg),
           );
+          _updateHomeWidget();
         }
       },
     );
+  }
+
+  void _updateHomeWidget() {
+    try {
+      final homeWidget = ref.read(homeWidgetServiceProvider);
+      final habitState = ref.read(habitNotifierProvider);
+      final isDark = state.themeMode == ThemeMode.dark;
+      final activeTheme = isDark ? state.darkTheme : state.lightTheme;
+      homeWidget.updateWidget(
+        habits: habitState.habits,
+        heatmapData: habitState.heatmapDateSet,
+        overrideTheme: activeTheme,
+        overrideIsDark: isDark,
+      );
+    } catch (e) {
+      debugPrint('Error updating home widget on theme change: $e');
+    }
   }
 
   void changeThemeMode(ThemeMode mode) {
@@ -204,6 +223,9 @@ class ThemeNotifier extends Notifier<ThemeState> {
       useCustomBackground: state.useCustomBackground,
       customBackgroundColor: state.useCustomBackground ? state.customBackgroundColor : null,
     );
+
+    // Immediately trigger Home Widget refresh with new theme
+    _updateHomeWidget();
 
     final saveUseCase = ref.read(saveThemeSettingsUseCaseProvider);
     final result = await saveUseCase(entity);
