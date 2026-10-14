@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/services/analytics_service.dart';
@@ -25,6 +24,8 @@ class AppRouter {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
+  static final AnalyticsService _analytics = AnalyticsService();
+
   static GoRouter? _router;
   static GoRouter get router => _router ??= _createRouter();
 
@@ -33,10 +34,8 @@ class AppRouter {
       navigatorKey: navigatorKey,
       initialLocation: AppRoutes.root,
       observers: [
-        if (Get.isRegistered<AnalyticsService>()) ...[
-          Get.find<AnalyticsService>().getObserver(),
-          Get.find<AnalyticsService>().getTimeTrackerObserver(),
-        ],
+        _analytics.getObserver(),
+        _analytics.getTimeTrackerObserver(),
       ],
       routes: [
         GoRoute(
