@@ -448,15 +448,6 @@ class $HabitCompletionsTable extends HabitCompletions
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $HabitCompletionsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _habitIdMeta =
       const VerificationMeta('habitId');
   @override
@@ -483,7 +474,7 @@ class $HabitCompletionsTable extends HabitCompletions
           'CHECK ("is_completed" IN (0, 1))'),
       defaultValue: const Constant(true));
   @override
-  List<GeneratedColumn> get $columns => [id, habitId, dateStr, isCompleted];
+  List<GeneratedColumn> get $columns => [habitId, dateStr, isCompleted];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -495,9 +486,6 @@ class $HabitCompletionsTable extends HabitCompletions
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
     if (data.containsKey('habit_id')) {
       context.handle(_habitIdMeta,
           habitId.isAcceptableOrUnknown(data['habit_id']!, _habitIdMeta));
@@ -520,13 +508,11 @@ class $HabitCompletionsTable extends HabitCompletions
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {habitId, dateStr};
   @override
   HabitCompletionRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return HabitCompletionRecord(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       habitId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}habit_id'])!,
       dateStr: attachedDatabase.typeMapping
@@ -544,19 +530,16 @@ class $HabitCompletionsTable extends HabitCompletions
 
 class HabitCompletionRecord extends DataClass
     implements Insertable<HabitCompletionRecord> {
-  final int id;
   final String habitId;
   final String dateStr;
   final bool isCompleted;
   const HabitCompletionRecord(
-      {required this.id,
-      required this.habitId,
+      {required this.habitId,
       required this.dateStr,
       required this.isCompleted});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
     map['habit_id'] = Variable<String>(habitId);
     map['date_str'] = Variable<String>(dateStr);
     map['is_completed'] = Variable<bool>(isCompleted);
@@ -565,7 +548,6 @@ class HabitCompletionRecord extends DataClass
 
   HabitCompletionsCompanion toCompanion(bool nullToAbsent) {
     return HabitCompletionsCompanion(
-      id: Value(id),
       habitId: Value(habitId),
       dateStr: Value(dateStr),
       isCompleted: Value(isCompleted),
@@ -576,7 +558,6 @@ class HabitCompletionRecord extends DataClass
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return HabitCompletionRecord(
-      id: serializer.fromJson<int>(json['id']),
       habitId: serializer.fromJson<String>(json['habitId']),
       dateStr: serializer.fromJson<String>(json['dateStr']),
       isCompleted: serializer.fromJson<bool>(json['isCompleted']),
@@ -586,7 +567,6 @@ class HabitCompletionRecord extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
       'habitId': serializer.toJson<String>(habitId),
       'dateStr': serializer.toJson<String>(dateStr),
       'isCompleted': serializer.toJson<bool>(isCompleted),
@@ -594,16 +574,14 @@ class HabitCompletionRecord extends DataClass
   }
 
   HabitCompletionRecord copyWith(
-          {int? id, String? habitId, String? dateStr, bool? isCompleted}) =>
+          {String? habitId, String? dateStr, bool? isCompleted}) =>
       HabitCompletionRecord(
-        id: id ?? this.id,
         habitId: habitId ?? this.habitId,
         dateStr: dateStr ?? this.dateStr,
         isCompleted: isCompleted ?? this.isCompleted,
       );
   HabitCompletionRecord copyWithCompanion(HabitCompletionsCompanion data) {
     return HabitCompletionRecord(
-      id: data.id.present ? data.id.value : this.id,
       habitId: data.habitId.present ? data.habitId.value : this.habitId,
       dateStr: data.dateStr.present ? data.dateStr.value : this.dateStr,
       isCompleted:
@@ -614,7 +592,6 @@ class HabitCompletionRecord extends DataClass
   @override
   String toString() {
     return (StringBuffer('HabitCompletionRecord(')
-          ..write('id: $id, ')
           ..write('habitId: $habitId, ')
           ..write('dateStr: $dateStr, ')
           ..write('isCompleted: $isCompleted')
@@ -623,68 +600,64 @@ class HabitCompletionRecord extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(id, habitId, dateStr, isCompleted);
+  int get hashCode => Object.hash(habitId, dateStr, isCompleted);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is HabitCompletionRecord &&
-          other.id == this.id &&
           other.habitId == this.habitId &&
           other.dateStr == this.dateStr &&
           other.isCompleted == this.isCompleted);
 }
 
 class HabitCompletionsCompanion extends UpdateCompanion<HabitCompletionRecord> {
-  final Value<int> id;
   final Value<String> habitId;
   final Value<String> dateStr;
   final Value<bool> isCompleted;
+  final Value<int> rowid;
   const HabitCompletionsCompanion({
-    this.id = const Value.absent(),
     this.habitId = const Value.absent(),
     this.dateStr = const Value.absent(),
     this.isCompleted = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   HabitCompletionsCompanion.insert({
-    this.id = const Value.absent(),
     required String habitId,
     required String dateStr,
     this.isCompleted = const Value.absent(),
+    this.rowid = const Value.absent(),
   })  : habitId = Value(habitId),
         dateStr = Value(dateStr);
   static Insertable<HabitCompletionRecord> custom({
-    Expression<int>? id,
     Expression<String>? habitId,
     Expression<String>? dateStr,
     Expression<bool>? isCompleted,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (id != null) 'id': id,
       if (habitId != null) 'habit_id': habitId,
       if (dateStr != null) 'date_str': dateStr,
       if (isCompleted != null) 'is_completed': isCompleted,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   HabitCompletionsCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? habitId,
+      {Value<String>? habitId,
       Value<String>? dateStr,
-      Value<bool>? isCompleted}) {
+      Value<bool>? isCompleted,
+      Value<int>? rowid}) {
     return HabitCompletionsCompanion(
-      id: id ?? this.id,
       habitId: habitId ?? this.habitId,
       dateStr: dateStr ?? this.dateStr,
       isCompleted: isCompleted ?? this.isCompleted,
+      rowid: rowid ?? this.rowid,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
     if (habitId.present) {
       map['habit_id'] = Variable<String>(habitId.value);
     }
@@ -694,16 +667,19 @@ class HabitCompletionsCompanion extends UpdateCompanion<HabitCompletionRecord> {
     if (isCompleted.present) {
       map['is_completed'] = Variable<bool>(isCompleted.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
   @override
   String toString() {
     return (StringBuffer('HabitCompletionsCompanion(')
-          ..write('id: $id, ')
           ..write('habitId: $habitId, ')
           ..write('dateStr: $dateStr, ')
-          ..write('isCompleted: $isCompleted')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -909,8 +885,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AppMetadataTable appMetadata = $AppMetadataTable(this);
   late final Index idxCompletionsDate = Index('idx_completions_date',
       'CREATE INDEX idx_completions_date ON habit_completions (date_str)');
-  late final Index idxCompletionsHabitDate = Index('idx_completions_habit_date',
-      'CREATE UNIQUE INDEX idx_completions_habit_date ON habit_completions (habit_id, date_str)');
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
   late final HabitHistoryDao habitHistoryDao =
       HabitHistoryDao(this as AppDatabase);
@@ -918,13 +892,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [
-        habits,
-        habitCompletions,
-        appMetadata,
-        idxCompletionsDate,
-        idxCompletionsHabitDate
-      ];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [habits, habitCompletions, appMetadata, idxCompletionsDate];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
         [
@@ -1241,17 +1210,17 @@ typedef $$HabitsTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function({bool habitCompletionsRefs})>;
 typedef $$HabitCompletionsTableCreateCompanionBuilder
     = HabitCompletionsCompanion Function({
-  Value<int> id,
   required String habitId,
   required String dateStr,
   Value<bool> isCompleted,
+  Value<int> rowid,
 });
 typedef $$HabitCompletionsTableUpdateCompanionBuilder
     = HabitCompletionsCompanion Function({
-  Value<int> id,
   Value<String> habitId,
   Value<String> dateStr,
   Value<bool> isCompleted,
+  Value<int> rowid,
 });
 
 final class $$HabitCompletionsTableReferences extends BaseReferences<
@@ -1282,9 +1251,6 @@ class $$HabitCompletionsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
-
   ColumnFilters<String> get dateStr => $composableBuilder(
       column: $table.dateStr, builder: (column) => ColumnFilters(column));
 
@@ -1321,9 +1287,6 @@ class $$HabitCompletionsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get dateStr => $composableBuilder(
       column: $table.dateStr, builder: (column) => ColumnOrderings(column));
 
@@ -1360,9 +1323,6 @@ class $$HabitCompletionsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
   GeneratedColumn<String> get dateStr =>
       $composableBuilder(column: $table.dateStr, builder: (column) => column);
 
@@ -1414,28 +1374,28 @@ class $$HabitCompletionsTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$HabitCompletionsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
             Value<String> habitId = const Value.absent(),
             Value<String> dateStr = const Value.absent(),
             Value<bool> isCompleted = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               HabitCompletionsCompanion(
-            id: id,
             habitId: habitId,
             dateStr: dateStr,
             isCompleted: isCompleted,
+            rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
             required String habitId,
             required String dateStr,
             Value<bool> isCompleted = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               HabitCompletionsCompanion.insert(
-            id: id,
             habitId: habitId,
             dateStr: dateStr,
             isCompleted: isCompleted,
+            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
