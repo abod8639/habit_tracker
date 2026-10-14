@@ -25,6 +25,7 @@ class HabitStatsPage extends ConsumerStatefulWidget {
 class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -37,6 +38,13 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
   }
 
   @override
+  void dispose() {
+    _animationController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -44,7 +52,7 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
 
     return KeyboardListener(
       autofocus: true,
-      focusNode: FocusNode(),
+      focusNode: _focusNode,
       onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -112,12 +120,6 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
   }
 }
 
