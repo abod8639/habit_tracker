@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
-import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:habit_tracker/features/auth/presentation/providers/auth_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Presentation dialog for user logout confirmation.
@@ -10,7 +11,7 @@ class LogoutDialog {
   /// Displays a confirmation dialog before signing the user out.
   static Future<void> show(
     BuildContext context,
-    AuthController authController,
+    WidgetRef ref,
   ) async {
     final confirmed = await AppConfirmationDialog.show(
       context: context,
@@ -23,7 +24,7 @@ class LogoutDialog {
     );
 
     if (confirmed == true) {
-      await authController.signOut();
+      await ref.read(authNotifierProvider.notifier).signOut();
     }
   }
 }
