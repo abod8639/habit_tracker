@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import '../controllers/habitstats_controller.dart';
+import '../providers/habitstats_providers.dart';
 import 'build_habit_list.dart';
 import 'stats_neumorphic_utils.dart';
 
 /// Interactive habit list card breaking down today's completed and incomplete habits.
-class HabitListCard extends StatelessWidget {
+class HabitListCard extends ConsumerWidget {
   const HabitListCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final HabitStatsController controller = Get.find<HabitStatsController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(habitStatsNotifierProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Obx(() {
-      final List<Map<String, dynamic>> chartData = controller.todaySummary;
+    final List<Map<String, dynamic>> chartData = state.todaySummary;
       final completedHabits = chartData
           .where((habit) => habit['completed'] == true)
           .toList();
@@ -130,7 +129,6 @@ class HabitListCard extends StatelessWidget {
           ],
         ),
       );
-    });
   }
 }
 
