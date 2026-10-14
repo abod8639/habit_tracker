@@ -258,12 +258,30 @@ class HabitNotifier extends Notifier<HabitState> {
   }
 
   Future<void> editHabit(String id, String newName) async {
-    if (newName.trim().isEmpty) return;
+    final trimmedName = newName.trim();
+    if (trimmedName.isEmpty) return;
+
+    final currentHabits = List<HabitEntity>.from(state.habits);
+    final index = currentHabits.indexWhere((h) => h.id == id);
+    if (index == -1) return;
+
+    final oldHabit = currentHabits[index];
+    if (oldHabit.name == trimmedName) return;
+
+    currentHabits[index] = oldHabit.copyWith(name: trimmedName);
+    state = state.copyWith(habits: currentHabits);
+
     final editUseCase = ref.read(editHabitUseCaseProvider);
-    final result = await editUseCase(id, newName);
-    result.fold(
-      (failure) => state = state.copyWith(errorMessage: failure.message),
-      (_) => _loadHabits(),
+    final result = await editUseCase(id, trimmedName);
+    await result.fold(
+      (failure) async {
+        currentHabits[index] = oldHabit;
+        state = state.copyWith(
+          habits: currentHabits,
+          errorMessage: failure.message,
+        );
+      },
+      (_) async => refreshData(),
     );
   }
 
