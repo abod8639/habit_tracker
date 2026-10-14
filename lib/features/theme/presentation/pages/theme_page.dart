@@ -8,20 +8,33 @@ import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/theme_providers.dart';
 import '../widgets/theme_card.dart';
 
-class ThemePage extends ConsumerWidget {
+class ThemePage extends ConsumerStatefulWidget {
   const ThemePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ThemePage> createState() => _ThemePageState();
+}
+
+class _ThemePageState extends ConsumerState<ThemePage> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final currentTheme = ref.watch(
       themeNotifierProvider.select((state) => state.currentTheme),
     );
-    final themeNotifier = ref.read(themeNotifierProvider.notifier);
+    final themeNotifier = ref.watch(themeNotifierProvider.notifier);
     final availableThemes = themeColors.keys.toList();
 
     return KeyboardListener(
       autofocus: true,
-      focusNode: FocusNode(),
+      focusNode: _focusNode,
       onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
         appBar: myAppBar(
