@@ -1,30 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/neumorphic_input.dart';
 import '../../domain/entities/question_entity.dart';
-import '../controllers/plan_generator_controller.dart';
+import '../providers/plan_generator_providers.dart';
 
-class QuestionTextInput extends StatefulWidget {
+class QuestionTextInput extends ConsumerStatefulWidget {
   final QuestionEntity question;
-  final PlanGeneratorController controller;
 
   const QuestionTextInput({
     super.key,
     required this.question,
-    required this.controller,
   });
 
   @override
-  State<QuestionTextInput> createState() => _QuestionTextInputState();
+  ConsumerState<QuestionTextInput> createState() => _QuestionTextInputState();
 }
 
-class _QuestionTextInputState extends State<QuestionTextInput> {
+class _QuestionTextInputState extends ConsumerState<QuestionTextInput> {
   late final TextEditingController _textController;
 
   @override
   void initState() {
     super.initState();
+    final initialAnswer =
+        ref.read(planGeneratorNotifierProvider).getAnswer(widget.question.id);
     _textController = TextEditingController(
-      text: widget.controller.getAnswer(widget.question.id)?.toString() ?? '',
+      text: initialAnswer?.toString() ?? '',
     );
   }
 
@@ -36,11 +37,13 @@ class _QuestionTextInputState extends State<QuestionTextInput> {
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.controller.selectedCategory.value?.color;
+    final color = ref.watch(planGeneratorNotifierProvider).selectedCategory?.color;
 
     return NeumorphicInput(
       controller: _textController,
-      onChanged: (v) => widget.controller.setAnswer(widget.question.id, v),
+      onChanged: (v) => ref
+          .read(planGeneratorNotifierProvider.notifier)
+          .setAnswer(widget.question.id, v),
       hintText: widget.question.hint,
       accentColor: color,
       minLines: 1,
