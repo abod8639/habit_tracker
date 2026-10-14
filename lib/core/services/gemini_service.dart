@@ -258,10 +258,15 @@ class GeminiService {
     return false;
   }
 
-  /// Checks if the current active API key is valid and operational
-  static Future<bool> isCurrentKeyValid() async {
+  /// Whether an API key is configured and present
+  static bool get hasValidKey => currentApiKey.isNotEmpty;
+
+  /// Checks if the current active API key is valid and operational.
+  /// If [forceValidate] is false, performs a fast check (presence) without blocking the UI.
+  static Future<bool> isCurrentKeyValid({bool forceValidate = false}) async {
     final key = currentApiKey;
     if (key.isEmpty) return false;
+    if (!forceValidate) return true;
     return validateApiKey(key);
   }
 
