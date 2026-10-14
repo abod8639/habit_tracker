@@ -5,12 +5,14 @@ class HabitStatsEntity extends Equatable {
   final int completedHabits;
   final double completionRate;
   final int streak;
+  final int bestStreak;
 
   const HabitStatsEntity({
     required this.totalHabits,
     required this.completedHabits,
     required this.completionRate,
     required this.streak,
+    this.bestStreak = 0,
   });
 
   @override
@@ -19,5 +21,6 @@ class HabitStatsEntity extends Equatable {
     completedHabits,
     completionRate,
     streak,
+    bestStreak,
   ];
 }
