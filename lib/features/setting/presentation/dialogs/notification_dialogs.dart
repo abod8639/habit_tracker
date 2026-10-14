@@ -32,11 +32,13 @@ class NotificationDialogs {
       final formattedTime = picked.format(context);
       final s = S.of(context);
       await notifier.setNotificationTime(picked);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${s.success}: ${s.reminderSetFor(formattedTime)}'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${s.success}: ${s.reminderSetFor(formattedTime)}'),
+          ),
+        );
+      }
     }
   }
 
