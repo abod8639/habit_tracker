@@ -31,7 +31,7 @@ class TrendChartCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(habitStatsNotifierProvider);
-    final notifier = ref.read(habitStatsNotifierProvider.notifier);
+    final notifier = ref.watch(habitStatsNotifierProvider.notifier);
 
     final List<FlSpot> trendSpots = state.overallTrend;
     final bool hasOverallData =
