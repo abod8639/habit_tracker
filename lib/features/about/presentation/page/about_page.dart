@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
@@ -35,9 +34,7 @@ class AboutPage extends StatelessWidget {
     final baseSurface = theme.cardColor;
     final primaryColor = theme.primaryColor;
     final isArabic =
-        (Get.locale?.languageCode ??
-                Localizations.localeOf(context).languageCode)
-            .startsWith('ar');
+        Localizations.localeOf(context).languageCode.startsWith('ar');
 
     return KeyboardListener(
       autofocus: true,
@@ -196,7 +193,7 @@ class AboutPage extends StatelessWidget {
                         children: [
                           _buildTechChip(context, 'Flutter', isDark),
                           _buildTechChip(context, 'Clean Architecture', isDark),
-                          _buildTechChip(context, 'GetX', isDark),
+                          _buildTechChip(context, 'Riverpod', isDark),
                           _buildTechChip(context, 'Hive', isDark),
                           _buildTechChip(context, 'Firebase', isDark),
                           _buildTechChip(context, 'Google Gemini', isDark),
