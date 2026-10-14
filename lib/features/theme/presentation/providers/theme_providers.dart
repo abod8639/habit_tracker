@@ -139,6 +139,16 @@ class ThemeNotifier extends Notifier<ThemeState> {
               : entity.themeMode;
           final customBg = entity.useCustomBackground ? entity.customBackgroundColor : null;
 
+          final hasChanged = state.currentTheme != entity.themeName ||
+              state.themeMode != mode ||
+              state.useCustomBackground != entity.useCustomBackground ||
+              state.customBackgroundColor != (entity.customBackgroundColor ?? Colors.transparent);
+
+          if (!hasChanged) return;
+
+          _lightThemeCache.clear();
+          _darkThemeCache.clear();
+
           state = state.copyWith(
             currentTheme: entity.themeName,
             themeMode: mode,
@@ -148,6 +158,17 @@ class ThemeNotifier extends Notifier<ThemeState> {
             darkTheme: _buildThemeData(entity.themeName, true, customBg),
           );
           _updateHomeWidget();
+        } else {
+          final firestore = ref.read(firestoreServiceProvider);
+          if (firestore.isUserLoggedIn) {
+            final uploadUseCase = ref.read(uploadThemeSettingsUseCaseProvider);
+            uploadUseCase(ThemeEntity(
+              themeName: state.currentTheme,
+              themeMode: state.themeMode,
+              useCustomBackground: state.useCustomBackground,
+              customBackgroundColor: state.useCustomBackground ? state.customBackgroundColor : null,
+            ));
+          }
         }
       },
     );
