@@ -1,34 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/ai_settings_controller.dart';
+import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Neumorphic Dialog for managing Gemini Custom AI API Key.
-class AiApiKeyDialog extends StatelessWidget {
-  final AiSettingsController controller;
+class AiApiKeyDialog extends ConsumerStatefulWidget {
+  const AiApiKeyDialog({super.key});
 
-  const AiApiKeyDialog({super.key, required this.controller});
-
-  static Future<void> show(
-    BuildContext context,
-    AiSettingsController controller,
-  ) {
+  static Future<void> show(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (dialogContext) => AiApiKeyDialog(controller: controller),
+      builder: (dialogContext) => const AiApiKeyDialog(),
     );
   }
 
   @override
+  ConsumerState<AiApiKeyDialog> createState() => _AiApiKeyDialogState();
+}
+
+class _AiApiKeyDialogState extends ConsumerState<AiApiKeyDialog> {
+  late TextEditingController _textController;
+  bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialKey = ref.read(aiSettingsNotifierProvider).customApiKey;
+    _textController = TextEditingController(text: initialKey);
+  }
+
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final textController = TextEditingController(
-      text: controller.customApiKey.value,
-    );
-    final obscureRx = true.obs;
+    final aiState = ref.watch(aiSettingsNotifierProvider);
     final s = S.of(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -98,51 +112,47 @@ class AiApiKeyDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 14),
+
+              // Description
               Text(
                 s.customApiKeyDialogDesc,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurface.withValues(alpha: 0.65),
-                  height: 1.35,
-                  fontSize: 13,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.textTheme.bodyMedium?.color?.withValues(
+                    alpha: 0.75,
+                  ),
+                  height: 1.45,
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
-              // Neumorphic Helper info container linking to Google AI Studio
+              // Get Key Link Well (Neumorphic recessed)
               Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: AppRadius.mdRadius,
                   onTap: () async {
-                    final Uri url = Uri.parse(
-                      'https://aistudio.google.com/app/apikey',
-                    );
-                    try {
-                      await launchUrl(
-                        url,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } catch (e) {
-                      debugPrint('Could not launch $url: $e');
+                    final uri = Uri.parse('https://aistudio.google.com/app/apikey');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
                     }
                   },
+                  borderRadius: AppRadius.mdRadius,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
+                      horizontal: 14,
+                      vertical: 12,
                     ),
                     decoration: BoxDecoration(
                       color: Color.alphaBlend(
-                        primaryColor.withValues(alpha: isDark ? 0.08 : 0.04),
+                        primaryColor.withValues(alpha: isDark ? 0.12 : 0.07),
                         baseSurface,
                       ),
                       borderRadius: AppRadius.mdRadius,
-                      boxShadow: AppShadows.dotIndicator(isDark: isDark),
+                      boxShadow: AppShadows.insetWell(isDark: isDark),
                       border: Border.all(
                         color: primaryColor.withValues(
                           alpha: isDark ? 0.22 : 0.15,
                         ),
-                        width: 1,
+                        width: 0.8,
                       ),
                     ),
                     child: Row(
@@ -177,86 +187,84 @@ class AiApiKeyDialog extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Neumorphic Sunken TextField
-              Obx(
-                () => Container(
-                  decoration: BoxDecoration(
-                    color: Color.alphaBlend(
-                      colorScheme.onSurface.withValues(
-                        alpha: isDark ? 0.04 : 0.02,
-                      ),
-                      baseSurface,
+              Container(
+                decoration: BoxDecoration(
+                  color: Color.alphaBlend(
+                    colorScheme.onSurface.withValues(
+                      alpha: isDark ? 0.04 : 0.02,
                     ),
-                    borderRadius: AppRadius.lgRadius,
-                    boxShadow: AppShadows.insetWell(isDark: isDark),
+                    baseSurface,
                   ),
-                  child: TextField(
-                    controller: textController,
-                    obscureText: obscureRx.value,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.2,
+                  borderRadius: AppRadius.lgRadius,
+                  boxShadow: AppShadows.insetWell(isDark: isDark),
+                ),
+                child: TextField(
+                  controller: _textController,
+                  obscureText: _obscureText,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: s.aiApiKeyTitle,
+                    hintText: s.apiKeyHint,
+                    prefixIcon: Icon(Icons.key_rounded, color: primaryColor),
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          tooltip: _obscureText ? 'Show' : 'Hide',
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility_off_rounded
+                                : Icons.visibility_rounded,
+                            size: 20,
+                          ),
+                          onPressed: () => setState(() => _obscureText = !_obscureText),
+                        ),
+                        IconButton(
+                          tooltip: s.paste,
+                          icon: const Icon(
+                            Icons.paste_rounded,
+                            size: 20,
+                          ),
+                          onPressed: () async {
+                            final data = await Clipboard.getData(
+                              Clipboard.kTextPlain,
+                            );
+                            if (data != null && data.text != null) {
+                              _textController.text = data.text!.trim();
+                            }
+                          },
+                        ),
+                      ],
                     ),
-                    decoration: InputDecoration(
-                      labelText: s.aiApiKeyTitle,
-                      hintText: s.apiKeyHint,
-                      prefixIcon: Icon(Icons.key_rounded, color: primaryColor),
-                      suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            tooltip: obscureRx.value ? 'Show' : 'Hide',
-                            icon: Icon(
-                              obscureRx.value
-                                  ? Icons.visibility_off_rounded
-                                  : Icons.visibility_rounded,
-                              size: 20,
-                            ),
-                            onPressed: () => obscureRx.value = !obscureRx.value,
-                          ),
-                          IconButton(
-                            tooltip: s.paste,
-                            icon: const Icon(
-                              Icons.paste_rounded,
-                              size: 20,
-                            ),
-                            onPressed: () async {
-                              final data = await Clipboard.getData(
-                                Clipboard.kTextPlain,
-                              );
-                              if (data != null && data.text != null) {
-                                textController.text = data.text!.trim();
-                              }
-                            },
-                          ),
-                        ],
+                    border: OutlineInputBorder(
+                      borderRadius: AppRadius.lgRadius,
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.06)
+                            : Colors.black.withValues(alpha: 0.06),
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: AppRadius.lgRadius,
-                        borderSide: BorderSide(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.06)
-                              : Colors.black.withValues(alpha: 0.06),
-                        ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: AppRadius.lgRadius,
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.06)
+                            : Colors.black.withValues(alpha: 0.06),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: AppRadius.lgRadius,
-                        borderSide: BorderSide(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.06)
-                              : Colors.black.withValues(alpha: 0.06),
-                        ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: AppRadius.lgRadius,
+                      borderSide: BorderSide(
+                        color: primaryColor,
+                        width: 1.5,
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: AppRadius.lgRadius,
-                        borderSide: BorderSide(
-                          color: primaryColor,
-                          width: 1.5,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
                     ),
                   ),
                 ),
@@ -268,16 +276,13 @@ class AiApiKeyDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   // Reset to default button (if custom key active)
-                  Obx(() {
-                    if (!controller.isCustom.value) {
-                      return const SizedBox.shrink();
-                    }
-                    return Padding(
+                  if (aiState.isCustom)
+                    Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: TextButton.icon(
                         onPressed: () async {
                           Navigator.of(context).pop();
-                          await controller.clearApiKey();
+                          await ref.read(aiSettingsNotifierProvider.notifier).clearApiKey();
                         },
                         icon: const Icon(
                           Icons.restore_rounded,
@@ -293,8 +298,7 @@ class AiApiKeyDialog extends StatelessWidget {
                           ),
                         ),
                       ),
-                    );
-                  }),
+                    ),
                   const Spacer(),
 
                   // Cancel button
@@ -334,56 +338,52 @@ class AiApiKeyDialog extends StatelessWidget {
                   const SizedBox(width: 10),
 
                   // Save button (Neumorphic raised primary)
-                  Obx(() {
-                    final isValidating = controller.isValidating.value;
-                    return GestureDetector(
-                      onTap: isValidating
-                          ? null
-                          : () async {
-                              final newKey = textController.text.trim();
-                              if (newKey.isEmpty) {
-                                Navigator.of(context).pop();
-                                await controller.clearApiKey();
-                                return;
-                              }
-                              final success =
-                                  await controller.saveApiKey(newKey);
-                              if (success && context.mounted) {
-                                Navigator.of(context).pop();
-                              }
-                            },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: AppRadius.mdRadius,
-                          boxShadow: AppShadows.buttonResting(isDark: isDark),
-                        ),
-                        child: isValidating
-                            ? 
-                                  const SizedBox(
-                                    width: 23,
-                                    height: 23,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                              
-                              )
-                            : Text(
-                                s.save,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                  GestureDetector(
+                    onTap: aiState.isValidating
+                        ? null
+                        : () async {
+                            final newKey = _textController.text.trim();
+                            if (newKey.isEmpty) {
+                              Navigator.of(context).pop();
+                              await ref.read(aiSettingsNotifierProvider.notifier).clearApiKey();
+                              return;
+                            }
+                            final success = await ref
+                                .read(aiSettingsNotifierProvider.notifier)
+                                .saveApiKey(newKey);
+                            if (success && context.mounted) {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
                       ),
-                    );
-                  }),
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: AppRadius.mdRadius,
+                        boxShadow: AppShadows.buttonResting(isDark: isDark),
+                      ),
+                      child: aiState.isValidating
+                          ? const SizedBox(
+                              width: 23,
+                              height: 23,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              s.save,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
+                  ),
                 ],
               ),
             ],
