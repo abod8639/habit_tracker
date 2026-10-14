@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 
 /// Clean Architecture component: 3D Convex Neumorphic send button with
 /// tactile spring feedback and loading transition.
@@ -107,39 +108,8 @@ class _AiSendButtonState extends State<AiSendButton>
               width: 1.2,
             ),
             boxShadow: isActive
-                ? [
-                    // Top-left soft highlight
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.15)
-                          : Colors.white.withValues(alpha: 0.8),
-                      offset: const Offset(-2, -2),
-                      blurRadius: 4,
-                    ),
-                    // Radiant colored bloom / depth
-                    BoxShadow(
-                      color: primary.withValues(alpha: isDark ? 0.28 : 0.35),
-                      offset: const Offset(2, 4),
-                      blurRadius: 5,
-                    ),
-                  ]
-                : [
-                    // Resting ambient shadows
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.035)
-                          : Colors.white.withValues(alpha: 0.9),
-                      offset: const Offset(-1, -1),
-                      blurRadius: 2,
-                    ),
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.4)
-                          : const Color(0xFFA3B1C6).withValues(alpha: 0.28),
-                      offset: const Offset(1, 1),
-                      blurRadius: 2,
-                    ),
-                  ],
+                ? AppShadows.buttonResting(isDark: isDark)
+                :AppShadows.buttonPressed(isDark: isDark),
           ),
           child: Center(
             child: widget.isLoading
