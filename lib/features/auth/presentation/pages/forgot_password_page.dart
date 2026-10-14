@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:habit_tracker/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:habit_tracker/features/auth/presentation/providers/auth_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
-class ForgotPasswordPage extends StatefulWidget {
+class ForgotPasswordPage extends ConsumerStatefulWidget {
   const ForgotPasswordPage({super.key});
 
   @override
-  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+  ConsumerState<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  final AuthController _authController = Get.find<AuthController>();
 
   @override
   void dispose() {
@@ -24,9 +23,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   Future<void> _handleResetPassword() async {
     if (_formKey.currentState!.validate()) {
-      final success = await _authController.resetPassword(
-        email: _emailController.text,
-      );
+      final success = await ref.read(authNotifierProvider.notifier).resetPassword(
+            email: _emailController.text,
+          );
 
       if (success && mounted) {
         await Future.delayed(const Duration(seconds: 2));
@@ -40,6 +39,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final authState = ref.watch(authNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -100,30 +100,28 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  Obx(
-                    () => ElevatedButton(
-                      onPressed: _authController.isLoading.value
-                          ? null
-                          : _handleResetPassword,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                  ElevatedButton(
+                    onPressed: authState.isLoading
+                        ? null
+                        : _handleResetPassword,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: _authController.isLoading.value
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              S.current.sendResetLink,
-                              style: const TextStyle(fontSize: 16),
-                            ),
                     ),
+                    child: authState.isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            S.current.sendResetLink,
+                            style: const TextStyle(fontSize: 16),
+                          ),
                   ),
                   const SizedBox(height: 16),
 
