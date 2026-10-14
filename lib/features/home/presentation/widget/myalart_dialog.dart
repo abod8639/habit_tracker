@@ -390,8 +390,10 @@ class _MyalartdState extends State<MyalartDialog>
                     ),
                     const SizedBox(width: 12),
                     _NeumorphicDialogButton(
-                      label: S.current.add,
-                      icon: Icons.check_rounded,
+                      label: buttonLabel,
+                      icon: widget.isEditing
+                          ? Icons.edit_rounded
+                          : Icons.check_rounded,
                       isPrimary: true,
                       onPressed: _handleSave,
                     ),
