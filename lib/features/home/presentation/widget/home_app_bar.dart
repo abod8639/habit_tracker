@@ -24,7 +24,7 @@ class HomeAppBar extends ConsumerWidget {
     final selectedCount = ref.watch(
       habitNotifierProvider.select((s) => s.selectedHabitIds.length),
     );
-    final habitNotifier = ref.read(habitNotifierProvider.notifier);
+    final habitNotifier = ref.watch(habitNotifierProvider.notifier);
 
     if (isSelectionMode) {
       final theme = Theme.of(context);
