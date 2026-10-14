@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_auth
   firebase_core
   flutter_timezone
+  sqlite3_flutter_libs
   url_launcher_windows
 )
 
