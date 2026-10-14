@@ -18,10 +18,10 @@ import 'package:path_provider/path_provider.dart';
 class AppInitializer {
   AppInitializer._();
 
-  static late final FirestoreService firestoreService;
-  static late final ThemeStorageService themeStorage;
-  static late final SettingsStorage settingsStorage;
-  static late final LangStorage langStorage;
+  static late FirestoreService firestoreService;
+  static late ThemeStorageService themeStorage;
+  static late SettingsStorage settingsStorage;
+  static late LangStorage langStorage;
   static NotificationService? notificationService;
   static FcmService? fcmService;
 
