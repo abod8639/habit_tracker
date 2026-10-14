@@ -1,6 +1,4 @@
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/lang_controller.dart';
 import '../../domain/entities/category_entity.dart';
 import '../../domain/entities/question_entity.dart';
 
@@ -8,13 +6,7 @@ import '../../domain/entities/question_entity.dart';
 class QuestionsDataSource {
   QuestionsDataSource._();
 
-  static bool get _isArabic {
-    if (Get.isRegistered<LangController>()) {
-      return Get.find<LangController>().isArabic;
-    }
-    final loc = Get.locale?.languageCode ?? Intl.getCurrentLocale();
-    return loc.startsWith('ar');
-  }
+  static bool get _isArabic => Intl.getCurrentLocale().startsWith('ar');
 
   static List<QuestionEntity> forCategory(PlanCategory category) {
     if (_isArabic) {
