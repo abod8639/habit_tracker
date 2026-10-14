@@ -62,6 +62,7 @@ class _ThemePageState extends ConsumerState<ThemePage> {
                   final isSelected = currentTheme == themeName;
 
                   return ThemeCard(
+                    key: ValueKey(themeName),
                     themeName: themeName,
                     colors: colors,
                     isSelected: isSelected,
