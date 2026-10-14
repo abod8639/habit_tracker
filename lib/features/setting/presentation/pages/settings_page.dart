@@ -21,6 +21,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage>
   @override
   void dispose() {
     _animationController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -42,7 +44,7 @@ class _SettingsPageState extends State<SettingsPage>
   Widget build(BuildContext context) {
     return KeyboardListener(
       autofocus: true,
-      focusNode: FocusNode(),
+      focusNode: _focusNode,
       onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
         appBar: myAppBar(
