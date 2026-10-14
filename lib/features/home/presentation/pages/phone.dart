@@ -46,7 +46,7 @@ class _PhoneState extends ConsumerState<Phone> {
       floatingActionButton: isSelectionMode
           ? const SizedBox.shrink()
           : MyfloatingActionButton(
-              onPressed: () => HabitDialogs.showAdd(context),
+              onPressed: () => HabitDialogs.showAdd(context, ref: ref),
             ),
       body: SafeArea(
         child: Builder(
