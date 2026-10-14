@@ -2,11 +2,16 @@ import 'dart:io';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_tracker/core/database/app_database.dart';
+import 'package:habit_tracker/core/database/database_provider.dart';
 import 'package:habit_tracker/core/database/migrators/hive_to_sql_migrator.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_sql_local_data_source.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
+import 'package:habit_tracker/features/home/data/repositories/habit_repository_impl.dart';
+import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
+import 'package:habit_tracker/core/services/firestore_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 void main() {
@@ -83,6 +88,59 @@ void main() {
       final remaining = await dataSource.fetchHabitsFromDb();
       expect(remaining.length, 1);
       expect(remaining.first.id, 'h1');
+
+      // 5. Repository editHabit
+      final repository = HabitRepositoryImpl(
+        localDataSource: dataSource,
+        firestoreService: FirestoreService(),
+      );
+      final editResult = await repository.editHabit('h1', 'Super Workout');
+      expect(editResult.isRight(), true);
+
+      final habitsAfterEdit = await dataSource.fetchHabitsFromDb();
+      expect(habitsAfterEdit.first.name, 'Super Workout');
+      expect(dataSource.loadHabits().first.name, 'Super Workout');
+    });
+
+    test('HabitNotifier editHabit updates UI state optimistically and persists', () async {
+      await Hive.openBox(HabitStorage.boxName);
+      await Hive.openBox(HabitStorage.backupVaultBox);
+
+      final dataSource = HabitSqlLocalDataSource(db);
+      await dataSource.init();
+      final now = DateTime.now();
+      final habit = HabitModel(
+        id: 'h_notifier_edit',
+        name: 'Initial Habit',
+        isCompleted: false,
+        createdAt: now,
+        index: 0,
+      );
+      await dataSource.saveHabits([habit]);
+
+      final container = ProviderContainer(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(db),
+          habitLocalDataSourceProvider.overrideWithValue(dataSource),
+        ],
+      );
+
+      // Wait for initialization
+      await container.read(habitNotifierProvider.notifier).refreshData();
+      final initialState = container.read(habitNotifierProvider);
+      expect(initialState.habits.first.name, 'Initial Habit');
+
+      // Edit habit
+      await container
+          .read(habitNotifierProvider.notifier)
+          .editHabit('h_notifier_edit', 'Renamed Habit');
+
+      final updatedState = container.read(habitNotifierProvider);
+      expect(updatedState.habits.first.name, 'Renamed Habit');
+
+      // Verify in SQLite
+      final dbHabits = await dataSource.fetchHabitsFromDb();
+      expect(dbHabits.first.name, 'Renamed Habit');
     });
 
     test('HabitHistoryDao performs single-pass aggregation for heatmap', () async {
