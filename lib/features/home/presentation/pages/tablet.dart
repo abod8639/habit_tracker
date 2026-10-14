@@ -25,7 +25,7 @@ class Tablet extends ConsumerWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: MyfloatingActionButton(
-        onPressed: () => HabitDialogs.showAdd(context),
+        onPressed: () => HabitDialogs.showAdd(context, ref: ref),
       ),
       body: Builder(
         builder: (context) {
