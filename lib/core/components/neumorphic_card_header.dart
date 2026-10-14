@@ -86,7 +86,7 @@ class NeumorphicCardHeader extends StatelessWidget {
               ),
             ],
           ),
-          ?trailing,
+          if (trailing != null) ?trailing,
         ],
       ),
     );
