@@ -32,6 +32,7 @@ class CheckboxList extends ConsumerWidget {
               context,
               id: habit.id,
               currentName: habit.name,
+              ref: ref,
             ),
             onChanged: (value) =>
                 habitNotifier.toggleHabit(habit.id, value ?? false),
