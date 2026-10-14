@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../../domain/entities/question_entity.dart';
-import '../controllers/plan_generator_controller.dart';
+import '../providers/plan_generator_providers.dart';
 import 'question_choice_input.dart';
 import 'question_number_input.dart';
 import 'question_text_input.dart';
 
-class QuestionContent extends StatelessWidget {
+class QuestionContent extends ConsumerWidget {
   final QuestionEntity question;
-  final PlanGeneratorController controller;
 
   const QuestionContent({
     super.key,
     required this.question,
-    required this.controller,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
@@ -73,25 +72,26 @@ class QuestionContent extends StatelessWidget {
                     ),
                   ),
                 ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: AppRadius.smRadius,
-                boxShadow: AppShadows.badge(isDark: isDark),
-              ),
-              child: TextButton(
-                onPressed: controller.next,
-                child: Text(
-                  S.current.skipNow,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: theme.hintColor,
-                    fontWeight: FontWeight.w500,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: AppRadius.smRadius,
+                    boxShadow: AppShadows.badge(isDark: isDark),
+                  ),
+                  child: TextButton(
+                    onPressed: () =>
+                        ref.read(planGeneratorNotifierProvider.notifier).next(),
+                    child: Text(
+                      S.current.skipNow,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.hintColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                 ),
-                ),
-              ),
-            ),
               ],
             ),
           ],
@@ -102,16 +102,13 @@ class QuestionContent extends StatelessWidget {
           switch (question.type) {
             QuestionType.text => QuestionTextInput(
                 question: question,
-                controller: controller,
               ),
             QuestionType.number => QuestionNumberInput(
                 question: question,
-                controller: controller,
               ),
             QuestionType.singleChoice || QuestionType.multipleChoice =>
               QuestionChoiceInput(
                 question: question,
-                controller: controller,
               ),
           },
 
