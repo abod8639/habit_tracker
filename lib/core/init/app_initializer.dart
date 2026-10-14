@@ -19,6 +19,12 @@ import 'package:path_provider/path_provider.dart';
 class AppInitializer {
   AppInitializer._();
 
+  static late final ThemeStorageService themeStorage;
+  static late final SettingsStorage settingsStorage;
+  static late final LangStorage langStorage;
+  static NotificationService? notificationService;
+  static FcmService? fcmService;
+
   /// Initializes storage adapters, Hive boxes, environment variables,
   /// core infrastructure services, and localization.
   static Future<void> init() async {
@@ -46,25 +52,30 @@ class AppInitializer {
       // 4. Initialize and register infrastructure services
       Get.put(FirestoreService());
 
-      final themeStorage = await ThemeStorageService.init();
+      themeStorage = await ThemeStorageService.init();
       Get.put(themeStorage);
 
-      final settingsStorage = SettingsStorage();
+      settingsStorage = SettingsStorage();
       await settingsStorage.init();
       Get.put(settingsStorage);
 
+      langStorage = LangStorage(Hive.box(LangStorage.boxName));
+      Get.put(langStorage);
+
       try {
-        final notificationService = NotificationService();
-        await notificationService.init();
-        Get.put<NotificationService>(notificationService, permanent: true);
+        final notif = NotificationService();
+        await notif.init();
+        notificationService = notif;
+        Get.put<NotificationService>(notif, permanent: true);
       } catch (e) {
         debugPrint('NotificationService initialization error: $e');
       }
 
       try {
-        final fcmService = FcmService();
-        await fcmService.init();
-        Get.put<FcmService>(fcmService, permanent: true);
+        final fcm = FcmService();
+        await fcm.init();
+        fcmService = fcm;
+        Get.put<FcmService>(fcm, permanent: true);
       } catch (e) {
         debugPrint('FcmService initialization error: $e');
       }
