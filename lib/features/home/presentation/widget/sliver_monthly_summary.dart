@@ -1,30 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:habit_tracker/features/home/presentation/controllers/habit_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/presentation/widget/monthly_summary.dart';
 
-class SliverMonthlySummary extends StatelessWidget {
+class SliverMonthlySummary extends ConsumerWidget {
   const SliverMonthlySummary({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final HabitController controller = Get.find<HabitController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final datasets = ref.watch(
+      habitNotifierProvider.select((s) => s.heatmapDateSet),
+    );
+    final habitNotifier = ref.read(habitNotifierProvider.notifier);
+    final startDay = habitNotifier.getStartDay();
 
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Obx(() {
-          final datasets = controller.heatmapDateSet;
-          // Observing habits guarantees Obx triggers on checkbox toggles
-          final _ = controller.habits;
-          final startDay = controller.getStartDay();
-          return MonthlySummary(
-            key: ValueKey(startDay),
-            datasets: Map<DateTime, int>.from(datasets),
-          );
-        }),
+        child: MonthlySummary(
+          key: ValueKey(startDay),
+          datasets: Map<DateTime, int>.from(datasets),
+        ),
       ),
     );
   }
