@@ -7,9 +7,14 @@ import 'package:habit_tracker/generated/l10n.dart';
 /// Neumorphic Color Picker Dialog with 3D color coins.
 /// Allows user to tint selected habits with a vibrant palette.
 class NeumorphicColorPickerDialog extends StatelessWidget {
-  final HabitController controller;
+  final HabitController? controller;
+  final ValueChanged<Color>? onColorSelected;
 
-  const NeumorphicColorPickerDialog({super.key, required this.controller});
+  const NeumorphicColorPickerDialog({
+    super.key,
+    this.controller,
+    this.onColorSelected,
+  });
 
   static final List<Color> _colors = [
     Colors.red[400]!,
@@ -153,7 +158,11 @@ class NeumorphicColorPickerDialog extends StatelessWidget {
                 return ColorCoin(
                   color: color,
                   onTap: () {
-                    controller.updateSelectedHabitsColor(color);
+                    if (onColorSelected != null) {
+                      onColorSelected!(color);
+                    } else if (controller != null) {
+                      controller!.updateSelectedHabitsColor(color);
+                    }
                     Navigator.pop(context);
                   },
                 );
