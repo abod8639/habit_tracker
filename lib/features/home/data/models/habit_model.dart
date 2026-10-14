@@ -2,30 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import '../../domain/entities/habit_entity.dart';
 
-@HiveType(typeId: 0)
 class HabitModel {
-  @HiveField(0)
   final String id;
-
-  @HiveField(1)
   final String name;
-
-  @HiveField(2)
   final bool isCompleted;
-
-  @HiveField(3)
   final DateTime createdAt;
-
-  @HiveField(4)
   final DateTime? completedAt;
-
-  @HiveField(5)
   final int? colorValue;
-
-  @HiveField(6)
   final int? index;
-
-  @HiveField(7)
   final DateTime? updatedAt;
 
   const HabitModel({
