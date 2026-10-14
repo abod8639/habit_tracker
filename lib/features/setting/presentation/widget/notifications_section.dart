@@ -17,7 +17,7 @@ class NotificationsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationState = ref.watch(notificationNotifierProvider);
     final notificationNotifier =
-        ref.read(notificationNotifierProvider.notifier);
+        ref.watch(notificationNotifierProvider.notifier);
     final isEnabled = notificationState.isNotificationEnabled;
     final time = notificationState.notificationTime;
     final isBatteryIgnored =
