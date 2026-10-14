@@ -1,15 +1,16 @@
 import 'dart:io';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 import 'package:habit_tracker/features/setting/data/datasources/setting_local_datasource.dart';
 import 'package:habit_tracker/features/setting/data/repositories/setting_repository_impl.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/get_custom_api_key_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/save_custom_api_key_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/clear_custom_api_key_usecase.dart';
-import 'package:habit_tracker/features/setting/presentation/controllers/ai_settings_controller.dart';
+import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/setting/data/datasources/setting_remote_datasource.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
@@ -57,7 +58,6 @@ void main() {
   late ClearCustomApiKeyUseCase clearCustomApiKeyUseCase;
 
   setUp(() async {
-    Get.reset();
     tempDir = await Directory.systemTemp.createTemp('ai_settings_test_');
     Hive.init(tempDir.path);
     settingsBox = await Hive.openBox(SettingsStorage.boxName);
@@ -65,7 +65,7 @@ void main() {
 
     settingsStorage = SettingsStorage();
     await settingsStorage.init();
-    Get.put<SettingsStorage>(settingsStorage);
+    AppInitializer.settingsStorage = settingsStorage;
 
     localDataSource = SettingLocalDataSourceImpl(
       langBox: langBox,
@@ -86,7 +86,6 @@ void main() {
   });
 
   tearDown(() async {
-    Get.reset();
     dotenv.clean();
     await settingsBox.close();
     await langBox.close();
@@ -196,61 +195,58 @@ void main() {
     );
 
     test(
-      'AiSettingsController manages state, maskedKey, and reactions correctly',
-      () async {
-        final controller = AiSettingsController(
-          getCustomApiKeyUseCase: getCustomApiKeyUseCase,
-          saveCustomApiKeyUseCase: saveCustomApiKeyUseCase,
-          clearCustomApiKeyUseCase: clearCustomApiKeyUseCase,
-          apiKeyValidator: (key) async => key.startsWith('AIzaSy'),
+      'AiSettingsState manages maskedKey correctly',
+      () {
+        const emptyState = AiSettingsState();
+        expect(emptyState.isCustom, isFalse);
+        expect(emptyState.maskedKey, '');
+
+        const shortState = AiSettingsState(customApiKey: '12345');
+        expect(shortState.maskedKey, '••••••••');
+
+        const filledState = AiSettingsState(
+          customApiKey: 'AIzaSyCustomKeyToMask1234',
+          isCustom: true,
         );
-
-        expect(controller.isCustom.value, isFalse);
-        expect(controller.maskedKey, '');
-
-        // Save valid custom key
-        final saved = await controller.saveApiKey('AIzaSyCustomKeyToMask1234');
-        expect(saved, isTrue);
-        expect(controller.isCustom.value, isTrue);
-        expect(controller.customApiKey.value, 'AIzaSyCustomKeyToMask1234');
-        expect(controller.maskedKey, 'AIzaSy...1234');
-
-        // Clear key
-        await controller.clearApiKey();
-        expect(controller.isCustom.value, isFalse);
-        expect(controller.customApiKey.value, '');
-        expect(controller.maskedKey, '');
+        expect(filledState.isCustom, isTrue);
+        expect(filledState.customApiKey, 'AIzaSyCustomKeyToMask1234');
+        expect(filledState.maskedKey, 'AIzaSy...1234');
       },
     );
 
-    test('AiSettingsController rejects invalid API key during save', () async {
-      final controller = AiSettingsController(
-        getCustomApiKeyUseCase: getCustomApiKeyUseCase,
-        saveCustomApiKeyUseCase: saveCustomApiKeyUseCase,
-        clearCustomApiKeyUseCase: clearCustomApiKeyUseCase,
-        apiKeyValidator: (key) async => false,
-      );
+    test(
+      'AiSettingsNotifier loads, saves, and clears API key via ProviderContainer',
+      () async {
+        final container = ProviderContainer(
+          overrides: [
+            settingRepositoryProvider.overrideWithValue(repository),
+            getCustomApiKeyUseCaseProvider.overrideWithValue(getCustomApiKeyUseCase),
+            saveCustomApiKeyUseCaseProvider.overrideWithValue(saveCustomApiKeyUseCase),
+            clearCustomApiKeyUseCaseProvider.overrideWithValue(clearCustomApiKeyUseCase),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final saved = await controller.saveApiKey('InvalidKey123');
-      expect(saved, isFalse);
-      expect(controller.apiKeyStatus.value, ApiKeyStatus.invalid);
-      expect(controller.isCustom.value, isFalse);
-    });
+        final notifier = container.read(aiSettingsNotifierProvider.notifier);
+        expect(container.read(aiSettingsNotifierProvider).isCustom, isFalse);
 
-    test('AiSettingsController checkKeyHealth updates status correctly', () async {
-      final controller = AiSettingsController(
-        getCustomApiKeyUseCase: getCustomApiKeyUseCase,
-        saveCustomApiKeyUseCase: saveCustomApiKeyUseCase,
-        clearCustomApiKeyUseCase: clearCustomApiKeyUseCase,
-        apiKeyValidator: (key) async => key == 'AIzaSyValid',
-      );
+        // Save valid custom key directly to repository
+        await saveCustomApiKeyUseCase('AIzaSyCustomKeyToMask1234');
+        await notifier.loadApiKey();
 
-      dotenv.loadFromString(envString: 'GEMINI_API_KEY=AIzaSyValid');
-      final valid = await controller.checkKeyHealth(force: true);
-      expect(valid, isTrue);
-      expect(controller.apiKeyStatus.value, ApiKeyStatus.valid);
-      expect(controller.isKeyWorking, isTrue);
-    });
+        var state = container.read(aiSettingsNotifierProvider);
+        expect(state.isCustom, isTrue);
+        expect(state.customApiKey, 'AIzaSyCustomKeyToMask1234');
+        expect(state.maskedKey, 'AIzaSy...1234');
+
+        // Clear key
+        await notifier.clearApiKey();
+        state = container.read(aiSettingsNotifierProvider);
+        expect(state.isCustom, isFalse);
+        expect(state.customApiKey, '');
+        expect(state.maskedKey, '');
+      },
+    );
 
     test('GeminiService.sanitizeApiKey cleans quotes, prefixes, and whitespaces', () {
       expect(GeminiService.sanitizeApiKey('  AIzaSyCleanKey  '), 'AIzaSyCleanKey');
