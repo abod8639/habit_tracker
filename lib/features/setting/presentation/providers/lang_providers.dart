@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
+import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -62,8 +63,20 @@ class LangNotifier extends Notifier<LangState> {
           languageCode: lang,
           effectiveLocale: newEffective,
         );
+        _updateHomeWidget();
       },
     );
+  }
+
+  void _updateHomeWidget() {
+    try {
+      final homeWidget = ref.read(homeWidgetServiceProvider);
+      final habitState = ref.read(habitNotifierProvider);
+      homeWidget.updateWidget(
+        habits: habitState.habits,
+        heatmapData: habitState.heatmapDateSet,
+      );
+    } catch (_) {}
   }
 }
 
