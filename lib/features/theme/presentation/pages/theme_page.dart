@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/components/section_title.dart';
 import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
 import 'package:habit_tracker/generated/l10n.dart';
-import '../controllers/theme_controller.dart';
+import '../providers/theme_providers.dart';
 import '../widgets/theme_card.dart';
 
-class ThemePage extends StatelessWidget {
+class ThemePage extends ConsumerWidget {
   const ThemePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentTheme = ref.watch(
+      themeNotifierProvider.select((state) => state.currentTheme),
+    );
+    final themeNotifier = ref.read(themeNotifierProvider.notifier);
+    final availableThemes = themeColors.keys.toList();
 
     return KeyboardListener(
       autofocus: true,
@@ -36,23 +40,20 @@ class ThemePage extends StatelessWidget {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               sliver: SliverList.separated(
-                itemCount: themeController.availableThemes.length,
+                itemCount: availableThemes.length,
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 20),
                 itemBuilder: (context, index) {
-                  final themeName = themeController.availableThemes[index];
+                  final themeName = availableThemes[index];
                   final colors = themeColors[themeName]!;
+                  final isSelected = currentTheme == themeName;
 
-                  return Obx(() {
-                    final isSelected =
-                        themeController.currentTheme.value == themeName;
-                    return ThemeCard(
-                      themeName: themeName,
-                      colors: colors,
-                      isSelected: isSelected,
-                      onTap: () => themeController.changeCustomTheme(themeName),
-                    );
-                  });
+                  return ThemeCard(
+                    themeName: themeName,
+                    colors: colors,
+                    isSelected: isSelected,
+                    onTap: () => themeNotifier.changeCustomTheme(themeName),
+                  );
                 },
               ),
             ),
@@ -65,3 +66,4 @@ class ThemePage extends StatelessWidget {
     );
   }
 }
+
