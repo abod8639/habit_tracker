@@ -38,6 +38,7 @@ class _DrawerListState extends State<DrawerList> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (bottomSheetContext) => ImageScannerBottomSheet(
         onImageSelected: (image) async {
           setState(() {
