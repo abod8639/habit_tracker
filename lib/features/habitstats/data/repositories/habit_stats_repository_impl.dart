@@ -164,9 +164,9 @@ class HabitStatsRepositoryImpl implements HabitStatsRepository {
 
             for (int i = 0; i < days; i++) {
               final normalizedDate = DateTime(
-                now.year,
-                now.month,
-                now.day - (days - 1 - i),
+                today.year,
+                today.month,
+                today.day - (days - 1 - i),
               );
 
               final bool? completed = habitHistory[normalizedDate];
@@ -184,6 +184,7 @@ class HabitStatsRepositoryImpl implements HabitStatsRepository {
               );
             }
             individualTrends[habit.name] = spots;
+            // individualTrends[habit.id] = spots;
           }
 
           return Right(
