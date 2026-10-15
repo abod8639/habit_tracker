@@ -12,6 +12,8 @@ import 'package:habit_tracker/features/home/data/repositories/habit_repository_i
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/features/habitstats/data/datasources/habit_stats_local_datasource.dart';
+import 'package:habit_tracker/features/habitstats/data/repositories/habit_stats_repository_impl.dart';
 import 'package:hive/hive.dart';
 
 void main() {
@@ -271,6 +273,97 @@ void main() {
       await migrator.migrateIfNeeded();
       final habitsAfterSecondRun = await dataSource.fetchHabitsFromDb();
       expect(habitsAfterSecondRun.length, 1);
+    });
+
+    test('HabitHistoryDao and HabitStatsRepository accurately track previous days history', () async {
+      final dataSource = HabitSqlLocalDataSource(db);
+      await dataSource.init();
+
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final yesterday = today.subtract(const Duration(days: 1));
+      final twoDaysAgo = today.subtract(const Duration(days: 2));
+
+      final h1 = HabitModel(
+        id: 'h_gym',
+        name: 'Gym',
+        isCompleted: true,
+        createdAt: now.subtract(const Duration(days: 10)),
+        colorValue: 0xFFFF5722,
+        index: 0,
+      );
+      final h2 = HabitModel(
+        id: 'h_read',
+        name: 'Reading',
+        isCompleted: false,
+        createdAt: now.subtract(const Duration(days: 10)),
+        colorValue: 0xFF2196F3,
+        index: 1,
+      );
+
+      await dataSource.saveHabits([h1, h2]);
+
+      final yesterdayStr = convertDateTimeToString(yesterday);
+      final twoDaysAgoStr = convertDateTimeToString(twoDaysAgo);
+
+      // Record completions for past days:
+      // Gym: completed yesterday (true), incomplete two days ago (false)
+      // Reading: incomplete yesterday (false), completed two days ago (true)
+      await db.habitHistoryDao.recordCompletion('h_gym', yesterdayStr, true);
+      await db.habitHistoryDao.recordCompletion('h_gym', twoDaysAgoStr, false);
+
+      await db.habitHistoryDao.recordCompletion('h_read', yesterdayStr, false);
+      await db.habitHistoryDao.recordCompletion('h_read', twoDaysAgoStr, true);
+
+      // 1. Verify getHabitHistoryMap indexes by both ID and Name
+      final historyMap = await db.habitHistoryDao.getHabitHistoryMap(7);
+
+      expect(historyMap['h_gym']?[yesterday], true);
+      expect(historyMap['Gym']?[yesterday], true);
+      expect(historyMap['h_gym']?[twoDaysAgo], false);
+      expect(historyMap['Gym']?[twoDaysAgo], false);
+
+      expect(historyMap['h_read']?[yesterday], false);
+      expect(historyMap['Reading']?[yesterday], false);
+      expect(historyMap['h_read']?[twoDaysAgo], true);
+      expect(historyMap['Reading']?[twoDaysAgo], true);
+
+      // 2. Verify HabitStatsRepositoryImpl produces accurate trends for previous days
+      final habitRepo = HabitRepositoryImpl(
+        localDataSource: dataSource,
+        firestoreService: FirestoreService(),
+      );
+
+      final statsRepo = HabitStatsRepositoryImpl(
+        localDataSource: HabitStatsLocalDataSourceImpl(),
+        habitRepository: habitRepo,
+      );
+
+      final bundleResult = await statsRepo.getCompleteStatsBundle(7);
+      expect(bundleResult.isRight(), true);
+
+      bundleResult.fold(
+        (failure) => fail(failure.toString()),
+        (bundle) {
+          final gymSpots = bundle.individualTrends['Gym']!;
+          expect(gymSpots.length, 7);
+          // Index 6 = Today (1.0 because isCompleted = true)
+          expect(gymSpots[6].y, 1.0);
+          // Index 5 = Yesterday (1.0 because completed = true)
+          expect(gymSpots[5].y, 1.0);
+          // Index 4 = Two days ago (0.0 because completed = false)
+          expect(gymSpots[4].y, 0.0);
+
+          final readSpots = bundle.individualTrends['Reading']!;
+          expect(readSpots.length, 7);
+          // Index 6 = Today (0.0 because isCompleted = false)
+          expect(readSpots[6].y, 0.0);
+          // Index 5 = Yesterday (0.0 because completed = false)
+          expect(readSpots[5].y, 0.0);
+          // Index 4 = Two days ago (1.0 because completed = true)
+          expect(readSpots[4].y, 1.0);
+        },
+      );
     });
   });
 }
