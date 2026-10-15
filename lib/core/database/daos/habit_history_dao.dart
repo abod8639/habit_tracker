@@ -87,9 +87,14 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
 
   Future<Map<String, Map<DateTime, bool>>> getHabitHistoryMap(int days) async {
     final now = DateTime.now();
-    final cutoffDate = now.subtract(Duration(days: days));
+    final today = DateTime(now.year, now.month, now.day);
+    final cutoffDate = today.subtract(Duration(days: days + 1));
     final cutoffStr =
         '${cutoffDate.year}${cutoffDate.month.toString().padLeft(2, '0')}${cutoffDate.day.toString().padLeft(2, '0')}';
+
+    final habitRecords = await select(habits).get();
+    final idToName = {for (var h in habitRecords) h.id: h.name};
+    final nameToId = {for (var h in habitRecords) h.name: h.id};
 
     final query = select(habitCompletions)
       ..where((t) => t.dateStr.isBiggerOrEqualValue(cutoffStr));
@@ -105,7 +110,20 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
         final dd = int.parse(rec.dateStr.substring(6, 8));
         final date = DateTime(yyyy, mm, dd);
 
+        // Map by habitId
         historyMap.putIfAbsent(rec.habitId, () => {})[date] = rec.isCompleted;
+
+        // Also map by habit name
+        final habitName = idToName[rec.habitId];
+        if (habitName != null) {
+          historyMap.putIfAbsent(habitName, () => {})[date] = rec.isCompleted;
+        }
+
+        // Also map by habit ID if rec.habitId was saved as habit name
+        final habitId = nameToId[rec.habitId];
+        if (habitId != null) {
+          historyMap.putIfAbsent(habitId, () => {})[date] = rec.isCompleted;
+        }
       } catch (_) {}
     }
 
