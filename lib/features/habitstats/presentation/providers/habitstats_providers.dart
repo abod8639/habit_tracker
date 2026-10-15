@@ -72,6 +72,7 @@ class HabitStatsState {
   final int daysPeriod;
   final bool isWeeklyView;
   final bool showAllHabits;
+  final String? selectedHabitName;
   final List<String> habitNames;
   final bool isLoading;
 
@@ -83,6 +84,7 @@ class HabitStatsState {
     this.daysPeriod = 7,
     this.isWeeklyView = true,
     this.showAllHabits = true,
+    this.selectedHabitName,
     this.habitNames = const [],
     this.isLoading = false,
   });
@@ -95,6 +97,7 @@ class HabitStatsState {
     int? daysPeriod,
     bool? isWeeklyView,
     bool? showAllHabits,
+    String? Function()? selectedHabitName,
     List<String>? habitNames,
     bool? isLoading,
   }) {
@@ -106,6 +109,7 @@ class HabitStatsState {
       daysPeriod: daysPeriod ?? this.daysPeriod,
       isWeeklyView: isWeeklyView ?? this.isWeeklyView,
       showAllHabits: showAllHabits ?? this.showAllHabits,
+      selectedHabitName: selectedHabitName != null ? selectedHabitName() : this.selectedHabitName,
       habitNames: habitNames ?? this.habitNames,
       isLoading: isLoading ?? this.isLoading,
     );
@@ -300,6 +304,17 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
 
   void toggleShowAllHabits() {
     state = state.copyWith(showAllHabits: !state.showAllHabits);
+  }
+
+  void selectHabit(String? habitName) {
+    if (state.selectedHabitName == habitName) {
+      state = state.copyWith(selectedHabitName: () => null);
+    } else {
+      state = state.copyWith(
+        selectedHabitName: () => habitName,
+        showAllHabits: true,
+      );
+    }
   }
 }
 
