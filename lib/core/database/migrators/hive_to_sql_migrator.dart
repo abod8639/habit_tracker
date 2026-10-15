@@ -7,7 +7,7 @@ import '../app_database.dart';
 
 class HiveToSqlMigrator {
   final AppDatabase db;
-  static const String migrationKey = 'HIVE_MIGRATION_V1_COMPLETED';
+  static const String migrationKey = 'HIVE_MIGRATION_V2_COMPLETED';
 
   HiveToSqlMigrator(this.db);
 
@@ -63,7 +63,72 @@ class HiveToSqlMigrator {
         await db.habitDao.insertMultipleHabits(companions);
       }
 
-      // 3. Migrate historical completions from monthly boxes
+      // Fetch all known habits (both newly migrated and existing in DB)
+      final existingDbHabits = await db.habitDao.getAllHabits();
+      final Map<String, String> idAndNameToId = {};
+      for (final h in habitsToMigrate) {
+        idAndNameToId[h.id] = h.id;
+        idAndNameToId[h.name] = h.id;
+      }
+      for (final h in existingDbHabits) {
+        idAndNameToId[h.id] = h.id;
+        idAndNameToId[h.name] = h.id;
+      }
+
+      // Helper to record completions safely
+      Future<void> recordIfMatches(String habitIdOrName, String dateStr, bool isCompleted) async {
+        final resolvedId = idAndNameToId[habitIdOrName] ?? habitIdOrName;
+        await db.habitHistoryDao.recordCompletion(
+          resolvedId,
+          dateStr,
+          isCompleted,
+        );
+      }
+
+      // Helper to process daily lists
+      Future<void> processDailyList(String dateStr, dynamic dailyList) async {
+        if (dailyList is List && dateStr.length == 8) {
+          for (final item in dailyList) {
+            if (item is HabitModel) {
+              await recordIfMatches(item.id, dateStr, item.isCompleted);
+            } else if (item is Map) {
+              final id = item['id']?.toString() ?? '';
+              final name = item['name']?.toString() ?? '';
+              final isComp = item['isCompleted'] == true ||
+                  item['is_completed'] == true ||
+                  item['completed'] == true;
+              if (id.isNotEmpty) {
+                await recordIfMatches(id, dateStr, isComp);
+              } else if (name.isNotEmpty) {
+                await recordIfMatches(name, dateStr, isComp);
+              }
+            }
+          }
+        }
+      }
+
+      // 3. Migrate completions from mainBox
+      for (final key in mainBox.keys) {
+        final keyStr = key.toString();
+        if (keyStr.length > 9 && keyStr.contains('_')) {
+          final lastUnderscore = keyStr.lastIndexOf('_');
+          final habitIdOrName = keyStr.substring(0, lastUnderscore);
+          final dateStr = keyStr.substring(lastUnderscore + 1);
+
+          if (dateStr.length == 8 && int.tryParse(dateStr) != null) {
+            final dynamic val = mainBox.get(key);
+            final bool isCompleted = val == true || val == 1 || val == 'true';
+            await recordIfMatches(habitIdOrName, dateStr, isCompleted);
+          }
+        } else if (keyStr.length == 8 && int.tryParse(keyStr) != null) {
+          await processDailyList(keyStr, mainBox.get(key));
+        } else if (keyStr.startsWith("${HabitStorage.habitListKey}_")) {
+          final dateStr = keyStr.replaceFirst("${HabitStorage.habitListKey}_", '');
+          await processDailyList(dateStr, mainBox.get(key));
+        }
+      }
+
+      // 4. Migrate historical completions from monthly boxes
       final String? startDayStr = mainBox.get(HabitStorage.startDayKey);
       final DateTime startDate = startDayStr != null && startDayStr.length == 8
           ? createDateTimeObject(startDayStr)
@@ -90,30 +155,16 @@ class HiveToSqlMigrator {
             // Match pattern habitId_YYYYMMDD where date is 8 digits
             if (keyStr.length > 9 && keyStr.contains('_')) {
               final lastUnderscore = keyStr.lastIndexOf('_');
-              final habitId = keyStr.substring(0, lastUnderscore);
+              final habitIdOrName = keyStr.substring(0, lastUnderscore);
               final dateStr = keyStr.substring(lastUnderscore + 1);
 
               if (dateStr.length == 8 && int.tryParse(dateStr) != null) {
                 final dynamic val = historyBox.get(key);
                 final bool isCompleted = val == true || val == 1 || val == 'true';
-
-                // Check if key matches habitId or habitName in migrated habits
-                HabitModel? matchingHabit;
-                for (final h in habitsToMigrate) {
-                  if (h.id == habitId || h.name == habitId) {
-                    matchingHabit = h;
-                    break;
-                  }
-                }
-
-                if (matchingHabit != null) {
-                  await db.habitHistoryDao.recordCompletion(
-                    matchingHabit.id,
-                    dateStr,
-                    isCompleted,
-                  );
-                }
+                await recordIfMatches(habitIdOrName, dateStr, isCompleted);
               }
+            } else if (keyStr.length == 8 && int.tryParse(keyStr) != null) {
+              await processDailyList(keyStr, historyBox.get(key));
             }
           }
         } catch (_) {}
