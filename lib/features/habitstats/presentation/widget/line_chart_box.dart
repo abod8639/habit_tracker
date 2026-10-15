@@ -155,6 +155,70 @@ class LineChartBox extends ConsumerWidget {
     final List<LineChartBarData> lineBars = [];
 
     if (state.showAllHabits) {
+      // Display each individual habit's trend data
+      final habits = state.todaySummary;
+      final habitNames = state.habitNames.isNotEmpty
+          ? state.habitNames
+          : (progression.isNotEmpty
+              ? progression.keys.toList()
+              : habits.map((h) => h.name).toList());
+
+      for (int i = 0; i < habitNames.length; i++) {
+        final habitName = habitNames[i];
+        List<FlSpot>? spots = progression[habitName];
+
+        if (spots == null || spots.isEmpty) {
+          final matchingHabit = habits
+              .where((h) => h.name == habitName || h.id == habitName)
+              .firstOrNull;
+          if (matchingHabit != null) {
+            spots = progression[matchingHabit.id] ??
+                progression[matchingHabit.name];
+          }
+        }
+
+        if (spots == null || spots.isEmpty) {
+          final matchingHabit = habits
+              .where((h) => h.name == habitName)
+              .firstOrNull;
+          final bool isCompletedToday = matchingHabit?.isCompleted ?? false;
+          spots = List.generate(
+            state.daysPeriod,
+            (index) => FlSpot(
+              index.toDouble(),
+              (index == state.daysPeriod - 1 && isCompletedToday) ? 1.0 : 0.0,
+            ),
+          );
+        }
+
+        final habitColor = _getHabitColor(i, context);
+        lineBars.add(
+          myLineChartBarData(
+            color: habitColor,
+            spots: spots,
+            color1: habitColor.withValues(alpha: 0.15),
+            color2: habitColor.withValues(alpha: 0.02),
+            label: _getHabitLabel(habitName, state.isWeeklyView),
+          ),
+        );
+      }
+    } else {
+      // Display overall aggregated trend line
+      List<FlSpot> overallSpots = state.overallTrend;
+      if (overallSpots.isEmpty) {
+        final total = state.todaySummary.length;
+        final completed =
+            state.todaySummary.where((h) => h.isCompleted).length;
+        final rate = total > 0 ? (completed / total) : 0.0;
+        overallSpots = List.generate(
+          state.daysPeriod,
+          (index) => FlSpot(
+            index.toDouble(),
+            index == state.daysPeriod - 1 ? rate : 0.0,
+          ),
+        );
+      }
+
       lineBars.add(
         myLineChartBarData(
           color: Theme.of(context).colorScheme.secondary,
@@ -162,30 +226,12 @@ class LineChartBox extends ConsumerWidget {
           color2: Theme.of(
             context,
           ).colorScheme.secondary.withValues(alpha: 0.1),
-          spots: state.overallTrend,
+          spots: overallSpots,
           label: 'Overall',
         ),
       );
-    } else {
-      for (int i = 0; i < state.habitNames.length; i++) {
-        final habitName = state.habitNames[i];
-
-        if (progression.containsKey(habitName)) {
-          final spots = progression[habitName];
-          if (spots != null && spots.isNotEmpty) {
-            lineBars.add(
-              myLineChartBarData(
-                color: _getHabitColor(i, context),
-                spots: spots,
-                color1: _getHabitColor(i, context).withValues(alpha: 0.05),
-                color2: _getHabitColor(i, context).withValues(alpha: 0.07),
-                label: _getHabitLabel(habitName, state.isWeeklyView),
-              ),
-            );
-          }
-        }
-      }
     }
+
     return lineBars;
   }
 
