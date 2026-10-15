@@ -16,7 +16,17 @@ LineChartBarData myLineChartBarData({
     barWidth: 3.2,
     color: color,
     isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
+    dotData: FlDotData(
+      show: true,
+      getDotPainter: (spot, percent, barData, index) {
+        return FlDotCirclePainter(
+          radius: 3.5,
+          color: color ?? Colors.blue,
+          strokeWidth: 1.5,
+          strokeColor: Colors.white,
+        );
+      },
+    ),
     belowBarData: BarAreaData(
       show: true,
       gradient: LinearGradient(
