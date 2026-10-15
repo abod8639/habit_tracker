@@ -73,6 +73,7 @@ class _MyalartdState extends State<MyalartDialog>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (bottomSheetContext) => ImageScannerBottomSheet(
         onImageSelected: (image) async {
           setState(() {
@@ -203,203 +204,205 @@ class _MyalartdState extends State<MyalartDialog>
               ),
               boxShadow: AppShadows.softCard(isDark: isDark),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header: Icon + Title + Action buttons (Scan / Close)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color.alphaBlend(
-                              colorScheme.primary.withValues(
-                                alpha: isDark ? 0.16 : 0.10,
-                              ),
-                              baseColor,
-                            ),
-                            border: Border.all(
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.08)
-                                  : Colors.white.withValues(alpha: 0.90),
-                              width: 1.0,
-                            ),
-                            boxShadow: AppShadows.badge(isDark: isDark),
-                          ),
-                          child: Icon(
-                            widget.isEditing
-                                ? Icons.edit_rounded
-                                : Icons.add_task_rounded,
-                            color: colorScheme.primary,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Text(
-                          dialogTitle,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.2,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_isScanning)
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header: Icon + Title + Action buttons (Scan / Close)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
                           Container(
-                            width: 36,
-                            height: 36,
-                            padding: const EdgeInsets.all(8),
+                            width: 40,
+                            height: 40,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              boxShadow: AppShadows.dotIndicator(
-                                isDark: isDark,
+                              color: Color.alphaBlend(
+                                colorScheme.primary.withValues(
+                                  alpha: isDark ? 0.16 : 0.10,
+                                ),
+                                baseColor,
                               ),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.08)
+                                    : Colors.white.withValues(alpha: 0.90),
+                                width: 1.0,
+                              ),
+                              boxShadow: AppShadows.badge(isDark: isDark),
                             ),
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                            child: Icon(
+                              widget.isEditing
+                                  ? Icons.edit_rounded
+                                  : Icons.add_task_rounded,
                               color: colorScheme.primary,
+                              size: 22,
                             ),
-                          )
-                        else if (!widget.isEditing)
-                          NeumorphicIconButton(
-                            size: 40,
-                            icon: Icons.document_scanner_rounded,
-                            accentColor: colorScheme.primary,
-                            tooltip: S.of(context).scanHabitsTitle,
-                            onPressed: _handleScanImage,
                           ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 22),
-
-                // Neumorphic Debossed Well for Text Input
-                KeyboardListener(
-                  focusNode: _keyboardFocusNode,
-                  onKeyEvent: (KeyEvent event) {
-                    if (event.physicalKey == PhysicalKeyboardKey.numLock) {
-                      return;
-                    }
-                    if (event is KeyUpEvent) {
-                      if (event.logicalKey == LogicalKeyboardKey.escape ||
-                          event.logicalKey == LogicalKeyboardKey.exit) {
-                        Navigator.of(context).pop();
-                        widget.controller.clear();
-                      }
-                      return;
-                    }
-
-                    if (event is KeyDownEvent) {
-                      if (event.logicalKey == LogicalKeyboardKey.enter ||
-                          event.logicalKey == LogicalKeyboardKey.numpadEnter) {
-                        if (HardwareKeyboard.instance.isControlPressed) {
-                          final currentText = widget.controller.text;
-                          final currentPosition =
-                              widget.controller.selection.base.offset;
-                          final validPosition = currentPosition.clamp(
-                            0,
-                            currentText.length,
-                          );
-                          final newText =
-                              '${currentText.substring(0, validPosition)}\n${currentText.substring(validPosition)}';
-                          widget.controller.value = TextEditingValue(
-                            text: newText,
-                            selection: TextSelection.collapsed(
-                              offset: validPosition + 1,
+                          const SizedBox(width: 14),
+                          Text(
+                            dialogTitle,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.2,
+                              color: colorScheme.onSurface,
                             ),
-                          );
-                        } else {
-                          _handleSave();
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_isScanning)
+                            Container(
+                              width: 36,
+                              height: 36,
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: AppShadows.dotIndicator(
+                                  isDark: isDark,
+                                ),
+                              ),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.primary,
+                              ),
+                            )
+                          else if (!widget.isEditing)
+                            NeumorphicIconButton(
+                              size: 40,
+                              icon: Icons.document_scanner_rounded,
+                              accentColor: colorScheme.primary,
+                              tooltip: S.of(context).scanHabitsTitle,
+                              onPressed: _handleScanImage,
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 22),
+
+                  // Neumorphic Debossed Well for Text Input
+                  KeyboardListener(
+                    focusNode: _keyboardFocusNode,
+                    onKeyEvent: (KeyEvent event) {
+                      if (event.physicalKey == PhysicalKeyboardKey.numLock) {
+                        return;
+                      }
+                      if (event is KeyUpEvent) {
+                        if (event.logicalKey == LogicalKeyboardKey.escape ||
+                            event.logicalKey == LogicalKeyboardKey.exit) {
+                          Navigator.of(context).pop();
+                          widget.controller.clear();
+                        }
+                        return;
+                      }
+
+                      if (event is KeyDownEvent) {
+                        if (event.logicalKey == LogicalKeyboardKey.enter ||
+                            event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+                          if (HardwareKeyboard.instance.isControlPressed) {
+                            final currentText = widget.controller.text;
+                            final currentPosition =
+                                widget.controller.selection.base.offset;
+                            final validPosition = currentPosition.clamp(
+                              0,
+                              currentText.length,
+                            );
+                            final newText =
+                                '${currentText.substring(0, validPosition)}\n${currentText.substring(validPosition)}';
+                            widget.controller.value = TextEditingValue(
+                              text: newText,
+                              selection: TextSelection.collapsed(
+                                offset: validPosition + 1,
+                              ),
+                            );
+                          } else {
+                            _handleSave();
+                          }
                         }
                       }
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: wellBase,
-                      borderRadius: AppRadius.lgRadius,
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : Colors.white.withValues(alpha: 0.70),
-                        width: 1.0,
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: wellBase,
+                        borderRadius: AppRadius.lgRadius,
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.white.withValues(alpha: 0.70),
+                          width: 1.0,
+                        ),
+                        boxShadow: AppShadows.wellDual(isDark: isDark),
                       ),
-                      boxShadow: AppShadows.wellDual(isDark: isDark),
-                    ),
-                    child: TextFormField(  
-                      maxLength: 100,   
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15.5,
-                        color: colorScheme.onSurface,
-                        letterSpacing: 0.2,
-                      ),
-                      minLines: 1,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintMaxLines: 100,
-                        hintText: widget.hintText,
-                        hintStyle: TextStyle(
-                          color: colorScheme.onSurfaceVariant.withValues(
-                            alpha: 0.60,
+                      child: TextFormField(  
+                        maxLength: 100,   
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15.5,
+                          color: colorScheme.onSurface,
+                          letterSpacing: 0.2,
+                        ),
+                        minLines: 1,
+                        maxLines: 4,
+                        decoration: InputDecoration(
+                          hintMaxLines: 100,
+                          hintText: widget.hintText,
+                          hintStyle: TextStyle(
+                            color: colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.60,
+                            ),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14.5,
                           ),
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14.5,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 14,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.edit_rounded,
+                            color: colorScheme.primary.withValues(alpha: 0.75),
+                            size: 20,
+                          ),
                         ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 14,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.edit_rounded,
-                          color: colorScheme.primary.withValues(alpha: 0.75),
-                          size: 20,
-                        ),
+                        autofocus: true,
+                        controller: widget.controller,
                       ),
-                      autofocus: true,
-                      controller: widget.controller,
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                // Tactile Action Buttons (Cancel & Save)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _NeumorphicDialogButton(
-                      label: S.current.cancel,
-                      icon: Icons.close_rounded,
-                      isPrimary: false,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        widget.controller.clear();
-                      },
-                    ),
-                    const SizedBox(width: 12),
-                    _NeumorphicDialogButton(
-                      label: buttonLabel,
-                      icon: widget.isEditing
-                          ? Icons.edit_rounded
-                          : Icons.check_rounded,
-                      isPrimary: true,
-                      onPressed: _handleSave,
-                    ),
-                  ],
-                ),
-              ],
+                  // Tactile Action Buttons (Cancel & Save)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _NeumorphicDialogButton(
+                        label: S.current.cancel,
+                        icon: Icons.close_rounded,
+                        isPrimary: false,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          widget.controller.clear();
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                      _NeumorphicDialogButton(
+                        label: buttonLabel,
+                        icon: widget.isEditing
+                            ? Icons.edit_rounded
+                            : Icons.check_rounded,
+                        isPrimary: true,
+                        onPressed: _handleSave,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
