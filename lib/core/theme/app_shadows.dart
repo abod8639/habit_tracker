@@ -307,7 +307,7 @@ abstract final class AppShadows {
   }) {
     final double glowAlpha =
         (isDark ? 0.12 : 0.06) + (progress * (isDark ? 0.15 : 0.08));
-    final double glowRadius = 3.5 + (progress * 6.5);
+    final double glowRadius = 1.5 + (progress * 6.5);
     final double spread = progress >= 0.7 ? 1.0 : 0.0;
 
     return [
