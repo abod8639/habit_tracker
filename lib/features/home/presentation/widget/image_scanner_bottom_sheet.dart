@@ -37,52 +37,57 @@ class ImageScannerBottomSheet extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: AppRadius.top(AppRadius.card),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-              borderRadius: AppRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            S.of(context).scanHabitsTitle,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            S.of(context).scanHabitsDesc,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _buildOptionCard(
-                context,
-                icon: Icons.camera_alt_rounded,
-                label: S.of(context).camera,
-                onTap: () => _pickImage(context, ImageSource.camera),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                  borderRadius: AppRadius.circular(2),
+                ),
               ),
-              _buildOptionCard(
-                context,
-                icon: Icons.photo_library_rounded,
-                label: S.of(context).gallery,
-                onTap: () => _pickImage(context, ImageSource.gallery),
+              const SizedBox(height: 24),
+              Text(
+                S.of(context).scanHabitsTitle,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+              const SizedBox(height: 8),
+              Text(
+                S.of(context).scanHabitsDesc,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildOptionCard(
+                    context,
+                    icon: Icons.camera_alt_rounded,
+                    label: S.of(context).camera,
+                    onTap: () => _pickImage(context, ImageSource.camera),
+                  ),
+                  _buildOptionCard(
+                    context,
+                    icon: Icons.photo_library_rounded,
+                    label: S.of(context).gallery,
+                    onTap: () => _pickImage(context, ImageSource.gallery),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
             ],
           ),
-          const SizedBox(height: 16),
-        ],
+        ),
       ),
     );
   }
