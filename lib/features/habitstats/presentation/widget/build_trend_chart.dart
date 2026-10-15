@@ -37,13 +37,11 @@ class TrendChartCard extends ConsumerWidget {
     final bool hasOverallData =
         trendSpots.isNotEmpty &&
         !(trendSpots.length <= 1 && trendSpots[0] == const FlSpot(0, 0));
-    final bool hasHabitsData = state.todaySummary.isNotEmpty ||
-        state.habitNames.isNotEmpty ||
-        state.individualTrends.isNotEmpty;
+    final bool hasIndividualData = state.individualTrends.isNotEmpty;
 
     final bool isEmpty = state.showAllHabits
-        ? !hasHabitsData
-        : (!hasOverallData && !hasHabitsData);
+        ? !hasOverallData
+        : !hasIndividualData;
 
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -93,12 +91,12 @@ class TrendChartCard extends ConsumerWidget {
                 NeumorphicIconButton(
                   size: 36,
                   icon: state.showAllHabits
-                      ? Icons.view_list_rounded
-                      : Icons.stacked_line_chart_rounded,
+                      ? Icons.stacked_line_chart_rounded
+                      : Icons.view_list_rounded,
                   accentColor: colorScheme.primary,
                   tooltip: state.showAllHabits
-                      ? 'Show overall trend'
-                      : 'Show individual habits',
+                      ? 'Show individual habits'
+                      : 'Show overall trend',
                   onPressed: () => notifier.toggleShowAllHabits(),
                 ),
               ],
