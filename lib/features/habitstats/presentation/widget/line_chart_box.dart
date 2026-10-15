@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/habitstats_providers.dart';
 import 'my_line_chart_bar_data.dart';
-import 'build_trend_chart.dart';
+import 'warp_habit_names.dart';
 
 class LineChartBox extends ConsumerWidget {
   const LineChartBox({super.key});
@@ -28,10 +28,65 @@ class LineChartBox extends ConsumerWidget {
       },
     );
 
+    final lineBars = _buildLineBarsData(
+      context: context,
+      state: state,
+      progression: progression,
+      trendLabels: trendLabels,
+    );
+
     return SizedBox(
       height: 240,
       child: LineChart(
         LineChartData(
+          lineTouchData: LineTouchData(
+            handleBuiltInTouches: true,
+            touchTooltipData: LineTouchTooltipData(
+              getTooltipColor: (spot) => isDark
+                  ? const Color(0xFF1E293B)
+                  : Colors.white,
+              tooltipBorderRadius: BorderRadius.circular(8),
+              fitInsideHorizontally: true,
+              fitInsideVertically: true,
+              getTooltipItems: (touchedSpots) {
+                return touchedSpots.map((barSpot) {
+                  final barIndex = barSpot.barIndex;
+                  if (barIndex < 0 || barIndex >= lineBars.length) return null;
+                  final bar = lineBars[barIndex];
+                  final isOverall = !state.showAllHabits;
+                  if (isOverall) {
+                    final percent = (barSpot.y * 100).toInt();
+                    return LineTooltipItem(
+                      '$percent%',
+                      TextStyle(
+                        color: bar.color ?? colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    );
+                  }
+                  final habitName = state.selectedHabitName ??
+                      (barIndex < state.habitNames.length
+                          ? state.habitNames[barIndex]
+                          : 'Habit');
+                  final isCompleted = barSpot.y >= 0.5;
+                  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+                  final statusText = isCompleted
+                      ? (isArabic ? 'مكتملة' : 'Completed')
+                      : (isArabic ? 'غير مكتملة' : 'Incomplete');
+
+                  return LineTooltipItem(
+                    '$habitName\n$statusText',
+                    TextStyle(
+                      color: bar.color ?? colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  );
+                }).toList();
+              },
+            ),
+          ),
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
@@ -79,9 +134,9 @@ class LineChartBox extends ConsumerWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  if (value == 0 ||
+                  if (value == 0    ||
                       value == 0.25 ||
-                      value == 0.5 ||
+                      value == 0.5  ||
                       value == 0.75 ||
                       value == 1.0) {
                     return Text(
@@ -133,12 +188,7 @@ class LineChartBox extends ConsumerWidget {
           minY: -0.05,
           maxY: 1.10,
 
-          lineBarsData: _buildLineBarsData(
-            context: context,
-            state: state,
-            progression: progression,
-            trendLabels: trendLabels,
-          ),
+          lineBarsData: lineBars,
         ),
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOutCubic,
@@ -155,7 +205,6 @@ class LineChartBox extends ConsumerWidget {
     final List<LineChartBarData> lineBars = [];
 
     if (state.showAllHabits) {
-      // Display each individual habit's trend data
       final habits = state.todaySummary;
       final habitNames = state.habitNames.isNotEmpty
           ? state.habitNames
@@ -163,26 +212,37 @@ class LineChartBox extends ConsumerWidget {
               ? progression.keys.toList()
               : habits.map((h) => h.name).toList());
 
-      for (int i = 0; i < habitNames.length; i++) {
-        final habitName = habitNames[i];
-        List<FlSpot>? spots = progression[habitName];
+      final selectedName = state.selectedHabitName;
+      final targetHabitNames = selectedName != null
+          ? habitNames.where((name) => name == selectedName).toList()
+          : habitNames;
 
-        if (spots == null || spots.isEmpty) {
+      final activeList = targetHabitNames.isNotEmpty ? targetHabitNames : habitNames;
+      final isSingleHabit = selectedName != null || activeList.length == 1;
+
+      for (int i = 0; i < activeList.length; i++) {
+        final habitName = activeList[i];
+        final originalIndex = habitNames.indexOf(habitName);
+        final effectiveIndex = originalIndex >= 0 ? originalIndex : i;
+
+        List<FlSpot>? rawSpots = progression[habitName];
+
+        if (rawSpots == null || rawSpots.isEmpty) {
           final matchingHabit = habits
               .where((h) => h.name == habitName || h.id == habitName)
               .firstOrNull;
           if (matchingHabit != null) {
-            spots = progression[matchingHabit.id] ??
+            rawSpots = progression[matchingHabit.id] ??
                 progression[matchingHabit.name];
           }
         }
 
-        if (spots == null || spots.isEmpty) {
+        if (rawSpots == null || rawSpots.isEmpty) {
           final matchingHabit = habits
               .where((h) => h.name == habitName)
               .firstOrNull;
           final bool isCompletedToday = matchingHabit?.isCompleted ?? false;
-          spots = List.generate(
+          rawSpots = List.generate(
             state.daysPeriod,
             (index) => FlSpot(
               index.toDouble(),
@@ -191,13 +251,32 @@ class LineChartBox extends ConsumerWidget {
           );
         }
 
-        final habitColor = _getHabitColor(i, context);
+        final habitColor = resolveHabitColor(habitName, effectiveIndex, habits);
+
+        // When multiple habits are shown together, apply a slight vertical offset
+        // to overlapping points so all lines are clearly distinguishable.
+        final spotsToRender = isSingleHabit
+            ? rawSpots
+            : rawSpots.map((s) {
+            //     final offset = (effectiveIndex * 0.025);
+            //     double y = s.y;
+            //     if (y >= 0.99) {
+            //       y = (1.0 - offset).clamp(0.0, 1.0);
+            //     } else if (y <= 0.00) {
+            //       y = (0.0 + offset).clamp(0.0, 1.0);
+            //     }
+                return FlSpot(s.x, s.y);
+              }).toList();
+
         lineBars.add(
           myLineChartBarData(
             color: habitColor,
-            spots: spots,
-            color1: habitColor.withValues(alpha: 0.15),
+            spots: spotsToRender,
+            color1: habitColor.withValues(alpha: isSingleHabit ? 0.35 : 0.12),
             color2: habitColor.withValues(alpha: 0.02),
+            // showBelowBar: isSingleHabit,
+            // barWidth: isSingleHabit ? 3.5 : 2.8,
+            // dotRadius: isSingleHabit ? 4.0 : 2.8,
             label: _getHabitLabel(habitName, state.isWeeklyView),
           ),
         );
@@ -223,9 +302,7 @@ class LineChartBox extends ConsumerWidget {
         myLineChartBarData(
           color: Theme.of(context).colorScheme.secondary,
           color1: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-          color2: Theme.of(
-            context,
-          ).colorScheme.secondary.withValues(alpha: 0.1),
+          color2: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
           spots: overallSpots,
           label: 'Overall',
         ),
@@ -233,13 +310,6 @@ class LineChartBox extends ConsumerWidget {
     }
 
     return lineBars;
-  }
-
-  Color _getHabitColor(int index, BuildContext context) {
-    if (index < lineColors.length) {
-      return lineColors[index];
-    }
-    return lineColors[index % lineColors.length];
   }
 
   String _getHabitLabel(String habitName, bool isWeekly) {
