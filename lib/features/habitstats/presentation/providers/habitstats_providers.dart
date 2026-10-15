@@ -145,7 +145,16 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
       bestStreak: habitState.bestStreak,
     );
 
-    // 3. Schedule fresh historical data fetch
+    // 3. Pre-populate initial individual trends from habits
+    final initialIndividualTrends = <String, List<FlSpot>>{};
+    for (var habit in habits) {
+      initialIndividualTrends[habit.name] = List.generate(
+        7,
+        (i) => FlSpot(i.toDouble(), (i == 6 && habit.isCompleted) ? 1.0 : 0.0),
+      );
+    }
+
+    // 4. Schedule fresh historical data fetch
     Future.microtask(() {
       refreshStats();
     });
@@ -153,6 +162,7 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
     return HabitStatsState(
       stats: initialStats,
       todaySummary: habits,
+      individualTrends: initialIndividualTrends,
       habitNames: habits.map((h) => h.name).toList(),
       isLoading: false,
     );
@@ -174,9 +184,30 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
       bestStreak: habitState.bestStreak,
     );
 
+    final currentTrends = Map<String, List<FlSpot>>.from(state.individualTrends);
+    for (var habit in habits) {
+      final existingSpots = currentTrends[habit.name];
+      if (existingSpots != null && existingSpots.isNotEmpty) {
+        final lastIdx = existingSpots.length - 1;
+        existingSpots[lastIdx] = FlSpot(
+          lastIdx.toDouble(),
+          habit.isCompleted ? 1.0 : 0.0,
+        );
+      } else {
+        currentTrends[habit.name] = List.generate(
+          state.daysPeriod,
+          (i) => FlSpot(
+            i.toDouble(),
+            (i == state.daysPeriod - 1 && habit.isCompleted) ? 1.0 : 0.0,
+          ),
+        );
+      }
+    }
+
     state = state.copyWith(
       stats: updatedStats,
       todaySummary: habits,
+      individualTrends: currentTrends,
       habitNames: habits.map((h) => h.name).toList(),
     );
   }
