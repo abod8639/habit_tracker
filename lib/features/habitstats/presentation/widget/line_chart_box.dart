@@ -186,7 +186,6 @@ class LineChartBox extends ConsumerWidget {
         }
       }
     }
-
     return lineBars;
   }
 
