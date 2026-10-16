@@ -110,6 +110,42 @@ class NotificationsSection extends ConsumerWidget {
             ref,
           ),
         ),
+        if (isEnabled) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: () async {
+                    await notificationNotifier.sendTestNotification();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(s.notificationTestSent),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                  icon: Icon(
+                    Icons.notifications_active_outlined,
+                    size: 16,
+                    color: primaryColor,
+                  ),
+                  label: Text(
+                    s.testNotification,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: primaryColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         if (isEnabled && !isBatteryIgnored) ...[
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
