@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:habit_tracker/core/contracts/habit_facade_contract.dart';
 import 'package:habit_tracker/core/error/failures.dart';
-import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
 import '../../domain/entities/category_entity.dart';
 import '../../domain/entities/plan_suggestion.dart';
 import '../../domain/entities/question_entity.dart';
@@ -10,11 +10,11 @@ import '../datasources/questions_datasource.dart';
 
 class PlanRepositoryImpl implements PlanRepository {
   final PlanRemoteDataSource remoteDataSource;
-  final HabitRepository habitRepository;
+  final IHabitFacade habitFacade;
 
   PlanRepositoryImpl({
     required this.remoteDataSource,
-    required this.habitRepository,
+    required this.habitFacade,
   });
 
   @override
@@ -41,7 +41,8 @@ class PlanRepositoryImpl implements PlanRepository {
   @override
   Future<Either<Failure, void>> savePlanHabits(List<String> habitNames) async {
     try {
-      return await habitRepository.addMultipleHabits(habitNames);
+      await habitFacade.addHabits(habitNames);
+      return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
