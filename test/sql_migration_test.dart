@@ -14,7 +14,6 @@ import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/features/habitstats/data/datasources/habit_stats_local_datasource.dart';
 import 'package:habit_tracker/features/habitstats/data/repositories/habit_stats_repository_impl.dart';
-import 'package:hive/hive.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -24,13 +23,11 @@ void main() {
 
   setUp(() async {
     db = AppDatabase(NativeDatabase.memory());
-    tempDir = await Directory.systemTemp.createTemp('hive_sql_test_');
-    Hive.init(tempDir.path);
+    tempDir = await Directory.systemTemp.createTemp('sql_test_');
   });
 
   tearDown(() async {
     await db.close();
-    await Hive.close();
     if (tempDir.existsSync()) {
       await tempDir.delete(recursive: true);
     }
@@ -105,9 +102,6 @@ void main() {
     });
 
     test('HabitNotifier editHabit updates UI state optimistically and persists', () async {
-      await Hive.openBox(HabitStorage.boxName);
-      await Hive.openBox(HabitStorage.backupVaultBox);
-
       final dataSource = HabitSqlLocalDataSource(db);
       await dataSource.init();
       final now = DateTime.now();
@@ -223,56 +217,11 @@ void main() {
       expect(dataSource.getStartDate(), '20260101');
     });
 
-    test('HiveToSqlMigrator accurately migrates legacy Hive data into SQLite', () async {
-      // 1. Populate legacy Hive box
-      final mainBox = await Hive.openBox(HabitStorage.boxName);
-      final legacyHabit = HabitModel(
-        id: 'legacy_h1',
-        name: 'Read Quran',
-        isCompleted: true,
-        createdAt: DateTime(2026, 1, 1),
-        index: 0,
-      );
-
-      await mainBox.put(HabitStorage.habitListKey, [legacyHabit.toMap()]);
-      await mainBox.put(HabitStorage.startDayKey, '20260101');
-      await mainBox.put(HabitStorage.dayCountKey, 14);
-      await mainBox.put(HabitStorage.lastResetDateKey, '2026-01-14T00:00:00.000');
-
-      // Populate monthly history box (202601)
-      final historyBox = await Hive.openBox('${HabitStorage.boxName}_history_202601');
-      await historyBox.put('legacy_h1_20260101', true);
-      await historyBox.put('legacy_h1_20260102', true);
-
-      // 2. Execute migration
+    test('HiveToSqlMigrator reports migration completed for direct SQLite usage', () async {
       final migrator = HiveToSqlMigrator(db);
-      expect(await migrator.isMigrationDone(), false);
-
-      await migrator.migrateIfNeeded();
-
-      // 3. Verify migration in SQLite
       expect(await migrator.isMigrationDone(), true);
-
-      final dataSource = HabitSqlLocalDataSource(db);
-      final habits = await dataSource.fetchHabitsFromDb();
-      expect(habits.length, 1);
-      expect(habits.first.id, 'legacy_h1');
-      expect(habits.first.name, 'Read Quran');
-
-      final startDay = await db.habitHistoryDao.getMetadata(HabitStorage.startDayKey);
-      expect(startDay, '20260101');
-
-      final dayCount = await db.habitHistoryDao.getMetadata(HabitStorage.dayCountKey);
-      expect(dayCount, '14');
-
-      final heatmap = await dataSource.getHeatmapData();
-      expect(heatmap[DateTime(2026, 1, 1)], 10);
-      expect(heatmap[DateTime(2026, 1, 2)], 10);
-
-      // 4. Verify idempotency
       await migrator.migrateIfNeeded();
-      final habitsAfterSecondRun = await dataSource.fetchHabitsFromDb();
-      expect(habitsAfterSecondRun.length, 1);
+      expect(await migrator.isMigrationDone(), true);
     });
 
     test('HabitHistoryDao and HabitStatsRepository accurately track previous days history', () async {
