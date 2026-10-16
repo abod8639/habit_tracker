@@ -1,4 +1,6 @@
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/database/app_database.dart';
 import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/core/services/analytics_service.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
@@ -6,6 +8,7 @@ import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/core/services/home_widget_service.dart';
 import 'package:habit_tracker/core/services/notification_service.dart';
+import 'package:habit_tracker/core/storage/key_value_storage.dart';
 import 'package:habit_tracker/features/setting/data/datasources/lang_storage.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_storage.dart';
@@ -30,7 +33,17 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
   return GeminiService();
 });
 
-/// Theme storage service provider (Hive)
+/// Key-Value storage service provider (backed by SQLite)
+final keyValueStorageProvider = Provider<KeyValueStorage>((ref) {
+  try {
+    return AppInitializer.keyValueStorage;
+  } catch (_) {
+    final db = AppDatabase(NativeDatabase.memory());
+    return KeyValueStorage(db);
+  }
+});
+
+/// Theme storage service provider
 final themeStorageServiceProvider = Provider<ThemeStorageService?>((ref) {
   try {
     return AppInitializer.themeStorage;
@@ -39,14 +52,24 @@ final themeStorageServiceProvider = Provider<ThemeStorageService?>((ref) {
   }
 });
 
-/// Settings storage service provider (Hive)
+/// Settings storage service provider
 final settingsStorageServiceProvider = Provider<SettingsStorage>((ref) {
-  return AppInitializer.settingsStorage;
+  try {
+    return AppInitializer.settingsStorage;
+  } catch (_) {
+    final storage = ref.watch(keyValueStorageProvider);
+    return SettingsStorage(storage);
+  }
 });
 
-/// Language storage service provider (Hive)
+/// Language storage service provider
 final langStorageServiceProvider = Provider<LangStorage>((ref) {
-  return AppInitializer.langStorage;
+  try {
+    return AppInitializer.langStorage;
+  } catch (_) {
+    final storage = ref.watch(keyValueStorageProvider);
+    return LangStorage(storage);
+  }
 });
 
 /// Local notifications service provider
