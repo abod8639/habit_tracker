@@ -349,10 +349,17 @@ class NotificationNotifier extends Notifier<NotificationState> {
     final enabledResult = await isEnabledUseCase();
     final timeResult = await getTimeUseCase();
 
+    final isEnabled = enabledResult.getOrElse(() => false);
+    final time = timeResult.getOrElse(() => null);
+
     state = state.copyWith(
-      isNotificationEnabled: enabledResult.getOrElse(() => false),
-      notificationTime: timeResult.getOrElse(() => null),
+      isNotificationEnabled: isEnabled,
+      notificationTime: time,
     );
+
+    if (isEnabled && time != null) {
+      await _scheduleDailyReminder(time);
+    }
 
     await checkBatteryOptimization();
   }
@@ -373,6 +380,35 @@ class NotificationNotifier extends Notifier<NotificationState> {
     }
   }
 
+  Future<void> openAppSettings() async {
+    final notificationService = ref.read(notificationServiceProvider);
+    if (notificationService != null) {
+      await notificationService.openAppSettings();
+    }
+  }
+
+  Future<void> _scheduleDailyReminder(TimeOfDay time) async {
+    final notificationService = ref.read(notificationServiceProvider);
+    if (notificationService != null) {
+      await notificationService.scheduleDailyNotification(
+        id: 1001,
+        title: S.current.dailyReminderTitle,
+        body: S.current.dailyReminderBody,
+        time: time,
+      );
+    }
+  }
+
+  Future<void> sendTestNotification() async {
+    final notificationService = ref.read(notificationServiceProvider);
+    if (notificationService != null) {
+      await notificationService.showTestNotification(
+        title: S.current.notificationTestTitle,
+        body: S.current.notificationTestSent,
+      );
+    }
+  }
+
   Future<void> toggleNotification(bool enabled) async {
     final notificationService = ref.read(notificationServiceProvider);
     if (enabled && notificationService != null) {
@@ -384,8 +420,14 @@ class NotificationNotifier extends Notifier<NotificationState> {
     await setEnabled(enabled);
     state = state.copyWith(isNotificationEnabled: enabled);
 
-    if (!enabled && notificationService != null) {
-      await notificationService.cancelAllNotifications();
+    if (enabled) {
+      if (state.notificationTime != null) {
+        await _scheduleDailyReminder(state.notificationTime!);
+      }
+    } else {
+      if (notificationService != null) {
+        await notificationService.cancelAllNotifications();
+      }
     }
   }
 
@@ -393,6 +435,10 @@ class NotificationNotifier extends Notifier<NotificationState> {
     final setTime = ref.read(setNotificationTimeUseCaseProvider);
     await setTime(time);
     state = state.copyWith(notificationTime: time);
+
+    if (state.isNotificationEnabled) {
+      await _scheduleDailyReminder(time);
+    }
   }
 }
 
