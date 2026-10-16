@@ -17,21 +17,21 @@ class NotificationDialogs {
     final notifier = ref.read(notificationNotifierProvider.notifier);
     final state = ref.read(notificationNotifierProvider);
 
-    if (!state.isNotificationEnabled) {
-      await notifier.toggleNotification(true);
-    }
-
-    if (!context.mounted) return;
+    final initialTime =
+        state.notificationTime ?? const TimeOfDay(hour: 20, minute: 0);
 
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: state.notificationTime ?? TimeOfDay.now(),
+      initialTime: initialTime,
     );
 
     if (picked != null && context.mounted) {
       final formattedTime = picked.format(context);
       final s = S.of(context);
       await notifier.setNotificationTime(picked);
+      if (!state.isNotificationEnabled) {
+        await notifier.toggleNotification(true);
+      }
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -49,17 +49,35 @@ class NotificationDialogs {
     bool value,
   ) async {
     final notifier = ref.read(notificationNotifierProvider.notifier);
-    await notifier.toggleNotification(value);
-    if (value && context.mounted) {
-      await showReminderTimePicker(context, ref);
-    } else if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '${S.current.success}: ${S.current.notificationsDisabled}',
+    final state = ref.read(notificationNotifierProvider);
+
+    if (value) {
+      if (state.notificationTime == null) {
+        await showReminderTimePicker(context, ref);
+      } else {
+        await notifier.toggleNotification(true);
+        if (context.mounted) {
+          final formattedTime = state.notificationTime!.format(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${S.current.success}: ${S.current.reminderSetFor(formattedTime)}',
+              ),
+            ),
+          );
+        }
+      }
+    } else {
+      await notifier.toggleNotification(false);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${S.current.success}: ${S.current.notificationsDisabled}',
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
   }
 }
