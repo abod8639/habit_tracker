@@ -1,9 +1,11 @@
-import 'dart:io';
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:habit_tracker/core/database/app_database.dart';
 import 'package:habit_tracker/core/init/app_initializer.dart';
+import 'package:habit_tracker/core/storage/key_value_storage.dart';
+import 'package:habit_tracker/features/setting/data/datasources/lang_storage.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 import 'package:habit_tracker/features/setting/data/datasources/setting_local_datasource.dart';
 import 'package:habit_tracker/features/setting/data/repositories/setting_repository_impl.dart';
@@ -14,6 +16,7 @@ import 'package:habit_tracker/features/setting/presentation/providers/setting_pr
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/setting/data/datasources/setting_remote_datasource.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
+import 'package:habit_tracker/features/theme/data/datasources/theme_storage.dart';
 
 // Minimal mock/fake for dependencies not under test
 class FakeSettingRemoteDataSource implements SettingRemoteDataSource {
@@ -46,10 +49,11 @@ class FakeHabitLocalDataSource implements HabitLocalDataSource {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late Directory tempDir;
-  late Box settingsBox;
-  late Box langBox;
+  late AppDatabase db;
+  late KeyValueStorage storage;
   late SettingsStorage settingsStorage;
+  late LangStorage langStorage;
+  late ThemeStorageService themeStorage;
   late SettingLocalDataSource localDataSource;
   late FakeSettingRemoteDataSource remoteDataSource;
   late SettingRepositoryImpl repository;
@@ -58,18 +62,19 @@ void main() {
   late ClearCustomApiKeyUseCase clearCustomApiKeyUseCase;
 
   setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('ai_settings_test_');
-    Hive.init(tempDir.path);
-    settingsBox = await Hive.openBox(SettingsStorage.boxName);
-    langBox = await Hive.openBox('lang_box');
+    db = AppDatabase(NativeDatabase.memory());
+    storage = KeyValueStorage(db);
+    await storage.init();
 
-    settingsStorage = SettingsStorage();
-    await settingsStorage.init();
+    settingsStorage = SettingsStorage(storage);
+    langStorage = LangStorage(storage);
+    themeStorage = ThemeStorageService(storage);
     AppInitializer.settingsStorage = settingsStorage;
 
     localDataSource = SettingLocalDataSourceImpl(
-      langBox: langBox,
-      settingsBox: settingsBox,
+      langStorage: langStorage,
+      settingsStorage: settingsStorage,
+      themeStorage: themeStorage,
     );
 
     remoteDataSource = FakeSettingRemoteDataSource();
@@ -87,12 +92,7 @@ void main() {
 
   tearDown(() async {
     dotenv.clean();
-    await settingsBox.close();
-    await langBox.close();
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await db.close();
   });
 
   group('AI Settings - Clean Architecture & Custom API Key Tests', () {
