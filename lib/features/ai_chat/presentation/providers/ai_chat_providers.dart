@@ -17,7 +17,8 @@ import 'package:habit_tracker/generated/l10n.dart';
 
 // Data Sources
 final aiChatLocalDataSourceProvider = Provider<AiChatLocalDataSource>((ref) {
-  return AiChatLocalDataSourceImpl();
+  final storage = ref.watch(keyValueStorageProvider);
+  return AiChatLocalDataSourceImpl(storage: storage);
 });
 
 final aiChatRemoteDataSourceProvider = Provider<AiChatRemoteDataSource>((ref) {
