@@ -1,6 +1,7 @@
-import 'dart:io';
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
+import 'package:habit_tracker/core/database/app_database.dart';
+import 'package:habit_tracker/core/storage/key_value_storage.dart';
 import 'package:habit_tracker/features/ai_chat/domain/entities/chat_message_entity.dart';
 import 'package:habit_tracker/features/ai_chat/data/models/chat_message_model.dart';
 import 'package:habit_tracker/features/ai_chat/data/datasources/ai_chat_local_datasource.dart';
@@ -35,7 +36,8 @@ class FakeAiChatRemoteDataSource implements AiChatRemoteDataSource {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late Directory tempDir;
+  late AppDatabase db;
+  late KeyValueStorage storage;
   late AiChatLocalDataSourceImpl localDataSource;
   late FakeAiChatRemoteDataSource remoteDataSource;
   late AiChatRepositoryImpl repository;
@@ -44,10 +46,11 @@ void main() {
   late ClearChatHistoryUseCase clearChatHistoryUseCase;
 
   setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('ai_clean_arch_test_');
-    Hive.init(tempDir.path);
+    db = AppDatabase(NativeDatabase.memory());
+    storage = KeyValueStorage(db);
+    await storage.init();
 
-    localDataSource = AiChatLocalDataSourceImpl();
+    localDataSource = AiChatLocalDataSourceImpl(storage: storage);
     remoteDataSource = FakeAiChatRemoteDataSource();
     repository = AiChatRepositoryImpl(
       localDataSource: localDataSource,
@@ -60,10 +63,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      await tempDir.delete(recursive: true);
-    }
+    await db.close();
   });
 
   group('AI Clean Architecture - AI Chat Feature Tests', () {
