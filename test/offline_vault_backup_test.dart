@@ -1,9 +1,9 @@
-import 'dart:io';
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
+import 'package:habit_tracker/core/database/app_database.dart';
+import 'package:habit_tracker/core/storage/key_value_storage.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_local_data_source.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
-import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/data/models/habit_vault_data.dart';
 import 'package:habit_tracker/features/home/data/repositories/habit_repository_impl.dart';
@@ -11,36 +11,25 @@ import 'package:habit_tracker/core/services/firestore_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  late Directory tempDir;
-  late Box mainBox;
-  late Box vaultBox;
+  late AppDatabase db;
+  late KeyValueStorage storage;
   late HabitOfflineVaultDataSource vaultDataSource;
   late HabitLocalDataSource localDataSource;
 
   setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('vault_test_');
-    Hive.init(tempDir.path);
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(HabitModelAdapter());
-    }
+    db = AppDatabase(NativeDatabase.memory());
+    storage = KeyValueStorage(db);
+    await storage.init();
 
-    mainBox = await Hive.openBox(HabitStorage.boxName);
-    vaultBox = await Hive.openBox(HabitStorage.backupVaultBox);
-
-    vaultDataSource = HabitOfflineVaultDataSource(vaultBox);
+    vaultDataSource = HabitOfflineVaultDataSource(storage);
     localDataSource = HabitLocalDataSource(
-      mainBox,
+      db,
       vaultDataSource: vaultDataSource,
     );
   });
 
   tearDown(() async {
-    await mainBox.close();
-    await vaultBox.close();
-    await Hive.deleteFromDisk();
-    try {
-      await tempDir.delete(recursive: true);
-    } catch (_) {}
+    await db.close();
   });
 
   group('HabitOfflineVaultDataSource Tests', () {
