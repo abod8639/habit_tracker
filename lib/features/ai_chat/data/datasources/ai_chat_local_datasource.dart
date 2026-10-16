@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:habit_tracker/core/storage/key_value_storage.dart';
 import '../models/chat_message_model.dart';
 
 abstract class AiChatLocalDataSource {
@@ -8,21 +8,16 @@ abstract class AiChatLocalDataSource {
 }
 
 class AiChatLocalDataSourceImpl implements AiChatLocalDataSource {
-  static const String historyBoxName = 'ai_chat_history';
-  Box? _historyBox;
+  static const String historyKey = 'ai_chat_history';
+  final KeyValueStorage _storage;
 
-  Future<Box> _getHistoryBox() async {
-    if (_historyBox != null && _historyBox!.isOpen) {
-      return _historyBox!;
-    }
-    _historyBox = await Hive.openBox(historyBoxName);
-    return _historyBox!;
-  }
+  AiChatLocalDataSourceImpl({required KeyValueStorage storage})
+      : _storage = storage;
 
   @override
   Future<List<ChatMessageModel>> getChatHistory() async {
-    final box = await _getHistoryBox();
-    final storedList = box.get('history', defaultValue: []) as List;
+    final storedList = _storage.getJsonList(historyKey);
+    if (storedList == null) return [];
     return storedList.map((item) {
       final map = Map<String, dynamic>.from(item as Map);
       return ChatMessageModel.fromJson(map);
@@ -31,19 +26,17 @@ class AiChatLocalDataSourceImpl implements AiChatLocalDataSource {
 
   @override
   Future<void> saveChatHistory(List<ChatMessageModel> messages) async {
-    final box = await _getHistoryBox();
     // Keep only the last 10 messages for token and memory efficiency
     final start = messages.length > 10 ? messages.length - 10 : 0;
     final listToSave = messages
         .sublist(start)
         .map((m) => m.toJson())
         .toList();
-    await box.put('history', listToSave);
+    await _storage.setJson(historyKey, listToSave);
   }
 
   @override
   Future<void> clearChatHistory() async {
-    final box = await _getHistoryBox();
-    await box.delete('history');
+    await _storage.remove(historyKey);
   }
 }
