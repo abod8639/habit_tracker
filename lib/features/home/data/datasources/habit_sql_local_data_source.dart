@@ -242,7 +242,18 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
   }
 
   @override
-  Future<void> clearAllData({String? earliestDateStr}) async {
+  Future<void> clearAllData({
+    String? earliestDateStr,
+    bool backupBeforeClear = false,
+    String? userId,
+  }) async {
+    if (backupBeforeClear && vaultDataSource != null) {
+      final uid = userId ?? _lastUserId;
+      if (uid != null && uid.isNotEmpty) {
+        final snapshot = await createSnapshot(userId: uid);
+        await vaultDataSource!.saveBackup(snapshot);
+      }
+    }
     await db.habitDao.clearAllHabits();
     await db.habitHistoryDao.clearAllHistory();
     _cachedHabits.clear();
