@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
-import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:habit_tracker/features/home/data/repositories/habit_repository_impl.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
@@ -34,10 +32,8 @@ import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_
 
 // Data Sources
 final habitVaultDataSourceProvider = Provider<HabitOfflineVaultDataSource>((ref) {
-  final vaultBox = Hive.isBoxOpen(HabitStorage.backupVaultBox)
-      ? Hive.box(HabitStorage.backupVaultBox)
-      : Hive.box(HabitStorage.boxName);
-  return HabitOfflineVaultDataSource(vaultBox);
+  final storage = ref.watch(keyValueStorageProvider);
+  return HabitOfflineVaultDataSource(storage);
 });
 
 final habitSqlLocalDataSourceProvider = Provider<HabitSqlLocalDataSource>((ref) {
