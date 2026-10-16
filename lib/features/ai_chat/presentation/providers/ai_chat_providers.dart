@@ -11,9 +11,7 @@ import 'package:habit_tracker/features/ai_chat/domain/repositories/ai_chat_repos
 import 'package:habit_tracker/features/ai_chat/domain/usecases/clear_chat_history_usecase.dart';
 import 'package:habit_tracker/features/ai_chat/domain/usecases/get_chat_history_usecase.dart';
 import 'package:habit_tracker/features/ai_chat/domain/usecases/save_chat_history_usecase.dart';
-import 'package:habit_tracker/features/home/data/models/date_time.dart';
-import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
-import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
+import 'package:habit_tracker/core/contracts/habit_facade_contract.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/lang_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -96,11 +94,12 @@ class AiChatNotifier extends Notifier<AiChatState> {
   ClearChatHistoryUseCase get _clearChatHistoryUseCase =>
       ref.read(clearChatHistoryUseCaseProvider);
 
-  String _buildSystemInstruction() {
-    final habitState = ref.read(habitNotifierProvider);
-    final List<HabitEntity> habits = habitState.habits;
+  String _buildSystemInstruction([HabitContextDto? habitContext]) {
+    final List<HabitSummaryDto> habits = habitContext?.habits ?? const [];
 
-    final todayStr = todaysDateFormatted();
+    final now = DateTime.now();
+    final todayStr =
+        '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
     final int completedCount = habits.where((h) => h.isCompleted).length;
     final int totalCount = habits.length;
 
@@ -125,11 +124,12 @@ class AiChatNotifier extends Notifier<AiChatState> {
           .join("\n");
     }
 
-    final startDateStr = ref.read(habitNotifierProvider.notifier).getStartDay();
-    final dailyHistoryContext = _getHeatmapContext(habitState.heatmapDateSet, isArabic);
+    final startDateStr = habitContext?.startDay ?? '';
+    final dailyHistoryContext =
+        _getHeatmapContext(habitContext?.heatmap ?? const {}, isArabic);
 
-    final int currentStreak = habitState.streak;
-    final int bestStreak = habitState.bestStreak;
+    final int currentStreak = habitContext?.streak ?? 0;
+    final int bestStreak = habitContext?.bestStreak ?? 0;
     final bool isStreakAtRisk = currentStreak > 0 && completedCount == 0;
     final bool isStreakSecured = currentStreak > 0 && completedCount > 0;
     final bool isNewRecord = currentStreak > 0 && currentStreak >= bestStreak;
@@ -288,6 +288,11 @@ TONE & EMOTION DETECTION
 
   Future<void> initializeChat() async {
     try {
+      HabitContextDto? habitContext;
+      try {
+        habitContext = await ref.read(habitFacadeProvider).getHabitContext();
+      } catch (_) {}
+
       final result = await _getChatHistoryUseCase();
       final List<ChatMessageEntity> loadedEntities = result.fold(
         (failure) => [],
@@ -297,7 +302,7 @@ TONE & EMOTION DETECTION
       state = state.copyWith(messages: loadedEntities);
 
       _chatRepository.initChatSession(
-        systemInstruction: _buildSystemInstruction(),
+        systemInstruction: _buildSystemInstruction(habitContext),
         history: loadedEntities,
       );
 
