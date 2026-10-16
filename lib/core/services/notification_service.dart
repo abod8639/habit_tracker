@@ -88,6 +88,8 @@ class NotificationService {
           'Daily Reminders',
           description: 'Daily reminders for your habits',
           importance: fln.Importance.max,
+          enableVibration: true,
+          playSound: true,
         ),
       );
 
@@ -97,6 +99,8 @@ class NotificationService {
           'Immediate Notifications',
           description: 'Notifications that show immediately',
           importance: fln.Importance.max,
+          enableVibration: true,
+          playSound: true,
         ),
       );
 
@@ -106,6 +110,8 @@ class NotificationService {
           'Firebase Notifications',
           description: 'Notifications received from Firebase Cloud Messaging',
           importance: fln.Importance.max,
+          enableVibration: true,
+          playSound: true,
         ),
       );
     }
@@ -164,6 +170,20 @@ class NotificationService {
     }
   }
 
+  /// Opens application details settings in Android OS (useful for HyperOS Autostart/Battery).
+  Future<bool> openAppSettings() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      return true;
+    }
+    try {
+      final result = await batteryChannel.invokeMethod<bool>('openAppSettings');
+      return result ?? false;
+    } catch (e) {
+      debugPrint('NotificationService: Failed to open app settings: $e');
+      return false;
+    }
+  }
+
   Future<bool> requestPermissions({bool requestBatteryExemption = true}) async {
     bool granted = false;
 
@@ -174,8 +194,20 @@ class NotificationService {
 
     if (androidPlugin != null) {
       final notifGranted = await androidPlugin.requestNotificationsPermission();
-      final alarmGranted = await androidPlugin.requestExactAlarmsPermission();
-      granted = (notifGranted ?? false) || (alarmGranted ?? false);
+
+      try {
+        final canExact =
+            await androidPlugin.canScheduleExactNotifications() ?? false;
+        if (!canExact) {
+          await androidPlugin.requestExactAlarmsPermission();
+        }
+      } catch (e) {
+        debugPrint(
+          'NotificationService: Could not check/request exact alarm permission: $e',
+        );
+      }
+
+      granted = notifGranted ?? false;
 
       if (requestBatteryExemption &&
           !kIsWeb &&
@@ -298,6 +330,7 @@ class NotificationService {
         icon: '@mipmap/ic_launcher',
         playSound: true,
         enableVibration: true,
+        channelShowBadge: true,
       ),
       iOS: fln.DarwinNotificationDetails(
         presentAlert: true,
@@ -307,6 +340,25 @@ class NotificationService {
       linux: fln.LinuxNotificationDetails(),
     );
 
+    final androidPlugin = flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          fln.AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    bool canExact = true;
+    if (androidPlugin != null) {
+      try {
+        canExact =
+            await androidPlugin.canScheduleExactNotifications() ?? false;
+      } catch (_) {
+        canExact = false;
+      }
+    }
+
+    final preferredMode = canExact
+        ? fln.AndroidScheduleMode.exactAllowWhileIdle
+        : fln.AndroidScheduleMode.inexactAllowWhileIdle;
+
     try {
       await flutterLocalNotificationsPlugin.zonedSchedule(
         id: id,
@@ -314,9 +366,12 @@ class NotificationService {
         body: body,
         scheduledDate: scheduledDate,
         notificationDetails: notificationDetails,
-        androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: preferredMode,
         matchDateTimeComponents: fln.DateTimeComponents.time,
         payload: 'habit_notification_payload',
+      );
+      debugPrint(
+        'NotificationService: Scheduled successfully with mode $preferredMode',
       );
     } catch (e) {
       debugPrint(
@@ -333,6 +388,7 @@ class NotificationService {
           matchDateTimeComponents: fln.DateTimeComponents.time,
           payload: 'habit_notification_payload',
         );
+        debugPrint('NotificationService: Fallback scheduled successfully.');
       } catch (fallbackError) {
         debugPrint('Failed to schedule notification: $fallbackError');
       }
