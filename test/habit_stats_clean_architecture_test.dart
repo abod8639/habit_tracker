@@ -1,32 +1,14 @@
 import 'package:dartz/dartz.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:habit_tracker/core/database/app_database.dart';
 import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/storage/key_value_storage.dart';
 import 'package:habit_tracker/features/habitstats/data/datasources/habit_stats_local_datasource.dart';
 import 'package:habit_tracker/features/habitstats/data/models/habit_stats_model.dart';
 import 'package:habit_tracker/features/habitstats/data/repositories/habit_stats_repository_impl.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
-import 'package:hive/hive.dart';
-
-class FakeBox implements Box {
-  final Map<dynamic, dynamic> _store = {};
-
-  @override
-  dynamic get(key, {defaultValue}) => _store[key] ?? defaultValue;
-
-  @override
-  Future<void> put(key, value) async {
-    _store[key] = value;
-  }
-
-  @override
-  Future<void> delete(key) async {
-    _store.remove(key);
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
 
 class FakeHabitRepository implements HabitRepository {
   List<HabitEntity> habits = [];
@@ -43,10 +25,10 @@ class FakeHabitRepository implements HabitRepository {
     return Right(heatmapData);
   }
 
+
+
   @override
-  Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(
-    int days,
-  ) async {
+  Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(int days) async {
     return Right(historyMap);
   }
 
@@ -55,20 +37,27 @@ class FakeHabitRepository implements HabitRepository {
 }
 
 void main() {
-  group('HabitStats Clean Architecture & Storage Tests', () {
-    late FakeBox fakeBox;
+  group('HabitStats Clean Architecture & Data Flow Tests', () {
+    late AppDatabase db;
+    late KeyValueStorage storage;
     late HabitStatsLocalDataSource localDataSource;
     late FakeHabitRepository fakeHabitRepo;
     late HabitStatsRepositoryImpl repository;
 
-    setUp(() {
-      fakeBox = FakeBox();
-      localDataSource = HabitStatsLocalDataSourceImpl(myBox: fakeBox);
+    setUp(() async {
+      db = AppDatabase(NativeDatabase.memory());
+      storage = KeyValueStorage(db);
+      await storage.init();
+      localDataSource = HabitStatsLocalDataSourceImpl(storage: storage);
       fakeHabitRepo = FakeHabitRepository();
       repository = HabitStatsRepositoryImpl(
         localDataSource: localDataSource,
         habitRepository: fakeHabitRepo,
       );
+    });
+
+    tearDown(() async {
+      await db.close();
     });
 
     test('HabitStatsModel serialization and deserialization', () {
@@ -90,7 +79,7 @@ void main() {
       expect(fromMap.bestStreak, 12);
     });
 
-    test('HabitStatsLocalDataSource caching works via Box', () async {
+    test('HabitStatsLocalDataSource caching works via SQLite KeyValueStorage', () async {
       expect(localDataSource.getCachedStats(), isNull);
 
       const stats = HabitStatsModel(
