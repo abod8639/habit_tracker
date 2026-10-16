@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
-import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
+import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_state.dart';
@@ -18,10 +17,8 @@ import 'package:habit_tracker/features/habitstats/domain/usecases/get_today_habi
 // Data Source
 final habitStatsLocalDataSourceProvider =
     Provider<HabitStatsLocalDataSource>((ref) {
-  final box = Hive.isBoxOpen(HabitStorage.boxName)
-      ? Hive.box(HabitStorage.boxName)
-      : null;
-  return HabitStatsLocalDataSourceImpl(myBox: box);
+  final storage = ref.watch(keyValueStorageProvider);
+  return HabitStatsLocalDataSourceImpl(storage: storage);
 });
 
 // Repository
