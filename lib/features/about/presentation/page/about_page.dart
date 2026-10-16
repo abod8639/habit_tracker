@@ -207,7 +207,7 @@ class _AboutPageState extends State<AboutPage> {
                           _buildTechChip(context, 'Flutter', isDark),
                           _buildTechChip(context, 'Clean Architecture', isDark),
                           _buildTechChip(context, 'Riverpod', isDark),
-                          _buildTechChip(context, 'Hive', isDark),
+                          _buildTechChip(context, 'Drift / SQLite', isDark),
                           _buildTechChip(context, 'Firebase', isDark),
                           _buildTechChip(context, 'Google Gemini', isDark),
                         ],
@@ -344,8 +344,8 @@ class _AboutPageState extends State<AboutPage> {
                             ? 'المزامنة السحابية والأمان'
                             : 'Cloud Sync & Privacy',
                         subtitle: isArabic
-                            ? 'تخزين محلي سريع عبر Hive ومزامنة موثوقة مع Cloud Firestore'
-                            : 'Fast local Hive persistence with Firestore multi-device sync',
+                            ? 'تخزين محلي فائق السرعة عبر SQLite ومزامنة موثوقة مع Cloud Firestore'
+                            : 'Fast local SQLite persistence with Firestore multi-device sync',
                         primaryColor: primaryColor,
                       ),
                     ],
