@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:habit_tracker/core/storage/key_value_storage.dart';
 
 class ThemeStorageService {
   static const String themeBox = "Theme_db";
@@ -8,30 +8,25 @@ class ThemeStorageService {
   static const String useCustomBgKey = "use_custom_bg";
   static const String customBgColorKey = "custom_bg_color";
 
-  final Box _box;
+  final KeyValueStorage _storage;
 
-  ThemeStorageService(this._box);
-
-  static Future<ThemeStorageService> init() async {
-    final box = await Hive.openBox(themeBox);
-    return ThemeStorageService(box);
-  }
+  ThemeStorageService(this._storage);
 
   String getThemeName(String defaultTheme) {
-    return _box.get(themeNameKey, defaultValue: defaultTheme);
+    return _storage.getString(themeNameKey, defaultValue: defaultTheme)!;
   }
 
   bool getUseCustomBackground() {
-    return _box.get(useCustomBgKey, defaultValue: false);
+    return _storage.getBool(useCustomBgKey, defaultValue: false);
   }
 
   Color? getCustomBackgroundColor() {
-    final int? colorValue = _box.get(customBgColorKey);
+    final int? colorValue = _storage.getInt(customBgColorKey);
     return colorValue != null ? Color(colorValue) : null;
   }
 
   ThemeMode getThemeMode() {
-    final String? modeStr = _box.get(themeModeKey);
+    final String? modeStr = _storage.getString(themeModeKey);
     if (modeStr == 'ThemeMode.dark') return ThemeMode.dark;
     if (modeStr == 'ThemeMode.light') return ThemeMode.light;
     return ThemeMode.system;
@@ -43,13 +38,20 @@ class ThemeStorageService {
     required bool useCustomBg,
     Color? customBgColor,
   }) async {
-    await _box.put(themeNameKey, themeName);
-    await _box.put(themeModeKey, mode.toString());
-    await _box.put(useCustomBgKey, useCustomBg);
+    await _storage.setString(themeNameKey, themeName);
+    await _storage.setString(themeModeKey, mode.toString());
+    await _storage.setBool(useCustomBgKey, useCustomBg);
     if (customBgColor != null) {
-      await _box.put(customBgColorKey, customBgColor.toARGB32());
+      await _storage.setInt(customBgColorKey, customBgColor.toARGB32());
     } else {
-      await _box.delete(customBgColorKey);
+      await _storage.remove(customBgColorKey);
     }
+  }
+
+  Future<void> clear() async {
+    await _storage.remove(themeNameKey);
+    await _storage.remove(themeModeKey);
+    await _storage.remove(useCustomBgKey);
+    await _storage.remove(customBgColorKey);
   }
 }
