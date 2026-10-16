@@ -83,8 +83,9 @@ class PlanResultScreen extends ConsumerWidget {
                   ),
                   const Spacer(),
                   TextButton(
-                    onPressed: () =>
-                        ref.read(planGeneratorNotifierProvider.notifier).selectAll(),
+                    onPressed: () => ref
+                        .read(planGeneratorNotifierProvider.notifier)
+                        .selectAll(),
                     style: TextButton.styleFrom(
                       foregroundColor: color,
                       textStyle: const TextStyle(fontWeight: FontWeight.w600),

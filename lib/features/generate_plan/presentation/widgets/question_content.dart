@@ -57,7 +57,10 @@ class QuestionContent extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.cardColor,
                     borderRadius: AppRadius.smRadius,
@@ -73,7 +76,10 @@ class QuestionContent extends ConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.cardColor,
                     borderRadius: AppRadius.smRadius,
@@ -101,15 +107,15 @@ class QuestionContent extends ConsumerWidget {
           // ── Input by type ─────────────────────────────────────────────
           switch (question.type) {
             QuestionType.text => QuestionTextInput(
-                question: question,
-              ),
+              question: question,
+            ),
             QuestionType.number => QuestionNumberInput(
-                question: question,
-              ),
-            QuestionType.singleChoice || QuestionType.multipleChoice =>
-              QuestionChoiceInput(
-                question: question,
-              ),
+              question: question,
+            ),
+            QuestionType.singleChoice ||
+            QuestionType.multipleChoice => QuestionChoiceInput(
+              question: question,
+            ),
           },
 
           const SizedBox(height: 24),

@@ -73,14 +73,13 @@ class PlanGeneratorState {
 
   QuestionEntity? get currentQuestion =>
       questions.isNotEmpty && currentIndex < questions.length
-          ? questions[currentIndex]
-          : null;
+      ? questions[currentIndex]
+      : null;
 
   double get progress =>
       questions.isEmpty ? 0 : (currentIndex + 1) / questions.length;
 
-  String get progressLabel =>
-      '${currentIndex + 1} / ${questions.length}';
+  String get progressLabel => '${currentIndex + 1} / ${questions.length}';
 
   List<PlanSuggestion> get selectedSuggestions =>
       suggestions.where((s) => s.isSelected).toList();
@@ -108,8 +107,9 @@ class PlanGeneratorState {
     String? errorMessage,
   }) {
     return PlanGeneratorState(
-      selectedCategory:
-          clearCategory ? null : (selectedCategory ?? this.selectedCategory),
+      selectedCategory: clearCategory
+          ? null
+          : (selectedCategory ?? this.selectedCategory),
       questions: questions ?? this.questions,
       answers: answers ?? this.answers,
       currentIndex: currentIndex ?? this.currentIndex,
@@ -311,5 +311,5 @@ class PlanGeneratorNotifier extends Notifier<PlanGeneratorState> {
 
 final planGeneratorNotifierProvider =
     NotifierProvider<PlanGeneratorNotifier, PlanGeneratorState>(() {
-  return PlanGeneratorNotifier();
-});
+      return PlanGeneratorNotifier();
+    });

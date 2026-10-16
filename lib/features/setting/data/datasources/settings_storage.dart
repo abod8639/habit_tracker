@@ -28,7 +28,10 @@ class SettingsStorage {
   }
 
   Future<void> setNotificationTime(TimeOfDay time) async {
-    await _storage.setString(_notificationTimeKey, '${time.hour}:${time.minute}');
+    await _storage.setString(
+      _notificationTimeKey,
+      '${time.hour}:${time.minute}',
+    );
   }
 
   bool get hasSkippedLogin =>

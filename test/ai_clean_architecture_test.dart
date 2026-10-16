@@ -67,90 +67,104 @@ void main() {
   });
 
   group('AI Clean Architecture - AI Chat Feature Tests', () {
-    test('ChatMessageModel serialization and entity conversion works properly', () {
-      final now = DateTime.now();
-      final model = ChatMessageModel(
-        text: 'Hello Coach',
-        isUser: true,
-        hasError: false,
-        timestamp: now,
-      );
+    test(
+      'ChatMessageModel serialization and entity conversion works properly',
+      () {
+        final now = DateTime.now();
+        final model = ChatMessageModel(
+          text: 'Hello Coach',
+          isUser: true,
+          hasError: false,
+          timestamp: now,
+        );
 
-      final json = model.toJson();
-      expect(json['text'], 'Hello Coach');
-      expect(json['isUser'], true);
-      expect(json['hasError'], false);
+        final json = model.toJson();
+        expect(json['text'], 'Hello Coach');
+        expect(json['isUser'], true);
+        expect(json['hasError'], false);
 
-      final fromJson = ChatMessageModel.fromJson(json);
-      expect(fromJson.text, model.text);
-      expect(fromJson.isUser, model.isUser);
-      expect(fromJson.hasError, model.hasError);
+        final fromJson = ChatMessageModel.fromJson(json);
+        expect(fromJson.text, model.text);
+        expect(fromJson.isUser, model.isUser);
+        expect(fromJson.hasError, model.hasError);
 
-      final entity = model.copyWith(text: 'Updated Text');
-      expect(entity.text, 'Updated Text');
-      expect(entity.isUser, true);
-    });
+        final entity = model.copyWith(text: 'Updated Text');
+        expect(entity.text, 'Updated Text');
+        expect(entity.isUser, true);
+      },
+    );
 
-    test('AiChatLocalDataSource saves, retrieves, and clears chat history', () async {
-      final messages = [
-        const ChatMessageModel(text: 'Msg 1', isUser: true),
-        const ChatMessageModel(text: 'Reply 1', isUser: false),
-      ];
+    test(
+      'AiChatLocalDataSource saves, retrieves, and clears chat history',
+      () async {
+        final messages = [
+          const ChatMessageModel(text: 'Msg 1', isUser: true),
+          const ChatMessageModel(text: 'Reply 1', isUser: false),
+        ];
 
-      await localDataSource.saveChatHistory(messages);
-      final loaded = await localDataSource.getChatHistory();
+        await localDataSource.saveChatHistory(messages);
+        final loaded = await localDataSource.getChatHistory();
 
-      expect(loaded.length, 2);
-      expect(loaded[0].text, 'Msg 1');
-      expect(loaded[1].text, 'Reply 1');
+        expect(loaded.length, 2);
+        expect(loaded[0].text, 'Msg 1');
+        expect(loaded[1].text, 'Reply 1');
 
-      await localDataSource.clearChatHistory();
-      final afterClear = await localDataSource.getChatHistory();
-      expect(afterClear, isEmpty);
-    });
+        await localDataSource.clearChatHistory();
+        final afterClear = await localDataSource.getChatHistory();
+        expect(afterClear, isEmpty);
+      },
+    );
 
-    test('AiChatRepository and UseCases interact and coordinate layers cleanly', () async {
-      final messages = [
-        const ChatMessageEntity(text: 'What should I do?', isUser: true),
-      ];
+    test(
+      'AiChatRepository and UseCases interact and coordinate layers cleanly',
+      () async {
+        final messages = [
+          const ChatMessageEntity(text: 'What should I do?', isUser: true),
+        ];
 
-      final saveResult = await saveChatHistoryUseCase(messages);
-      expect(saveResult.isRight(), isTrue);
+        final saveResult = await saveChatHistoryUseCase(messages);
+        expect(saveResult.isRight(), isTrue);
 
-      final getResult = await getChatHistoryUseCase();
-      expect(getResult.isRight(), isTrue);
-      getResult.fold(
-        (failure) => fail('Should not fail'),
-        (loaded) {
-          expect(loaded.length, 1);
-          expect(loaded.first.text, 'What should I do?');
-        },
-      );
+        final getResult = await getChatHistoryUseCase();
+        expect(getResult.isRight(), isTrue);
+        getResult.fold(
+          (failure) => fail('Should not fail'),
+          (loaded) {
+            expect(loaded.length, 1);
+            expect(loaded.first.text, 'What should I do?');
+          },
+        );
 
-      repository.initChatSession(
-        systemInstruction: 'Coaching Instruction',
-        history: messages,
-      );
-      expect(remoteDataSource.lastSystemInstruction, 'Coaching Instruction');
-      expect(remoteDataSource.lastHistory?.length, 1);
+        repository.initChatSession(
+          systemInstruction: 'Coaching Instruction',
+          history: messages,
+        );
+        expect(remoteDataSource.lastSystemInstruction, 'Coaching Instruction');
+        expect(remoteDataSource.lastHistory?.length, 1);
 
-      final streamChunks = await repository.sendMessageStream('Ping').toList();
-      expect(streamChunks, ['Chunk 1', 'Chunk 2']);
+        final streamChunks = await repository
+            .sendMessageStream('Ping')
+            .toList();
+        expect(streamChunks, ['Chunk 1', 'Chunk 2']);
 
-      final clearResult = await clearChatHistoryUseCase();
-      expect(clearResult.isRight(), isTrue);
-    });
+        final clearResult = await clearChatHistoryUseCase();
+        expect(clearResult.isRight(), isTrue);
+      },
+    );
   });
 
   group('AI Clean Architecture - Generate Plan Dedicated Service Tests', () {
-    test('PlanRemoteDataSourceImpl is decoupled and instantiable with GeminiService', () {
-      final geminiService = GeminiService();
-      final planRemoteDataSource = PlanRemoteDataSourceImpl(
-        geminiService: geminiService,
-      );
+    test(
+      'PlanRemoteDataSourceImpl is decoupled and instantiable with GeminiService',
+      () {
+        final geminiService = GeminiService();
+        final planRemoteDataSource = PlanRemoteDataSourceImpl(
+          geminiService: geminiService,
+        );
 
-      expect(planRemoteDataSource, isNotNull);
-      expect(planRemoteDataSource.geminiService, equals(geminiService));
-    });
+        expect(planRemoteDataSource, isNotNull);
+        expect(planRemoteDataSource.geminiService, equals(geminiService));
+      },
+    );
   });
 }

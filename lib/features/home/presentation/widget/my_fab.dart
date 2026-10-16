@@ -103,9 +103,7 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
                 ),
                 boxShadow: _isPressed
                     ? AppShadows.buttonPressed(isDark: isDark)
-                       
                     : AppShadows.buttonResting(isDark: isDark),
-                       
               ),
               child: Center(
                 child: Icon(

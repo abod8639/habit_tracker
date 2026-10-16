@@ -8,7 +8,9 @@ import 'build_trend_chart.dart';
 import 'stats_neumorphic_utils.dart';
 
 Color resolveHabitColor(String habitName, int index, List<HabitEntity> habits) {
-  final habit = habits.where((h) => h.name == habitName || h.id == habitName).firstOrNull;
+  final habit = habits
+      .where((h) => h.name == habitName || h.id == habitName)
+      .firstOrNull;
   if (habit?.colorValue != null && habit!.colorValue != 0) {
     return Color(habit.colorValue!);
   }
@@ -109,18 +111,24 @@ class _HabitLegendChip extends StatelessWidget {
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeInOut,
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-            decoration: StatsNeumorphicTheme.wellDecoration(
-              context,
-              borderRadius: AppRadius.well,
-              accentColor: isSelected ? color : color.withValues(alpha: 0.3),
-              accentAlpha: isSelected
-                  ? (isDark ? 0.22 : 0.14)
-                  : (isDark ? 0.06 : 0.03),
-            ).copyWith(
-              border: isSelected
-                  ? Border.all(color: color.withValues(alpha: 0.8), width: 1.5)
-                  : null,
-            ),
+            decoration:
+                StatsNeumorphicTheme.wellDecoration(
+                  context,
+                  borderRadius: AppRadius.well,
+                  accentColor: isSelected
+                      ? color
+                      : color.withValues(alpha: 0.3),
+                  accentAlpha: isSelected
+                      ? (isDark ? 0.22 : 0.14)
+                      : (isDark ? 0.06 : 0.03),
+                ).copyWith(
+                  border: isSelected
+                      ? Border.all(
+                          color: color.withValues(alpha: 0.8),
+                          width: 1.5,
+                        )
+                      : null,
+                ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -130,7 +138,9 @@ class _HabitLegendChip extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: color,
                     shape: BoxShape.circle,
-                    boxShadow: isSelected ? AppShadows.activeDot(color: color) : null,
+                    boxShadow: isSelected
+                        ? AppShadows.activeDot(color: color)
+                        : null,
                   ),
                 ),
                 const SizedBox(width: 7),

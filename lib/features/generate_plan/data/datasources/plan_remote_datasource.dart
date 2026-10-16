@@ -34,7 +34,8 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
           responseMimeType: 'application/json',
           temperature: 0.4,
           responseSchema: Schema.array(
-            description: 'List of 3 to 4 personalized, high-adherence habit suggestions',
+            description:
+                'List of 3 to 4 personalized, high-adherence habit suggestions',
             items: Schema.object(
               properties: {
                 'name': Schema.string(
@@ -49,9 +50,16 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
                   description:
                       'Realistic frequency calibrated to user schedule (e.g. "يومياً", "3 مرات أسبوعياً")',
                 ),
-                'category': Schema.string(description: 'Category identifier string'),
+                'category': Schema.string(
+                  description: 'Category identifier string',
+                ),
               },
-              requiredProperties: ['name', 'description', 'frequency', 'category'],
+              requiredProperties: [
+                'name',
+                'description',
+                'frequency',
+                'category',
+              ],
             ),
           ),
         ),
@@ -72,8 +80,9 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
                 temperature: 0.4,
               ),
             );
-            final response =
-                await fallbackModel.generateContent([Content.text(prompt)]);
+            final response = await fallbackModel.generateContent([
+              Content.text(prompt),
+            ]);
             final text = response.text ?? '';
             return _parsePlanResponse(text, category);
           } catch (_) {}

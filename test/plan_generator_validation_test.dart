@@ -26,7 +26,7 @@ void main() {
       // Validation logic check:
       const num maxValue = 120;
       const num minValue = 10;
-      expect(parsed200 !> maxValue, true); // Correctly caught!
+      expect(parsed200! > maxValue, true); // Correctly caught!
       expect(parsed25 < minValue, false);
       expect(parsed25 > maxValue, false);
 
@@ -37,34 +37,48 @@ void main() {
   });
 
   group('Duplicate Habit Prevention', () {
-    test('Deduplicates existing habits case-insensitively and trims whitespace', () {
-      final now = DateTime.now();
-      final existingModels = [
-        HabitModel(id: '1', name: 'قراءة القرآن', isCompleted: false, createdAt: now),
-        HabitModel(id: '2', name: 'Morning Walk', isCompleted: false, createdAt: now),
-      ];
+    test(
+      'Deduplicates existing habits case-insensitively and trims whitespace',
+      () {
+        final now = DateTime.now();
+        final existingModels = [
+          HabitModel(
+            id: '1',
+            name: 'قراءة القرآن',
+            isCompleted: false,
+            createdAt: now,
+          ),
+          HabitModel(
+            id: '2',
+            name: 'Morning Walk',
+            isCompleted: false,
+            createdAt: now,
+          ),
+        ];
 
-      final existingNames =
-          existingModels.map((m) => m.name.trim().toLowerCase()).toSet();
+        final existingNames = existingModels
+            .map((m) => m.name.trim().toLowerCase())
+            .toSet();
 
-      final incomingSuggestions = [
-        '  قراءة القرآن  ', // Duplicate
-        'morning walk', // Duplicate case-insensitive
-        'شرب الماء', // New
-        'شرب الماء', // Duplicate within batch
-      ];
+        final incomingSuggestions = [
+          '  قراءة القرآن  ', // Duplicate
+          'morning walk', // Duplicate case-insensitive
+          'شرب الماء', // New
+          'شرب الماء', // Duplicate within batch
+        ];
 
-      final added = <String>[];
-      for (final name in incomingSuggestions) {
-        final trimmed = name.trim();
-        if (trimmed.isEmpty) continue;
-        final normalized = trimmed.toLowerCase();
-        if (existingNames.contains(normalized)) continue;
-        existingNames.add(normalized);
-        added.add(trimmed);
-      }
+        final added = <String>[];
+        for (final name in incomingSuggestions) {
+          final trimmed = name.trim();
+          if (trimmed.isEmpty) continue;
+          final normalized = trimmed.toLowerCase();
+          if (existingNames.contains(normalized)) continue;
+          existingNames.add(normalized);
+          added.add(trimmed);
+        }
 
-      expect(added, ['شرب الماء']);
-    });
+        expect(added, ['شرب الماء']);
+      },
+    );
   });
 }

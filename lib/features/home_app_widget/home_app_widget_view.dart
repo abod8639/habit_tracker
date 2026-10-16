@@ -47,7 +47,6 @@ class HomeAppWidgetView extends StatelessWidget {
       10: primaryColor,
     };
 
-
     return Container(
       width: 360,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -124,7 +123,9 @@ class HomeAppWidgetView extends StatelessWidget {
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: uncompletedHabits.isEmpty
-                          ? (isDark ? Colors.greenAccent : Colors.green.shade800)
+                          ? (isDark
+                                ? Colors.greenAccent
+                                : Colors.green.shade800)
                           : primaryColor,
                     ),
                   ),
@@ -193,7 +194,9 @@ class HomeAppWidgetView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white70 : const Color(0xFF4A4E57),
+                        color: isDark
+                            ? Colors.white70
+                            : const Color(0xFF4A4E57),
                       ),
                     ),
                   ],

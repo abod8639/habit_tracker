@@ -48,7 +48,9 @@ final settingLocalDataSourceProvider = Provider<SettingLocalDataSource>((ref) {
   );
 });
 
-final settingRemoteDataSourceProvider = Provider<SettingRemoteDataSource>((ref) {
+final settingRemoteDataSourceProvider = Provider<SettingRemoteDataSource>((
+  ref,
+) {
   final firestoreService = ref.watch(firestoreServiceProvider);
   return SettingRemoteDataSourceImpl(firestoreService);
 });
@@ -74,21 +76,29 @@ final saveLanguageUseCaseProvider = Provider<SaveLanguageUseCase>((ref) {
   return SaveLanguageUseCase(ref.watch(settingRepositoryProvider));
 });
 
-final isNotificationEnabledUseCaseProvider = Provider<IsNotificationEnabledUseCase>((ref) {
-  return IsNotificationEnabledUseCase(ref.watch(settingRepositoryProvider));
-});
+final isNotificationEnabledUseCaseProvider =
+    Provider<IsNotificationEnabledUseCase>((ref) {
+      return IsNotificationEnabledUseCase(ref.watch(settingRepositoryProvider));
+    });
 
-final setNotificationEnabledUseCaseProvider = Provider<SetNotificationEnabledUseCase>((ref) {
-  return SetNotificationEnabledUseCase(ref.watch(settingRepositoryProvider));
-});
+final setNotificationEnabledUseCaseProvider =
+    Provider<SetNotificationEnabledUseCase>((ref) {
+      return SetNotificationEnabledUseCase(
+        ref.watch(settingRepositoryProvider),
+      );
+    });
 
-final getNotificationTimeUseCaseProvider = Provider<GetNotificationTimeUseCase>((ref) {
-  return GetNotificationTimeUseCase(ref.watch(settingRepositoryProvider));
-});
+final getNotificationTimeUseCaseProvider = Provider<GetNotificationTimeUseCase>(
+  (ref) {
+    return GetNotificationTimeUseCase(ref.watch(settingRepositoryProvider));
+  },
+);
 
-final setNotificationTimeUseCaseProvider = Provider<SetNotificationTimeUseCase>((ref) {
-  return SetNotificationTimeUseCase(ref.watch(settingRepositoryProvider));
-});
+final setNotificationTimeUseCaseProvider = Provider<SetNotificationTimeUseCase>(
+  (ref) {
+    return SetNotificationTimeUseCase(ref.watch(settingRepositoryProvider));
+  },
+);
 
 final syncHabitsUseCaseProvider = Provider<SyncHabitsUseCase>((ref) {
   return SyncHabitsUseCase(ref.watch(settingRepositoryProvider));
@@ -106,11 +116,15 @@ final getCustomApiKeyUseCaseProvider = Provider<GetCustomApiKeyUseCase>((ref) {
   return GetCustomApiKeyUseCase(ref.watch(settingRepositoryProvider));
 });
 
-final saveCustomApiKeyUseCaseProvider = Provider<SaveCustomApiKeyUseCase>((ref) {
+final saveCustomApiKeyUseCaseProvider = Provider<SaveCustomApiKeyUseCase>((
+  ref,
+) {
   return SaveCustomApiKeyUseCase(ref.watch(settingRepositoryProvider));
 });
 
-final clearCustomApiKeyUseCaseProvider = Provider<ClearCustomApiKeyUseCase>((ref) {
+final clearCustomApiKeyUseCaseProvider = Provider<ClearCustomApiKeyUseCase>((
+  ref,
+) {
   return ClearCustomApiKeyUseCase(ref.watch(settingRepositoryProvider));
 });
 
@@ -218,8 +232,9 @@ class SyncNotifier extends Notifier<SyncState> {
 
       final habitRepo = ref.read(habitRepositoryProvider);
       final localTombstones = habitRepo.getLocalTombstones();
-      final localStartDay =
-          ref.read(habitNotifierProvider.notifier).getStartDay();
+      final localStartDay = ref
+          .read(habitNotifierProvider.notifier)
+          .getStartDay();
 
       final syncUseCase = ref.read(syncHabitsUseCaseProvider);
       final result = await syncUseCase(
@@ -266,8 +281,9 @@ class SyncNotifier extends Notifier<SyncState> {
 
       final habitRepo = ref.read(habitRepositoryProvider);
       final localTombstones = habitRepo.getLocalTombstones();
-      final localStartDay =
-          ref.read(habitNotifierProvider.notifier).getStartDay();
+      final localStartDay = ref
+          .read(habitNotifierProvider.notifier)
+          .getStartDay();
 
       final syncUseCase = ref.read(syncHabitsUseCaseProvider);
       final result = await syncUseCase(
@@ -327,7 +343,8 @@ class NotificationState {
     bool? isBatteryOptimizationIgnored,
   }) {
     return NotificationState(
-      isNotificationEnabled: isNotificationEnabled ?? this.isNotificationEnabled,
+      isNotificationEnabled:
+          isNotificationEnabled ?? this.isNotificationEnabled,
       notificationTime: notificationTime ?? this.notificationTime,
       isBatteryOptimizationIgnored:
           isBatteryOptimizationIgnored ?? this.isBatteryOptimizationIgnored,
@@ -367,7 +384,8 @@ class NotificationNotifier extends Notifier<NotificationState> {
   Future<void> checkBatteryOptimization() async {
     final notificationService = ref.read(notificationServiceProvider);
     if (notificationService != null) {
-      final ignored = await notificationService.isIgnoringBatteryOptimizations();
+      final ignored = await notificationService
+          .isIgnoringBatteryOptimizations();
       state = state.copyWith(isBatteryOptimizationIgnored: ignored);
     }
   }
@@ -412,7 +430,9 @@ class NotificationNotifier extends Notifier<NotificationState> {
   Future<void> toggleNotification(bool enabled) async {
     final notificationService = ref.read(notificationServiceProvider);
     if (enabled && notificationService != null) {
-      await notificationService.requestPermissions(requestBatteryExemption: true);
+      await notificationService.requestPermissions(
+        requestBatteryExemption: true,
+      );
       await checkBatteryOptimization();
     }
 
@@ -444,8 +464,8 @@ class NotificationNotifier extends Notifier<NotificationState> {
 
 final notificationNotifierProvider =
     NotifierProvider<NotificationNotifier, NotificationState>(() {
-  return NotificationNotifier();
-});
+      return NotificationNotifier();
+    });
 
 // ── AI SETTINGS STATE & NOTIFIER ───────────────────────────────────────────
 class AiSettingsState {
@@ -508,7 +528,9 @@ class AiSettingsNotifier extends Notifier<AiSettingsState> {
         state = state.copyWith(
           customApiKey: key ?? '',
           isCustom: key?.isNotEmpty ?? false,
-          apiKeyStatus: (key?.isNotEmpty ?? false) ? ApiKeyStatus.valid : ApiKeyStatus.unknown,
+          apiKeyStatus: (key?.isNotEmpty ?? false)
+              ? ApiKeyStatus.valid
+              : ApiKeyStatus.unknown,
         );
       },
     );
@@ -570,5 +592,5 @@ class AiSettingsNotifier extends Notifier<AiSettingsState> {
 
 final aiSettingsNotifierProvider =
     NotifierProvider<AiSettingsNotifier, AiSettingsState>(() {
-  return AiSettingsNotifier();
-});
+      return AiSettingsNotifier();
+    });

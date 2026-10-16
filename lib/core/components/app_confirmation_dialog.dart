@@ -46,8 +46,7 @@ class AppConfirmationDialog extends StatefulWidget {
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
   }) {
-    final targetContext =
-        context ?? AppRouter.navigatorKey.currentContext;
+    final targetContext = context ?? AppRouter.navigatorKey.currentContext;
     if (targetContext == null) return Future.value(false);
 
     return showDialog<bool>(

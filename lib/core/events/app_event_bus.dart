@@ -54,7 +54,7 @@ class AppEventBus {
   final StreamController<AppEvent> _controller;
 
   AppEventBus({bool sync = false})
-      : _controller = StreamController<AppEvent>.broadcast(sync: sync);
+    : _controller = StreamController<AppEvent>.broadcast(sync: sync);
 
   /// Dispatches an event to all interested subscribers asynchronously.
   void fire(AppEvent event) {

@@ -29,7 +29,10 @@ class _CategoryCardState extends State<CategoryCard> {
     final baseColor = theme.cardColor;
     final color = widget.category.color;
 
-    final surfaceGradientStart = ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final surfaceGradientStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
     final surfaceGradientEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return MouseRegion(
@@ -96,8 +99,10 @@ class _CategoryCardState extends State<CategoryCard> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color.lerp(color, Colors.white, isDark ? 0.08 : 0.20) ?? color,
-                        Color.lerp(color, Colors.black, isDark ? 0.15 : 0.08) ?? color,
+                        Color.lerp(color, Colors.white, isDark ? 0.08 : 0.20) ??
+                            color,
+                        Color.lerp(color, Colors.black, isDark ? 0.15 : 0.08) ??
+                            color,
                       ],
                     ),
                     boxShadow: AppShadows.bloom(

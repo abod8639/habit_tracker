@@ -49,7 +49,8 @@ class SoftCard extends StatelessWidget {
               ? Colors.white.withValues(alpha: 0.06)
               : Colors.white.withValues(alpha: 0.85));
 
-    final effectiveShadows = customShadows ??
+    final effectiveShadows =
+        customShadows ??
         (isSelected
             ? AppShadows.selectedCard(primary: effectiveAccent, isDark: isDark)
             : AppShadows.softCard(isDark: isDark));

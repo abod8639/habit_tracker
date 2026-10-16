@@ -47,7 +47,8 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
     final baseColor = theme.cardColor;
 
     final primary = widget.activeColor ?? colorScheme.primary;
-    final secondary = widget.activeSecondaryColor ??
+    final secondary =
+        widget.activeSecondaryColor ??
         (Color.lerp(primary, Colors.black, isDark ? 0.22 : 0.12) ?? primary);
 
     // Deep recessed track color and ambient inner shadow gradient
@@ -82,7 +83,8 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
         builder: (context, constraints) {
           final horizontalPadding = resolvedPadding.horizontal;
           final segmentWidth =
-              (constraints.maxWidth - horizontalPadding) / widget.options.length;
+              (constraints.maxWidth - horizontalPadding) /
+              widget.options.length;
           return _buildToggle(
             context: context,
             segmentWidth: math.max(segmentWidth, 0.0),
@@ -148,8 +150,10 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final totalInnerWidth = segmentWidth * widget.options.length;
-    final innerHeight =
-        math.max(widget.height - resolvedPadding.vertical, 24.0);
+    final innerHeight = math.max(
+      widget.height - resolvedPadding.vertical,
+      24.0,
+    );
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -281,7 +285,6 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
                                     ? FontWeight.w800
                                     : FontWeight.w600,
                                 color: targetTextColor,
-                                
                               ),
                               child: Text(
                                 widget.options[index],

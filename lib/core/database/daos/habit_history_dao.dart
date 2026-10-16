@@ -151,8 +151,9 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<String?> getMetadata(String key) async {
-    final record = await (select(appMetadata)..where((t) => t.key.equals(key)))
-        .getSingleOrNull();
+    final record = await (select(
+      appMetadata,
+    )..where((t) => t.key.equals(key))).getSingleOrNull();
     return record?.value;
   }
 
@@ -166,9 +167,9 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<Map<String, String>> getAllStrengthMetadata() async {
-    final records = await (select(appMetadata)
-          ..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%')))
-        .get();
+    final records = await (select(
+      appMetadata,
+    )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%'))).get();
 
     final Map<String, String> results = {};
     for (final r in records) {
@@ -183,8 +184,8 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
 
   Future<void> clearAllHistory() async {
     await delete(habitCompletions).go();
-    await (delete(appMetadata)
-          ..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%')))
-        .go();
+    await (delete(
+      appMetadata,
+    )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%'))).go();
   }
 }

@@ -64,5 +64,7 @@ final habitFacadeProvider = Provider<IHabitFacade>((ref) {
   if (factory != null) {
     return factory(ref);
   }
-  throw UnimplementedError('IHabitFacade has not been registered. Ensure home feature is loaded.');
+  throw UnimplementedError(
+    'IHabitFacade has not been registered. Ensure home feature is loaded.',
+  );
 });

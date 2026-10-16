@@ -15,8 +15,9 @@ import 'package:habit_tracker/features/habitstats/domain/usecases/get_overall_tr
 import 'package:habit_tracker/features/habitstats/domain/usecases/get_today_habits_summary_usecase.dart';
 
 // Data Source
-final habitStatsLocalDataSourceProvider =
-    Provider<HabitStatsLocalDataSource>((ref) {
+final habitStatsLocalDataSourceProvider = Provider<HabitStatsLocalDataSource>((
+  ref,
+) {
   final storage = ref.watch(keyValueStorageProvider);
   return HabitStatsLocalDataSourceImpl(storage: storage);
 });
@@ -32,11 +33,12 @@ final habitStatsRepositoryProvider = Provider<HabitStatsRepository>((ref) {
 });
 
 // Use Cases
-final getHabitStatsBundleUseCaseProvider =
-    Provider<GetHabitStatsBundleUseCase>((ref) {
-  final repo = ref.watch(habitStatsRepositoryProvider);
-  return GetHabitStatsBundleUseCase(repo);
-});
+final getHabitStatsBundleUseCaseProvider = Provider<GetHabitStatsBundleUseCase>(
+  (ref) {
+    final repo = ref.watch(habitStatsRepositoryProvider);
+    return GetHabitStatsBundleUseCase(repo);
+  },
+);
 
 final getOverallStatsUseCaseProvider = Provider<GetOverallStatsUseCase>((ref) {
   final repo = ref.watch(habitStatsRepositoryProvider);
@@ -50,15 +52,15 @@ final getOverallTrendUseCaseProvider = Provider<GetOverallTrendUseCase>((ref) {
 
 final getIndividualHabitTrendsUseCaseProvider =
     Provider<GetIndividualHabitTrendsUseCase>((ref) {
-  final repo = ref.watch(habitStatsRepositoryProvider);
-  return GetIndividualHabitTrendsUseCase(repo);
-});
+      final repo = ref.watch(habitStatsRepositoryProvider);
+      return GetIndividualHabitTrendsUseCase(repo);
+    });
 
 final getTodayHabitsSummaryUseCaseProvider =
     Provider<GetTodayHabitsSummaryUseCase>((ref) {
-  final repo = ref.watch(habitStatsRepositoryProvider);
-  return GetTodayHabitsSummaryUseCase(repo);
-});
+      final repo = ref.watch(habitStatsRepositoryProvider);
+      return GetTodayHabitsSummaryUseCase(repo);
+    });
 
 // Habit Stats State
 class HabitStatsState {
@@ -106,7 +108,9 @@ class HabitStatsState {
       daysPeriod: daysPeriod ?? this.daysPeriod,
       isWeeklyView: isWeeklyView ?? this.isWeeklyView,
       showAllHabits: showAllHabits ?? this.showAllHabits,
-      selectedHabitName: selectedHabitName != null ? selectedHabitName() : this.selectedHabitName,
+      selectedHabitName: selectedHabitName != null
+          ? selectedHabitName()
+          : this.selectedHabitName,
       habitNames: habitNames ?? this.habitNames,
       isLoading: isLoading ?? this.isLoading,
     );
@@ -185,7 +189,9 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
       bestStreak: habitState.bestStreak,
     );
 
-    final currentTrends = Map<String, List<FlSpot>>.from(state.individualTrends);
+    final currentTrends = Map<String, List<FlSpot>>.from(
+      state.individualTrends,
+    );
     for (var habit in habits) {
       final existingSpots = currentTrends[habit.name];
       if (existingSpots != null && existingSpots.isNotEmpty) {
@@ -317,5 +323,5 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
 
 final habitStatsNotifierProvider =
     NotifierProvider<HabitStatsNotifier, HabitStatsState>(() {
-  return HabitStatsNotifier();
-});
+      return HabitStatsNotifier();
+    });

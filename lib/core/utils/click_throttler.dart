@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
-
 class ClickThrottler {
   final Duration duration;
   bool _isProcessing = false;
@@ -21,7 +20,6 @@ class ClickThrottler {
       _startCooldown();
     }
   }
-
 
   Future<void> runAsync(Future<void> Function() asyncAction) async {
     if (_isProcessing) return;
@@ -54,7 +52,9 @@ class ClickThrottler {
 }
 
 extension ClickThrottlerExtension on VoidCallback {
-  VoidCallback throttle([Duration duration = const Duration(milliseconds: 600)]) {
+  VoidCallback throttle([
+    Duration duration = const Duration(milliseconds: 600),
+  ]) {
     final throttler = ClickThrottler(duration: duration);
     return () => throttler.run(this);
   }

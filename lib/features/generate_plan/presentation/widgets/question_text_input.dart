@@ -22,8 +22,9 @@ class _QuestionTextInputState extends ConsumerState<QuestionTextInput> {
   @override
   void initState() {
     super.initState();
-    final initialAnswer =
-        ref.read(planGeneratorNotifierProvider).getAnswer(widget.question.id);
+    final initialAnswer = ref
+        .read(planGeneratorNotifierProvider)
+        .getAnswer(widget.question.id);
     _textController = TextEditingController(
       text: initialAnswer?.toString() ?? '',
     );

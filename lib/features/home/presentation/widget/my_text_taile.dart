@@ -252,9 +252,8 @@ class _MyTextTaileState extends State<MyTextTaile>
                     )!,
                   ],
                 ),
-                boxShadow: 
-                  AppShadows.buttonResting(isDark: isDark),
-               
+                boxShadow: AppShadows.buttonResting(isDark: isDark),
+
                 border: Border.all(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.12)

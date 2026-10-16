@@ -24,7 +24,9 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
 
   Future<void> init() async {
     await fetchHabitsFromDb();
-    final startDay = await db.habitHistoryDao.getMetadata(HabitStorage.startDayKey);
+    final startDay = await db.habitHistoryDao.getMetadata(
+      HabitStorage.startDayKey,
+    );
     if (startDay != null) {
       _cachedStartDate = startDay;
     }
@@ -170,7 +172,9 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
 
   @override
   Future<DateTime?> getLastResetDate() async {
-    final val = await db.habitHistoryDao.getMetadata(HabitStorage.lastResetDateKey);
+    final val = await db.habitHistoryDao.getMetadata(
+      HabitStorage.lastResetDateKey,
+    );
     return val != null ? DateTime.tryParse(val) : null;
   }
 
@@ -218,7 +222,11 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
     String? habitName,
   }) async {
     final dateStr = convertDateTimeToString(date);
-    await db.habitHistoryDao.recordCompletion(habitIdOrName, dateStr, isCompleted);
+    await db.habitHistoryDao.recordCompletion(
+      habitIdOrName,
+      dateStr,
+      isCompleted,
+    );
   }
 
   @override
@@ -265,7 +273,9 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
     final habits = await fetchHabitsFromDb();
     final strengths = await getAllHabitStrengths();
     final lastReset = await getLastResetDate();
-    final dayCountStr = await db.habitHistoryDao.getMetadata(HabitStorage.dayCountKey);
+    final dayCountStr = await db.habitHistoryDao.getMetadata(
+      HabitStorage.dayCountKey,
+    );
 
     return HabitVaultData(
       userId: userId,

@@ -12,7 +12,7 @@ class AiChatLocalDataSourceImpl implements AiChatLocalDataSource {
   final KeyValueStorage _storage;
 
   AiChatLocalDataSourceImpl({required KeyValueStorage storage})
-      : _storage = storage;
+    : _storage = storage;
 
   @override
   Future<List<ChatMessageModel>> getChatHistory() async {
@@ -28,10 +28,7 @@ class AiChatLocalDataSourceImpl implements AiChatLocalDataSource {
   Future<void> saveChatHistory(List<ChatMessageModel> messages) async {
     // Keep only the last 10 messages for token and memory efficiency
     final start = messages.length > 10 ? messages.length - 10 : 0;
-    final listToSave = messages
-        .sublist(start)
-        .map((m) => m.toJson())
-        .toList();
+    final listToSave = messages.sublist(start).map((m) => m.toJson()).toList();
     await _storage.setJson(historyKey, listToSave);
   }
 

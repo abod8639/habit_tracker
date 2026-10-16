@@ -12,7 +12,6 @@ class ErrorView extends StatelessWidget {
     this.onRetry,
   });
 
-
   @override
   Widget build(BuildContext context) {
     debugPrint(errorMessage);

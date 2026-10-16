@@ -8,7 +8,9 @@ class GetIndividualHabitTrendsUseCase {
 
   GetIndividualHabitTrendsUseCase(this.repository);
 
-  Future<Either<Failure, Map<String, List<TrendPointEntity>>>> call(int days) async {
+  Future<Either<Failure, Map<String, List<TrendPointEntity>>>> call(
+    int days,
+  ) async {
     return await repository.getIndividualHabitTrends(days);
   }
 }

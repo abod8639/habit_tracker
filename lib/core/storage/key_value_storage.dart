@@ -33,7 +33,9 @@ class KeyValueStorage {
   /// Sets a string value with immediate in-memory update and asynchronous SQLite persistence.
   Future<void> setString(String key, String value) async {
     _cache[key] = value;
-    await _db.into(_db.appMetadata).insertOnConflictUpdate(
+    await _db
+        .into(_db.appMetadata)
+        .insertOnConflictUpdate(
           AppMetadataCompanion(
             key: Value(key),
             value: Value(value),

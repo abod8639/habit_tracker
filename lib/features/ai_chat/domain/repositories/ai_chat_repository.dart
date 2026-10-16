@@ -7,7 +7,9 @@ abstract class AiChatRepository {
   Future<Either<Failure, List<ChatMessageEntity>>> getChatHistory();
 
   /// Persists recent chat messages.
-  Future<Either<Failure, void>> saveChatHistory(List<ChatMessageEntity> messages);
+  Future<Either<Failure, void>> saveChatHistory(
+    List<ChatMessageEntity> messages,
+  );
 
   /// Clears stored chat history.
   Future<Either<Failure, void>> clearChatHistory();

@@ -15,7 +15,8 @@ class QuestionNumberInput extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<QuestionNumberInput> createState() => _QuestionNumberInputState();
+  ConsumerState<QuestionNumberInput> createState() =>
+      _QuestionNumberInputState();
 }
 
 class _QuestionNumberInputState extends ConsumerState<QuestionNumberInput> {
@@ -24,8 +25,9 @@ class _QuestionNumberInputState extends ConsumerState<QuestionNumberInput> {
   @override
   void initState() {
     super.initState();
-    final initialAnswer =
-        ref.read(planGeneratorNotifierProvider).getAnswer(widget.question.id);
+    final initialAnswer = ref
+        .read(planGeneratorNotifierProvider)
+        .getAnswer(widget.question.id);
     _textController = TextEditingController(
       text: initialAnswer?.toString() ?? '',
     );
@@ -90,8 +92,10 @@ class _QuestionNumberInputState extends ConsumerState<QuestionNumberInput> {
           const SizedBox(height: 10),
           Text(
             isArabic
-                ? 'الحد الأقصى: ${widget.question.maxValue} ${widget.question.unit ?? ''}'.trim()
-                : 'Maximum: ${widget.question.maxValue} ${widget.question.unit ?? ''}'.trim(),
+                ? 'الحد الأقصى: ${widget.question.maxValue} ${widget.question.unit ?? ''}'
+                      .trim()
+                : 'Maximum: ${widget.question.maxValue} ${widget.question.unit ?? ''}'
+                      .trim(),
             style: TextStyle(
               fontSize: 13,
               color: theme.hintColor.withValues(alpha: 0.75),

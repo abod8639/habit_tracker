@@ -45,7 +45,9 @@ final saveChatHistoryUseCaseProvider = Provider<SaveChatHistoryUseCase>((ref) {
   return SaveChatHistoryUseCase(ref.watch(aiChatRepositoryProvider));
 });
 
-final clearChatHistoryUseCaseProvider = Provider<ClearChatHistoryUseCase>((ref) {
+final clearChatHistoryUseCaseProvider = Provider<ClearChatHistoryUseCase>((
+  ref,
+) {
   return ClearChatHistoryUseCase(ref.watch(aiChatRepositoryProvider));
 });
 
@@ -74,7 +76,9 @@ class AiChatState {
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
       loadingMessage: loadingMessage ?? this.loadingMessage,
-      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
+      errorMessage: clearErrorMessage
+          ? null
+          : (errorMessage ?? this.errorMessage),
     );
   }
 }
@@ -126,8 +130,10 @@ class AiChatNotifier extends Notifier<AiChatState> {
     }
 
     final startDateStr = habitContext?.startDay ?? '';
-    final dailyHistoryContext =
-        _getHeatmapContext(habitContext?.heatmap ?? const {}, isArabic);
+    final dailyHistoryContext = _getHeatmapContext(
+      habitContext?.heatmap ?? const {},
+      isArabic,
+    );
 
     final int currentStreak = habitContext?.streak ?? 0;
     final int bestStreak = habitContext?.bestStreak ?? 0;
@@ -358,7 +364,9 @@ TONE & EMOTION DETECTION
       currentList.removeAt(targetIndex);
       final userIndex = targetIndex - 1;
       if (userIndex >= 0 && userIndex < currentList.length) {
-        currentList[userIndex] = currentList[userIndex].copyWith(hasError: true);
+        currentList[userIndex] = currentList[userIndex].copyWith(
+          hasError: true,
+        );
       }
       state = state.copyWith(messages: currentList);
       await _saveHistory();
@@ -505,11 +513,11 @@ TONE & EMOTION DETECTION
             state = state.copyWith(
               loadingMessage: isArabic
                   ? (isRateLimit
-                      ? 'تم تجاوز حد الطلبات. جاري إعادة المحاولة خلال $sec ثانية...'
-                      : 'الخدمة مشغولة مؤقتاً. جاري إعادة المحاولة خلال $sec ثانية...')
+                        ? 'تم تجاوز حد الطلبات. جاري إعادة المحاولة خلال $sec ثانية...'
+                        : 'الخدمة مشغولة مؤقتاً. جاري إعادة المحاولة خلال $sec ثانية...')
                   : (isRateLimit
-                      ? 'Rate limit exceeded. Retrying in $sec seconds...'
-                      : 'Service temporarily busy. Retrying in $sec seconds...'),
+                        ? 'Rate limit exceeded. Retrying in $sec seconds...'
+                        : 'Service temporarily busy. Retrying in $sec seconds...'),
             );
             await Future.delayed(const Duration(seconds: 1));
           }
@@ -517,7 +525,9 @@ TONE & EMOTION DETECTION
         } else {
           if (targetIndex < state.messages.length) {
             final updated = List<ChatMessageEntity>.from(state.messages);
-            updated[targetIndex] = updated[targetIndex].copyWith(hasError: true);
+            updated[targetIndex] = updated[targetIndex].copyWith(
+              hasError: true,
+            );
             state = state.copyWith(messages: updated);
           }
           if (!isGreeting) {
@@ -573,7 +583,8 @@ TONE & EMOTION DETECTION
   }
 }
 
-final aiChatNotifierProvider =
-    NotifierProvider<AiChatNotifier, AiChatState>(() {
-  return AiChatNotifier();
-});
+final aiChatNotifierProvider = NotifierProvider<AiChatNotifier, AiChatState>(
+  () {
+    return AiChatNotifier();
+  },
+);

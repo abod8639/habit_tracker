@@ -39,31 +39,35 @@ class _NeumorphicGoogleButtonState extends State<NeumorphicGoogleButton> {
 
     final List<BoxShadow> shadows = (_isPressed || widget.isLoading)
         ? (isDark
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.50),
-                  offset: const Offset(1.5, 1.5),
-                  blurRadius: 3.0,
-                ),
-              ]
-            : [
-                const BoxShadow(
-                  color: Color(0x55A3B1C6),
-                  offset: Offset(1.5, 1.5),
-                  blurRadius: 3.0,
-                ),
-              ])
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.50),
+                    offset: const Offset(1.5, 1.5),
+                    blurRadius: 3.0,
+                  ),
+                ]
+              : [
+                  const BoxShadow(
+                    color: Color(0x55A3B1C6),
+                    offset: Offset(1.5, 1.5),
+                    blurRadius: 3.0,
+                  ),
+                ])
         : AppShadows.softButton(isDark: isDark);
 
     return GestureDetector(
-      onTapDown: isInteractive ? (_) => setState(() => _isPressed = true) : null,
+      onTapDown: isInteractive
+          ? (_) => setState(() => _isPressed = true)
+          : null,
       onTapUp: isInteractive
           ? (_) {
               setState(() => _isPressed = false);
               widget.onPressed?.call();
             }
           : null,
-      onTapCancel: isInteractive ? () => setState(() => _isPressed = false) : null,
+      onTapCancel: isInteractive
+          ? () => setState(() => _isPressed = false)
+          : null,
       child: AnimatedScale(
         scale: _isPressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 120),
@@ -83,8 +87,8 @@ class _NeumorphicGoogleButtonState extends State<NeumorphicGoogleButton> {
                   ),
             color: _isPressed
                 ? (isDark
-                    ? Colors.black.withValues(alpha: 0.25)
-                    : const Color(0xFFD6DFEC))
+                      ? Colors.black.withValues(alpha: 0.25)
+                      : const Color(0xFFD6DFEC))
                 : null,
             border: Border.all(
               color: isDark

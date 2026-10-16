@@ -131,7 +131,9 @@ class NotificationService {
       );
       return result ?? true;
     } catch (e) {
-      debugPrint('NotificationService: Failed to check battery optimizations: $e');
+      debugPrint(
+        'NotificationService: Failed to check battery optimizations: $e',
+      );
       return true;
     }
   }
@@ -348,8 +350,7 @@ class NotificationService {
     bool canExact = true;
     if (androidPlugin != null) {
       try {
-        canExact =
-            await androidPlugin.canScheduleExactNotifications() ?? false;
+        canExact = await androidPlugin.canScheduleExactNotifications() ?? false;
       } catch (_) {
         canExact = false;
       }

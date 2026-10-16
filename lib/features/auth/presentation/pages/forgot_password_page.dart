@@ -23,7 +23,9 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
 
   Future<void> _handleResetPassword() async {
     if (_formKey.currentState!.validate()) {
-      final success = await ref.read(authNotifierProvider.notifier).resetPassword(
+      final success = await ref
+          .read(authNotifierProvider.notifier)
+          .resetPassword(
             email: _emailController.text,
           );
 

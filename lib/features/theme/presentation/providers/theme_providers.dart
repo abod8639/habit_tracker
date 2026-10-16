@@ -38,21 +38,29 @@ final themeRepositoryProvider = Provider<ThemeRepository>((ref) {
 });
 
 // Use Cases
-final getThemeSettingsUseCaseProvider = Provider<GetThemeSettingsUseCase>((ref) {
+final getThemeSettingsUseCaseProvider = Provider<GetThemeSettingsUseCase>((
+  ref,
+) {
   return GetThemeSettingsUseCase(ref.watch(themeRepositoryProvider));
 });
 
-final saveThemeSettingsUseCaseProvider = Provider<SaveThemeSettingsUseCase>((ref) {
+final saveThemeSettingsUseCaseProvider = Provider<SaveThemeSettingsUseCase>((
+  ref,
+) {
   return SaveThemeSettingsUseCase(ref.watch(themeRepositoryProvider));
 });
 
-final syncThemeWithCloudUseCaseProvider = Provider<SyncThemeWithCloudUseCase>((ref) {
+final syncThemeWithCloudUseCaseProvider = Provider<SyncThemeWithCloudUseCase>((
+  ref,
+) {
   return SyncThemeWithCloudUseCase(ref.watch(themeRepositoryProvider));
 });
 
-final uploadThemeSettingsUseCaseProvider = Provider<UploadThemeSettingsUseCase>((ref) {
-  return UploadThemeSettingsUseCase(ref.watch(themeRepositoryProvider));
-});
+final uploadThemeSettingsUseCaseProvider = Provider<UploadThemeSettingsUseCase>(
+  (ref) {
+    return UploadThemeSettingsUseCase(ref.watch(themeRepositoryProvider));
+  },
+);
 
 // Theme Notifier
 class ThemeNotifier extends Notifier<ThemeState> {
@@ -86,7 +94,8 @@ class ThemeNotifier extends Notifier<ThemeState> {
         themeMode: initialMode,
         currentTheme: themeKey,
         useCustomBackground: cachedSettings.useCustomBackground,
-        customBackgroundColor: cachedSettings.customBackgroundColor ?? Colors.transparent,
+        customBackgroundColor:
+            cachedSettings.customBackgroundColor ?? Colors.transparent,
         lightTheme: _buildThemeData(themeKey, false, customBg),
         darkTheme: _buildThemeData(themeKey, true, customBg),
       );
@@ -135,20 +144,27 @@ class ThemeNotifier extends Notifier<ThemeState> {
     final syncUseCase = ref.read(syncThemeWithCloudUseCaseProvider);
     final result = await syncUseCase();
     result.fold(
-      (failure) => debugPrint('Error syncing theme from cloud: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error syncing theme from cloud: ${failure.message}'),
       (entity) {
         if (entity != null) {
           final themeData = themeColors[entity.themeName];
-          final isDark = themeData != null ? ThemeUtils.isDarkTheme(themeData) : true;
+          final isDark = themeData != null
+              ? ThemeUtils.isDarkTheme(themeData)
+              : true;
           final mode = entity.themeMode == ThemeMode.system
               ? (isDark ? ThemeMode.dark : ThemeMode.light)
               : entity.themeMode;
-          final customBg = entity.useCustomBackground ? entity.customBackgroundColor : null;
+          final customBg = entity.useCustomBackground
+              ? entity.customBackgroundColor
+              : null;
 
-          final hasChanged = state.currentTheme != entity.themeName ||
+          final hasChanged =
+              state.currentTheme != entity.themeName ||
               state.themeMode != mode ||
               state.useCustomBackground != entity.useCustomBackground ||
-              state.customBackgroundColor != (entity.customBackgroundColor ?? Colors.transparent);
+              state.customBackgroundColor !=
+                  (entity.customBackgroundColor ?? Colors.transparent);
 
           if (!hasChanged) return;
 
@@ -159,7 +175,8 @@ class ThemeNotifier extends Notifier<ThemeState> {
             currentTheme: entity.themeName,
             themeMode: mode,
             useCustomBackground: entity.useCustomBackground,
-            customBackgroundColor: entity.customBackgroundColor ?? Colors.transparent,
+            customBackgroundColor:
+                entity.customBackgroundColor ?? Colors.transparent,
             lightTheme: _buildThemeData(entity.themeName, false, customBg),
             darkTheme: _buildThemeData(entity.themeName, true, customBg),
           );
@@ -168,12 +185,16 @@ class ThemeNotifier extends Notifier<ThemeState> {
           final firestore = ref.read(firestoreServiceProvider);
           if (firestore.isUserLoggedIn) {
             final uploadUseCase = ref.read(uploadThemeSettingsUseCaseProvider);
-            uploadUseCase(ThemeEntity(
-              themeName: state.currentTheme,
-              themeMode: state.themeMode,
-              useCustomBackground: state.useCustomBackground,
-              customBackgroundColor: state.useCustomBackground ? state.customBackgroundColor : null,
-            ));
+            uploadUseCase(
+              ThemeEntity(
+                themeName: state.currentTheme,
+                themeMode: state.themeMode,
+                useCustomBackground: state.useCustomBackground,
+                customBackgroundColor: state.useCustomBackground
+                    ? state.customBackgroundColor
+                    : null,
+              ),
+            );
           }
         }
       },
@@ -211,7 +232,9 @@ class ThemeNotifier extends Notifier<ThemeState> {
     if (themeColors.containsKey(themeName)) {
       final isDark = ThemeUtils.isDarkTheme(themeColors[themeName]!);
       final mode = isDark ? ThemeMode.dark : ThemeMode.light;
-      final customBg = state.useCustomBackground ? state.customBackgroundColor : null;
+      final customBg = state.useCustomBackground
+          ? state.customBackgroundColor
+          : null;
 
       state = state.copyWith(
         currentTheme: themeName,
@@ -251,7 +274,9 @@ class ThemeNotifier extends Notifier<ThemeState> {
       themeName: state.currentTheme,
       themeMode: state.themeMode,
       useCustomBackground: state.useCustomBackground,
-      customBackgroundColor: state.useCustomBackground ? state.customBackgroundColor : null,
+      customBackgroundColor: state.useCustomBackground
+          ? state.customBackgroundColor
+          : null,
     );
 
     // Immediately trigger Home Widget refresh with new theme
@@ -260,7 +285,8 @@ class ThemeNotifier extends Notifier<ThemeState> {
     final saveUseCase = ref.read(saveThemeSettingsUseCaseProvider);
     final result = await saveUseCase(entity);
     result.fold(
-      (failure) => debugPrint('Error saving theme settings locally: ${failure.message}'),
+      (failure) =>
+          debugPrint('Error saving theme settings locally: ${failure.message}'),
       (_) {
         final firestore = ref.read(firestoreServiceProvider);
         if (firestore.isUserLoggedIn) {

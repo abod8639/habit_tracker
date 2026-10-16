@@ -135,8 +135,9 @@ HabitStatsBundleEntity _computeStatsBundleInBackground(
   // 1. Calculate overall stats & streak
   final int totalHabits = habits.length;
   final int completedHabits = habits.where((h) => h.isCompleted).length;
-  final double completionRate =
-      totalHabits > 0 ? (completedHabits / totalHabits) * 100 : 0.0;
+  final double completionRate = totalHabits > 0
+      ? (completedHabits / totalHabits) * 100
+      : 0.0;
 
   int streak = 0;
   final bool isTodayCompleted =
@@ -231,8 +232,7 @@ HabitStatsBundleEntity _computeStatsBundleInBackground(
   final Map<String, List<TrendPointEntity>> individualTrends = {};
   for (var habit in habits) {
     final List<TrendPointEntity> spots = [];
-    final habitHistory =
-        historyMap[habit.id] ?? historyMap[habit.name] ?? {};
+    final habitHistory = historyMap[habit.id] ?? historyMap[habit.name] ?? {};
 
     for (int i = 0; i < days; i++) {
       final normalizedDate = DateTime(

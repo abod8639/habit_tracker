@@ -220,9 +220,15 @@ void main() {
         final container = ProviderContainer(
           overrides: [
             settingRepositoryProvider.overrideWithValue(repository),
-            getCustomApiKeyUseCaseProvider.overrideWithValue(getCustomApiKeyUseCase),
-            saveCustomApiKeyUseCaseProvider.overrideWithValue(saveCustomApiKeyUseCase),
-            clearCustomApiKeyUseCaseProvider.overrideWithValue(clearCustomApiKeyUseCase),
+            getCustomApiKeyUseCaseProvider.overrideWithValue(
+              getCustomApiKeyUseCase,
+            ),
+            saveCustomApiKeyUseCaseProvider.overrideWithValue(
+              saveCustomApiKeyUseCase,
+            ),
+            clearCustomApiKeyUseCaseProvider.overrideWithValue(
+              clearCustomApiKeyUseCase,
+            ),
           ],
         );
         addTearDown(container.dispose);
@@ -248,25 +254,49 @@ void main() {
       },
     );
 
-    test('GeminiService.sanitizeApiKey cleans quotes, prefixes, and whitespaces', () {
-      expect(GeminiService.sanitizeApiKey('  AIzaSyCleanKey  '), 'AIzaSyCleanKey');
-      expect(GeminiService.sanitizeApiKey('"AIzaSyQuotedKey"'), 'AIzaSyQuotedKey');
-      expect(GeminiService.sanitizeApiKey("'AIzaSySingleQuote'"), 'AIzaSySingleQuote');
-      expect(GeminiService.sanitizeApiKey('GEMINI_API_KEY=AIzaSyAssigned'), 'AIzaSyAssigned');
-      expect(GeminiService.sanitizeApiKey('api_key="AIzaSyAssignedQuoted"'), 'AIzaSyAssignedQuoted');
-    });
+    test(
+      'GeminiService.sanitizeApiKey cleans quotes, prefixes, and whitespaces',
+      () {
+        expect(
+          GeminiService.sanitizeApiKey('  AIzaSyCleanKey  '),
+          'AIzaSyCleanKey',
+        );
+        expect(
+          GeminiService.sanitizeApiKey('"AIzaSyQuotedKey"'),
+          'AIzaSyQuotedKey',
+        );
+        expect(
+          GeminiService.sanitizeApiKey("'AIzaSySingleQuote'"),
+          'AIzaSySingleQuote',
+        );
+        expect(
+          GeminiService.sanitizeApiKey('GEMINI_API_KEY=AIzaSyAssigned'),
+          'AIzaSyAssigned',
+        );
+        expect(
+          GeminiService.sanitizeApiKey('api_key="AIzaSyAssignedQuoted"'),
+          'AIzaSyAssignedQuoted',
+        );
+      },
+    );
 
-    test('SettingsStorage correctly saves, retrieves, and clears custom Gemini model', () async {
-      expect(settingsStorage.customGeminiModel, isNull);
-      await settingsStorage.setCustomGeminiModel('gemini-3.8-flash');
-      expect(settingsStorage.customGeminiModel, 'gemini-3.8-flash');
-      expect(GeminiService.effectiveModelName, 'gemini-3.8-flash');
+    test(
+      'SettingsStorage correctly saves, retrieves, and clears custom Gemini model',
+      () async {
+        expect(settingsStorage.customGeminiModel, isNull);
+        await settingsStorage.setCustomGeminiModel('gemini-3.8-flash');
+        expect(settingsStorage.customGeminiModel, 'gemini-3.8-flash');
+        expect(GeminiService.effectiveModelName, 'gemini-3.8-flash');
 
-      // Clearing custom API key also clears model
-      await settingsStorage.clearCustomGeminiApiKey();
-      expect(settingsStorage.customGeminiModel, isNull);
-      GeminiService.resetModelInstance();
-      expect(GeminiService.effectiveModelName, GeminiService.defaultModelName);
-    });
+        // Clearing custom API key also clears model
+        await settingsStorage.clearCustomGeminiApiKey();
+        expect(settingsStorage.customGeminiModel, isNull);
+        GeminiService.resetModelInstance();
+        expect(
+          GeminiService.effectiveModelName,
+          GeminiService.defaultModelName,
+        );
+      },
+    );
   });
 }

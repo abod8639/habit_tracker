@@ -7,7 +7,9 @@ import '../entities/trend_point_entity.dart';
 
 abstract class HabitStatsRepository {
   /// Fetches aggregated stats bundle in a single unified pass.
-  Future<Either<Failure, HabitStatsBundleEntity>> getCompleteStatsBundle(int days);
+  Future<Either<Failure, HabitStatsBundleEntity>> getCompleteStatsBundle(
+    int days,
+  );
 
   /// Synchronously or quickly retrieves cached stats if available.
   HabitStatsEntity? getCachedStats();
@@ -19,7 +21,8 @@ abstract class HabitStatsRepository {
   Future<Either<Failure, List<TrendPointEntity>>> getOverallTrendData(int days);
 
   /// Fetches per-habit individual trend spots for [days] range.
-  Future<Either<Failure, Map<String, List<TrendPointEntity>>>> getIndividualHabitTrends(int days);
+  Future<Either<Failure, Map<String, List<TrendPointEntity>>>>
+  getIndividualHabitTrends(int days);
 
   /// Fetches summary of today's habits.
   Future<Either<Failure, List<HabitEntity>>> getTodayHabitsSummary();

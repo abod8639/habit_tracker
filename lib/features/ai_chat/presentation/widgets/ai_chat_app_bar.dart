@@ -28,9 +28,7 @@ class AiChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final statusColor = isWorking
         ? const Color(0xFF4CAF50)
         : Colors.orangeAccent;
-    final statusText = isWorking
-        ? S.current.online
-        : S.current.apiKeyRequired;
+    final statusText = isWorking ? S.current.online : S.current.apiKeyRequired;
 
     return AppBar(
       elevation: 0,
@@ -72,9 +70,7 @@ class AiChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
               ),
               const SizedBox(height: 2),
               GestureDetector(
-                onTap: isWorking
-                    ? null
-                    : () => AiApiKeyDialog.show(context),
+                onTap: isWorking ? null : () => AiApiKeyDialog.show(context),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 7,
@@ -83,8 +79,8 @@ class AiChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   decoration: BoxDecoration(
                     color: isWorking
                         ? (isDark
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : Colors.black.withValues(alpha: 0.04))
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.black.withValues(alpha: 0.04))
                         : Colors.orange.withValues(
                             alpha: isDark ? 0.16 : 0.08,
                           ),
@@ -92,8 +88,8 @@ class AiChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
                     border: Border.all(
                       color: isWorking
                           ? (isDark
-                              ? Colors.white.withValues(alpha: 0.06)
-                              : Colors.black.withValues(alpha: 0.04))
+                                ? Colors.white.withValues(alpha: 0.06)
+                                : Colors.black.withValues(alpha: 0.04))
                           : Colors.orange.withValues(alpha: 0.35),
                       width: 0.75,
                     ),
@@ -127,8 +123,8 @@ class AiChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
                                   alpha: 0.6,
                                 )
                               : (isDark
-                                  ? Colors.orange.shade300
-                                  : Colors.orange.shade800),
+                                    ? Colors.orange.shade300
+                                    : Colors.orange.shade800),
                         ),
                       ),
                       if (!isWorking) ...[

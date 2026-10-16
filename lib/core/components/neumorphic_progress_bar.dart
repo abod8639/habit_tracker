@@ -25,10 +25,12 @@ class NeumorphicProgressBar extends StatelessWidget {
     final baseColor = theme.cardColor;
     final effectiveAccent = accentColor ?? theme.colorScheme.primary;
 
-    final Color wellColor = trackColor ??
+    final Color wellColor =
+        trackColor ??
         (isDark
             ? (Color.lerp(baseColor, Colors.black, 0.28) ?? baseColor)
-            : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.40) ?? baseColor));
+            : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.40) ??
+                  baseColor));
 
     final clampedValue = value.clamp(0.0, 1.0);
 
@@ -62,7 +64,8 @@ class NeumorphicProgressBar extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color.lerp(effectiveAccent, Colors.white, 0.15) ?? effectiveAccent,
+                    Color.lerp(effectiveAccent, Colors.white, 0.15) ??
+                        effectiveAccent,
                     effectiveAccent,
                   ],
                 ),

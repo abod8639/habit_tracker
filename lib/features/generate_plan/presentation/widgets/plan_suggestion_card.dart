@@ -25,7 +25,10 @@ class PlanSuggestionCard extends StatelessWidget {
     final baseColor = theme.cardColor;
     final selected = suggestion.isSelected;
 
-    final surfaceGradientStart = ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final surfaceGradientStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
     final surfaceGradientEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return MouseRegion(
@@ -42,16 +45,16 @@ class PlanSuggestionCard extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                 surfaceGradientStart,
-                 surfaceGradientEnd,
+                surfaceGradientStart,
+                surfaceGradientEnd,
               ],
             ),
             border: Border.all(
               color: selected
                   ? color.withValues(alpha: isDark ? 0.65 : 0.45)
                   : (isDark
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.white.withValues(alpha: 0.85)),
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : Colors.white.withValues(alpha: 0.85)),
               width: selected ? 1.5 : 1.0,
             ),
             boxShadow: selected
@@ -112,8 +115,10 @@ class PlanSuggestionCard extends StatelessWidget {
                           color: selected
                               ? color.withValues(alpha: 0.3)
                               : (isDark
-                                  ? Colors.white.withValues(alpha: 0.05)
-                                  : const Color(0xFFA3B1C6).withValues(alpha: 0.3)),
+                                    ? Colors.white.withValues(alpha: 0.05)
+                                    : const Color(
+                                        0xFFA3B1C6,
+                                      ).withValues(alpha: 0.3)),
                           width: 0.8,
                         ),
                         boxShadow: AppShadows.badge(isDark: isDark),

@@ -16,12 +16,12 @@ class NotificationsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationState = ref.watch(notificationNotifierProvider);
-    final notificationNotifier =
-        ref.watch(notificationNotifierProvider.notifier);
+    final notificationNotifier = ref.watch(
+      notificationNotifierProvider.notifier,
+    );
     final isEnabled = notificationState.isNotificationEnabled;
     final time = notificationState.notificationTime;
-    final isBatteryIgnored =
-        notificationState.isBatteryOptimizationIgnored;
+    final isBatteryIgnored = notificationState.isBatteryOptimizationIgnored;
 
     final s = S.of(context);
     final theme = Theme.of(context);

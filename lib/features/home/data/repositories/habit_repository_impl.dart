@@ -43,8 +43,9 @@ class HabitRepositoryImpl implements HabitRepository {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       final now = DateTime.now();
 
-      final existingNames =
-          models.map((m) => m.name.trim().toLowerCase()).toSet();
+      final existingNames = models
+          .map((m) => m.name.trim().toLowerCase())
+          .toSet();
       int addedCount = 0;
 
       for (final name in names) {
@@ -283,7 +284,9 @@ class HabitRepositoryImpl implements HabitRepository {
 
       // 1. Get historical data directly from local storage
       final rawHeatmap = await localDataSource.getHeatmapData();
-      final Map<DateTime, int> heatmapData = Map<DateTime, int>.from(rawHeatmap);
+      final Map<DateTime, int> heatmapData = Map<DateTime, int>.from(
+        rawHeatmap,
+      );
 
       // 2. Recalculate TODAY's strength based on LIVE habits
       heatmapData[normalizedToday] = todayStrength;
@@ -510,13 +513,15 @@ class HabitRepositoryImpl implements HabitRepository {
         }
       } catch (_) {}
 
-      final effectiveUid = userId ??
+      final effectiveUid =
+          userId ??
           authUid ??
           localDataSource.getLastUserId() ??
           'offline_user';
 
-      final snapshot =
-          await localDataSource.createSnapshot(userId: effectiveUid);
+      final snapshot = await localDataSource.createSnapshot(
+        userId: effectiveUid,
+      );
       final vault = vaultDataSource ?? localDataSource.vaultDataSource;
       if (vault != null) {
         await vault.saveBackup(snapshot);
@@ -580,7 +585,8 @@ class HabitRepositoryImpl implements HabitRepository {
           }
         } catch (_) {}
 
-        final effectiveUid = userId ??
+        final effectiveUid =
+            userId ??
             authUid ??
             localDataSource.getLastUserId() ??
             'offline_user';

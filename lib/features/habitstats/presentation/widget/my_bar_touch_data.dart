@@ -16,8 +16,8 @@ BarTouchData myBarTouchData(
       tooltipMargin: 8,
       getTooltipColor: (group) =>
           Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF1E222D)
-              : const Color(0xFFF0F3F8),
+          ? const Color(0xFF1E222D)
+          : const Color(0xFFF0F3F8),
       tooltipBorder: BorderSide(
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.white.withValues(alpha: 0.12)

@@ -7,22 +7,27 @@ void main() {
       expect(FirestoreService.tombstoneRetentionPeriod.inDays, 30);
     });
 
-    test('Separates active tombstones from expired tombstones by cutoff date', () {
-      final now = DateTime.now();
-      final cutoffDate = now.subtract(FirestoreService.tombstoneRetentionPeriod);
+    test(
+      'Separates active tombstones from expired tombstones by cutoff date',
+      () {
+        final now = DateTime.now();
+        final cutoffDate = now.subtract(
+          FirestoreService.tombstoneRetentionPeriod,
+        );
 
-      final recentTombstoneDate = now.subtract(const Duration(days: 5));
-      final staleTombstoneDate = now.subtract(const Duration(days: 45));
+        final recentTombstoneDate = now.subtract(const Duration(days: 5));
+        final staleTombstoneDate = now.subtract(const Duration(days: 45));
 
-      final isRecentActive = !recentTombstoneDate.isBefore(cutoffDate);
-      final isStaleActive = !staleTombstoneDate.isBefore(cutoffDate);
+        final isRecentActive = !recentTombstoneDate.isBefore(cutoffDate);
+        final isStaleActive = !staleTombstoneDate.isBefore(cutoffDate);
 
-      // Recent tombstone (5 days ago) is within active window:
-      expect(isRecentActive, true);
+        // Recent tombstone (5 days ago) is within active window:
+        expect(isRecentActive, true);
 
-      // Stale tombstone (45 days ago) is expired and eligible for GC:
-      expect(isStaleActive, false);
-    });
+        // Stale tombstone (45 days ago) is expired and eligible for GC:
+        expect(isStaleActive, false);
+      },
+    );
 
     test('Active tombstones filter ignores expired entries', () {
       final now = DateTime.now();
@@ -37,7 +42,8 @@ void main() {
 
       final activeMap = {
         for (var t in tombstones)
-          if (!(t['deletedAt'] as DateTime).isBefore(cutoff)) t['id'] as String: true,
+          if (!(t['deletedAt'] as DateTime).isBefore(cutoff))
+            t['id'] as String: true,
       };
 
       expect(activeMap.containsKey('h_1'), true);

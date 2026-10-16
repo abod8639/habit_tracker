@@ -96,18 +96,20 @@ class HomeWidgetService {
       final bool isThemeDark = ThemeUtils.isDarkTheme(colors);
 
       final themeMode = themeStorage.getThemeMode();
-      final isDark = overrideIsDark ??
+      final isDark =
+          overrideIsDark ??
           (themeMode == ThemeMode.system
               ? (PlatformDispatcher.instance.platformBrightness ==
-                      Brightness.dark ||
-                  isThemeDark)
+                        Brightness.dark ||
+                    isThemeDark)
               : themeMode == ThemeMode.dark);
 
       final customBg = themeStorage.getUseCustomBackground()
           ? themeStorage.getCustomBackgroundColor()
           : null;
 
-      final themeData = overrideTheme ??
+      final themeData =
+          overrideTheme ??
           ThemeUtils.buildThemeData(
             forceDark: isDark,
             colors: colors,
@@ -119,10 +121,10 @@ class HomeWidgetService {
       final effectiveLocale = (langCode == 'ar')
           ? const Locale('ar')
           : (langCode == 'en'
-              ? const Locale('en')
-              : (PlatformDispatcher.instance.locale.languageCode == 'ar'
-                  ? const Locale('ar')
-                  : const Locale('en')));
+                ? const Locale('en')
+                : (PlatformDispatcher.instance.locale.languageCode == 'ar'
+                      ? const Locale('ar')
+                      : const Locale('en')));
 
       // Ensure active localization messages are fully loaded for effectiveLocale
       await S.load(effectiveLocale);

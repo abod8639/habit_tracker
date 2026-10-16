@@ -40,7 +40,8 @@ class NeumorphicSelectionTile extends StatefulWidget {
   });
 
   @override
-  State<NeumorphicSelectionTile> createState() => _NeumorphicSelectionTileState();
+  State<NeumorphicSelectionTile> createState() =>
+      _NeumorphicSelectionTileState();
 }
 
 class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
@@ -67,31 +68,40 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
     final Color borderColor = widget.isSelected
         ? effectiveAccent.withValues(alpha: isDark ? 0.65 : 0.45)
         : (isDark
-            ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
-            : Colors.white.withValues(alpha: _isPressed ? 0.35 : 0.85));
+              ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
+              : Colors.white.withValues(alpha: _isPressed ? 0.35 : 0.85));
 
     final List<BoxShadow> effectiveShadows = widget.isSelected
         ? AppShadows.selectedCard(primary: effectiveAccent, isDark: isDark)
         : (_isPressed
-            ? AppShadows.softButtonPressed(isDark: isDark)
-            : AppShadows.tileResting(isDark: isDark));
+              ? AppShadows.softButtonPressed(isDark: isDark)
+              : AppShadows.tileResting(isDark: isDark));
 
     final Widget? effectiveLeading = widget.leading;
 
-    final Widget? effectiveTrailing = widget.trailing ??
+    final Widget? effectiveTrailing =
+        widget.trailing ??
         (widget.showDefaultIndicator
             ? AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  shape: widget.isMultiple ? BoxShape.rectangle : BoxShape.circle,
-                  borderRadius: widget.isMultiple ? BorderRadius.circular(6) : null,
-                  color: widget.isSelected ? effectiveAccent : Colors.transparent,
+                  shape: widget.isMultiple
+                      ? BoxShape.rectangle
+                      : BoxShape.circle,
+                  borderRadius: widget.isMultiple
+                      ? BorderRadius.circular(6)
+                      : null,
+                  color: widget.isSelected
+                      ? effectiveAccent
+                      : Colors.transparent,
                   border: Border.all(
                     color: widget.isSelected
                         ? effectiveAccent
-                        : (isDark ? Colors.white.withValues(alpha: 0.20) : const Color(0xFFA3B1C6)),
+                        : (isDark
+                              ? Colors.white.withValues(alpha: 0.20)
+                              : const Color(0xFFA3B1C6)),
                     width: 1.5,
                   ),
                   boxShadow: widget.isSelected
@@ -111,7 +121,9 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
             : null);
 
     return MouseRegion(
-      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      cursor: widget.onTap != null
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTapDown: (_) => setState(() => _isPressed = true),
@@ -126,7 +138,9 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
             margin: widget.margin ?? const EdgeInsets.symmetric(vertical: 6.0),
-            padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+            padding:
+                widget.padding ??
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
             decoration: BoxDecoration(
               borderRadius: effectiveRadius,
               gradient: LinearGradient(
@@ -135,13 +149,17 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
                 colors: [
                   widget.isSelected
                       ? Color.alphaBlend(
-                          effectiveAccent.withValues(alpha: isDark ? 0.16 : 0.10),
+                          effectiveAccent.withValues(
+                            alpha: isDark ? 0.16 : 0.10,
+                          ),
                           surfaceStart,
                         )
                       : surfaceStart,
                   widget.isSelected
                       ? Color.alphaBlend(
-                          effectiveAccent.withValues(alpha: isDark ? 0.22 : 0.14),
+                          effectiveAccent.withValues(
+                            alpha: isDark ? 0.22 : 0.14,
+                          ),
                           surfaceEnd,
                         )
                       : surfaceEnd,
@@ -171,7 +189,9 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
                           widget.titleText!,
                           style: TextStyle(
                             fontSize: 15,
-                            fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
+                            fontWeight: widget.isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
                             color: widget.isSelected
                                 ? effectiveAccent
                                 : colorScheme.onSurface,
@@ -186,7 +206,9 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
                           widget.subtitleText!,
                           style: TextStyle(
                             fontSize: 13,
-                            color: colorScheme.onSurface.withValues(alpha: 0.65),
+                            color: colorScheme.onSurface.withValues(
+                              alpha: 0.65,
+                            ),
                             height: 1.35,
                           ),
                         ),

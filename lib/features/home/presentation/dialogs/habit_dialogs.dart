@@ -39,11 +39,17 @@ class HabitDialogs {
             } else {
               try {
                 if (ref != null) {
-                  await ref.read(habitNotifierProvider.notifier).addHabit(habitName);
+                  await ref
+                      .read(habitNotifierProvider.notifier)
+                      .addHabit(habitName);
                 } else {
-                  final targetContext = dialogContext.mounted ? dialogContext : context;
+                  final targetContext = dialogContext.mounted
+                      ? dialogContext
+                      : context;
                   final container = ProviderScope.containerOf(targetContext);
-                  await container.read(habitNotifierProvider.notifier).addHabit(habitName);
+                  await container
+                      .read(habitNotifierProvider.notifier)
+                      .addHabit(habitName);
                 }
               } catch (e, st) {
                 debugPrint('Failed to add habit: $e\n$st');
@@ -83,11 +89,17 @@ class HabitDialogs {
             if (habitName.isNotEmpty) {
               try {
                 if (ref != null) {
-                  await ref.read(habitNotifierProvider.notifier).editHabit(id, habitName);
+                  await ref
+                      .read(habitNotifierProvider.notifier)
+                      .editHabit(id, habitName);
                 } else {
-                  final targetContext = dialogContext.mounted ? dialogContext : context;
+                  final targetContext = dialogContext.mounted
+                      ? dialogContext
+                      : context;
                   final container = ProviderScope.containerOf(targetContext);
-                  await container.read(habitNotifierProvider.notifier).editHabit(id, habitName);
+                  await container
+                      .read(habitNotifierProvider.notifier)
+                      .editHabit(id, habitName);
                 }
               } catch (e, st) {
                 debugPrint('Failed to edit habit: $e\n$st');

@@ -93,7 +93,10 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
     final chatState = ref.watch(aiChatNotifierProvider);
     final theme = Theme.of(context);
 
-    ref.listen(aiChatNotifierProvider.select((s) => s.errorMessage), (prev, next) {
+    ref.listen(aiChatNotifierProvider.select((s) => s.errorMessage), (
+      prev,
+      next,
+    ) {
       if (next != null && next.isNotEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

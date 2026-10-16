@@ -11,8 +11,8 @@ class FirestoreService {
   FirestoreService({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
-  })  : _firestoreInstance = firestore,
-        _authInstance = auth;
+  }) : _firestoreInstance = firestore,
+       _authInstance = auth;
 
   FirebaseFirestore get _firestore =>
       _firestoreInstance ?? FirebaseFirestore.instance;

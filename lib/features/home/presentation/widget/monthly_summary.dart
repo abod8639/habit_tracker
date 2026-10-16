@@ -389,7 +389,7 @@ class _MonthlySummaryState extends ConsumerState<MonthlySummary>
                           );
                         }),
                       ),
-                      SizedBox(height: _tileGap *1.5),
+                      SizedBox(height: _tileGap * 1.5),
                     ],
                   ),
                 ),

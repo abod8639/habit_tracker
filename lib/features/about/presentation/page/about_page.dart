@@ -46,8 +46,9 @@ class _AboutPageState extends State<AboutPage> {
     final isDark = theme.brightness == Brightness.dark;
     final baseSurface = theme.cardColor;
     final primaryColor = theme.primaryColor;
-    final isArabic =
-        Localizations.localeOf(context).languageCode.startsWith('ar');
+    final isArabic = Localizations.localeOf(
+      context,
+    ).languageCode.startsWith('ar');
 
     return KeyboardListener(
       autofocus: true,
@@ -432,7 +433,6 @@ class _AboutPageState extends State<AboutPage> {
     required String title,
     required IconData icon,
     required List<Widget> children,
-
   }) {
     final theme = Theme.of(context);
 

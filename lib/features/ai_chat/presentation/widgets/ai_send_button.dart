@@ -109,7 +109,7 @@ class _AiSendButtonState extends State<AiSendButton>
             ),
             boxShadow: isActive
                 ? AppShadows.buttonResting(isDark: isDark)
-                :AppShadows.buttonPressed(isDark: isDark),
+                : AppShadows.buttonPressed(isDark: isDark),
           ),
           child: Center(
             child: widget.isLoading

@@ -31,12 +31,16 @@ import 'package:habit_tracker/features/home/data/datasources/habit_sql_local_dat
 import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_source.dart';
 
 // Data Sources
-final habitVaultDataSourceProvider = Provider<HabitOfflineVaultDataSource>((ref) {
+final habitVaultDataSourceProvider = Provider<HabitOfflineVaultDataSource>((
+  ref,
+) {
   final storage = ref.watch(keyValueStorageProvider);
   return HabitOfflineVaultDataSource(storage);
 });
 
-final habitSqlLocalDataSourceProvider = Provider<HabitSqlLocalDataSource>((ref) {
+final habitSqlLocalDataSourceProvider = Provider<HabitSqlLocalDataSource>((
+  ref,
+) {
   final db = ref.watch(appDatabaseProvider);
   final vaultDataSource = ref.watch(habitVaultDataSourceProvider);
   return HabitSqlLocalDataSource(db, vaultDataSource: vaultDataSource);
@@ -67,7 +71,9 @@ final addHabitUseCaseProvider = Provider<AddHabitUseCase>((ref) {
   return AddHabitUseCase(ref.watch(habitRepositoryProvider));
 });
 
-final addMultipleHabitsUseCaseProvider = Provider<AddMultipleHabitsUseCase>((ref) {
+final addMultipleHabitsUseCaseProvider = Provider<AddMultipleHabitsUseCase>((
+  ref,
+) {
   return AddMultipleHabitsUseCase(ref.watch(habitRepositoryProvider));
 });
 
@@ -79,9 +85,10 @@ final deleteHabitUseCaseProvider = Provider<DeleteHabitUseCase>((ref) {
   return DeleteHabitUseCase(ref.watch(habitRepositoryProvider));
 });
 
-final deleteMultipleHabitsUseCaseProvider = Provider<DeleteMultipleHabitsUseCase>((ref) {
-  return DeleteMultipleHabitsUseCase(ref.watch(habitRepositoryProvider));
-});
+final deleteMultipleHabitsUseCaseProvider =
+    Provider<DeleteMultipleHabitsUseCase>((ref) {
+      return DeleteMultipleHabitsUseCase(ref.watch(habitRepositoryProvider));
+    });
 
 final toggleHabitUseCaseProvider = Provider<ToggleHabitUseCase>((ref) {
   return ToggleHabitUseCase(ref.watch(habitRepositoryProvider));
@@ -99,32 +106,48 @@ final isUserLoggedInUseCaseProvider = Provider<IsUserLoggedInUseCase>((ref) {
   return IsUserLoggedInUseCase(ref.watch(habitRepositoryProvider));
 });
 
-final updateHabitColorUseCaseProvider = Provider<UpdateHabitColorUseCase>((ref) {
-  return UpdateHabitColorUseCase(repository: ref.watch(habitRepositoryProvider));
+final updateHabitColorUseCaseProvider = Provider<UpdateHabitColorUseCase>((
+  ref,
+) {
+  return UpdateHabitColorUseCase(
+    repository: ref.watch(habitRepositoryProvider),
+  );
 });
 
-final updateHabitOrderUseCaseProvider = Provider<UpdateHabitOrderUseCase>((ref) {
-  return UpdateHabitOrderUseCase(repository: ref.watch(habitRepositoryProvider));
+final updateHabitOrderUseCaseProvider = Provider<UpdateHabitOrderUseCase>((
+  ref,
+) {
+  return UpdateHabitOrderUseCase(
+    repository: ref.watch(habitRepositoryProvider),
+  );
 });
 
-final resetDailyHabitsUseCaseProvider = Provider<ResetDailyHabitsUseCase>((ref) {
+final resetDailyHabitsUseCaseProvider = Provider<ResetDailyHabitsUseCase>((
+  ref,
+) {
   return ResetDailyHabitsUseCase(ref.watch(habitRepositoryProvider));
 });
 
 final getCompletionStatusForDateUseCaseProvider =
     Provider<GetCompletionStatusForDateUseCase>((ref) {
-  return GetCompletionStatusForDateUseCase(ref.watch(habitRepositoryProvider));
-});
+      return GetCompletionStatusForDateUseCase(
+        ref.watch(habitRepositoryProvider),
+      );
+    });
 
 final getStartDateUseCaseProvider = Provider<GetStartDateUseCase>((ref) {
   return GetStartDateUseCase(ref.watch(habitRepositoryProvider));
 });
 
-final incrementDayCountUseCaseProvider = Provider<IncrementDayCountUseCase>((ref) {
+final incrementDayCountUseCaseProvider = Provider<IncrementDayCountUseCase>((
+  ref,
+) {
   return IncrementDayCountUseCase(ref.watch(habitRepositoryProvider));
 });
 
-final clearLocalHabitsUseCaseProvider = Provider<ClearLocalHabitsUseCase>((ref) {
+final clearLocalHabitsUseCaseProvider = Provider<ClearLocalHabitsUseCase>((
+  ref,
+) {
   return ClearLocalHabitsUseCase(ref.watch(habitRepositoryProvider));
 });
 
@@ -297,7 +320,10 @@ class HabitNotifier extends Notifier<HabitState> {
     result.fold(
       (failure) {
         currentHabits.insert(index, oldHabit);
-        state = state.copyWith(habits: currentHabits, errorMessage: failure.message);
+        state = state.copyWith(
+          habits: currentHabits,
+          errorMessage: failure.message,
+        );
         _updateOptimisticHeatmap();
       },
       (_) => refreshData(),
@@ -321,7 +347,10 @@ class HabitNotifier extends Notifier<HabitState> {
     result.fold(
       (failure) {
         currentHabits[index] = oldHabit;
-        state = state.copyWith(habits: currentHabits, errorMessage: failure.message);
+        state = state.copyWith(
+          habits: currentHabits,
+          errorMessage: failure.message,
+        );
         _updateOptimisticHeatmap();
         _updateHomeWidget();
       },
@@ -348,7 +377,11 @@ class HabitNotifier extends Notifier<HabitState> {
     state = state.copyWith(localHeatmapDateSet: updatedLocal);
   }
 
-  Future<void> reorderHabits(int oldIndex, int newIndex, {bool isAdjusted = false}) async {
+  Future<void> reorderHabits(
+    int oldIndex,
+    int newIndex, {
+    bool isAdjusted = false,
+  }) async {
     if (!isAdjusted && newIndex > oldIndex) {
       newIndex -= 1;
     }
@@ -357,7 +390,9 @@ class HabitNotifier extends Notifier<HabitState> {
 
     final draggedItem = currentHabits[oldIndex];
     if (selectedIds.contains(draggedItem.id) && selectedIds.length > 1) {
-      final selectedItems = currentHabits.where((h) => selectedIds.contains(h.id)).toList();
+      final selectedItems = currentHabits
+          .where((h) => selectedIds.contains(h.id))
+          .toList();
       currentHabits.removeWhere((h) => selectedIds.contains(h.id));
       final insertIndex = newIndex.clamp(0, currentHabits.length);
       currentHabits.insertAll(insertIndex, selectedItems);

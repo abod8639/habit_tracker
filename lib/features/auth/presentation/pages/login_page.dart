@@ -18,8 +18,9 @@ class LoginPage extends ConsumerWidget {
     required BuildContext context,
     required WidgetRef ref,
   }) async {
-    final success =
-        await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .signInWithGoogle();
     if (success && context.mounted) {
       context.go(AppRoutes.home);
     }
@@ -91,18 +92,18 @@ class LoginPage extends ConsumerWidget {
                         colors: [
                           isDark
                               ? (Color.lerp(baseColor, Colors.white, 0.04) ??
-                                  baseColor)
+                                    baseColor)
                               : (Color.lerp(baseColor, Colors.white, 0.50) ??
-                                  baseColor),
+                                    baseColor),
                           isDark
                               ? (Color.lerp(baseColor, Colors.black, 0.16) ??
-                                  baseColor)
+                                    baseColor)
                               : (Color.lerp(
-                                    baseColor,
-                                    const Color(0xFFA3B1C6),
-                                    0.10,
-                                  ) ??
-                                  baseColor),
+                                      baseColor,
+                                      const Color(0xFFA3B1C6),
+                                      0.10,
+                                    ) ??
+                                    baseColor),
                         ],
                       ),
                       border: Border.all(
@@ -140,9 +141,9 @@ class LoginPage extends ConsumerWidget {
                           onPressed: isLoading
                               ? null
                               : () => _handleGoogleSignIn(
-                                    context: context,
-                                    ref: ref,
-                                  ),
+                                  context: context,
+                                  ref: ref,
+                                ),
                         ),
                       ],
                     ),
@@ -213,8 +214,8 @@ class _NeumorphicSkipButtonState extends State<_NeumorphicSkipButton> {
                   ),
             color: _isPressed
                 ? (isDark
-                    ? Colors.black.withValues(alpha: 0.25)
-                    : const Color(0xFFD6DFEC))
+                      ? Colors.black.withValues(alpha: 0.25)
+                      : const Color(0xFFD6DFEC))
                 : null,
             border: Border.all(
               color: isDark
@@ -224,20 +225,20 @@ class _NeumorphicSkipButtonState extends State<_NeumorphicSkipButton> {
             ),
             boxShadow: _isPressed
                 ? (isDark
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.45),
-                          offset: const Offset(1, 1),
-                          blurRadius: 2,
-                        ),
-                      ]
-                    : [
-                        const BoxShadow(
-                          color: Color(0x40A3B1C6),
-                          offset: Offset(1, 1),
-                          blurRadius: 2,
-                        ),
-                      ])
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            offset: const Offset(1, 1),
+                            blurRadius: 2,
+                          ),
+                        ]
+                      : [
+                          const BoxShadow(
+                            color: Color(0x40A3B1C6),
+                            offset: Offset(1, 1),
+                            blurRadius: 2,
+                          ),
+                        ])
                 : AppShadows.badge(isDark: isDark),
           ),
           child: Row(
@@ -264,5 +265,3 @@ class _NeumorphicSkipButtonState extends State<_NeumorphicSkipButton> {
     );
   }
 }
-
-

@@ -38,37 +38,43 @@ void main() {
       expect(lookupById[today], true);
     });
 
-    test('Two habits with identical names maintain separate histories by ID', () {
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
+    test(
+      'Two habits with identical names maintain separate histories by ID',
+      () {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
 
-      const habit1Id = 'id_morning_walk';
-      const habit2Id = 'id_evening_walk';
-      const sharedName = 'Walk';
+        const habit1Id = 'id_morning_walk';
+        const habit2Id = 'id_evening_walk';
+        const sharedName = 'Walk';
 
-      final habit1 = HabitModel(
-        id: habit1Id,
-        name: sharedName,
-        isCompleted: true,
-        createdAt: now,
-      );
+        final habit1 = HabitModel(
+          id: habit1Id,
+          name: sharedName,
+          isCompleted: true,
+          createdAt: now,
+        );
 
-      final habit2 = HabitModel(
-        id: habit2Id,
-        name: sharedName,
-        isCompleted: false,
-        createdAt: now,
-      );
+        final habit2 = HabitModel(
+          id: habit2Id,
+          name: sharedName,
+          isCompleted: false,
+          createdAt: now,
+        );
 
-      final historyMap = <String, Map<DateTime, bool>>{
-        habit1.id: {today: habit1.isCompleted},
-        habit2.id: {today: habit2.isCompleted},
-      };
+        final historyMap = <String, Map<DateTime, bool>>{
+          habit1.id: {today: habit1.isCompleted},
+          habit2.id: {today: habit2.isCompleted},
+        };
 
-      // Querying by ID preserves independent completion statuses
-      expect(historyMap[habit1.id]?[today], true);
-      expect(historyMap[habit2.id]?[today], false);
-      expect(historyMap[habit1.id]?[today], isNot(historyMap[habit2.id]?[today]));
-    });
+        // Querying by ID preserves independent completion statuses
+        expect(historyMap[habit1.id]?[today], true);
+        expect(historyMap[habit2.id]?[today], false);
+        expect(
+          historyMap[habit1.id]?[today],
+          isNot(historyMap[habit2.id]?[today]),
+        );
+      },
+    );
   });
 }

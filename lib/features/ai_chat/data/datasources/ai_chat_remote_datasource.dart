@@ -29,16 +29,13 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
   }) {
     _lastSystemInstruction = systemInstruction;
     _lastHistory = List.from(history);
-    final validHistory = history
-        .where((msg) => !msg.hasError)
-        .map((msg) {
-          if (msg.isUser) {
-            return Content.text(msg.text);
-          } else {
-            return Content.model([TextPart(msg.text)]);
-          }
-        })
-        .toList();
+    final validHistory = history.where((msg) => !msg.hasError).map((msg) {
+      if (msg.isUser) {
+        return Content.text(msg.text);
+      } else {
+        return Content.model([TextPart(msg.text)]);
+      }
+    }).toList();
 
     _chatSession = geminiService.startChat(
       systemInstruction: systemInstruction,
@@ -53,8 +50,9 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
     }
 
     try {
-      final responseStream =
-          _chatSession!.sendMessageStream(Content.text(message));
+      final responseStream = _chatSession!.sendMessageStream(
+        Content.text(message),
+      );
       await for (final chunk in responseStream) {
         final chunkText = chunk.text;
         if (chunkText != null && chunkText.isNotEmpty) {
@@ -69,8 +67,9 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
             systemInstruction: _lastSystemInstruction!,
             history: _lastHistory,
           );
-          final retryStream =
-              _chatSession!.sendMessageStream(Content.text(message));
+          final retryStream = _chatSession!.sendMessageStream(
+            Content.text(message),
+          );
           await for (final chunk in retryStream) {
             final chunkText = chunk.text;
             if (chunkText != null && chunkText.isNotEmpty) {
@@ -84,4 +83,3 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
     }
   }
 }
-

@@ -33,7 +33,6 @@ class _AiApiKeyDialogState extends ConsumerState<AiApiKeyDialog> {
     _textController = TextEditingController(text: initialKey);
   }
 
-
   @override
   void dispose() {
     _textController.dispose();
@@ -130,9 +129,14 @@ class _AiApiKeyDialogState extends ConsumerState<AiApiKeyDialog> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () async {
-                    final uri = Uri.parse('https://aistudio.google.com/app/apikey');
+                    final uri = Uri.parse(
+                      'https://aistudio.google.com/app/apikey',
+                    );
                     if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
                     }
                   },
                   borderRadius: AppRadius.mdRadius,
@@ -220,7 +224,8 @@ class _AiApiKeyDialogState extends ConsumerState<AiApiKeyDialog> {
                                 : Icons.visibility_rounded,
                             size: 20,
                           ),
-                          onPressed: () => setState(() => _obscureText = !_obscureText),
+                          onPressed: () =>
+                              setState(() => _obscureText = !_obscureText),
                         ),
                         IconButton(
                           tooltip: s.paste,
@@ -282,7 +287,9 @@ class _AiApiKeyDialogState extends ConsumerState<AiApiKeyDialog> {
                       child: TextButton.icon(
                         onPressed: () async {
                           Navigator.of(context).pop();
-                          await ref.read(aiSettingsNotifierProvider.notifier).clearApiKey();
+                          await ref
+                              .read(aiSettingsNotifierProvider.notifier)
+                              .clearApiKey();
                         },
                         icon: const Icon(
                           Icons.restore_rounded,
@@ -345,7 +352,9 @@ class _AiApiKeyDialogState extends ConsumerState<AiApiKeyDialog> {
                             final newKey = _textController.text.trim();
                             if (newKey.isEmpty) {
                               Navigator.of(context).pop();
-                              await ref.read(aiSettingsNotifierProvider.notifier).clearApiKey();
+                              await ref
+                                  .read(aiSettingsNotifierProvider.notifier)
+                                  .clearApiKey();
                               return;
                             }
                             final success = await ref

@@ -18,20 +18,21 @@ PreferredSizeWidget myAppBar({
     leadingWidth: 56,
     leading: showLeading
         ? (leading ??
-            Center(
-              child: NeumorphicIconButton.square(
-                size: 40,
-                iconSize: 18,
-                icon: Icons.arrow_back_ios_new_rounded,
-                accentColor: theme.colorScheme.onSurface,
-                onPressed: onBack ??
-                    () {
-                      if (Navigator.of(context).canPop()) {
-                        Navigator.of(context).pop();
-                      }
-                    },
-              ),
-            ))
+              Center(
+                child: NeumorphicIconButton.square(
+                  size: 40,
+                  iconSize: 18,
+                  icon: Icons.arrow_back_ios_new_rounded,
+                  accentColor: theme.colorScheme.onSurface,
+                  onPressed:
+                      onBack ??
+                      () {
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                ),
+              ))
         : null,
     title: Text(
       title,

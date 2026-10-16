@@ -63,17 +63,23 @@ void main() {
       },
     );
 
-    test('isIgnoringBatteryOptimizations handles channel error gracefully', () async {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (call) async {
-            throw PlatformException(code: 'ERROR', message: 'Failed');
-          });
+    test(
+      'isIgnoringBatteryOptimizations handles channel error gracefully',
+      () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, (call) async {
+              throw PlatformException(code: 'ERROR', message: 'Failed');
+            });
 
-      final service = NotificationService();
-      final isIgnoring = await service.isIgnoringBatteryOptimizations();
+        final service = NotificationService();
+        final isIgnoring = await service.isIgnoringBatteryOptimizations();
 
-      expect(isIgnoring, true); // fallback is true to avoid false-positive blocking
-    });
+        expect(
+          isIgnoring,
+          true,
+        ); // fallback is true to avoid false-positive blocking
+      },
+    );
 
     test(
       'requestIgnoreBatteryOptimizations invokes native request',
@@ -82,7 +88,12 @@ void main() {
         final result = await service.requestIgnoreBatteryOptimizations();
 
         expect(result, true);
-        expect(methodCalls.any((c) => c.method == 'requestIgnoreBatteryOptimizations'), true);
+        expect(
+          methodCalls.any(
+            (c) => c.method == 'requestIgnoreBatteryOptimizations',
+          ),
+          true,
+        );
       },
     );
 
@@ -93,16 +104,22 @@ void main() {
         final result = await service.openBatteryOptimizationSettings();
 
         expect(result, true);
-        expect(methodCalls.any((c) => c.method == 'openBatteryOptimizationSettings'), true);
+        expect(
+          methodCalls.any((c) => c.method == 'openBatteryOptimizationSettings'),
+          true,
+        );
       },
     );
 
-    test('Non-android platform defaults to ignoring battery optimization', () async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      final service = NotificationService();
-      final isIgnoring = await service.isIgnoringBatteryOptimizations();
-      expect(isIgnoring, true);
-      expect(methodCalls.isEmpty, true);
-    });
+    test(
+      'Non-android platform defaults to ignoring battery optimization',
+      () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        final service = NotificationService();
+        final isIgnoring = await service.isIgnoringBatteryOptimizations();
+        expect(isIgnoring, true);
+        expect(methodCalls.isEmpty, true);
+      },
+    );
   });
 }

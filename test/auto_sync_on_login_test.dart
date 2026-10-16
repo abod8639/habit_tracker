@@ -57,7 +57,8 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> getSkipLoginStatus() async => const Right(false);
+  Future<Either<Failure, bool>> getSkipLoginStatus() async =>
+      const Right(false);
 
   @override
   Future<Either<Failure, void>> setSkipLogin(bool skipped) async =>
@@ -77,7 +78,12 @@ class FakeFirestoreService implements FirestoreService {
   Future<Map<String, dynamic>?> downloadTheme() async => cloudTheme;
 
   @override
-  Future<void> uploadTheme(dynamic themeName, dynamic mode, dynamic useCustomBg, dynamic customBgColor) async {}
+  Future<void> uploadTheme(
+    dynamic themeName,
+    dynamic mode,
+    dynamic useCustomBg,
+    dynamic customBgColor,
+  ) async {}
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -208,47 +214,55 @@ void main() {
     );
   }
 
-  test('Signing in with Google automatically triggers syncHabits and refreshes habit state',
-      () async {
-    final container = createContainer();
-    final authNotifier = container.read(authNotifierProvider.notifier);
+  test(
+    'Signing in with Google automatically triggers syncHabits and refreshes habit state',
+    () async {
+      final container = createContainer();
+      final authNotifier = container.read(authNotifierProvider.notifier);
 
-    expect(fakeSettingRepo.syncCallCount, 0);
+      expect(fakeSettingRepo.syncCallCount, 0);
 
-    final success = await authNotifier.signInWithGoogle();
+      final success = await authNotifier.signInWithGoogle();
 
-    expect(success, true);
-    expect(fakeSettingRepo.syncCallCount, 1);
-    expect(container.read(authNotifierProvider).isLoggedIn, true);
+      expect(success, true);
+      expect(fakeSettingRepo.syncCallCount, 1);
+      expect(container.read(authNotifierProvider).isLoggedIn, true);
 
-    final habitNotifier = container.read(habitNotifierProvider.notifier) as FakeHabitNotifier;
-    expect(habitNotifier.refreshed, true);
-    expect(container.read(habitNotifierProvider).habits.length, 1);
-    expect(container.read(habitNotifierProvider).habits.first.name, 'Cloud Exercise');
-  });
+      final habitNotifier =
+          container.read(habitNotifierProvider.notifier) as FakeHabitNotifier;
+      expect(habitNotifier.refreshed, true);
+      expect(container.read(habitNotifierProvider).habits.length, 1);
+      expect(
+        container.read(habitNotifierProvider).habits.first.name,
+        'Cloud Exercise',
+      );
+    },
+  );
 
-  test('Restoring auth session on app startup triggers automatic background sync',
-      () async {
-    final container = createContainer();
+  test(
+    'Restoring auth session on app startup triggers automatic background sync',
+    () async {
+      final container = createContainer();
 
-    // Trigger notifier creation
-    container.read(authNotifierProvider);
+      // Trigger notifier creation
+      container.read(authNotifierProvider);
 
-    expect(fakeSettingRepo.syncCallCount, 0);
+      expect(fakeSettingRepo.syncCallCount, 0);
 
-    // Emit existing restored session
-    mockAuthRepo.emitUser(
-      const AuthEntity(
-        uid: 'restored_uid',
-        email: 'restored@example.com',
-      ),
-    );
+      // Emit existing restored session
+      mockAuthRepo.emitUser(
+        const AuthEntity(
+          uid: 'restored_uid',
+          email: 'restored@example.com',
+        ),
+      );
 
-    // Allow microtask to process stream event and sync
-    await Future<void>.delayed(const Duration(milliseconds: 50));
+      // Allow microtask to process stream event and sync
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
-    expect(fakeSettingRepo.syncCallCount, 1);
-  });
+      expect(fakeSettingRepo.syncCallCount, 1);
+    },
+  );
 
   test('SyncNotifier prevents duplicate concurrent sync calls', () async {
     final container = createContainer();
@@ -264,25 +278,30 @@ void main() {
     expect(fakeSettingRepo.syncCallCount, 1);
   });
 
-  test('Signing in with Google immediately synchronizes and applies cloud theme without restart',
-      () async {
-    fakeFirestore.cloudTheme = {
-      'themeName': 'github',
-      'themeMode': ThemeMode.light.index,
-      'useCustomBg': false,
-    };
+  test(
+    'Signing in with Google immediately synchronizes and applies cloud theme without restart',
+    () async {
+      fakeFirestore.cloudTheme = {
+        'themeName': 'github',
+        'themeMode': ThemeMode.light.index,
+        'useCustomBg': false,
+      };
 
-    final container = createContainer();
-    final authNotifier = container.read(authNotifierProvider.notifier);
+      final container = createContainer();
+      final authNotifier = container.read(authNotifierProvider.notifier);
 
-    // Initial theme before login is default
-    expect(container.read(themeNotifierProvider).currentTheme, 'github_dark_green');
+      // Initial theme before login is default
+      expect(
+        container.read(themeNotifierProvider).currentTheme,
+        'github_dark_green',
+      );
 
-    final success = await authNotifier.signInWithGoogle();
+      final success = await authNotifier.signInWithGoogle();
 
-    expect(success, true);
-    // Theme is immediately updated to the Google account's stored theme
-    expect(container.read(themeNotifierProvider).currentTheme, 'github');
-    expect(container.read(themeNotifierProvider).themeMode, ThemeMode.light);
-  });
+      expect(success, true);
+      // Theme is immediately updated to the Google account's stored theme
+      expect(container.read(themeNotifierProvider).currentTheme, 'github');
+      expect(container.read(themeNotifierProvider).themeMode, ThemeMode.light);
+    },
+  );
 }

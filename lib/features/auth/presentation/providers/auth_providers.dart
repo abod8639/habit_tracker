@@ -51,7 +51,9 @@ final signUpWithEmailUseCaseProvider = Provider<SignUpWithEmailUseCase>((ref) {
   return SignUpWithEmailUseCase(ref.watch(authRepositoryProvider));
 });
 
-final signInWithGoogleUseCaseProvider = Provider<SignInWithGoogleUseCase>((ref) {
+final signInWithGoogleUseCaseProvider = Provider<SignInWithGoogleUseCase>((
+  ref,
+) {
   return SignInWithGoogleUseCase(ref.watch(authRepositoryProvider));
 });
 
@@ -71,7 +73,9 @@ final setSkipLoginUseCaseProvider = Provider<SetSkipLoginUseCase>((ref) {
   return SetSkipLoginUseCase(ref.watch(authRepositoryProvider));
 });
 
-final getSkipLoginStatusUseCaseProvider = Provider<GetSkipLoginStatusUseCase>((ref) {
+final getSkipLoginStatusUseCaseProvider = Provider<GetSkipLoginStatusUseCase>((
+  ref,
+) {
   return GetSkipLoginStatusUseCase(ref.watch(authRepositoryProvider));
 });
 
@@ -150,8 +154,12 @@ class AuthNotifier extends Notifier<AuthState> {
       final result = await getSkipStatus();
       if (!ref.mounted) return;
       result.fold(
-        (_) => state = state.copyWith(hasSkippedLogin: false, isInitialized: true),
-        (status) => state = state.copyWith(hasSkippedLogin: status, isInitialized: true),
+        (_) =>
+            state = state.copyWith(hasSkippedLogin: false, isInitialized: true),
+        (status) => state = state.copyWith(
+          hasSkippedLogin: status,
+          isInitialized: true,
+        ),
       );
     });
 

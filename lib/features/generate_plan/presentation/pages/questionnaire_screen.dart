@@ -115,15 +115,16 @@ class QuestionnaireScreen extends ConsumerWidget {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                     transitionBuilder: (child, animation) => SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.08, 0),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeOutCubic,
-                        ),
-                      ),
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0.08, 0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                            ),
+                          ),
                       child: FadeTransition(opacity: animation, child: child),
                     ),
                     child: QuestionContent(
@@ -147,7 +148,9 @@ class QuestionnaireScreen extends ConsumerWidget {
                     : Icons.arrow_forward_rounded,
                 isLoading: state.isLoading,
                 accentColor: state.selectedCategory?.color,
-                onPressed: state.isLoading ? null : () => _handleNext(context, ref),
+                onPressed: state.isLoading
+                    ? null
+                    : () => _handleNext(context, ref),
                 width: double.infinity,
                 height: 52,
               ),

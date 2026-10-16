@@ -89,9 +89,11 @@ class _ThemeCardState extends State<ThemeCard>
   String _formatThemeName(String name) {
     return name
         .split('_')
-        .map((word) => word.isEmpty
-            ? ''
-            : '${word[0].toUpperCase()}${word.substring(1)}')
+        .map(
+          (word) => word.isEmpty
+              ? ''
+              : '${word[0].toUpperCase()}${word.substring(1)}',
+        )
         .join(' ');
   }
 

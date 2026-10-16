@@ -139,8 +139,8 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
     final Color borderColor = _isFocused
         ? effectiveAccent.withValues(alpha: isDark ? 0.70 : 0.50)
         : (isDark
-            ? Colors.black.withValues(alpha: 0.5)
-            : const Color(0xFFA3B1C6).withValues(alpha: 0.35));
+              ? Colors.black.withValues(alpha: 0.5)
+              : const Color(0xFFA3B1C6).withValues(alpha: 0.35));
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
@@ -182,7 +182,8 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
       child: ClipRRect(
         borderRadius: effectiveRadius,
         child: Padding(
-          padding: widget.padding ??
+          padding:
+              widget.padding ??
               EdgeInsets.symmetric(
                 horizontal: widget.isNumber ? 20.0 : 16.0,
                 vertical: widget.isNumber ? 12.0 : 4.0,
@@ -197,7 +198,9 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
                 Icon(
                   widget.prefixIcon,
                   size: 18,
-                  color: effectiveAccent.withValues(alpha: _hasText ? 0.85 : 0.4),
+                  color: effectiveAccent.withValues(
+                    alpha: _hasText ? 0.85 : 0.4,
+                  ),
                 ),
                 const SizedBox(width: 8),
               ],
@@ -211,9 +214,10 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
                   keyboardType: widget.isNumber
                       ? TextInputType.number
                       : (widget.maxLines > 1
-                          ? TextInputType.multiline
-                          : TextInputType.text),
-                  inputFormatters: widget.inputFormatters ??
+                            ? TextInputType.multiline
+                            : TextInputType.text),
+                  inputFormatters:
+                      widget.inputFormatters ??
                       (widget.isNumber
                           ? [FilteringTextInputFormatter.digitsOnly]
                           : null),
@@ -221,10 +225,14 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
                   maxLines: widget.maxLines,
                   cursorColor: effectiveAccent,
                   style: TextStyle(
-                    fontSize: widget.fontSize ?? (widget.isNumber ? 28.0 : 15.0),
-                    fontWeight: widget.fontWeight ??
+                    fontSize:
+                        widget.fontSize ?? (widget.isNumber ? 28.0 : 15.0),
+                    fontWeight:
+                        widget.fontWeight ??
                         (widget.isNumber ? FontWeight.bold : FontWeight.w500),
-                    color: widget.isNumber ? effectiveAccent : colorScheme.onSurface,
+                    color: widget.isNumber
+                        ? effectiveAccent
+                        : colorScheme.onSurface,
                   ),
                   decoration: InputDecoration(
                     isDense: true,
@@ -235,9 +243,13 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
                       color: widget.isNumber
                           ? effectiveAccent.withValues(alpha: 0.30)
                           : colorScheme.onSurface.withValues(alpha: 0.40),
-                      fontSize: widget.fontSize ?? (widget.isNumber ? 28.0 : 14.5),
-                      fontWeight: widget.fontWeight ??
-                          (widget.isNumber ? FontWeight.bold : FontWeight.normal),
+                      fontSize:
+                          widget.fontSize ?? (widget.isNumber ? 28.0 : 14.5),
+                      fontWeight:
+                          widget.fontWeight ??
+                          (widget.isNumber
+                              ? FontWeight.bold
+                              : FontWeight.normal),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: effectiveRadius,
@@ -268,7 +280,10 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
               if (widget.unit != null) ...[
                 const SizedBox(width: 10),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: isDark
                         ? Colors.black.withValues(alpha: 0.25)

@@ -31,9 +31,9 @@ class SettingLocalDataSourceImpl implements SettingLocalDataSource {
     required LangStorage langStorage,
     required SettingsStorage settingsStorage,
     required ThemeStorageService themeStorage,
-  })  : _langStorage = langStorage,
-        _settingsStorage = settingsStorage,
-        _themeStorage = themeStorage;
+  }) : _langStorage = langStorage,
+       _settingsStorage = settingsStorage,
+       _themeStorage = themeStorage;
 
   @override
   Future<String> getLanguage() async {

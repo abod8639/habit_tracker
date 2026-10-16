@@ -42,9 +42,8 @@ class LineChartBox extends ConsumerWidget {
           lineTouchData: LineTouchData(
             handleBuiltInTouches: true,
             touchTooltipData: LineTouchTooltipData(
-              getTooltipColor: (spot) => isDark
-                  ? const Color(0xFF1E293B)
-                  : Colors.white,
+              getTooltipColor: (spot) =>
+                  isDark ? const Color(0xFF1E293B) : Colors.white,
               tooltipBorderRadius: BorderRadius.circular(8),
               fitInsideHorizontally: true,
               fitInsideVertically: true,
@@ -65,12 +64,14 @@ class LineChartBox extends ConsumerWidget {
                       ),
                     );
                   }
-                  final habitName = state.selectedHabitName ??
+                  final habitName =
+                      state.selectedHabitName ??
                       (barIndex < state.habitNames.length
                           ? state.habitNames[barIndex]
                           : 'Habit');
                   final isCompleted = barSpot.y >= 0.5;
-                  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+                  final isArabic =
+                      Localizations.localeOf(context).languageCode == 'ar';
                   final statusText = isCompleted
                       ? (isArabic ? 'مكتملة' : 'Completed')
                       : (isArabic ? 'غير مكتملة' : 'Incomplete');
@@ -134,9 +135,9 @@ class LineChartBox extends ConsumerWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  if (value == 0    ||
+                  if (value == 0 ||
                       value == 0.25 ||
-                      value == 0.5  ||
+                      value == 0.5 ||
                       value == 0.75 ||
                       value == 1.0) {
                     return Text(
@@ -209,15 +210,17 @@ class LineChartBox extends ConsumerWidget {
       final habitNames = state.habitNames.isNotEmpty
           ? state.habitNames
           : (progression.isNotEmpty
-              ? progression.keys.toList()
-              : habits.map((h) => h.name).toList());
+                ? progression.keys.toList()
+                : habits.map((h) => h.name).toList());
 
       final selectedName = state.selectedHabitName;
       final targetHabitNames = selectedName != null
           ? habitNames.where((name) => name == selectedName).toList()
           : habitNames;
 
-      final activeList = targetHabitNames.isNotEmpty ? targetHabitNames : habitNames;
+      final activeList = targetHabitNames.isNotEmpty
+          ? targetHabitNames
+          : habitNames;
       final isSingleHabit = selectedName != null || activeList.length == 1;
 
       for (int i = 0; i < activeList.length; i++) {
@@ -232,7 +235,8 @@ class LineChartBox extends ConsumerWidget {
               .where((h) => h.name == habitName || h.id == habitName)
               .firstOrNull;
           if (matchingHabit != null) {
-            rawSpots = progression[matchingHabit.id] ??
+            rawSpots =
+                progression[matchingHabit.id] ??
                 progression[matchingHabit.name];
           }
         }
@@ -258,13 +262,13 @@ class LineChartBox extends ConsumerWidget {
         final spotsToRender = isSingleHabit
             ? rawSpots
             : rawSpots.map((s) {
-            //     final offset = (effectiveIndex * 0.025);
-            //     double y = s.y;
-            //     if (y >= 0.99) {
-            //       y = (1.0 - offset).clamp(0.0, 1.0);
-            //     } else if (y <= 0.00) {
-            //       y = (0.0 + offset).clamp(0.0, 1.0);
-            //     }
+                //     final offset = (effectiveIndex * 0.025);
+                //     double y = s.y;
+                //     if (y >= 0.99) {
+                //       y = (1.0 - offset).clamp(0.0, 1.0);
+                //     } else if (y <= 0.00) {
+                //       y = (0.0 + offset).clamp(0.0, 1.0);
+                //     }
                 return FlSpot(s.x, s.y);
               }).toList();
 
@@ -286,8 +290,7 @@ class LineChartBox extends ConsumerWidget {
       List<FlSpot> overallSpots = state.overallTrend;
       if (overallSpots.isEmpty) {
         final total = state.todaySummary.length;
-        final completed =
-            state.todaySummary.where((h) => h.isCompleted).length;
+        final completed = state.todaySummary.where((h) => h.isCompleted).length;
         final rate = total > 0 ? (completed / total) : 0.0;
         overallSpots = List.generate(
           state.daysPeriod,
@@ -302,7 +305,9 @@ class LineChartBox extends ConsumerWidget {
         myLineChartBarData(
           color: Theme.of(context).colorScheme.secondary,
           color1: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-          color2: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+          color2: Theme.of(
+            context,
+          ).colorScheme.secondary.withValues(alpha: 0.1),
           spots: overallSpots,
           label: 'Overall',
         ),

@@ -34,7 +34,9 @@ class NeumorphicCheckbox extends StatelessWidget {
         : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.35) ?? baseColor);
 
     return MouseRegion(
-      cursor: onChanged != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      cursor: onChanged != null
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onChanged != null ? () => onChanged!(!value) : null,
@@ -50,8 +52,8 @@ class NeumorphicCheckbox extends StatelessWidget {
               color: value
                   ? effectiveColor
                   : (isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : const Color(0xFFA3B1C6).withValues(alpha: 0.50)),
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : const Color(0xFFA3B1C6).withValues(alpha: 0.50)),
               width: 1.2,
             ),
             boxShadow: value

@@ -64,85 +64,96 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
         : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.10) ?? baseColor);
 
     // Primary gradient
-    final Color primaryStart = Color.lerp(effectiveAccent, Colors.white, isDark ? 0.08 : 0.12) ?? effectiveAccent;
-    final Color primaryEnd = Color.lerp(effectiveAccent, Colors.black, isDark ? 0.16 : 0.10) ?? effectiveAccent;
+    final Color primaryStart =
+        Color.lerp(effectiveAccent, Colors.white, isDark ? 0.08 : 0.12) ??
+        effectiveAccent;
+    final Color primaryEnd =
+        Color.lerp(effectiveAccent, Colors.black, isDark ? 0.16 : 0.10) ??
+        effectiveAccent;
 
     // Determine colors
     final Gradient? backgroundGradient = !_isEnabled
         ? null
         : _isPressed
-            ? null
-            : widget.isPrimary
-                ? LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [primaryStart, primaryEnd],
-                  )
-                : LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [surfaceStart, surfaceEnd],
-                  );
+        ? null
+        : widget.isPrimary
+        ? LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [primaryStart, primaryEnd],
+          )
+        : LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [surfaceStart, surfaceEnd],
+          );
 
     final Color? solidColor = !_isEnabled
-        ? (isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFE2E8F0))
+        ? (isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : const Color(0xFFE2E8F0))
         : _isPressed
-            ? widget.isPrimary
-                ? primaryEnd
-                : (isDark ? Colors.black.withValues(alpha: 0.32) : const Color(0xFFD3DCE8))
-            : null;
+        ? widget.isPrimary
+              ? primaryEnd
+              : (isDark
+                    ? Colors.black.withValues(alpha: 0.32)
+                    : const Color(0xFFD3DCE8))
+        : null;
 
     final List<BoxShadow> effectiveShadows = !_isEnabled
         ? const []
         : _isPressed
-            ? (widget.isPrimary
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.35),
-                      offset: const Offset(1.5, 1.5),
-                      blurRadius: 3.0,
-                    ),
-                  ]
-                : AppShadows.softButtonPressed(isDark: isDark))
-            : widget.isPrimary
-                ? [
-                    ...AppShadows.bloom(
-                      color: effectiveAccent,
-                      isDark: isDark,
-                      blur: 10,
-                      spread: 0.8,
-                      offset: const Offset(0, 3.5),
-                    ),
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.50)
-                          : const Color(0xFFA3B1C6).withValues(alpha: 0.35),
-                      offset: const Offset(2.5, 2.5),
-                      blurRadius: 5.0,
-                    ),
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.06)
-                          : Colors.white.withValues(alpha: 0.80),
-                      offset: const Offset(-2, -2),
-                      blurRadius: 4.0,
-                    ),
-                  ]
-                : AppShadows.softButton(isDark: isDark);
+        ? (widget.isPrimary
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    offset: const Offset(1.5, 1.5),
+                    blurRadius: 3.0,
+                  ),
+                ]
+              : AppShadows.softButtonPressed(isDark: isDark))
+        : widget.isPrimary
+        ? [
+            ...AppShadows.bloom(
+              color: effectiveAccent,
+              isDark: isDark,
+              blur: 10,
+              spread: 0.8,
+              offset: const Offset(0, 3.5),
+            ),
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.50)
+                  : const Color(0xFFA3B1C6).withValues(alpha: 0.35),
+              offset: const Offset(2.5, 2.5),
+              blurRadius: 5.0,
+            ),
+            BoxShadow(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.06)
+                  : Colors.white.withValues(alpha: 0.80),
+              offset: const Offset(-2, -2),
+              blurRadius: 4.0,
+            ),
+          ]
+        : AppShadows.softButton(isDark: isDark);
 
-    final Color effectiveTextColor = widget.textColor ??
+    final Color effectiveTextColor =
+        widget.textColor ??
         (!_isEnabled
             ? theme.disabledColor
             : widget.isPrimary
-                ? Colors.white
-                : colorScheme.onSurface);
+            ? Colors.white
+            : colorScheme.onSurface);
 
     return MouseRegion(
       cursor: _isEnabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTapDown: _isEnabled ? (_) => setState(() => _isPressed = true) : null,
-        onTapCancel: _isEnabled ? () => setState(() => _isPressed = false) : null,
+        onTapCancel: _isEnabled
+            ? () => setState(() => _isPressed = false)
+            : null,
         onTapUp: _isEnabled ? (_) => setState(() => _isPressed = false) : null,
         onTap: _isEnabled ? widget.onPressed : null,
         child: AnimatedScale(
@@ -154,7 +165,8 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
             curve: Curves.easeOutCubic,
             width: widget.width,
             height: widget.height,
-            padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 20),
+            padding:
+                widget.padding ?? const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               borderRadius: effectiveRadius,
               gradient: backgroundGradient,
@@ -163,10 +175,14 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                 color: !_isEnabled
                     ? Colors.transparent
                     : widget.isPrimary
-                        ? Colors.white.withValues(alpha: isDark ? 0.15 : 0.35)
-                        : (isDark
-                            ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
-                            : Colors.white.withValues(alpha: _isPressed ? 0.35 : 0.85)),
+                    ? Colors.white.withValues(alpha: isDark ? 0.15 : 0.35)
+                    : (isDark
+                          ? Colors.white.withValues(
+                              alpha: _isPressed ? 0.03 : 0.06,
+                            )
+                          : Colors.white.withValues(
+                              alpha: _isPressed ? 0.35 : 0.85,
+                            )),
                 width: 1.2,
               ),
               boxShadow: effectiveShadows,
@@ -195,7 +211,8 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                         ],
                         Text(
                           widget.text,
-                          style: widget.textStyle ??
+                          style:
+                              widget.textStyle ??
                               TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

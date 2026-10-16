@@ -181,8 +181,10 @@ class GeminiService {
           final modelsList = decoded['models'] as List<dynamic>? ?? [];
           for (final item in modelsList) {
             if (item is Map<String, dynamic>) {
-              final name =
-                  (item['name'] as String? ?? '').replaceFirst('models/', '');
+              final name = (item['name'] as String? ?? '').replaceFirst(
+                'models/',
+                '',
+              );
               final methods =
                   (item['supportedGenerationMethods'] as List<dynamic>? ?? [])
                       .map((e) => e.toString())
@@ -225,9 +227,11 @@ class GeminiService {
           model: candidate,
           apiKey: cleaned,
         );
-        final countResult = await model.countTokens([
-          Content.text('test'),
-        ]).timeout(const Duration(seconds: 4));
+        final countResult = await model
+            .countTokens([
+              Content.text('test'),
+            ])
+            .timeout(const Duration(seconds: 4));
 
         if (countResult.totalTokens > 0) {
           _resolvedModelName = candidate;
@@ -340,9 +344,11 @@ class GeminiService {
           model: candidate,
           apiKey: currentKey,
         );
-        final result = await testModel.countTokens([
-          Content.text('test'),
-        ]).timeout(const Duration(seconds: 4));
+        final result = await testModel
+            .countTokens([
+              Content.text('test'),
+            ])
+            .timeout(const Duration(seconds: 4));
         if (result.totalTokens > 0) {
           _resolvedModelName = candidate;
           _saveResolvedModel(candidate);

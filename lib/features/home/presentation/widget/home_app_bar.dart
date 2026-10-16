@@ -38,8 +38,7 @@ class HomeAppBar extends ConsumerWidget {
 
       final Color surfaceGradientEnd = isDark
           ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
-          : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ??
-                baseColor);
+          : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
 
       return SliverAppBar(
         pinned: true,
@@ -137,7 +136,11 @@ class HomeAppBar extends ConsumerWidget {
                 icon: Icons.delete_outline_rounded,
                 iconColor: colorScheme.error,
                 tooltip: S.of(context).delete,
-                onPressed: () => _showBatchDeleteConfirm(context, habitNotifier, selectedCount),
+                onPressed: () => _showBatchDeleteConfirm(
+                  context,
+                  habitNotifier,
+                  selectedCount,
+                ),
               ),
             ),
           ),
@@ -211,9 +214,9 @@ class HomeAppBar extends ConsumerWidget {
               ),
             ),
           ),
-           )
-        ],
-      );
+        ),
+      ],
+    );
   }
 
   void _showColorPicker(BuildContext context, HabitNotifier notifier) {

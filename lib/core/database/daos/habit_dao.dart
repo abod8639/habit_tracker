@@ -9,11 +9,15 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   HabitDao(super.db);
 
   Future<List<HabitRecord>> getAllHabits() {
-    return (select(habits)..orderBy([(t) => OrderingTerm(expression: t.sortOrder)])).get();
+    return (select(
+      habits,
+    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)])).get();
   }
 
   Stream<List<HabitRecord>> watchAllHabits() {
-    return (select(habits)..orderBy([(t) => OrderingTerm(expression: t.sortOrder)])).watch();
+    return (select(
+      habits,
+    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)])).watch();
   }
 
   Future<HabitRecord?> getHabitById(String id) {
@@ -45,7 +49,9 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   }
 
   Future<void> updateHabit(HabitsCompanion habit) {
-    return (update(habits)..where((t) => t.id.equals(habit.id.value))).write(habit);
+    return (update(
+      habits,
+    )..where((t) => t.id.equals(habit.id.value))).write(habit);
   }
 
   Future<void> deleteHabitById(String id) {
@@ -60,13 +66,20 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
     await transaction(() async {
       for (int i = 0; i < ids.length; i++) {
         await (update(habits)..where((t) => t.id.equals(ids[i]))).write(
-          HabitsCompanion(sortOrder: Value(i), updatedAt: Value(DateTime.now())),
+          HabitsCompanion(
+            sortOrder: Value(i),
+            updatedAt: Value(DateTime.now()),
+          ),
         );
       }
     });
   }
 
-  Future<void> toggleHabitCompletion(String id, bool isCompleted, DateTime? completedAt) {
+  Future<void> toggleHabitCompletion(
+    String id,
+    bool isCompleted,
+    DateTime? completedAt,
+  ) {
     return (update(habits)..where((t) => t.id.equals(id))).write(
       HabitsCompanion(
         isCompleted: Value(isCompleted),

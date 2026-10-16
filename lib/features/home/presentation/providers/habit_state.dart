@@ -89,7 +89,11 @@ class HabitState {
       if (prevDate == null) {
         currentRun = 1;
       } else {
-        final nextDay = DateTime(prevDate.year, prevDate.month, prevDate.day + 1);
+        final nextDay = DateTime(
+          prevDate.year,
+          prevDate.month,
+          prevDate.day + 1,
+        );
         if (date.isAtSameMomentAs(nextDay)) {
           currentRun++;
         } else if (date.isAfter(nextDay)) {

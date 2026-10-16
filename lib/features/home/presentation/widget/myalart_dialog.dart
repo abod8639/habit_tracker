@@ -167,11 +167,13 @@ class _MyalartdState extends State<MyalartDialog>
         : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.30) ?? baseColor);
 
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final String dialogTitle = widget.title ??
+    final String dialogTitle =
+        widget.title ??
         (widget.isEditing
             ? S.current.editThisHabit
             : (isAr ? 'إضافة عادة' : 'Add Habit'));
-    final String buttonLabel = widget.actionButtonText ??
+    final String buttonLabel =
+        widget.actionButtonText ??
         (widget.isEditing
             ? (isAr ? 'تعديل' : 'Edit')
             : (isAr ? 'إضافة' : 'Add'));
@@ -304,7 +306,8 @@ class _MyalartdState extends State<MyalartDialog>
 
                       if (event is KeyDownEvent) {
                         if (event.logicalKey == LogicalKeyboardKey.enter ||
-                            event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+                            event.logicalKey ==
+                                LogicalKeyboardKey.numpadEnter) {
                           if (HardwareKeyboard.instance.isControlPressed) {
                             final currentText = widget.controller.text;
                             final currentPosition =
@@ -339,8 +342,8 @@ class _MyalartdState extends State<MyalartDialog>
                         ),
                         boxShadow: AppShadows.wellDual(isDark: isDark),
                       ),
-                      child: TextFormField(  
-                        maxLength: 100,   
+                      child: TextFormField(
+                        maxLength: 100,
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 15.5,
@@ -512,7 +515,7 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
               widget.icon,
               size: 20,
               color: iconColor,
-              shadows:AppShadows.buttonPressed(isDark: isDark) ,
+              shadows: AppShadows.buttonPressed(isDark: isDark),
             ),
             const SizedBox(width: 7),
             Text(
