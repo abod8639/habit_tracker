@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
-import 'package:habit_tracker/features/setting/data/datasources/lang_storage.dart';
 import 'package:habit_tracker/features/setting/data/datasources/setting_local_datasource.dart';
 import 'package:habit_tracker/features/setting/data/datasources/setting_remote_datasource.dart';
-import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
 import 'package:habit_tracker/features/setting/data/repositories/setting_repository_impl.dart';
 import 'package:habit_tracker/features/setting/domain/repositories/setting_repository.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/clear_all_data_usecase.dart';
@@ -41,9 +38,13 @@ enum ApiKeyStatus {
 
 // Data Sources
 final settingLocalDataSourceProvider = Provider<SettingLocalDataSource>((ref) {
+  final langStorage = ref.watch(langStorageServiceProvider);
+  final settingsStorage = ref.watch(settingsStorageServiceProvider);
+  final themeStorage = ref.watch(themeStorageServiceProvider);
   return SettingLocalDataSourceImpl(
-    langBox: Hive.box(LangStorage.boxName),
-    settingsBox: Hive.box(SettingsStorage.boxName),
+    langStorage: langStorage,
+    settingsStorage: settingsStorage,
+    themeStorage: themeStorage!,
   );
 });
 
