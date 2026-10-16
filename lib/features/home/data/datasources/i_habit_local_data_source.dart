@@ -36,7 +36,11 @@ abstract class IHabitLocalDataSource {
   Future<Map<String, Map<DateTime, bool>>> getHabitHistoryMap(int days);
   String getStartDate();
   void updateStartDate(String date);
-  Future<void> clearAllData({String? earliestDateStr});
+  Future<void> clearAllData({
+    String? earliestDateStr,
+    bool backupBeforeClear = false,
+    String? userId,
+  });
   String? getLastUserId();
   Future<HabitVaultData> createSnapshot({required String userId});
   Future<void> restoreFromSnapshot(HabitVaultData snapshot);
