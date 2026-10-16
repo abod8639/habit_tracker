@@ -8,6 +8,7 @@ import 'package:habit_tracker/core/services/notification_service.dart';
 import 'package:habit_tracker/core/database/app_database.dart';
 import 'package:habit_tracker/core/database/migrators/hive_to_sql_migrator.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
+import 'package:habit_tracker/features/home/data/facade/habit_facade_impl.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/setting/data/datasources/lang_storage.dart';
 import 'package:habit_tracker/features/setting/data/datasources/settings_storage.dart';
@@ -38,50 +39,62 @@ class AppInitializer {
         Hive.registerAdapter(HabitModelAdapter());
       }
 
-      // 2. Open necessary Hive boxes with corruption recovery
-      await _openBoxSafely(HabitStorage.boxName);
-      await _openBoxSafely(HabitStorage.backupVaultBox);
-      await _openBoxSafely(ThemeStorageService.themeBox);
-      await _openBoxSafely(LangStorage.boxName);
-      await _openBoxSafely(SettingsStorage.boxName);
+      // 2. Open necessary Hive boxes concurrently with corruption recovery
+      await Future.wait([
+        _openBoxSafely(HabitStorage.boxName),
+        _openBoxSafely(HabitStorage.backupVaultBox),
+        _openBoxSafely(ThemeStorageService.themeBox),
+        _openBoxSafely(LangStorage.boxName),
+        _openBoxSafely(SettingsStorage.boxName),
+      ]);
 
       // 3. Initialize SQLite Drift Database & run migration from Hive if needed
       database = AppDatabase();
       final migrator = HiveToSqlMigrator(database);
       await migrator.migrateIfNeeded();
 
-      // 4. Load Environment variables
+      // 4. Register cross-feature contracts
+      HabitFacadeImpl.register();
+
+      // 5. Load Environment variables
       try {
         await dotenv.load(fileName: '.env');
       } catch (_) {
         // .env is optional
       }
 
-      // 5. Initialize infrastructure services
+      // 6. Initialize independent infrastructure services concurrently
       firestoreService = FirestoreService();
-
-      themeStorage = await ThemeStorageService.init();
-
-      settingsStorage = SettingsStorage();
-      await settingsStorage.init();
-
       langStorage = LangStorage(Hive.box(LangStorage.boxName));
 
-      try {
-        final notif = NotificationService();
-        await notif.init();
-        notificationService = notif;
-      } catch (e) {
-        debugPrint('NotificationService initialization error: $e');
-      }
-
-      try {
-        final fcm = FcmService();
-        await fcm.init();
-        fcmService = fcm;
-      } catch (e) {
-        debugPrint('FcmService initialization error: $e');
-      }
+      await Future.wait([
+        () async {
+          themeStorage = await ThemeStorageService.init();
+        }(),
+        () async {
+          final sStorage = SettingsStorage();
+          await sStorage.init();
+          settingsStorage = sStorage;
+        }(),
+        () async {
+          try {
+            final notif = NotificationService();
+            await notif.init();
+            notificationService = notif;
+          } catch (e) {
+            debugPrint('NotificationService initialization error: $e');
+          }
+        }(),
+        () async {
+          try {
+            final fcm = FcmService();
+            await fcm.init();
+            fcmService = fcm;
+          } catch (e) {
+            debugPrint('FcmService initialization error: $e');
+          }
+        }(),
+      ]);
 
       // 5. Initialize Localization so S.current is never null on startup or hot restart
       try {
