@@ -11,7 +11,7 @@ import 'package:habit_tracker/features/generate_plan/domain/repositories/plan_re
 import 'package:habit_tracker/features/generate_plan/domain/usecases/generate_plan_usecase.dart';
 import 'package:habit_tracker/features/generate_plan/domain/usecases/get_questions_usecase.dart';
 import 'package:habit_tracker/features/generate_plan/domain/usecases/save_plan_habits_usecase.dart';
-import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
+import 'package:habit_tracker/core/contracts/habit_facade_contract.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 // Data Sources
@@ -23,10 +23,10 @@ final planRemoteDataSourceProvider = Provider<PlanRemoteDataSource>((ref) {
 // Repository
 final planRepositoryProvider = Provider<PlanRepository>((ref) {
   final remote = ref.watch(planRemoteDataSourceProvider);
-  final habitRepo = ref.watch(habitRepositoryProvider);
+  final habitFacade = ref.watch(habitFacadeProvider);
   return PlanRepositoryImpl(
     remoteDataSource: remote,
-    habitRepository: habitRepo,
+    habitFacade: habitFacade,
   );
 });
 
@@ -289,7 +289,6 @@ class PlanGeneratorNotifier extends Notifier<PlanGeneratorState> {
           return null;
         },
         (_) async {
-          await ref.read(habitNotifierProvider.notifier).refreshData();
           final count = state.selectedCount;
           reset();
           return count;
