@@ -103,40 +103,8 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
     final List<BoxShadow> effectiveShadows = !_isEnabled
         ? const []
         : _isPressed
-        ? (widget.isPrimary
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.35),
-                    offset: const Offset(1.5, 1.5),
-                    blurRadius: 3.0,
-                  ),
-                ]
-              : AppShadows.softButtonPressed(isDark: isDark))
-        : widget.isPrimary
-        ? [
-            ...AppShadows.bloom(
-              color: effectiveAccent,
-              isDark: isDark,
-              blur: 10,
-              spread: 0.8,
-              offset: const Offset(0, 3.5),
-            ),
-            BoxShadow(
-              color: isDark
-                  ? Colors.black.withValues(alpha: 0.50)
-                  : const Color(0xFFA3B1C6).withValues(alpha: 0.35),
-              offset: const Offset(2.5, 2.5),
-              blurRadius: 5.0,
-            ),
-            BoxShadow(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.06)
-                  : Colors.white.withValues(alpha: 0.80),
-              offset: const Offset(-2, -2),
-              blurRadius: 4.0,
-            ),
-          ]
-        : AppShadows.softButton(isDark: isDark);
+        ? AppShadows.buttonPressed(isDark: isDark)
+        : AppShadows.buttonResting(isDark: isDark);
 
     final Color effectiveTextColor =
         widget.textColor ??
