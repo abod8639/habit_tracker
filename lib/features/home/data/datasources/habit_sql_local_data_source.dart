@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:habit_tracker/core/database/app_database.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
@@ -8,6 +9,7 @@ import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/data/models/habit_vault_data.dart';
 
 class HabitSqlLocalDataSource implements IHabitLocalDataSource {
+  static const String _persistentTombstonesKey = 'PERSISTENT_HABIT_TOMBSTONES';
   final AppDatabase db;
   @override
   final HabitOfflineVaultDataSource? vaultDataSource;
@@ -30,6 +32,19 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
     if (startDay != null) {
       _cachedStartDate = startDay;
     }
+
+    try {
+      final storedTombstones = await db.habitHistoryDao.getMetadata(
+        _persistentTombstonesKey,
+      );
+      if (storedTombstones != null && storedTombstones.isNotEmpty) {
+        final decoded = jsonDecode(storedTombstones);
+        if (decoded is List) {
+          _tombstones.clear();
+          _tombstones.addAll(decoded.map((e) => e.toString()));
+        }
+      }
+    } catch (_) {}
   }
 
   Future<List<HabitModel>> fetchHabitsFromDb() async {
@@ -194,9 +209,19 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
 
   @override
   Future<void> saveAllHabitStrengths(Map<String, String> strengths) async {
-    for (var entry in strengths.entries) {
-      await saveHabitStrength(entry.key, entry.value);
-    }
+    if (strengths.isEmpty) return;
+    await db.batch((b) {
+      for (var entry in strengths.entries) {
+        b.insert(
+          db.appMetadata,
+          AppMetadataCompanion(
+            key: Value('${HabitStorage.habitStrengthPrefix}_${entry.key}'),
+            value: Value(entry.value),
+          ),
+          mode: InsertMode.insertOrReplace,
+        );
+      }
+    });
   }
 
   @override
@@ -235,11 +260,22 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
   @override
   void addLocalTombstones(List<String> ids) {
     _tombstones.addAll(ids);
+    _persistTombstones();
   }
 
   @override
   void clearLocalTombstones() {
     _tombstones.clear();
+    _persistTombstones();
+  }
+
+  Future<void> _persistTombstones() async {
+    try {
+      await db.habitHistoryDao.setMetadata(
+        _persistentTombstonesKey,
+        jsonEncode(_tombstones),
+      );
+    } catch (_) {}
   }
 
   @override
