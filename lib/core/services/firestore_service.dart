@@ -199,7 +199,9 @@ class FirestoreService {
         final cloud = cloudMap[id];
 
         if (local == null) {
-          mergedHabits.add(cloud!);
+          if (!deletedHabitsMap.containsKey(id)) {
+            mergedHabits.add(cloud!);
+          }
         } else if (cloud == null) {
           if (!deletedHabitsMap.containsKey(id)) {
             mergedHabits.add(local);
@@ -370,26 +372,46 @@ class FirestoreService {
       for (var entry in cloudHistory.entries) {
         if (!mergedHistory.containsKey(entry.key)) {
           mergedHistory[entry.key] = entry.value;
-        } else {
-          final localVal =
-              double.tryParse(mergedHistory[entry.key] ?? '') ?? 0.0;
-          final cloudVal = double.tryParse(entry.value) ?? 0.0;
-          if (cloudVal > localVal) {
-            mergedHistory[entry.key] = entry.value;
-          }
         }
       }
 
+      // Collect entries that need to be uploaded to cloud
+      final toUpload = <String, String>{};
       for (var entry in mergedHistory.entries) {
-        final cloudVal = double.tryParse(cloudHistory[entry.key] ?? '') ?? 0.0;
-        final mergedVal = double.tryParse(entry.value) ?? 0.0;
-        if (!cloudHistory.containsKey(entry.key) || mergedVal > cloudVal) {
-          await uploadHabitHistory(entry.key, entry.value);
+        if (!cloudHistory.containsKey(entry.key) ||
+            cloudHistory[entry.key] != entry.value) {
+          toUpload[entry.key] = entry.value;
+        }
+      }
+
+      // Batch upload history to avoid N sequential network requests
+      if (toUpload.isNotEmpty) {
+        final entriesList = toUpload.entries.toList();
+        for (var i = 0; i < entriesList.length; i += 400) {
+          final chunk = entriesList.sublist(
+            i,
+            i + 400 > entriesList.length ? entriesList.length : i + 400,
+          );
+          final batch = _firestore.batch();
+          for (var entry in chunk) {
+            final docRef = _userDoc!.collection('habitHistory').doc(entry.key);
+            batch.set(
+              docRef,
+              {
+                'date': entry.key,
+                'completionRate': entry.value,
+                'updatedAt': FieldValue.serverTimestamp(),
+              },
+              SetOptions(merge: true),
+            );
+          }
+          await batch.commit();
         }
       }
 
       return mergedHistory;
     } catch (e) {
+      debugPrint('Error syncing habit history: $e');
       return localHistory;
     }
   }
@@ -416,7 +438,9 @@ class FirestoreService {
     }
 
     return _habitsCollection!.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => HabitModel.fromFirestore(doc)).toList();
+      return snapshot.docs
+          .map((doc) => HabitModel.fromFirestore(doc))
+          .toList();
     });
   }
 
@@ -424,19 +448,52 @@ class FirestoreService {
     if (!isUserLoggedIn) return;
 
     try {
+      // 1. Delete habits in batch
       final habitsSnapshot = await _habitsCollection!.get();
-      for (var doc in habitsSnapshot.docs) {
-        await doc.reference.delete();
+      if (habitsSnapshot.docs.isNotEmpty) {
+        final batch = _firestore.batch();
+        for (var doc in habitsSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
       }
 
+      // 2. Delete habitHistory in batch
       final historySnapshot = await _userDoc!.collection('habitHistory').get();
-      for (var doc in historySnapshot.docs) {
-        await doc.reference.delete();
+      if (historySnapshot.docs.isNotEmpty) {
+        final batch = _firestore.batch();
+        for (var doc in historySnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
       }
 
+      // 3. Delete deleted_habits (tombstones) in batch
+      if (_deletedHabitsCollection != null) {
+        final tombstonesSnapshot = await _deletedHabitsCollection!.get();
+        if (tombstonesSnapshot.docs.isNotEmpty) {
+          final batch = _firestore.batch();
+          for (var doc in tombstonesSnapshot.docs) {
+            batch.delete(doc.reference);
+          }
+          await batch.commit();
+        }
+      }
+
+      // 4. Delete settings in batch
+      final settingsSnapshot = await _userDoc!.collection('settings').get();
+      if (settingsSnapshot.docs.isNotEmpty) {
+        final batch = _firestore.batch();
+        for (var doc in settingsSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      }
+
+      // 5. Delete root user document
       await _userDoc!.delete();
     } catch (e) {
-      // Ignored
+      debugPrint('Error deleting all user data from Firestore: $e');
     }
   }
 
