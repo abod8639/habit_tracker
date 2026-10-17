@@ -542,9 +542,6 @@ class $HabitCompletionsTable extends HabitCompletions
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES habits (id) ON DELETE CASCADE',
-    ),
   );
   static const VerificationMeta _dateStrMeta = const VerificationMeta(
     'dateStr',
@@ -899,10 +896,7 @@ class AppMetadataRecord extends DataClass
   }
 
   AppMetadataCompanion toCompanion(bool nullToAbsent) {
-    return AppMetadataCompanion(
-      key: Value(key),
-      value: Value(value),
-    );
+    return AppMetadataCompanion(key: Value(key), value: Value(value));
   }
 
   factory AppMetadataRecord.fromJson(
@@ -924,10 +918,8 @@ class AppMetadataRecord extends DataClass
     };
   }
 
-  AppMetadataRecord copyWith({String? key, String? value}) => AppMetadataRecord(
-    key: key ?? this.key,
-    value: value ?? this.value,
-  );
+  AppMetadataRecord copyWith({String? key, String? value}) =>
+      AppMetadataRecord(key: key ?? this.key, value: value ?? this.value);
   AppMetadataRecord copyWithCompanion(AppMetadataCompanion data) {
     return AppMetadataRecord(
       key: data.key.present ? data.key.value : this.key,
@@ -1045,20 +1037,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     appMetadata,
     idxCompletionsDate,
   ];
-  @override
-  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
-    [
-      WritePropagation(
-        on: TableUpdateQuery.onTableName(
-          'habits',
-          limitUpdateKind: UpdateKind.delete,
-        ),
-        result: [
-          TableUpdate('habit_completions', kind: UpdateKind.delete),
-        ],
-      ),
-    ],
-  );
 }
 
 typedef $$HabitsTableCreateCompanionBuilder =
@@ -1085,34 +1063,6 @@ typedef $$HabitsTableUpdateCompanionBuilder =
       Value<DateTime?> updatedAt,
       Value<int> rowid,
     });
-
-final class $$HabitsTableReferences
-    extends BaseReferences<_$AppDatabase, $HabitsTable, HabitRecord> {
-  $$HabitsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<
-    $HabitCompletionsTable,
-    List<HabitCompletionRecord>
-  >
-  _habitCompletionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.habitCompletions,
-    aliasName: $_aliasNameGenerator(db.habits.id, db.habitCompletions.habitId),
-  );
-
-  $$HabitCompletionsTableProcessedTableManager get habitCompletionsRefs {
-    final manager = $$HabitCompletionsTableTableManager(
-      $_db,
-      $_db.habitCompletions,
-    ).filter((f) => f.habitId.id($_item.id));
-
-    final cache = $_typedResult.readTableOrNull(
-      _habitCompletionsRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
 
 class $$HabitsTableFilterComposer
     extends Composer<_$AppDatabase, $HabitsTable> {
@@ -1162,31 +1112,6 @@ class $$HabitsTableFilterComposer
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  Expression<bool> habitCompletionsRefs(
-    Expression<bool> Function($$HabitCompletionsTableFilterComposer f) f,
-  ) {
-    final $$HabitCompletionsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.habitCompletions,
-      getReferencedColumn: (t) => t.habitId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HabitCompletionsTableFilterComposer(
-            $db: $db,
-            $table: $db.habitCompletions,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$HabitsTableOrderingComposer
@@ -1277,31 +1202,6 @@ class $$HabitsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  Expression<T> habitCompletionsRefs<T extends Object>(
-    Expression<T> Function($$HabitCompletionsTableAnnotationComposer a) f,
-  ) {
-    final $$HabitCompletionsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.habitCompletions,
-      getReferencedColumn: (t) => t.habitId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HabitCompletionsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.habitCompletions,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$HabitsTableTableManager
@@ -1315,9 +1215,12 @@ class $$HabitsTableTableManager
           $$HabitsTableAnnotationComposer,
           $$HabitsTableCreateCompanionBuilder,
           $$HabitsTableUpdateCompanionBuilder,
-          (HabitRecord, $$HabitsTableReferences),
+          (
+            HabitRecord,
+            BaseReferences<_$AppDatabase, $HabitsTable, HabitRecord>,
+          ),
           HabitRecord,
-          PrefetchHooks Function({bool habitCompletionsRefs})
+          PrefetchHooks Function()
         > {
   $$HabitsTableTableManager(_$AppDatabase db, $HabitsTable table)
     : super(
@@ -1376,37 +1279,17 @@ class $$HabitsTableTableManager
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) =>
-                    (e.readTable(table), $$HabitsTableReferences(db, table, e)),
+                (e) => (
+                  e.readTable<$HabitsTable, HabitRecord>(table),
+                  BaseReferences<_$AppDatabase, $HabitsTable, HabitRecord>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
               )
               .toList(),
-          prefetchHooksCallback: ({habitCompletionsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (habitCompletionsRefs) db.habitCompletions,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (habitCompletionsRefs)
-                    await $_getPrefetchedData(
-                      currentTable: table,
-                      referencedTable: $$HabitsTableReferences
-                          ._habitCompletionsRefsTable(db),
-                      managerFromTypedResult: (p0) => $$HabitsTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).habitCompletionsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.habitId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -1421,9 +1304,9 @@ typedef $$HabitsTableProcessedTableManager =
       $$HabitsTableAnnotationComposer,
       $$HabitsTableCreateCompanionBuilder,
       $$HabitsTableUpdateCompanionBuilder,
-      (HabitRecord, $$HabitsTableReferences),
+      (HabitRecord, BaseReferences<_$AppDatabase, $HabitsTable, HabitRecord>),
       HabitRecord,
-      PrefetchHooks Function({bool habitCompletionsRefs})
+      PrefetchHooks Function()
     >;
 typedef $$HabitCompletionsTableCreateCompanionBuilder =
     HabitCompletionsCompanion Function({
@@ -1440,37 +1323,6 @@ typedef $$HabitCompletionsTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
-final class $$HabitCompletionsTableReferences
-    extends
-        BaseReferences<
-          _$AppDatabase,
-          $HabitCompletionsTable,
-          HabitCompletionRecord
-        > {
-  $$HabitCompletionsTableReferences(
-    super.$_db,
-    super.$_table,
-    super.$_typedResult,
-  );
-
-  static $HabitsTable _habitIdTable(_$AppDatabase db) => db.habits.createAlias(
-    $_aliasNameGenerator(db.habitCompletions.habitId, db.habits.id),
-  );
-
-  $$HabitsTableProcessedTableManager? get habitId {
-    if ($_item.habitId == null) return null;
-    final manager = $$HabitsTableTableManager(
-      $_db,
-      $_db.habits,
-    ).filter((f) => f.id($_item.habitId!));
-    final item = $_typedResult.readTableOrNull(_habitIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
 class $$HabitCompletionsTableFilterComposer
     extends Composer<_$AppDatabase, $HabitCompletionsTable> {
   $$HabitCompletionsTableFilterComposer({
@@ -1480,6 +1332,11 @@ class $$HabitCompletionsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<String> get habitId => $composableBuilder(
+    column: $table.habitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get dateStr => $composableBuilder(
     column: $table.dateStr,
     builder: (column) => ColumnFilters(column),
@@ -1489,29 +1346,6 @@ class $$HabitCompletionsTableFilterComposer
     column: $table.isCompleted,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$HabitsTableFilterComposer get habitId {
-    final $$HabitsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.habitId,
-      referencedTable: $db.habits,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HabitsTableFilterComposer(
-            $db: $db,
-            $table: $db.habits,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$HabitCompletionsTableOrderingComposer
@@ -1523,6 +1357,11 @@ class $$HabitCompletionsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<String> get habitId => $composableBuilder(
+    column: $table.habitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get dateStr => $composableBuilder(
     column: $table.dateStr,
     builder: (column) => ColumnOrderings(column),
@@ -1532,29 +1371,6 @@ class $$HabitCompletionsTableOrderingComposer
     column: $table.isCompleted,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$HabitsTableOrderingComposer get habitId {
-    final $$HabitsTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.habitId,
-      referencedTable: $db.habits,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HabitsTableOrderingComposer(
-            $db: $db,
-            $table: $db.habits,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$HabitCompletionsTableAnnotationComposer
@@ -1566,6 +1382,9 @@ class $$HabitCompletionsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<String> get habitId =>
+      $composableBuilder(column: $table.habitId, builder: (column) => column);
+
   GeneratedColumn<String> get dateStr =>
       $composableBuilder(column: $table.dateStr, builder: (column) => column);
 
@@ -1573,29 +1392,6 @@ class $$HabitCompletionsTableAnnotationComposer
     column: $table.isCompleted,
     builder: (column) => column,
   );
-
-  $$HabitsTableAnnotationComposer get habitId {
-    final $$HabitsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.habitId,
-      referencedTable: $db.habits,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HabitsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.habits,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$HabitCompletionsTableTableManager
@@ -1609,9 +1405,16 @@ class $$HabitCompletionsTableTableManager
           $$HabitCompletionsTableAnnotationComposer,
           $$HabitCompletionsTableCreateCompanionBuilder,
           $$HabitCompletionsTableUpdateCompanionBuilder,
-          (HabitCompletionRecord, $$HabitCompletionsTableReferences),
+          (
+            HabitCompletionRecord,
+            BaseReferences<
+              _$AppDatabase,
+              $HabitCompletionsTable,
+              HabitCompletionRecord
+            >,
+          ),
           HabitCompletionRecord,
-          PrefetchHooks Function({bool habitId})
+          PrefetchHooks Function()
         > {
   $$HabitCompletionsTableTableManager(
     _$AppDatabase db,
@@ -1653,54 +1456,18 @@ class $$HabitCompletionsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
-                  $$HabitCompletionsTableReferences(db, table, e),
+                  e.readTable<$HabitCompletionsTable, HabitCompletionRecord>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $HabitCompletionsTable,
+                    HabitCompletionRecord
+                  >(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({habitId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (habitId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.habitId,
-                                referencedTable:
-                                    $$HabitCompletionsTableReferences
-                                        ._habitIdTable(db),
-                                referencedColumn:
-                                    $$HabitCompletionsTableReferences
-                                        ._habitIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -1715,9 +1482,16 @@ typedef $$HabitCompletionsTableProcessedTableManager =
       $$HabitCompletionsTableAnnotationComposer,
       $$HabitCompletionsTableCreateCompanionBuilder,
       $$HabitCompletionsTableUpdateCompanionBuilder,
-      (HabitCompletionRecord, $$HabitCompletionsTableReferences),
+      (
+        HabitCompletionRecord,
+        BaseReferences<
+          _$AppDatabase,
+          $HabitCompletionsTable,
+          HabitCompletionRecord
+        >,
+      ),
       HabitCompletionRecord,
-      PrefetchHooks Function({bool habitId})
+      PrefetchHooks Function()
     >;
 typedef $$AppMetadataTableCreateCompanionBuilder =
     AppMetadataCompanion Function({
@@ -1822,11 +1596,7 @@ class $$AppMetadataTableTableManager
                 Value<String> key = const Value.absent(),
                 Value<String> value = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => AppMetadataCompanion(
-                key: key,
-                value: value,
-                rowid: rowid,
-              ),
+              }) => AppMetadataCompanion(key: key, value: value, rowid: rowid),
           createCompanionCallback:
               ({
                 required String key,
@@ -1838,7 +1608,16 @@ class $$AppMetadataTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$AppMetadataTable, AppMetadataRecord>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AppMetadataTable,
+                    AppMetadataRecord
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
