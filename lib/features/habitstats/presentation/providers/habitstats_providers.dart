@@ -82,7 +82,7 @@ class HabitStatsState {
     this.todaySummary = const [],
     this.daysPeriod = 7,
     this.isWeeklyView = true,
-    this.showAllHabits = true,
+    this.showAllHabits = false,
     this.selectedHabitName,
     this.habitNames = const [],
     this.isLoading = false,
