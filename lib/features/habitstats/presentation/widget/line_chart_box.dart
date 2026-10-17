@@ -16,183 +16,180 @@ class LineChartBox extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final Map<String, List<FlSpot>> progression = state.individualTrends;
-
     final now = DateTime.now();
-    final List<String> trendLabels = List.generate(
-      state.daysPeriod,
-      (index) {
-        final date = now.subtract(
-          Duration(days: state.daysPeriod - 1 - index),
-        );
-        return '${date.day}/${date.month}';
-      },
-    );
 
     final lineBars = _buildLineBarsData(
       context: context,
       state: state,
       progression: progression,
-      trendLabels: trendLabels,
     );
 
-    return SizedBox(
-      height: 240,
-      child: LineChart(
-        LineChartData(
-          lineTouchData: LineTouchData(
-            handleBuiltInTouches: true,
-            touchTooltipData: LineTouchTooltipData(
-              getTooltipColor: (spot) =>
-                  isDark ? const Color(0xFF1E293B) : Colors.white,
-              tooltipBorderRadius: BorderRadius.circular(8),
-              fitInsideHorizontally: true,
-              fitInsideVertically: true,
-              getTooltipItems: (touchedSpots) {
-                return touchedSpots.map((barSpot) {
-                  final barIndex = barSpot.barIndex;
-                  if (barIndex < 0 || barIndex >= lineBars.length) return null;
-                  final bar = lineBars[barIndex];
-                  final isOverall = !state.showAllHabits;
-                  if (isOverall) {
-                    final percent = (barSpot.y * 100).toInt();
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      child: SizedBox(
+        key: ValueKey(state.isWeeklyView),
+        height: 240,
+        child: LineChart(
+          LineChartData(
+            lineTouchData: LineTouchData(
+              handleBuiltInTouches: true,
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (spot) =>
+                    isDark ? const Color(0xFF1E293B) : Colors.white,
+                tooltipBorderRadius: BorderRadius.circular(8),
+                fitInsideHorizontally: true,
+                fitInsideVertically: true,
+                getTooltipItems: (touchedSpots) {
+                  return touchedSpots.map((barSpot) {
+                    final barIndex = barSpot.barIndex;
+                    if (barIndex < 0 || barIndex >= lineBars.length) return null;
+                    final bar = lineBars[barIndex];
+                    final isOverall = !state.showAllHabits;
+                    if (isOverall) {
+                      final percent = (barSpot.y * 100).toInt();
+                      return LineTooltipItem(
+                        '$percent%',
+                        TextStyle(
+                          color: bar.color ?? colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      );
+                    }
+                    final habitName =
+                        state.selectedHabitName ??
+                        (barIndex < state.habitNames.length
+                            ? state.habitNames[barIndex]
+                            : 'Habit');
+                    final isCompleted = barSpot.y >= 0.5;
+                    final isArabic =
+                        Localizations.localeOf(context).languageCode == 'ar';
+                    final statusText = isCompleted
+                        ? (isArabic ? 'مكتملة' : 'Completed')
+                        : (isArabic ? 'غير مكتملة' : 'Incomplete');
+
                     return LineTooltipItem(
-                      '$percent%',
+                      '$habitName\n$statusText',
                       TextStyle(
                         color: bar.color ?? colorScheme.primary,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
                     );
-                  }
-                  final habitName =
-                      state.selectedHabitName ??
-                      (barIndex < state.habitNames.length
-                          ? state.habitNames[barIndex]
-                          : 'Habit');
-                  final isCompleted = barSpot.y >= 0.5;
-                  final isArabic =
-                      Localizations.localeOf(context).languageCode == 'ar';
-                  final statusText = isCompleted
-                      ? (isArabic ? 'مكتملة' : 'Completed')
-                      : (isArabic ? 'غير مكتملة' : 'Incomplete');
-
-                  return LineTooltipItem(
-                    '$habitName\n$statusText',
-                    TextStyle(
-                      color: bar.color ?? colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                    ),
-                  );
-                }).toList();
+                  }).toList();
+                },
+              ),
+            ),
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              horizontalInterval: 0.25,
+              getDrawingHorizontalLine: (value) {
+                return FlLine(
+                  color: colorScheme.outlineVariant.withValues(
+                    alpha: isDark ? 0.12 : 0.22,
+                  ),
+                  strokeWidth: 0.8,
+                  dashArray: [4, 4],
+                );
               },
             ),
-          ),
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: false,
-            horizontalInterval: 0.25,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: colorScheme.outlineVariant.withValues(
-                  alpha: isDark ? 0.12 : 0.22,
-                ),
-                strokeWidth: 0.8,
-                dashArray: [4, 4],
-              );
-            },
-          ),
 
-          titlesData: FlTitlesData(
-            show: true,
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  final index = value.toInt();
-                  if (index >= 0 && index < trendLabels.length) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 6.0),
-                      child: Text(
-                        trendLabels[index],
+            titlesData: FlTitlesData(
+              show: true,
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < state.daysPeriod) {
+                      final date = now.subtract(
+                        Duration(days: state.daysPeriod - 1 - index),
+                      );
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6.0),
+                        child: Text(
+                          '${date.day}/${date.month}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.50)
+                                : const Color(0xFF64748B),
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                  reservedSize: 28,
+                  interval: (state.daysPeriod / 7).ceilToDouble(),
+                ),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    if (value == 0 ||
+                        value == 0.25 ||
+                        value == 0.5 ||
+                        value == 0.75 ||
+                        value == 1.0) {
+                      return Text(
+                        '${(value * 100).toInt()}%',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: isDark
-                              ? Colors.white.withValues(alpha: 0.50)
+                              ? Colors.white.withValues(alpha: 0.45)
                               : const Color(0xFF64748B),
                         ),
-                      ),
-                    );
-                  }
-                  return const SizedBox();
-                },
-                reservedSize: 28,
-                interval: (state.daysPeriod / 7).ceilToDouble(),
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  if (value == 0 ||
-                      value == 0.25 ||
-                      value == 0.5 ||
-                      value == 0.75 ||
-                      value == 1.0) {
-                    return Text(
-                      '${(value * 100).toInt()}%',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.45)
-                            : const Color(0xFF64748B),
-                      ),
-                    );
-                  }
-                  return const SizedBox();
-                },
-                reservedSize: 34,
-                interval: 0.25,
-              ),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-          ),
-
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              bottom: BorderSide(
-                color: colorScheme.outlineVariant.withValues(
-                  alpha: isDark ? 0.20 : 0.35,
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                  reservedSize: 34,
+                  interval: 0.25,
                 ),
-                width: 1,
               ),
-              left: BorderSide(
-                color: colorScheme.outlineVariant.withValues(
-                  alpha: isDark ? 0.20 : 0.35,
-                ),
-                width: 1,
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
               ),
-              top: BorderSide.none,
-              right: BorderSide.none,
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
             ),
-          ),
-          minX: 0,
-          maxX: (state.daysPeriod - 1).toDouble(),
-          minY: -0.05,
-          maxY: 1.10,
 
-          lineBarsData: lineBars,
+            borderData: FlBorderData(
+              show: true,
+              border: Border(
+                bottom: BorderSide(
+                  color: colorScheme.outlineVariant.withValues(
+                    alpha: isDark ? 0.20 : 0.35,
+                  ),
+                  width: 1,
+                ),
+                left: BorderSide(
+                  color: colorScheme.outlineVariant.withValues(
+                    alpha: isDark ? 0.20 : 0.35,
+                  ),
+                  width: 1,
+                ),
+                top: BorderSide.none,
+                right: BorderSide.none,
+              ),
+            ),
+            minX: 0,
+            maxX: (state.daysPeriod - 1).toDouble(),
+            minY: -0.05,
+            maxY: 1.10,
+
+            lineBarsData: lineBars,
+          ),
+          duration: Duration.zero,
         ),
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOutCubic,
       ),
     );
   }
@@ -201,9 +198,9 @@ class LineChartBox extends ConsumerWidget {
     required BuildContext context,
     required HabitStatsState state,
     required Map<String, List<FlSpot>> progression,
-    required List<String> trendLabels,
   }) {
     final List<LineChartBarData> lineBars = [];
+    final int expectedCount = state.daysPeriod;
 
     if (state.showAllHabits) {
       final habits = state.todaySummary;
@@ -247,40 +244,39 @@ class LineChartBox extends ConsumerWidget {
               .firstOrNull;
           final bool isCompletedToday = matchingHabit?.isCompleted ?? false;
           rawSpots = List.generate(
-            state.daysPeriod,
+            expectedCount,
             (index) => FlSpot(
               index.toDouble(),
-              (index == state.daysPeriod - 1 && isCompletedToday) ? 1.0 : 0.0,
+              (index == expectedCount - 1 && isCompletedToday) ? 1.0 : 0.0,
             ),
           );
+        } else if (rawSpots.length != expectedCount) {
+          if (rawSpots.length > expectedCount) {
+            final sub = rawSpots.sublist(rawSpots.length - expectedCount);
+            rawSpots = List.generate(
+              expectedCount,
+              (idx) => FlSpot(idx.toDouble(), sub[idx].y),
+            );
+          } else {
+            final pad = expectedCount - rawSpots.length;
+            rawSpots = [
+              ...List.generate(pad, (idx) => FlSpot(idx.toDouble(), 0.0)),
+              ...List.generate(
+                rawSpots.length,
+                (idx) => FlSpot((pad + idx).toDouble(), rawSpots![idx].y),
+              ),
+            ];
+          }
         }
 
         final habitColor = resolveHabitColor(habitName, effectiveIndex, habits);
 
-        // When multiple habits are shown together, apply a slight vertical offset
-        // to overlapping points so all lines are clearly distinguishable.
-        final spotsToRender = isSingleHabit
-            ? rawSpots
-            : rawSpots.map((s) {
-                //     final offset = (effectiveIndex * 0.025);
-                //     double y = s.y;
-                //     if (y >= 0.99) {
-                //       y = (1.0 - offset).clamp(0.0, 1.0);
-                //     } else if (y <= 0.00) {
-                //       y = (0.0 + offset).clamp(0.0, 1.0);
-                //     }
-                return FlSpot(s.x, s.y);
-              }).toList();
-
         lineBars.add(
           myLineChartBarData(
             color: habitColor,
-            spots: spotsToRender,
+            spots: rawSpots,
             color1: habitColor.withValues(alpha: isSingleHabit ? 0.35 : 0.12),
             color2: habitColor.withValues(alpha: 0.02),
-            // showBelowBar: isSingleHabit,
-            // barWidth: isSingleHabit ? 3.5 : 2.8,
-            // dotRadius: isSingleHabit ? 4.0 : 2.8,
             label: _getHabitLabel(habitName, state.isWeeklyView),
           ),
         );
@@ -293,12 +289,29 @@ class LineChartBox extends ConsumerWidget {
         final completed = state.todaySummary.where((h) => h.isCompleted).length;
         final rate = total > 0 ? (completed / total) : 0.0;
         overallSpots = List.generate(
-          state.daysPeriod,
+          expectedCount,
           (index) => FlSpot(
             index.toDouble(),
-            index == state.daysPeriod - 1 ? rate : 0.0,
+            index == expectedCount - 1 ? rate : 0.0,
           ),
         );
+      } else if (overallSpots.length != expectedCount) {
+        if (overallSpots.length > expectedCount) {
+          final sub = overallSpots.sublist(overallSpots.length - expectedCount);
+          overallSpots = List.generate(
+            expectedCount,
+            (idx) => FlSpot(idx.toDouble(), sub[idx].y),
+          );
+        } else {
+          final pad = expectedCount - overallSpots.length;
+          overallSpots = [
+            ...List.generate(pad, (idx) => FlSpot(idx.toDouble(), 0.0)),
+            ...List.generate(
+              overallSpots.length,
+              (idx) => FlSpot((pad + idx).toDouble(), overallSpots[idx].y),
+            ),
+          ];
+        }
       }
 
       lineBars.add(
