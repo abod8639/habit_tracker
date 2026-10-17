@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
+import 'package:habit_tracker/core/config/app_config.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
@@ -19,7 +20,7 @@ class _AboutPageState extends State<AboutPage> {
       'https://github.com/abod8639/flutter_habit_tracker';
   static const String _downloadApkUrl =
       'https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk';
-  static const String _appVersion = '1.4.0';
+  static const String _appVersion = AppConfig.appVersion;
 
   final FocusNode _focusNode = FocusNode();
 
