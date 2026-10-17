@@ -18,6 +18,7 @@ class HomeAppBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isSelectionMode = ref.watch(
       habitNotifierProvider.select((s) => s.isSelectionMode),
     );
@@ -189,6 +190,7 @@ class HomeAppBar extends ConsumerWidget {
           padding: const EdgeInsetsDirectional.only(start: 16),
           child: Builder(
             builder: (context) => NeumorphicIconButton.square(
+              customShadows: AppShadows.softCard(isDark: isDark),
               size: 46,
               icon: Icons.menu_rounded,
               iconSize: 22,
@@ -203,6 +205,7 @@ class HomeAppBar extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsetsDirectional.only(end: 16),
             child: NeumorphicIconButton.square(
+              customShadows: AppShadows.softCard(isDark: isDark),
               size: 46,
               icon: Icons.auto_awesome_rounded,
               iconColor: Theme.of(context).colorScheme.primary,
