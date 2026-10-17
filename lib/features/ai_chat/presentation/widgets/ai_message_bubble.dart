@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/ai_chat/domain/entities/chat_message_entity.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'ai_avatar.dart';
@@ -154,46 +155,7 @@ class AiMessageBubble extends StatelessWidget {
                               : Colors.white.withValues(alpha: 0.85)),
                     width: 1.0,
                   ),
-                  boxShadow: isUser
-                      ? [
-                          // Top-left soft highlight
-                          BoxShadow(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.05)
-                                : Colors.white.withValues(alpha: 0.7),
-                            offset: const Offset(-2, -2),
-                            blurRadius: 5,
-                          ),
-                          // Bottom-right radiant glow & depth
-                          BoxShadow(
-                            color: primary.withValues(
-                              alpha: isDark ? 0.20 : 0.35,
-                            ),
-                            offset: const Offset(3, 5),
-                            blurRadius: 14,
-                            spreadRadius: 0.5,
-                          ),
-                        ]
-                      : [
-                          // Ambient Neumorphic Light Highlight (Top-left)
-                          BoxShadow(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.04)
-                                : Colors.white.withValues(alpha: 0.95),
-                            offset: const Offset(-3, -3),
-                            blurRadius: 8,
-                          ),
-                          // Ambient Neumorphic Depth Shadow (Bottom-right)
-                          BoxShadow(
-                            color: isDark
-                                ? Colors.black.withValues(alpha: 0.55)
-                                : const Color(0xFFA3B1C6).withValues(
-                                    alpha: 0.35,
-                                  ),
-                            offset: const Offset(3.5, 3.5),
-                            blurRadius: 9,
-                          ),
-                        ],
+                  boxShadow: AppShadows.softCard(isDark: isDark)
                 ),
                 child: Column(
                   crossAxisAlignment: isUser
@@ -228,6 +190,7 @@ class AiMessageBubble extends StatelessWidget {
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         height: 1.5,
+
                         letterSpacing: -0.1,
                         color: isUser
                             ? theme.colorScheme.onPrimary
