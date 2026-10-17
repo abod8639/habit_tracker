@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 
 /// Reusable Neumorphic AI coach avatar with soft lighting, dual shadows,
 /// and smooth rounded corners.
@@ -36,20 +37,7 @@ class AiAvatar extends StatelessWidget {
           color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.4),
           width: 1.2,
         ),
-        boxShadow: [
-          // Top-left light highlight
-          BoxShadow(
-            color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.45),
-            offset: const Offset(-2, -2),
-            blurRadius: 4,
-          ),
-          // Bottom-right soft depth glow
-          BoxShadow(
-            color: primary.withValues(alpha: isDark ? 0.25 : 0.35),
-            offset: const Offset(2, 4),
-            blurRadius: 5,
-          ),
-        ],
+        boxShadow: AppShadows.softCard(isDark: isDark),
       ),
       child: Center(
         child: Icon(
