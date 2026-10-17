@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:habit_tracker/core/database/database_provider.dart';
 import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/core/services/analytics_service.dart';
@@ -79,4 +80,11 @@ final notificationServiceProvider = Provider<NotificationService?>((ref) {
 /// Firebase Cloud Messaging service provider
 final fcmServiceProvider = Provider<FcmService?>((ref) {
   return AppInitializer.fcmService;
+});
+
+/// Shared HTTP client provider
+final httpClientProvider = Provider<http.Client>((ref) {
+  final client = http.Client();
+  ref.onDispose(() => client.close());
+  return client;
 });
