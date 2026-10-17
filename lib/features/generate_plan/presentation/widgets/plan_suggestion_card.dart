@@ -58,7 +58,7 @@ class PlanSuggestionCard extends StatelessWidget {
               width: selected ? 1.5 : 1.0,
             ),
             boxShadow: selected
-                ? AppShadows.selectedCard(primary: color, isDark: isDark)
+                ? AppShadows.softCard(isDark: isDark)
                 : AppShadows.tileResting(isDark: isDark),
           ),
           child: Row(
