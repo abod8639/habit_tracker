@@ -10,6 +10,7 @@ PreferredSizeWidget myAppBar({
   VoidCallback? onBack,
   bool showLeading = true,
 }) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
   ThemeData theme = Theme.of(context);
   return AppBar(
     backgroundColor: theme.scaffoldBackgroundColor,
@@ -20,6 +21,7 @@ PreferredSizeWidget myAppBar({
         ? (leading ??
               Center(
                 child: NeumorphicIconButton.square(
+              customShadows: AppShadows.softCard(isDark: isDark),
                   size: 40,
                   iconSize: 18,
                   icon: Icons.arrow_back_ios_new_rounded,
