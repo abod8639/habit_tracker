@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'package:dartz/dartz.dart';
-import 'package:flutter/foundation.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
@@ -42,7 +42,7 @@ class HabitStatsRepositoryImpl implements HabitStatsRepository {
 
       return await habitsEither.fold(
         (failure) => Left(failure),
-        (habits) async {
+        (habits) {
           final heatmapData = heatmapEither.fold(
             (_) => <DateTime, int>{},
             (data) => data,
@@ -61,12 +61,14 @@ class HabitStatsRepositoryImpl implements HabitStatsRepository {
             now: now,
           );
 
-          // Execute heavy CPU calculation in background isolate
-          final bundle = await compute(_computeStatsBundleInBackground, params);
+          // Sub-millisecond pure calculation (no isolate spawn overhead)
+          final bundle = _computeStatsBundleInBackground(params);
 
-          // Save to local cache asynchronously
-          await localDataSource.cacheStats(
-            HabitStatsModel.fromEntity(bundle.overallStats),
+          // Save to local cache asynchronously in the background
+          unawaited(
+            localDataSource.cacheStats(
+              HabitStatsModel.fromEntity(bundle.overallStats),
+            ),
           );
 
           return Right(bundle);
