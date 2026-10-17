@@ -6,6 +6,7 @@ import 'package:habit_tracker/core/components/neumorphic_empty_state.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
 import 'package:habit_tracker/core/components/neumorphic_pill_toggle.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/habitstats_providers.dart';
 import 'line_chart_box.dart';
@@ -30,8 +31,9 @@ class TrendChartCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(habitStatsNotifierProvider);
-    final notifier = ref.watch(habitStatsNotifierProvider.notifier);
+    final notifier = ref.read(habitStatsNotifierProvider.notifier);
 
     final List<FlSpot> trendSpots = state.overallTrend;
     final bool hasOverallData =
@@ -89,6 +91,7 @@ class TrendChartCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 NeumorphicIconButton(
+                  customShadows: AppShadows.softCard(isDark: isDark),
                   size: 36,
                   icon: state.showAllHabits
                       ? Icons.stacked_line_chart_rounded
