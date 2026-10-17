@@ -15,7 +15,13 @@ class KeyValueStorage {
   Future<void> init() async {
     if (_isInitialized) return;
     try {
-      final records = await _db.select(_db.appMetadata).get();
+      final records = await (_db.select(_db.appMetadata)
+            ..where(
+              (t) =>
+                  t.key.like('HABIT_STRENGTH_%').not() &
+                  t.key.like('vault_data_%').not(),
+            ))
+          .get();
       for (final r in records) {
         _cache[r.key] = r.value;
       }
@@ -102,9 +108,16 @@ class KeyValueStorage {
     await (_db.delete(_db.appMetadata)..where((t) => t.key.equals(key))).go();
   }
 
-  /// Clears all keys from memory and SQLite storage.
+  /// Clears all application preference keys from memory and SQLite storage,
+  /// preserving historical habit strengths and vault backups.
   Future<void> clear() async {
     _cache.clear();
-    await _db.delete(_db.appMetadata).go();
+    await (_db.delete(_db.appMetadata)
+          ..where(
+            (t) =>
+                t.key.like('HABIT_STRENGTH_%').not() &
+                t.key.like('vault_data_%').not(),
+          ))
+        .go();
   }
 }
