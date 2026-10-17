@@ -217,6 +217,7 @@ class SyncNotifier extends Notifier<SyncState> {
     final habitsModels = habits.map((e) => HabitModel.fromEntity(e)).toList();
     final result = await manualSync(habitsModels);
     if (result != null) {
+      habitRepo.invalidateHeatmapCache();
       await ref.read(habitNotifierProvider.notifier).refreshData();
     }
   }
