@@ -122,6 +122,11 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
   bool _isRefreshing = false;
   bool _needsRefresh = false;
 
+  List<FlSpot> _weeklyOverallTrend = const [];
+  List<FlSpot> _monthlyOverallTrend = const [];
+  Map<String, List<FlSpot>> _weeklyIndividualTrends = const {};
+  Map<String, List<FlSpot>> _monthlyIndividualTrends = const {};
+
   @override
   HabitStatsState build() {
     // 1. Reactive listener: immediately syncs stats when habits change (0 ms lag)
@@ -150,14 +155,31 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
       bestStreak: habitState.bestStreak,
     );
 
-    // 3. Pre-populate initial individual trends from habits
-    final initialIndividualTrends = <String, List<FlSpot>>{};
+    // 3. Pre-populate initial trends for both weekly and monthly from in-memory habits
+    final initialWeeklyInd = <String, List<FlSpot>>{};
+    final initialMonthlyInd = <String, List<FlSpot>>{};
     for (var habit in habits) {
-      initialIndividualTrends[habit.name] = List.generate(
+      initialWeeklyInd[habit.name] = List.generate(
         7,
         (i) => FlSpot(i.toDouble(), (i == 6 && habit.isCompleted) ? 1.0 : 0.0),
       );
+      initialMonthlyInd[habit.name] = List.generate(
+        30,
+        (i) => FlSpot(i.toDouble(), (i == 29 && habit.isCompleted) ? 1.0 : 0.0),
+      );
     }
+    _weeklyIndividualTrends = initialWeeklyInd;
+    _monthlyIndividualTrends = initialMonthlyInd;
+
+    final rate = totalHabits > 0 ? (completedHabits / totalHabits) : 0.0;
+    _weeklyOverallTrend = List.generate(
+      7,
+      (i) => FlSpot(i.toDouble(), i == 6 ? rate : 0.0),
+    );
+    _monthlyOverallTrend = List.generate(
+      30,
+      (i) => FlSpot(i.toDouble(), i == 29 ? rate : 0.0),
+    );
 
     // 4. Schedule fresh historical data fetch
     Future.microtask(() {
@@ -167,7 +189,8 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
     return HabitStatsState(
       stats: initialStats,
       todaySummary: habits,
-      individualTrends: initialIndividualTrends,
+      overallTrend: _weeklyOverallTrend,
+      individualTrends: initialWeeklyInd,
       habitNames: habits.map((h) => h.name).toList(),
       isLoading: false,
     );
@@ -180,6 +203,7 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
     final double completionRate = totalHabits > 0
         ? (completedHabits / totalHabits) * 100
         : 0.0;
+    final double rate = totalHabits > 0 ? (completedHabits / totalHabits) : 0.0;
 
     final updatedStats = HabitStatsEntity(
       totalHabits: totalHabits,
@@ -189,34 +213,95 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
       bestStreak: habitState.bestStreak,
     );
 
-    final currentTrends = Map<String, List<FlSpot>>.from(
-      state.individualTrends,
-    );
+    final updatedWeeklyInd =
+        Map<String, List<FlSpot>>.from(_weeklyIndividualTrends);
+    final updatedMonthlyInd =
+        Map<String, List<FlSpot>>.from(_monthlyIndividualTrends);
+
     for (var habit in habits) {
-      final existingSpots = currentTrends[habit.name];
-      if (existingSpots != null && existingSpots.isNotEmpty) {
-        final lastIdx = existingSpots.length - 1;
-        existingSpots[lastIdx] = FlSpot(
-          lastIdx.toDouble(),
-          habit.isCompleted ? 1.0 : 0.0,
-        );
+      final wSpots = updatedWeeklyInd[habit.name];
+      if (wSpots != null && wSpots.isNotEmpty) {
+        final lastIdx = wSpots.length - 1;
+        wSpots[lastIdx] =
+            FlSpot(lastIdx.toDouble(), habit.isCompleted ? 1.0 : 0.0);
       } else {
-        currentTrends[habit.name] = List.generate(
-          state.daysPeriod,
-          (i) => FlSpot(
-            i.toDouble(),
-            (i == state.daysPeriod - 1 && habit.isCompleted) ? 1.0 : 0.0,
-          ),
+        updatedWeeklyInd[habit.name] = List.generate(
+          7,
+          (i) => FlSpot(i.toDouble(), (i == 6 && habit.isCompleted) ? 1.0 : 0.0),
+        );
+      }
+
+      final mSpots = updatedMonthlyInd[habit.name];
+      if (mSpots != null && mSpots.isNotEmpty) {
+        final lastIdx = mSpots.length - 1;
+        mSpots[lastIdx] =
+            FlSpot(lastIdx.toDouble(), habit.isCompleted ? 1.0 : 0.0);
+      } else {
+        updatedMonthlyInd[habit.name] = List.generate(
+          30,
+          (i) => FlSpot(i.toDouble(), (i == 29 && habit.isCompleted) ? 1.0 : 0.0),
         );
       }
     }
 
+    _weeklyIndividualTrends = updatedWeeklyInd;
+    _monthlyIndividualTrends = updatedMonthlyInd;
+
+    if (_weeklyOverallTrend.isNotEmpty) {
+      final lastIdx = _weeklyOverallTrend.length - 1;
+      _weeklyOverallTrend[lastIdx] = FlSpot(lastIdx.toDouble(), rate);
+    }
+    if (_monthlyOverallTrend.isNotEmpty) {
+      final lastIdx = _monthlyOverallTrend.length - 1;
+      _monthlyOverallTrend[lastIdx] = FlSpot(lastIdx.toDouble(), rate);
+    }
+
+    final activeOverall =
+        state.isWeeklyView ? _weeklyOverallTrend : _monthlyOverallTrend;
+    final activeInd =
+        state.isWeeklyView ? _weeklyIndividualTrends : _monthlyIndividualTrends;
+
     state = state.copyWith(
       stats: updatedStats,
       todaySummary: habits,
-      individualTrends: currentTrends,
+      overallTrend: activeOverall,
+      individualTrends: activeInd,
       habitNames: habits.map((h) => h.name).toList(),
     );
+  }
+
+  static List<FlSpot> _extractWeeklyTrend(List<FlSpot> monthlyTrend) {
+    if (monthlyTrend.isEmpty) return const [];
+    if (monthlyTrend.length <= 7) {
+      return List.generate(
+        monthlyTrend.length,
+        (i) => FlSpot(i.toDouble(), monthlyTrend[i].y),
+      );
+    }
+    final sublist = monthlyTrend.sublist(monthlyTrend.length - 7);
+    return List.generate(
+      7,
+      (i) => FlSpot(i.toDouble(), sublist[i].y),
+    );
+  }
+
+  static Map<String, List<FlSpot>> _extractWeeklyIndividualTrends(
+    Map<String, List<FlSpot>> monthlyTrends,
+  ) {
+    return monthlyTrends.map((key, spots) {
+      if (spots.isEmpty) return MapEntry(key, const <FlSpot>[]);
+      if (spots.length <= 7) {
+        return MapEntry(
+          key,
+          List.generate(spots.length, (i) => FlSpot(i.toDouble(), spots[i].y)),
+        );
+      }
+      final sublist = spots.sublist(spots.length - 7);
+      return MapEntry(
+        key,
+        List.generate(7, (i) => FlSpot(i.toDouble(), sublist[i].y)),
+      );
+    });
   }
 
   Future<void> refreshStats() async {
@@ -229,29 +314,39 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
 
     try {
       final getBundle = ref.read(getHabitStatsBundleUseCaseProvider);
-      final result = await getBundle(state.daysPeriod);
+      final result = await getBundle(30);
 
       result.fold(
         (failure) {
           state = state.copyWith(isLoading: false);
         },
         (bundle) {
-          final overallSpots = bundle.overallTrend
+          _monthlyOverallTrend = bundle.overallTrend
               .map((p) => FlSpot(p.x, p.y))
               .toList();
 
-          final indTrends = bundle.individualTrends.map(
+          _monthlyIndividualTrends = bundle.individualTrends.map(
             (key, points) => MapEntry(
               key,
               points.map((p) => FlSpot(p.x, p.y)).toList(),
             ),
           );
 
+          _weeklyOverallTrend = _extractWeeklyTrend(_monthlyOverallTrend);
+          _weeklyIndividualTrends =
+              _extractWeeklyIndividualTrends(_monthlyIndividualTrends);
+
+          final activeOverall =
+              state.isWeeklyView ? _weeklyOverallTrend : _monthlyOverallTrend;
+          final activeInd = state.isWeeklyView
+              ? _weeklyIndividualTrends
+              : _monthlyIndividualTrends;
+
           state = state.copyWith(
             stats: bundle.overallStats,
-            overallTrend: overallSpots,
-            individualTrends: indTrends,
-            habitNames: indTrends.keys.toList(),
+            overallTrend: activeOverall,
+            individualTrends: activeInd,
+            habitNames: bundle.individualTrends.keys.toList(),
             todaySummary: bundle.todayHabits,
             isLoading: false,
           );
@@ -266,43 +361,25 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
     }
   }
 
-  void togglePeriod() async {
+  void togglePeriod() {
     final newIsWeekly = !state.isWeeklyView;
     final newDays = newIsWeekly ? 7 : 30;
+
+    final targetOverallTrend =
+        newIsWeekly ? _weeklyOverallTrend : _monthlyOverallTrend;
+    final targetIndividualTrends =
+        newIsWeekly ? _weeklyIndividualTrends : _monthlyIndividualTrends;
 
     state = state.copyWith(
       isWeeklyView: newIsWeekly,
       daysPeriod: newDays,
+      overallTrend: targetOverallTrend,
+      individualTrends: targetIndividualTrends,
     );
 
-    try {
-      final getBundle = ref.read(getHabitStatsBundleUseCaseProvider);
-      final result = await getBundle(newDays);
-
-      result.fold(
-        (_) {},
-        (bundle) {
-          final overallSpots = bundle.overallTrend
-              .map((p) => FlSpot(p.x, p.y))
-              .toList();
-
-          final indTrends = bundle.individualTrends.map(
-            (key, points) => MapEntry(
-              key,
-              points.map((p) => FlSpot(p.x, p.y)).toList(),
-            ),
-          );
-
-          state = state.copyWith(
-            stats: bundle.overallStats,
-            overallTrend: overallSpots,
-            individualTrends: indTrends,
-            habitNames: indTrends.keys.toList(),
-            todaySummary: bundle.todayHabits,
-          );
-        },
-      );
-    } catch (_) {}
+    if (targetOverallTrend.isEmpty) {
+      refreshStats();
+    }
   }
 
   void toggleShowAllHabits() {
