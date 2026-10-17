@@ -29,9 +29,10 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
       },
       onUpgrade: (m, from, to) async {
+        // Safe, non-destructive migration preserving all user data
         if (from < 2) {
-          await m.deleteTable('habit_completions');
-          await m.createTable(habitCompletions);
+          // Ensure all tables and indices exist without dropping existing user history
+          await m.createAll();
         }
       },
     );
