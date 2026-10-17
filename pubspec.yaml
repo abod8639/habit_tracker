@@ -62,7 +62,7 @@ flutter:
 
 
 icons_launcher:
-  image_path: "assets/icon/icon for habit_tracker app.png"
+  image_path: "assets/icon/habit_tracker_app_icon.png"
   platforms:
     ios:
       enable: true
@@ -70,7 +70,7 @@ icons_launcher:
       enable: true
     linux:
       enable: true
-      image_path: "assets/icon/icon for habit_tracker app.png"
+      image_path: "assets/icon/habit_tracker_app_icon.png"
 flutter_intl:
   enabled: true
   class_name: S

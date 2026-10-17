@@ -2,16 +2,28 @@
 
 A **beautiful**, **responsive**, and **intuitive** habit tracking app built with Flutter — designed to help you build positive daily routines with ease.
 
+<!-- ![image](assets/icon/habit_tracker_app_icon.png) -->
 <div align="center">
-<a href="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker7.png"><img src="https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Habit%20tracker7.png" width="700" alt="Habit Management" /></a> 
+<a href="assets/icon/habit_tracker_app_icon.png"><img src="assets/icon/habit_tracker_app_icon.png" width="300" alt="Habit Management" /></a> 
 </div>
 
 <div align="center">
 
-[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk)
+[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-3DDC84?logo=android&logoColor=white)](https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk)
+[![Latest Release](https://img.shields.io/github/v/release/abod8639/habit_tracker?logo=github&color=blue)](https://github.com/abod8639/habit_tracker/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[![Latest Release](https://img.shields.io/github/v/release/abod8639/habit_tracker?style=for-the-badge&logo=github&color=blue)](https://github.com/abod8639/habit_tracker/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+<br/>
+
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Riverpod](https://img.shields.io/badge/Riverpod-State_Management-00599C?logo=dart&logoColor=white)](https://riverpod.dev)
+[![SQLite & Drift](https://img.shields.io/badge/SQLite-Drift_Database-003B57?logo=sqlite&logoColor=white)](https://drift.simonbinder.eu)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth_%26_Firestore-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
+[![Google Gemini AI](https://img.shields.io/badge/Google_Gemini-AI_Coach-4285F4?logo=google&logoColor=white)](https://ai.google.dev)
+[![GoRouter](https://img.shields.io/badge/GoRouter-Navigation-40C4FF?logo=flutter&logoColor=black)](https://pub.dev/packages/go_router)
+[![FL Chart](https://img.shields.io/badge/FL_Chart-Analytics-673AB7?logo=flutter&logoColor=white)](https://pub.dev/packages/fl_chart)
+[![Home Widget](https://img.shields.io/badge/Home_Widget-Android_Widgets-34A853?logo=android&logoColor=white)](https://pub.dev/packages/home_widget)
+
 </div>
 
 <!-- 
@@ -148,20 +160,23 @@ flutter run
 
 ### Core
 - **Flutter** 3.x
-- **Dart SDK** ^3.7.0
-- **Hive** for fast local storage
+- **Dart SDK** ^3.11.0
+- **SQLite & Drift** for high-performance relational local persistence
 - **Firebase** for backend (Auth, Cloud Firestore, Cloud Messaging, Analytics)
-- **GetX** for state management & routing
+- **Riverpod** for reactive state management
+- **GoRouter** for declarative navigation & deep linking
 
 ### Key Packages
+- [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) — Reactive caching and state management  
+- [`drift`](https://pub.dev/packages/drift) & [`sqlite3_flutter_libs`](https://pub.dev/packages/sqlite3_flutter_libs) — Type-safe SQLite database and persistence  
 - [`home_widget`](https://pub.dev/packages/home_widget) — Android Home Screen Widget for quick access and live progress tracking  
 - [`google_generative_ai`](https://pub.dev/packages/google_generative_ai) — Google Gemini AI SDK for chat & smart scanning  
 - [`fl_chart`](https://pub.dev/packages/fl_chart) — Responsive and animated charts  
 - [`flutter_heatmap_calendar`](https://pub.dev/packages/flutter_heatmap_calendar) — Visual heatmap for habits  
+- [`go_router`](https://pub.dev/packages/go_router) — Declarative routing solution  
 - [`flutter_slidable`](https://pub.dev/packages/flutter_slidable) — Swipe-to-delete/edit functionality  
 - [`url_launcher`](https://pub.dev/packages/url_launcher) — External links (e.g. Google AI Studio)  
-- [`catppuccin_flutter`](https://pub.dev/packages/catppuccin_flutter) — Beautiful theme presets  
-- `flutter_local_notifications`, `flutter_colorpicker`, `flutter_secure_storage`, `hive_flutter`, and more
+- `flutter_local_notifications`, `flutter_dotenv`, `dartz`, and more
 
 ---
 
