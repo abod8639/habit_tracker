@@ -4,6 +4,7 @@ import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/about_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/account_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/ai_section.dart';
+import 'package:habit_tracker/features/setting/presentation/widget/app_update_tile.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/appearance_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/data_section.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/logout_tile.dart';
@@ -62,6 +63,7 @@ class _SettingsPageState extends State<SettingsPage>
             AboutSection(animationController: _animationController),
             DataSection(animationController: _animationController),
             LogoutTile(animationController: _animationController),
+            AppUpdateTile(animationController: _animationController),
           ],
         ),
       ),
