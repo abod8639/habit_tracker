@@ -56,8 +56,7 @@ class NeumorphicCheckbox extends StatelessWidget {
                         : const Color(0xFFA3B1C6).withValues(alpha: 0.50)),
               width: 1.2,
             ),
-            boxShadow: 
-                 AppShadows.insetWell(isDark: isDark),
+            boxShadow: AppShadows.insetWell(isDark: isDark),
           ),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 160),
