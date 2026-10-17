@@ -19,7 +19,7 @@ class _AboutPageState extends State<AboutPage> {
       'https://github.com/abod8639/flutter_habit_tracker';
   static const String _downloadApkUrl =
       'https://github.com/abod8639/habit_tracker/raw/main/APK/app-release.apk';
-  static const String _appVersion = '1.0.0+1';
+  static const String _appVersion = '1.4.0';
 
   final FocusNode _focusNode = FocusNode();
 
