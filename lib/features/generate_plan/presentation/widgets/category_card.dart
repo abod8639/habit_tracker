@@ -73,17 +73,9 @@ class _CategoryCardState extends State<CategoryCard> {
                 width: 1.2,
               ),
               boxShadow: _isPressed
-                  ? AppShadows.softButtonPressed(isDark: isDark)
-                  : [
-                      ...AppShadows.softCard(isDark: isDark),
-                      ...AppShadows.bloom(
-                        color: color,
-                        isDark: isDark,
-                        blur: 8,
-                        spread: 0.3,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                  ? AppShadows.buttonPressed(isDark: isDark)
+                  :AppShadows.buttonResting(isDark: isDark)
+
             ),
             padding: const EdgeInsets.all(18),
             child: Column(
