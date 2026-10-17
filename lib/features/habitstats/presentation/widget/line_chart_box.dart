@@ -24,12 +24,38 @@ class LineChartBox extends ConsumerWidget {
       progression: progression,
     );
 
+    final viewKey = ValueKey(
+      '${state.isWeeklyView}_${state.showAllHabits}_${state.selectedHabitName}',
+    );
+
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      switchInCurve: Curves.easeOut,
-      switchOutCurve: Curves.easeIn,
+      duration: const Duration(milliseconds: 320),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        final fadeAnimation = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOutCubic,
+        );
+        final scaleAnimation = Tween<double>(
+          begin: 0.96,
+          end: 1.0,
+        ).animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          ),
+        );
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: ScaleTransition(
+            scale: scaleAnimation,
+            child: child,
+          ),
+        );
+      },
       child: SizedBox(
-        key: ValueKey(state.isWeeklyView),
+        key: viewKey,
         height: 240,
         child: LineChart(
           LineChartData(
@@ -188,7 +214,8 @@ class LineChartBox extends ConsumerWidget {
 
             lineBarsData: lineBars,
           ),
-          duration: Duration.zero,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOutCubic,
         ),
       ),
     );
