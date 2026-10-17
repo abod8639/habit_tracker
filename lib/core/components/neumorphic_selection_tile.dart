@@ -72,10 +72,8 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
               : Colors.white.withValues(alpha: _isPressed ? 0.35 : 0.85));
 
     final List<BoxShadow> effectiveShadows = widget.isSelected
-        ? AppShadows.selectedCard(primary: effectiveAccent, isDark: isDark)
-        : (_isPressed
-              ? AppShadows.softButtonPressed(isDark: isDark)
-              : AppShadows.tileResting(isDark: isDark));
+        ? AppShadows.buttonPressed(isDark: isDark)
+        : AppShadows.softButton(isDark: isDark);
 
     final Widget? effectiveLeading = widget.leading;
 
