@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/ai_api_key_dialog.dart';
@@ -40,6 +41,7 @@ class AiChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
         padding: const EdgeInsetsDirectional.only(start: 16),
         child: Center(
           child: NeumorphicIconButton(
+            customShadows: AppShadows.softCard(isDark: isDark),
             icon: Icons.arrow_back_ios_new_rounded,
             size: 40,
             iconSize: 18,
@@ -103,13 +105,7 @@ class AiChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
                         decoration: BoxDecoration(
                           color: statusColor,
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: statusColor.withValues(alpha: 0.45),
-                              blurRadius: 4,
-                              spreadRadius: 1,
-                            ),
-                          ],
+                          boxShadow: AppShadows.softCard(isDark: isDark),
                         ),
                       ),
                       const SizedBox(width: 5),
@@ -149,6 +145,7 @@ class AiChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
         Padding(
           padding: const EdgeInsetsDirectional.only(end: 16),
           child: NeumorphicIconButton(
+            customShadows: AppShadows.softCard(isDark: isDark),
             icon: Icons.delete_sweep_rounded,
             size: 40,
             iconSize: 22,
