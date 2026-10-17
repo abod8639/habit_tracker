@@ -119,9 +119,6 @@ class HabitStatsState {
 
 // Habit Stats Notifier
 class HabitStatsNotifier extends Notifier<HabitStatsState> {
-  bool _isRefreshing = false;
-  bool _needsRefresh = false;
-
   List<FlSpot> _weeklyOverallTrend = const [];
   List<FlSpot> _monthlyOverallTrend = const [];
   Map<String, List<FlSpot>> _weeklyIndividualTrends = const {};
@@ -304,14 +301,18 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
     });
   }
 
-  Future<void> refreshStats() async {
-    if (_isRefreshing) {
-      _needsRefresh = true;
-      return;
-    }
-    _isRefreshing = true;
-    _needsRefresh = false;
+  Future<void>? _activeRefreshFuture;
 
+  Future<void> refreshStats() {
+    if (_activeRefreshFuture != null) {
+      return _activeRefreshFuture!;
+    }
+    final future = _executeRefresh();
+    _activeRefreshFuture = future;
+    return future;
+  }
+
+  Future<void> _executeRefresh() async {
     try {
       final getBundle = ref.read(getHabitStatsBundleUseCaseProvider);
       final result = await getBundle(30);
@@ -353,11 +354,7 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
         },
       );
     } finally {
-      _isRefreshing = false;
-      if (_needsRefresh) {
-        _needsRefresh = false;
-        refreshStats();
-      }
+      _activeRefreshFuture = null;
     }
   }
 
