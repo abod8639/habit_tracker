@@ -1,6 +1,5 @@
-import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:habit_tracker/core/database/app_database.dart';
+import 'package:habit_tracker/core/database/database_provider.dart';
 import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/core/services/analytics_service.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
@@ -38,7 +37,7 @@ final keyValueStorageProvider = Provider<KeyValueStorage>((ref) {
   try {
     return AppInitializer.keyValueStorage;
   } catch (_) {
-    final db = AppDatabase(NativeDatabase.memory());
+    final db = ref.watch(appDatabaseProvider);
     return KeyValueStorage(db);
   }
 });
