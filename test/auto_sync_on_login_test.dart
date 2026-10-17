@@ -23,6 +23,10 @@ import 'package:habit_tracker/features/setting/domain/usecases/sync_habits_useca
 import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
+import 'package:habit_tracker/core/database/app_database.dart';
+import 'package:habit_tracker/core/database/database_provider.dart';
+import 'package:drift/native.dart';
+import 'package:drift/drift.dart';
 
 class MockAuthRepository implements AuthRepository {
   final StreamController<AuthEntity?> _authStream =
@@ -172,21 +176,32 @@ class FakeHabitNotifier extends HabitNotifier {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  setUpAll(() {
+    driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+  });
+
   late MockAuthRepository mockAuthRepo;
   late FakeSettingRepository fakeSettingRepo;
   late FakeHabitRepository fakeHabitRepo;
   late FakeFirestoreService fakeFirestore;
+  late AppDatabase db;
 
   setUp(() {
     mockAuthRepo = MockAuthRepository();
     fakeSettingRepo = FakeSettingRepository();
     fakeHabitRepo = FakeHabitRepository();
     fakeFirestore = FakeFirestoreService();
+    db = AppDatabase(NativeDatabase.memory());
+  });
+
+  tearDown(() async {
+    await db.close();
   });
 
   ProviderContainer createContainer() {
     return ProviderContainer(
       overrides: [
+        appDatabaseProvider.overrideWithValue(db),
         authRepositoryProvider.overrideWithValue(mockAuthRepo),
         getAuthStateUseCaseProvider.overrideWithValue(
           GetAuthStateUseCase(mockAuthRepo),
