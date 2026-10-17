@@ -211,7 +211,7 @@ class HabitNotifier extends Notifier<HabitState> {
       (data) => state = state.copyWith(localHeatmapDateSet: data),
     );
 
-    _loadRemoteHeatmap();
+    await _loadRemoteHeatmap();
   }
 
   Future<void> _loadRemoteHeatmap() async {
@@ -219,7 +219,9 @@ class HabitNotifier extends Notifier<HabitState> {
     if (!firestore.isUserLoggedIn) return;
 
     try {
-      final remoteData = await firestore.downloadHabitHistory();
+      final remoteData = await firestore
+          .downloadHabitHistory()
+          .timeout(const Duration(seconds: 3));
       final Map<DateTime, int> parsed = {};
 
       for (var entry in remoteData.entries) {
