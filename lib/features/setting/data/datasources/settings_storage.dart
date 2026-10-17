@@ -22,9 +22,14 @@ class SettingsStorage {
 
   TimeOfDay? get notificationTime {
     final String? timeStr = _storage.getString(_notificationTimeKey);
-    if (timeStr == null) return null;
+    if (timeStr == null || timeStr.trim().isEmpty) return null;
     final parts = timeStr.split(':');
-    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    if (parts.length != 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return null;
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+    return TimeOfDay(hour: hour, minute: minute);
   }
 
   Future<void> setNotificationTime(TimeOfDay time) async {
