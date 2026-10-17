@@ -323,5 +323,36 @@
   "batteryOptimizationWarningSubtitle": "OEM battery savers (Samsung, Xiaomi) may silence your alarms. Tap to exempt the app from power restrictions.",
   "batteryOptimizationExemptAction": "Fix Alarms",
   "batteryOptimizationExemptSuccess": "Battery optimization exempted. Alarms will trigger reliably on time.",
-  "reliableAlarmsActive": "Reliable alarms active"
+  "reliableAlarmsActive": "Reliable alarms active",
+  "appUpdateAvailableTitle": "New Update Available: v{version}",
+  "@appUpdateAvailableTitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateAvailableSubtitle": "Current v{version} • Tap to download",
+  "@appUpdateAvailableSubtitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateBadge": "UPDATE",
+  "appUpdateDialogTitle": "New Update Available",
+  "appUpdateDialogMessage": "A new version (v{latestVersion}) is available on GitHub.\nYour current version: (v{currentVersion}).\nWould you like to download the update now?",
+  "@appUpdateDialogMessage": {
+    "placeholders": {
+      "latestVersion": {
+        "type": "String"
+      },
+      "currentVersion": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateDownloadButton": "Download Update",
+  "appUpdateLaterButton": "Later"
 }

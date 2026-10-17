@@ -239,5 +239,36 @@
   "batteryOptimizationWarningSubtitle": "أنظمة توفير الطاقة (Samsung و Xiaomi) قد توقف التنبيهات في الخلفية. انقر لاستثناء التطبيق وضمان وصولها.",
   "batteryOptimizationExemptAction": "إصلاح التنبيهات",
   "batteryOptimizationExemptSuccess": "تم استثناء تحسين البطارية بنجاح. ستصلك التنبيهات في موعدها المحدد بدقة.",
-  "reliableAlarmsActive": "التنبيهات الدقيقة مفعلة بنجاح"
+  "reliableAlarmsActive": "التنبيهات الدقيقة مفعلة بنجاح",
+  "appUpdateAvailableTitle": "تحديث جديد متوفر: v{version}",
+  "@appUpdateAvailableTitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateAvailableSubtitle": "الإصدار الحالي v{version} • اضغط للتحميل",
+  "@appUpdateAvailableSubtitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateBadge": "تحديث",
+  "appUpdateDialogTitle": "تحديث جديد متوفر",
+  "appUpdateDialogMessage": "يتوفر إصدار جديد (v{latestVersion}) على GitHub.\nإصدارك الحالي: (v{currentVersion}).\nهل ترغب بالانتقال لتحميل التحديث الآن؟",
+  "@appUpdateDialogMessage": {
+    "placeholders": {
+      "latestVersion": {
+        "type": "String"
+      },
+      "currentVersion": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateDownloadButton": "تحميل التحديث",
+  "appUpdateLaterButton": "لاحقاً"
 }

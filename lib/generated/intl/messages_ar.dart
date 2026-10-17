@@ -22,33 +22,40 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(count) => "إضافة ${count} عادات إلى قائمة العادات";
 
-  static String m1(count) =>
+  static String m1(version) => "الإصدار الحالي v${version} • اضغط للتحميل";
+
+  static String m2(version) => "تحديث جديد متوفر: v${version}";
+
+  static String m3(latestVersion, currentVersion) =>
+      "يتوفر إصدار جديد (v${latestVersion}) على GitHub.\nإصدارك الحالي: (v${currentVersion}).\nهل ترغب بالانتقال لتحميل التحديث الآن؟";
+
+  static String m4(count) =>
       "${Intl.plural(count, one: 'لديك مهمة واحدة متبقية بحاجة للإنجاز اليوم.', two: 'لديك مهمتان متبقيتان بحاجة للإنجاز اليوم.', few: 'لديك ${count} مهام متبقية بحاجة للإنجاز اليوم.', many: 'لديك ${count} مهمة متبقية بحاجة للإنجاز اليوم.', other: 'لديك ${count} مهمة متبقية بحاجة للإنجاز اليوم.')}";
 
-  static String m2(days) => "منذ ${days} يوم";
+  static String m5(days) => "منذ ${days} يوم";
 
-  static String m3(count) =>
+  static String m6(count) =>
       "هل أنت متأكد من حذف ${count} عادة؟ لا يمكن التراجع عن هذا الإجراء.";
 
-  static String m4(message) => "فشل مسح البيانات: ${message}";
+  static String m7(message) => "فشل مسح البيانات: ${message}";
 
-  static String m5(count) => "تم توليد ${count} عادات مخصصة لك";
+  static String m8(count) => "تم توليد ${count} عادات مخصصة لك";
 
-  static String m6(hours) => "منذ ${hours} ساعة";
+  static String m9(hours) => "منذ ${hours} ساعة";
 
-  static String m7(count) => "${count} محدد";
+  static String m10(count) => "${count} محدد";
 
-  static String m8(minutes) => "منذ ${minutes} دقيقة";
+  static String m11(minutes) => "منذ ${minutes} دقيقة";
 
-  static String m9(count) => "+${count} عادات أخرى...";
+  static String m12(count) => "+${count} عادات أخرى...";
 
-  static String m10(count) => "تمت إضافة ${count} عادات إلى متتبعك بنجاح.";
+  static String m13(count) => "تمت إضافة ${count} عادات إلى متتبعك بنجاح.";
 
-  static String m11(time) => "تم ضبط التذكير في ${time}";
+  static String m14(time) => "تم ضبط التذكير في ${time}";
 
-  static String m12(streak) => "يوم ${streak}";
+  static String m15(streak) => "يوم ${streak}";
 
-  static String m13(category) => "خطتك في ${category}";
+  static String m16(category) => "خطتك في ${category}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -109,6 +116,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "apiKeyValidating": MessageLookupByLibrary.simpleMessage(
       "جاري التحقق من المفتاح...",
     ),
+    "appUpdateAvailableSubtitle": m1,
+    "appUpdateAvailableTitle": m2,
+    "appUpdateBadge": MessageLookupByLibrary.simpleMessage("تحديث"),
+    "appUpdateDialogMessage": m3,
+    "appUpdateDialogTitle": MessageLookupByLibrary.simpleMessage(
+      "تحديث جديد متوفر",
+    ),
+    "appUpdateDownloadButton": MessageLookupByLibrary.simpleMessage(
+      "تحميل التحديث",
+    ),
+    "appUpdateLaterButton": MessageLookupByLibrary.simpleMessage("لاحقاً"),
     "appVersionAndInformation": MessageLookupByLibrary.simpleMessage(
       "هذا التطبيق من تطوير دكستر",
     ),
@@ -234,12 +252,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "dailyReminderNoTasks": MessageLookupByLibrary.simpleMessage(
       "لا توجد مهام مسجلة بعد، ابدأ بإضافة عاداتك اليومية.",
     ),
-    "dailyReminderPendingTasks": m1,
+    "dailyReminderPendingTasks": m4,
     "dailyReminderTitle": MessageLookupByLibrary.simpleMessage("متتبع العادات"),
     "dataClearedSuccess": MessageLookupByLibrary.simpleMessage(
       "تم مسح البيانات بنجاح! جاري إعادة تشغيل التطبيق...",
     ),
-    "daysAgo": m2,
+    "daysAgo": m5,
     "defaultApiKeyActive": MessageLookupByLibrary.simpleMessage(
       "المفتاح الافتراضي نشط",
     ),
@@ -256,7 +274,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "deleteHabit": MessageLookupByLibrary.simpleMessage("حذف العادة"),
     "deleteSelected": MessageLookupByLibrary.simpleMessage("حذف المحدد"),
-    "deleteSelectedConfirm": m3,
+    "deleteSelectedConfirm": m6,
     "detectedHabits": MessageLookupByLibrary.simpleMessage("العادات المكتشفة"),
     "dontHaveAccount": MessageLookupByLibrary.simpleMessage("ليس لديك حساب؟"),
     "drawer": MessageLookupByLibrary.simpleMessage(""),
@@ -275,7 +293,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "exportYourHabitData": MessageLookupByLibrary.simpleMessage(
       "تصدير بيانات العادات",
     ),
-    "failedToClearData": m4,
+    "failedToClearData": m7,
     "forgotPassword": MessageLookupByLibrary.simpleMessage("نسيت كلمة المرور؟"),
     "gallery": MessageLookupByLibrary.simpleMessage("المعرض"),
     "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
@@ -301,9 +319,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "habitNameTooLong": MessageLookupByLibrary.simpleMessage(
       "لا يمكن أن يتجاوز اسم العادة 100 حرف",
     ),
-    "habitsGeneratedCount": m5,
+    "habitsGeneratedCount": m8,
     "hambitstate": MessageLookupByLibrary.simpleMessage("حالة العادة"),
-    "hoursAgo": m6,
+    "hoursAgo": m9,
     "importPreviouslyExportedData": MessageLookupByLibrary.simpleMessage(
       "استيراد بيانات محفوظة مسبقاً",
     ),
@@ -315,7 +333,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "يرجى إدخال مفتاح API صالح",
     ),
     "isEmpty": MessageLookupByLibrary.simpleMessage("لا توجد عادات مسجلة بعد"),
-    "itemsSelected": m7,
+    "itemsSelected": m10,
     "joinUs": MessageLookupByLibrary.simpleMessage("انضم إلينا"),
     "justAMoment": MessageLookupByLibrary.simpleMessage("لحظة واحدة"),
     "justNow": MessageLookupByLibrary.simpleMessage("الآن"),
@@ -340,9 +358,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "logoutFromAccount": MessageLookupByLibrary.simpleMessage(
       "الخروج من حسابك",
     ),
-    "minutesAgo": m8,
+    "minutesAgo": m11,
     "monthly": MessageLookupByLibrary.simpleMessage("تقدم الشهري"),
-    "moreHabitsCount": m9,
+    "moreHabitsCount": m12,
     "name": MessageLookupByLibrary.simpleMessage("الاسم"),
     "nameRequired": MessageLookupByLibrary.simpleMessage("يرجى إدخال الاسم"),
     "noHabitsDetected": MessageLookupByLibrary.simpleMessage(
@@ -381,7 +399,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pieChartIsEmpty": MessageLookupByLibrary.simpleMessage(
       "لا توجد عادات لعرضها",
     ),
-    "planActivatedDesc": m10,
+    "planActivatedDesc": m13,
     "planActivatedTitle": MessageLookupByLibrary.simpleMessage(
       "🎉 تم تفعيل الخطة!",
     ),
@@ -395,7 +413,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "reliableAlarmsActive": MessageLookupByLibrary.simpleMessage(
       "التنبيهات الدقيقة مفعلة بنجاح",
     ),
-    "reminderSetFor": m11,
+    "reminderSetFor": m14,
     "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
       "ستصلك إشعارات متابعة عاداتك اليومية.",
     ),
@@ -451,7 +469,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "skipNow": MessageLookupByLibrary.simpleMessage("تخطي الآن"),
     "somethingWentWrong": MessageLookupByLibrary.simpleMessage("حدث خطأ ما"),
     "streak": MessageLookupByLibrary.simpleMessage("الاستمرارية"),
-    "streakDay": m12,
+    "streakDay": m15,
     "success": MessageLookupByLibrary.simpleMessage("معدل النجاح"),
     "summary": MessageLookupByLibrary.simpleMessage("ملخص العادات"),
     "syncError": MessageLookupByLibrary.simpleMessage("فشلت المزامنة"),
@@ -486,6 +504,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "user": MessageLookupByLibrary.simpleMessage("مستخدم"),
     "weekly": MessageLookupByLibrary.simpleMessage("تقدم الأسبوعي"),
-    "yourPlanTitle": m13,
+    "yourPlanTitle": m16,
   };
 }

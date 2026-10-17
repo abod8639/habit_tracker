@@ -22,33 +22,40 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(count) => "Add ${count} Habit(s) to Tracker";
 
-  static String m1(count) =>
+  static String m1(version) => "Current v${version} • Tap to download";
+
+  static String m2(version) => "New Update Available: v${version}";
+
+  static String m3(latestVersion, currentVersion) =>
+      "A new version (v${latestVersion}) is available on GitHub.\nYour current version: (v${currentVersion}).\nWould you like to download the update now?";
+
+  static String m4(count) =>
       "${Intl.plural(count, one: 'You have 1 task left to complete today.', other: 'You have ${count} tasks left to complete today.')}";
 
-  static String m2(days) => "${days} days ago";
+  static String m5(days) => "${days} days ago";
 
-  static String m3(count) =>
+  static String m6(count) =>
       "Are you sure you want to delete ${count} habit(s)? This action cannot be undone.";
 
-  static String m4(message) => "Failed to clear data: ${message}";
+  static String m7(message) => "Failed to clear data: ${message}";
 
-  static String m5(count) => "${count} habits generated for you";
+  static String m8(count) => "${count} habits generated for you";
 
-  static String m6(hours) => "${hours} hours ago";
+  static String m9(hours) => "${hours} hours ago";
 
-  static String m7(count) => "${count} Selected";
+  static String m10(count) => "${count} Selected";
 
-  static String m8(minutes) => "${minutes} minutes ago";
+  static String m11(minutes) => "${minutes} minutes ago";
 
-  static String m9(count) => "+${count} more habits...";
+  static String m12(count) => "+${count} more habits...";
 
-  static String m10(count) => "${count} habits added to your tracker.";
+  static String m13(count) => "${count} habits added to your tracker.";
 
-  static String m11(time) => "Reminder set for ${time}";
+  static String m14(time) => "Reminder set for ${time}";
 
-  static String m12(streak) => "Day ${streak}";
+  static String m15(streak) => "Day ${streak}";
 
-  static String m13(category) => "Your ${category} Plan";
+  static String m16(category) => "Your ${category} Plan";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -103,6 +110,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "apiKeyValidating": MessageLookupByLibrary.simpleMessage(
       "Validating key...",
     ),
+    "appUpdateAvailableSubtitle": m1,
+    "appUpdateAvailableTitle": m2,
+    "appUpdateBadge": MessageLookupByLibrary.simpleMessage("UPDATE"),
+    "appUpdateDialogMessage": m3,
+    "appUpdateDialogTitle": MessageLookupByLibrary.simpleMessage(
+      "New Update Available",
+    ),
+    "appUpdateDownloadButton": MessageLookupByLibrary.simpleMessage(
+      "Download Update",
+    ),
+    "appUpdateLaterButton": MessageLookupByLibrary.simpleMessage("Later"),
     "appVersionAndInformation": MessageLookupByLibrary.simpleMessage(
       "This app made by dexter ",
     ),
@@ -226,12 +244,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "dailyReminderNoTasks": MessageLookupByLibrary.simpleMessage(
       "No tasks registered yet. Start adding your daily habits today.",
     ),
-    "dailyReminderPendingTasks": m1,
+    "dailyReminderPendingTasks": m4,
     "dailyReminderTitle": MessageLookupByLibrary.simpleMessage("Habit Tracker"),
     "dataClearedSuccess": MessageLookupByLibrary.simpleMessage(
       "Data cleared successfully! Restarting app...",
     ),
-    "daysAgo": m2,
+    "daysAgo": m5,
     "defaultApiKeyActive": MessageLookupByLibrary.simpleMessage(
       "Default system key active",
     ),
@@ -248,7 +266,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "deleteHabit": MessageLookupByLibrary.simpleMessage("Delete Habit"),
     "deleteSelected": MessageLookupByLibrary.simpleMessage("Delete Selected"),
-    "deleteSelectedConfirm": m3,
+    "deleteSelectedConfirm": m6,
     "detectedHabits": MessageLookupByLibrary.simpleMessage("Detected Habits"),
     "dontHaveAccount": MessageLookupByLibrary.simpleMessage(
       "Don\'t have an account?",
@@ -269,7 +287,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "exportYourHabitData": MessageLookupByLibrary.simpleMessage(
       "Export your habit data",
     ),
-    "failedToClearData": m4,
+    "failedToClearData": m7,
     "forgotPassword": MessageLookupByLibrary.simpleMessage("Forgot Password?"),
     "gallery": MessageLookupByLibrary.simpleMessage("Gallery"),
     "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
@@ -297,9 +315,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "habitNameTooLong": MessageLookupByLibrary.simpleMessage(
       "Habit name cannot exceed 100 characters",
     ),
-    "habitsGeneratedCount": m5,
+    "habitsGeneratedCount": m8,
     "hambitstate": MessageLookupByLibrary.simpleMessage("Habit State"),
-    "hoursAgo": m6,
+    "hoursAgo": m9,
     "importPreviouslyExportedData": MessageLookupByLibrary.simpleMessage(
       "Import previously exported data",
     ),
@@ -311,7 +329,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Please enter a valid API key",
     ),
     "isEmpty": MessageLookupByLibrary.simpleMessage("No habits tracked yet"),
-    "itemsSelected": m7,
+    "itemsSelected": m10,
     "joinUs": MessageLookupByLibrary.simpleMessage("Join Us"),
     "justAMoment": MessageLookupByLibrary.simpleMessage("Just a moment"),
     "justNow": MessageLookupByLibrary.simpleMessage("Just now"),
@@ -334,9 +352,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "logoutFromAccount": MessageLookupByLibrary.simpleMessage(
       "Logout from your account",
     ),
-    "minutesAgo": m8,
+    "minutesAgo": m11,
     "monthly": MessageLookupByLibrary.simpleMessage("Monthly Progress"),
-    "moreHabitsCount": m9,
+    "moreHabitsCount": m12,
     "name": MessageLookupByLibrary.simpleMessage("Name"),
     "nameRequired": MessageLookupByLibrary.simpleMessage(
       "Please enter your name",
@@ -377,7 +395,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pieChartIsEmpty": MessageLookupByLibrary.simpleMessage(
       "No habits to display",
     ),
-    "planActivatedDesc": m10,
+    "planActivatedDesc": m13,
     "planActivatedTitle": MessageLookupByLibrary.simpleMessage(
       "🎉 Plan activated!",
     ),
@@ -391,7 +409,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "reliableAlarmsActive": MessageLookupByLibrary.simpleMessage(
       "Reliable alarms active",
     ),
-    "reminderSetFor": m11,
+    "reminderSetFor": m14,
     "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
       "You will receive daily habit checks.",
     ),
@@ -443,7 +461,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Something went wrong",
     ),
     "streak": MessageLookupByLibrary.simpleMessage("Streak"),
-    "streakDay": m12,
+    "streakDay": m15,
     "success": MessageLookupByLibrary.simpleMessage("Habit Success"),
     "summary": MessageLookupByLibrary.simpleMessage("Habit Summary"),
     "syncError": MessageLookupByLibrary.simpleMessage("Sync failed"),
@@ -480,6 +498,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "user": MessageLookupByLibrary.simpleMessage("User"),
     "weekly": MessageLookupByLibrary.simpleMessage("weekly Progress"),
-    "yourPlanTitle": m13,
+    "yourPlanTitle": m16,
   };
 }
