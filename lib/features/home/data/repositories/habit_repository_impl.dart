@@ -257,6 +257,7 @@ class HabitRepositoryImpl implements HabitRepository {
 
   Map<DateTime, int>? _cachedHeatmapData;
 
+  @override
   void invalidateHeatmapCache() {
     _cachedHeatmapData = null;
   }
