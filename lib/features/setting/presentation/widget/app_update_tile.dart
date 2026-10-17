@@ -4,6 +4,7 @@ import 'package:habit_tracker/core/components/animated_setting_tile.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/app_update_provider.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AppUpdateTile extends ConsumerWidget {
@@ -20,16 +21,15 @@ class AppUpdateTile extends ConsumerWidget {
     String currentVersion,
     String downloadUrl,
     String releaseUrl,
-    bool isArabic,
   ) async {
+    final s = S.of(context);
+
     final confirmed = await AppConfirmationDialog.show(
       context: context,
-      title: isArabic ? 'تحديث جديد متوفر' : 'New Update Available',
-      message: isArabic
-          ? 'يتوفر إصدار جديد (v$latestVersion) على GitHub.\nإصدارك الحالي: (v$currentVersion).\nهل ترغب بالانتقال لتحميل التحديث الآن؟'
-          : 'A new version (v$latestVersion) is available on GitHub.\nCurrent version: (v$currentVersion).\nWould you like to download the update now?',
-      confirmText: isArabic ? 'تحميل التحديث' : 'Download Update',
-      cancelText: isArabic ? 'لاحقاً' : 'Later',
+      title: s.appUpdateDialogTitle,
+      message: s.appUpdateDialogMessage(latestVersion, currentVersion),
+      confirmText: s.appUpdateDownloadButton,
+      cancelText: s.appUpdateLaterButton,
       icon: Icons.system_update_rounded,
     );
 
@@ -54,8 +54,7 @@ class AppUpdateTile extends ConsumerWidget {
           return const SizedBox.shrink();
         }
 
-        final isArabic =
-            Localizations.localeOf(context).languageCode.startsWith('ar');
+        final s = S.of(context);
         final theme = Theme.of(context);
         final primaryColor = theme.primaryColor;
 
@@ -63,12 +62,8 @@ class AppUpdateTile extends ConsumerWidget {
           animationController: animationController,
           index: 14,
           icon: Icons.system_update_rounded,
-          title: isArabic
-              ? 'تحديث جديد متوفر: v${updateInfo.latestVersion}'
-              : 'New Update Available: v${updateInfo.latestVersion}',
-          subtitle: isArabic
-              ? 'الإصدار الحالي v${updateInfo.currentVersion} • اضغط للتحميل'
-              : 'Current v${updateInfo.currentVersion} • Tap to download',
+          title: s.appUpdateAvailableTitle(updateInfo.latestVersion),
+          subtitle: s.appUpdateAvailableSubtitle(updateInfo.currentVersion),
           textColor: primaryColor,
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -90,7 +85,7 @@ class AppUpdateTile extends ConsumerWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  isArabic ? 'تحديث' : 'UPDATE',
+                  s.appUpdateBadge,
                   style: TextStyle(
                     color: primaryColor,
                     fontSize: 11,
@@ -107,7 +102,6 @@ class AppUpdateTile extends ConsumerWidget {
             updateInfo.currentVersion,
             updateInfo.downloadUrl,
             updateInfo.releaseUrl,
-            isArabic,
           ),
         );
       },
