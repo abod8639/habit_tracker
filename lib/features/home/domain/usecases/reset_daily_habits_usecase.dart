@@ -15,26 +15,30 @@ class ResetDailyHabitsUseCase {
       (failure) => Left(failure),
       (lastResetDate) async {
         if (HabitDateUtils.shouldResetHabits(lastResetDate)) {
+          final now = DateTime.now();
+          final today = DateTime(now.year, now.month, now.day);
+
+          // If this is the initial launch, just mark today as the reset benchmark
+          if (lastResetDate == null) {
+            return await repository.saveLastResetDate(now);
+          }
+
           // 1. Get current habits to save to history
           final habitsResult = await repository.getHabits();
 
           return await habitsResult.fold(
             (failure) => Left(failure),
             (habits) async {
-              final now = DateTime.now();
-              final today = DateTime(now.year, now.month, now.day);
-              final lastDay = lastResetDate != null
-                  ? DateTime(
-                      lastResetDate.year,
-                      lastResetDate.month,
-                      lastResetDate.day,
-                    )
-                  : today.subtract(const Duration(days: 1));
+              final lastDay = DateTime(
+                lastResetDate.year,
+                lastResetDate.month,
+                lastResetDate.day,
+              );
 
               final daysDiff = today.difference(lastDay).inDays;
 
-              // 2. Save last active day's habit completion status concurrently
               if (habits.isNotEmpty) {
+                // 2. Save last active day's habit completion status
                 await Future.wait(
                   habits.map(
                     (habit) => repository.saveHabitCompletionToHistory(
@@ -47,18 +51,18 @@ class ResetDailyHabitsUseCase {
                 );
               }
 
-              // 3. Reset completion status
+              // 4. Reset completion status for today
               final resetResult = await repository.resetHabitsCompletion();
               if (resetResult.isLeft()) return resetResult;
 
-              // 4. Increment day count by actual days elapsed
+              // 5. Increment day count by actual days elapsed
               final incrementResult = await repository.incrementDayCount(
                 daysDiff > 0 ? daysDiff : 1,
               );
               if (incrementResult.isLeft()) return incrementResult;
 
-              // 5. Update last reset date
-              return await repository.saveLastResetDate(DateTime.now());
+              // 6. Update last reset date
+              return await repository.saveLastResetDate(now);
             },
           );
         }
