@@ -28,6 +28,9 @@ class MockHabitRepository implements HabitRepository {
   ) async => Right(history);
 
   @override
+  void invalidateHeatmapCache() {}
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
