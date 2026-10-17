@@ -5,6 +5,7 @@ import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/components/neumorphic_button.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/plan_generator_providers.dart';
 import '../widgets/plan_suggestion_card.dart';
@@ -36,7 +37,7 @@ class PlanResultScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final category = state.selectedCategory;
     final color = category?.color ?? theme.colorScheme.primary;
-
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: myAppBar(
@@ -44,6 +45,7 @@ class PlanResultScreen extends ConsumerWidget {
         context: context,
         leading: Center(
           child: NeumorphicIconButton.square(
+            customShadows: AppShadows.buttonResting(isDark: isDark),
             size: 40,
             iconSize: 18,
             icon: Icons.close_rounded,
