@@ -3,16 +3,15 @@ import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
-import 'package:habit_tracker/features/home/presentation/widget/my_text_taile.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Simplified Home Screen Widget view designed to be rendered into an image
 /// and displayed on the Android/iOS Home Screen via `home_widget`.
 ///
 /// Features:
-/// 1. Simplified tactile Neumorphic container.
+/// 1. Simplified tactile Neumorphic container sized strictly to prevent RenderFlex overflow.
 /// 2. HeatMap progress calendar reflecting real live completion data.
-/// 3. Shows only uncompleted habits using `MyTextTaile`.
+/// 3. Shows compact uncompleted habit pills tailored for static widget snapshots.
 /// 4. Completed habits disappear immediately.
 class HomeAppWidgetView extends StatelessWidget {
   final List<HabitEntity> habits;
@@ -49,7 +48,7 @@ class HomeAppWidgetView extends StatelessWidget {
 
     return Container(
       width: 360,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(22),
@@ -73,7 +72,7 @@ class HomeAppWidgetView extends StatelessWidget {
         children: [
           // Header Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -81,15 +80,15 @@ class HomeAppWidgetView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 26,
-                      height: 26,
+                      width: 24,
+                      height: 24,
                       decoration: BoxDecoration(
                         color: primaryColor.withValues(alpha: 0.16),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.track_changes_rounded,
-                        size: 15,
+                        size: 14,
                         color: primaryColor,
                       ),
                     ),
@@ -97,7 +96,7 @@ class HomeAppWidgetView extends StatelessWidget {
                     Text(
                       s.today,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: isDark ? Colors.white : const Color(0xFF1E2024),
                       ),
@@ -106,8 +105,8 @@ class HomeAppWidgetView extends StatelessWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 3,
+                    horizontal: 9,
+                    vertical: 2.5,
                   ),
                   decoration: BoxDecoration(
                     color: uncompletedHabits.isEmpty
@@ -133,11 +132,11 @@ class HomeAppWidgetView extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
           // HeatMap from theme_card.dart showing real current progress
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
             decoration: BoxDecoration(
               color: isDark
                   ? Colors.black.withValues(alpha: 0.25)
@@ -166,17 +165,17 @@ class HomeAppWidgetView extends StatelessWidget {
                 showColorTip: false,
                 showText: false,
                 scrollable: false,
-                size: 14,
+                size: 13,
                 colorsets: activeColorSet,
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
-          // Uncompleted Habits using MyTextTaile
+          // Uncompleted Habits using compact snapshot-friendly tiles
           if (uncompletedHabits.isEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -186,13 +185,13 @@ class HomeAppWidgetView extends StatelessWidget {
                       color: isDark
                           ? Colors.greenAccent
                           : Colors.green.shade700,
-                      size: 18,
+                      size: 16,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Text(
                       s.allHabitsCompletedToday,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: isDark
                             ? Colors.white70
@@ -204,26 +203,20 @@ class HomeAppWidgetView extends StatelessWidget {
               ),
             )
           else ...[
-            for (final habit in uncompletedHabits.take(3))
-              MyTextTaile(
-                key: ValueKey(habit.id),
-                habitName: habit.name,
-                habitCompleted: false,
-                colorValue: habit.colorValue,
-                enableSlidable: false,
-                onChanged: (_) {},
-                onDelete: (_) {},
-                onEdit: (_) {},
-                onTap: () {},
+            for (final habit in uncompletedHabits.take(2))
+              _buildCompactHabitRow(
+                context: context,
+                habit: habit,
+                isDark: isDark,
               ),
-            if (uncompletedHabits.length > 3)
+            if (uncompletedHabits.length > 2)
               Padding(
-                padding: const EdgeInsets.only(top: 4, bottom: 2),
+                padding: const EdgeInsets.only(top: 3, bottom: 1),
                 child: Center(
                   child: Text(
-                    s.moreHabitsCount(uncompletedHabits.length - 3),
+                    s.moreHabitsCount(uncompletedHabits.length - 2),
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.w500,
                       color: isDark ? Colors.white38 : Colors.black38,
                     ),
@@ -231,6 +224,67 @@ class HomeAppWidgetView extends StatelessWidget {
                 ),
               ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactHabitRow({
+    required BuildContext context,
+    required HabitEntity habit,
+    required bool isDark,
+  }) {
+    final habitColor = habit.colorValue != null
+        ? Color(habit.colorValue!)
+        : primaryColor;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 2.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.5),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.black.withValues(alpha: 0.035),
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.07)
+              : Colors.black.withValues(alpha: 0.05),
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: habitColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: habitColor.withValues(alpha: 0.4),
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              habit.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.90)
+                    : const Color(0xFF202328),
+              ),
+            ),
+          ),
         ],
       ),
     );
