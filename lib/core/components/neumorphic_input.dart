@@ -152,32 +152,7 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
           color: borderColor,
           width: _isFocused ? 1.4 : 1.0,
         ),
-        boxShadow: [
-          // Top-left sunken depth shadow
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.5)
-                : const Color(0xFFA3B1C6).withValues(alpha: 0.4),
-            offset: const Offset(-2, -2),
-            blurRadius: 4,
-          ),
-          // Bottom-right inner highlight
-          BoxShadow(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.035)
-                : Colors.white.withValues(alpha: 0.95),
-            offset: const Offset(2, 2),
-            blurRadius: 3,
-          ),
-          if (_isFocused)
-            ...AppShadows.bloom(
-              color: effectiveAccent,
-              isDark: isDark,
-              blur: 6.0,
-              spread: 0.3,
-              offset: const Offset(0, 1),
-            ),
-        ],
+        boxShadow:AppShadows.softCard(isDark: isDark)
       ),
       child: ClipRRect(
         borderRadius: effectiveRadius,
