@@ -40,7 +40,7 @@ class NeumorphicProgressBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: wellColor,
         borderRadius: AppRadius.pillRadius,
-        boxShadow: AppShadows.insetWell(isDark: isDark),
+        boxShadow: AppShadows.softCard(isDark: isDark),
         border: Border.all(
           color: isDark
               ? Colors.white.withValues(alpha: 0.03)
@@ -73,7 +73,7 @@ class NeumorphicProgressBar extends StatelessWidget {
                   ...AppShadows.bloom(
                     color: effectiveAccent,
                     isDark: isDark,
-                    blur: 6,
+                    blur: 1,
                     spread: 0.5,
                   ),
                 ],
