@@ -171,7 +171,7 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
               widget.icon,
               size: effectiveIconSize,
               color: effectiveIconColor,
-              shadows: AppShadows.buttonPressed(isDark: isDark),
+              shadows: AppShadows.buttonResting(isDark: isDark),
             ),
           ),
         ),
