@@ -57,6 +57,9 @@ class MockHabitRepository implements HabitRepository {
   }
 
   @override
+  void invalidateHeatmapCache() {}
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
