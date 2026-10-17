@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
+import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/data/repositories/habit_repository_impl.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/domain/repositories/habit_repository.dart';
@@ -442,14 +443,38 @@ class HabitNotifier extends Notifier<HabitState> {
 
   Future<void> updateSelectedHabitsColor(Color color) async {
     final ids = List<String>.from(state.selectedHabitIds);
-    final colorValue = color.toARGB32();
-    final updateColor = ref.read(updateHabitColorUseCaseProvider);
+    if (ids.isEmpty) return;
 
-    for (final id in ids) {
-      await updateColor(id, colorValue);
-    }
+    final colorValue = color.toARGB32();
+    final idSet = ids.toSet();
+
+    // 1. Optimistic state update
+    final currentHabits = state.habits.map((h) {
+      if (idSet.contains(h.id)) {
+        return h.copyWith(colorValue: colorValue, updatedAt: DateTime.now());
+      }
+      return h;
+    }).toList();
+
+    state = state.copyWith(habits: currentHabits);
     clearSelection();
-    await refreshData();
+
+    // 2. Persist in a single operation
+    final localDataSource = ref.read(habitLocalDataSourceProvider);
+    final firestoreService = ref.read(firestoreServiceProvider);
+
+    final models = currentHabits.map((e) => HabitModel.fromEntity(e)).toList();
+    await localDataSource.saveHabits(models);
+
+    if (firestoreService.isUserLoggedIn) {
+      try {
+        await firestoreService.uploadHabits(models);
+      } catch (e) {
+        debugPrint('Error uploading updated habit colors: $e');
+      }
+    }
+
+    _updateHomeWidget();
   }
 
   Future<Map<String, int>> getCompletionStatusForDate(DateTime date) async {
