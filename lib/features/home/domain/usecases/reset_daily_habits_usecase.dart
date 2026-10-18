@@ -8,11 +8,11 @@ class ResetDailyHabitsUseCase {
 
   ResetDailyHabitsUseCase(this.repository);
 
-  Future<Either<Failure, void>> call() async {
+  Future<Either<Failure, bool>> call() async {
     final dateResult = await repository.getLastResetDate();
 
     return dateResult.fold(
-      (failure) => Left(failure),
+      (failure) async => Left(failure),
       (lastResetDate) async {
         if (HabitDateUtils.shouldResetHabits(lastResetDate)) {
           final now = DateTime.now();
@@ -20,14 +20,18 @@ class ResetDailyHabitsUseCase {
 
           // If this is the initial launch, just mark today as the reset benchmark
           if (lastResetDate == null) {
-            return await repository.saveLastResetDate(now);
+            final saveResult = await repository.saveLastResetDate(now);
+            return saveResult.fold(
+              (failure) => Left(failure),
+              (_) => const Right(false),
+            );
           }
 
           // 1. Get current habits to save to history
           final habitsResult = await repository.getHabits();
 
           return await habitsResult.fold(
-            (failure) => Left(failure),
+            (failure) async => Left(failure),
             (habits) async {
               final lastDay = DateTime(
                 lastResetDate.year,
@@ -53,20 +57,38 @@ class ResetDailyHabitsUseCase {
 
               // 4. Reset completion status for today
               final resetResult = await repository.resetHabitsCompletion();
-              if (resetResult.isLeft()) return resetResult;
+              if (resetResult.isLeft()) {
+                return Left(
+                  resetResult.fold(
+                    (failure) => failure,
+                    (_) => throw StateError('Unreachable'),
+                  ),
+                );
+              }
 
               // 5. Increment day count by actual days elapsed
               final incrementResult = await repository.incrementDayCount(
                 daysDiff > 0 ? daysDiff : 1,
               );
-              if (incrementResult.isLeft()) return incrementResult;
+              if (incrementResult.isLeft()) {
+                return Left(
+                  incrementResult.fold(
+                    (failure) => failure,
+                    (_) => throw StateError('Unreachable'),
+                  ),
+                );
+              }
 
               // 6. Update last reset date
-              return await repository.saveLastResetDate(now);
+              final saveDateResult = await repository.saveLastResetDate(now);
+              return saveDateResult.fold(
+                (failure) => Left(failure),
+                (_) => const Right(true),
+              );
             },
           );
         }
-        return const Right(null);
+        return const Right(false);
       },
     );
   }
