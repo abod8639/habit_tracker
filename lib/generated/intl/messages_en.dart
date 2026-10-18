@@ -53,9 +53,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m14(time) => "Reminder set for ${time}";
 
-  static String m15(streak) => "Day ${streak}";
+  static String m15(current, total) => "Step ${current} of ${total}";
 
-  static String m16(category) => "Your ${category} Plan";
+  static String m16(streak) => "Day ${streak}";
+
+  static String m17(category) => "Your ${category} Plan";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -122,7 +124,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appUpdateLaterButton": MessageLookupByLibrary.simpleMessage("Later"),
     "appVersionAndInformation": MessageLookupByLibrary.simpleMessage(
-      "This app made by dexter ",
+      "This app made with care and love ",
     ),
     "appearance": MessageLookupByLibrary.simpleMessage("Appearance"),
     "areYouSureYouWantToDeleteThisHabit": MessageLookupByLibrary.simpleMessage(
@@ -405,6 +407,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseAnswerToContinue": MessageLookupByLibrary.simpleMessage(
       "Please answer this question to continue.",
     ),
+    "quickHabitReading": MessageLookupByLibrary.simpleMessage(
+      "Read for 15 mins",
+    ),
+    "quickHabitWalking": MessageLookupByLibrary.simpleMessage(
+      "Walk for 20 mins",
+    ),
+    "quickHabitWater": MessageLookupByLibrary.simpleMessage("Drink 2L water"),
     "ratepagetitle": MessageLookupByLibrary.simpleMessage("Habit Statistics"),
     "reliableAlarmsActive": MessageLookupByLibrary.simpleMessage(
       "Reliable alarms active",
@@ -433,6 +442,8 @@ class MessageLookup extends MessageLookupByLibrary {
           "Restore feature will be available in future updates",
         ),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
+    "sampleHabit1": MessageLookupByLibrary.simpleMessage("Read for 15 minutes"),
+    "sampleHabit2": MessageLookupByLibrary.simpleMessage("Drink 2L of water"),
     "save": MessageLookupByLibrary.simpleMessage("Save"),
     "saveSelected": MessageLookupByLibrary.simpleMessage("Save Selected"),
     "scanHabitsDesc": MessageLookupByLibrary.simpleMessage(
@@ -449,6 +460,51 @@ class MessageLookup extends MessageLookupByLibrary {
       "Set a daily reminder for your habits",
     ),
     "settingPageTitle": MessageLookupByLibrary.simpleMessage("Settings"),
+    "showcaseAddDialogHint": MessageLookupByLibrary.simpleMessage(
+      "Type a habit name or pick a suggestion, then tap Add.",
+    ),
+    "showcaseAddHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "Tap the (+) button to create your first habit step by step.",
+    ),
+    "showcaseAddHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "Add a New Habit",
+    ),
+    "showcaseCompleteHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "Tap once on the habit to mark it completed for today.",
+    ),
+    "showcaseCompleteHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "Complete Habit by Tap",
+    ),
+    "showcaseCompletedToast": MessageLookupByLibrary.simpleMessage(
+      "🎉 Well done! You have mastered all habit actions successfully.",
+    ),
+    "showcaseDeleteHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "Swipe the habit the other way and tap 🗑️ to delete it.",
+    ),
+    "showcaseDeleteHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "Swipe to Delete",
+    ),
+    "showcaseEditDialogHint": MessageLookupByLibrary.simpleMessage(
+      "Edit the habit name, then tap Edit to save changes.",
+    ),
+    "showcaseEditHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "Swipe the habit and tap ✏️ to edit its details.",
+    ),
+    "showcaseEditHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "Swipe to Edit",
+    ),
+    "showcaseFinish": MessageLookupByLibrary.simpleMessage("Get Started"),
+    "showcaseNext": MessageLookupByLibrary.simpleMessage("Next"),
+    "showcasePrev": MessageLookupByLibrary.simpleMessage("Previous"),
+    "showcaseReorderHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "Long press and drag any habit up or down to reorganize your priorities.",
+    ),
+    "showcaseReorderHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "Long Press to Reorder",
+    ),
+    "showcaseSkip": MessageLookupByLibrary.simpleMessage("Skip"),
+    "showcaseStepIndicator": m15,
+    "showcaseTutorial": MessageLookupByLibrary.simpleMessage("App Tour"),
     "signInWithGoogle": MessageLookupByLibrary.simpleMessage(
       "Sign in with Google",
     ),
@@ -461,7 +517,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Something went wrong",
     ),
     "streak": MessageLookupByLibrary.simpleMessage("Streak"),
-    "streakDay": m15,
+    "streakDay": m16,
     "success": MessageLookupByLibrary.simpleMessage("Habit Success"),
     "summary": MessageLookupByLibrary.simpleMessage("Habit Summary"),
     "syncError": MessageLookupByLibrary.simpleMessage("Sync failed"),
@@ -498,6 +554,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "user": MessageLookupByLibrary.simpleMessage("User"),
     "weekly": MessageLookupByLibrary.simpleMessage("weekly Progress"),
-    "yourPlanTitle": m16,
+    "yourPlanTitle": m17,
   };
 }
