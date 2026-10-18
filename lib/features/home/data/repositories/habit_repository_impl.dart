@@ -426,6 +426,15 @@ class HabitRepositoryImpl implements HabitRepository {
 
       await localDataSource.saveHabits(resetHabits);
       _cachedHeatmapData = null;
+
+      if (firestoreService.isUserLoggedIn) {
+        try {
+          await firestoreService.uploadHabits(resetHabits);
+        } catch (e) {
+          debugPrint('Cloud sync error on reset: $e');
+        }
+      }
+
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
