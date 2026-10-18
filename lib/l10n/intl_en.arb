@@ -41,7 +41,7 @@
   "comingSoon": "Coming Soon",
   "restoreFeatureWillBeAvailableInFutureUpdates": "Restore feature will be available in future updates",
   "about": "About",
-  "appVersionAndInformation": "This app made by dexter ",
+  "appVersionAndInformation": "This app made with care and love ",
   "cancel": "Cancel",
   "add": "Add new habit",
   "theFieldCantBeEmpty": "The field can't be empty :)",
@@ -354,5 +354,39 @@
     }
   },
   "appUpdateDownloadButton": "Download Update",
-  "appUpdateLaterButton": "Later"
+  "appUpdateLaterButton": "Later",
+  "showcaseTutorial": "App Tour",
+  "showcaseStepIndicator": "Step {current} of {total}",
+  "@showcaseStepIndicator": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "showcaseAddHabitTitle": "Add a New Habit",
+  "showcaseAddHabitDesc": "Tap the (+) button to create your first habit step by step.",
+  "showcaseAddDialogHint": "Type a habit name or pick a suggestion, then tap Add.",
+  "showcaseCompleteHabitTitle": "Complete Habit by Tap",
+  "showcaseCompleteHabitDesc": "Tap once on the habit to mark it completed for today.",
+  "showcaseEditHabitTitle": "Swipe to Edit",
+  "showcaseEditHabitDesc": "Swipe the habit and tap ✏️ to edit its details.",
+  "showcaseEditDialogHint": "Edit the habit name, then tap Edit to save changes.",
+  "showcaseDeleteHabitTitle": "Swipe to Delete",
+  "showcaseDeleteHabitDesc": "Swipe the habit the other way and tap 🗑️ to delete it.",
+  "showcaseReorderHabitTitle": "Long Press to Reorder",
+  "showcaseReorderHabitDesc": "Long press and drag any habit up or down to reorganize your priorities.",
+  "showcaseNext": "Next",
+  "showcasePrev": "Previous",
+  "showcaseSkip": "Skip",
+  "showcaseFinish": "Get Started",
+  "showcaseCompletedToast": "🎉 Well done! You have mastered all habit actions successfully.",
+  "quickHabitReading": "Read for 15 mins",
+  "quickHabitWater": "Drink 2L water",
+  "quickHabitWalking": "Walk for 20 mins",
+  "sampleHabit1": "Read for 15 minutes",
+  "sampleHabit2": "Drink 2L of water"
 }
