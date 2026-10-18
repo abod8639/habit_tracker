@@ -365,10 +365,10 @@ class S {
     return Intl.message('About', name: 'about', desc: '', args: []);
   }
 
-  /// `This app made by dexter `
+  /// `This app made with care and love `
   String get appVersionAndInformation {
     return Intl.message(
-      'This app made by dexter ',
+      'This app made with care and love ',
       name: 'appVersionAndInformation',
       desc: '',
       args: [],
@@ -2082,6 +2082,231 @@ class S {
     return Intl.message(
       'Later',
       name: 'appUpdateLaterButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `App Tour`
+  String get showcaseTutorial {
+    return Intl.message(
+      'App Tour',
+      name: 'showcaseTutorial',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Step {current} of {total}`
+  String showcaseStepIndicator(int current, int total) {
+    return Intl.message(
+      'Step $current of $total',
+      name: 'showcaseStepIndicator',
+      desc: '',
+      args: [current, total],
+    );
+  }
+
+  /// `Add a New Habit`
+  String get showcaseAddHabitTitle {
+    return Intl.message(
+      'Add a New Habit',
+      name: 'showcaseAddHabitTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap the (+) button to create your first habit step by step.`
+  String get showcaseAddHabitDesc {
+    return Intl.message(
+      'Tap the (+) button to create your first habit step by step.',
+      name: 'showcaseAddHabitDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Type a habit name or pick a suggestion, then tap Add.`
+  String get showcaseAddDialogHint {
+    return Intl.message(
+      'Type a habit name or pick a suggestion, then tap Add.',
+      name: 'showcaseAddDialogHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Complete Habit by Tap`
+  String get showcaseCompleteHabitTitle {
+    return Intl.message(
+      'Complete Habit by Tap',
+      name: 'showcaseCompleteHabitTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap once on the habit to mark it completed for today.`
+  String get showcaseCompleteHabitDesc {
+    return Intl.message(
+      'Tap once on the habit to mark it completed for today.',
+      name: 'showcaseCompleteHabitDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Swipe to Edit`
+  String get showcaseEditHabitTitle {
+    return Intl.message(
+      'Swipe to Edit',
+      name: 'showcaseEditHabitTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Swipe the habit and tap ✏️ to edit its details.`
+  String get showcaseEditHabitDesc {
+    return Intl.message(
+      'Swipe the habit and tap ✏️ to edit its details.',
+      name: 'showcaseEditHabitDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit the habit name, then tap Edit to save changes.`
+  String get showcaseEditDialogHint {
+    return Intl.message(
+      'Edit the habit name, then tap Edit to save changes.',
+      name: 'showcaseEditDialogHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Swipe to Delete`
+  String get showcaseDeleteHabitTitle {
+    return Intl.message(
+      'Swipe to Delete',
+      name: 'showcaseDeleteHabitTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Swipe the habit the other way and tap 🗑️ to delete it.`
+  String get showcaseDeleteHabitDesc {
+    return Intl.message(
+      'Swipe the habit the other way and tap 🗑️ to delete it.',
+      name: 'showcaseDeleteHabitDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Long Press to Reorder`
+  String get showcaseReorderHabitTitle {
+    return Intl.message(
+      'Long Press to Reorder',
+      name: 'showcaseReorderHabitTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Long press and drag any habit up or down to reorganize your priorities.`
+  String get showcaseReorderHabitDesc {
+    return Intl.message(
+      'Long press and drag any habit up or down to reorganize your priorities.',
+      name: 'showcaseReorderHabitDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next`
+  String get showcaseNext {
+    return Intl.message('Next', name: 'showcaseNext', desc: '', args: []);
+  }
+
+  /// `Previous`
+  String get showcasePrev {
+    return Intl.message('Previous', name: 'showcasePrev', desc: '', args: []);
+  }
+
+  /// `Skip`
+  String get showcaseSkip {
+    return Intl.message('Skip', name: 'showcaseSkip', desc: '', args: []);
+  }
+
+  /// `Get Started`
+  String get showcaseFinish {
+    return Intl.message(
+      'Get Started',
+      name: 'showcaseFinish',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `🎉 Well done! You have mastered all habit actions successfully.`
+  String get showcaseCompletedToast {
+    return Intl.message(
+      '🎉 Well done! You have mastered all habit actions successfully.',
+      name: 'showcaseCompletedToast',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Read for 15 mins`
+  String get quickHabitReading {
+    return Intl.message(
+      'Read for 15 mins',
+      name: 'quickHabitReading',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drink 2L water`
+  String get quickHabitWater {
+    return Intl.message(
+      'Drink 2L water',
+      name: 'quickHabitWater',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Walk for 20 mins`
+  String get quickHabitWalking {
+    return Intl.message(
+      'Walk for 20 mins',
+      name: 'quickHabitWalking',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Read for 15 minutes`
+  String get sampleHabit1 {
+    return Intl.message(
+      'Read for 15 minutes',
+      name: 'sampleHabit1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drink 2L of water`
+  String get sampleHabit2 {
+    return Intl.message(
+      'Drink 2L of water',
+      name: 'sampleHabit2',
       desc: '',
       args: [],
     );
