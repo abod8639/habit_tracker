@@ -88,11 +88,58 @@ void main() {
       final result = await useCase();
 
       expect(result.isRight(), true);
+      expect(result.getOrElse(() => false), true);
       // Crucial test: It should ONLY save completion for lastDay (15 calls),
       // and NOT perform 60 * 15 = 900 sequential disk writes.
       expect(repo.saveCompletionCalls, 15);
       expect(repo.habitsResetCalled, true);
       expect(repo.dayCount, 61);
+      expect(repo.lastResetDate?.day, now.day);
+    });
+
+    test('Same day does not trigger reset and returns Right(false)', () async {
+      final now = DateTime.now();
+      final repo = MockHabitRepository(
+        lastResetDate: now,
+        habits: [
+          HabitEntity(
+            id: 'h1',
+            name: 'Habit 1',
+            isCompleted: true,
+            createdAt: now,
+          ),
+        ],
+      );
+
+      final useCase = ResetDailyHabitsUseCase(repo);
+      final result = await useCase();
+
+      expect(result.isRight(), true);
+      expect(result.getOrElse(() => true), false);
+      expect(repo.habitsResetCalled, false);
+      expect(repo.saveCompletionCalls, 0);
+    });
+
+    test('Initial launch (null lastResetDate) marks benchmark and returns Right(false)', () async {
+      final now = DateTime.now();
+      final repo = MockHabitRepository(
+        lastResetDate: null,
+        habits: [
+          HabitEntity(
+            id: 'h1',
+            name: 'Habit 1',
+            isCompleted: true,
+            createdAt: now,
+          ),
+        ],
+      );
+
+      final useCase = ResetDailyHabitsUseCase(repo);
+      final result = await useCase();
+
+      expect(result.isRight(), true);
+      expect(result.getOrElse(() => true), false);
+      expect(repo.habitsResetCalled, false);
       expect(repo.lastResetDate?.day, now.day);
     });
   });
