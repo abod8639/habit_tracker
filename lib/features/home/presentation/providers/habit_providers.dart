@@ -154,23 +154,58 @@ final clearLocalHabitsUseCaseProvider = Provider<ClearLocalHabitsUseCase>((
 
 // Habit Notifier
 class HabitNotifier extends Notifier<HabitState> {
-  Timer? _resetCheckTimer;
+  Timer? _midnightTimer;
+  Timer? _periodicCheckTimer;
+  AppLifecycleListener? _lifecycleListener;
+  bool _isResetting = false;
 
   @override
   HabitState build() {
-    _resetCheckTimer?.cancel();
-    _resetCheckTimer = Timer.periodic(
-      const Duration(minutes: 15),
+    _cleanupTimers();
+
+    _scheduleMidnightTimer();
+
+    _periodicCheckTimer = Timer.periodic(
+      const Duration(minutes: 1),
       (_) => checkAndResetDailyHabits(),
     );
 
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () {
+        checkAndResetDailyHabits();
+        _scheduleMidnightTimer();
+      },
+    );
+
     ref.onDispose(() {
-      _resetCheckTimer?.cancel();
+      _cleanupTimers();
     });
 
     Future.microtask(() => _initialize());
 
     return const HabitState();
+  }
+
+  void _cleanupTimers() {
+    _midnightTimer?.cancel();
+    _midnightTimer = null;
+    _periodicCheckTimer?.cancel();
+    _periodicCheckTimer = null;
+    _lifecycleListener?.dispose();
+    _lifecycleListener = null;
+  }
+
+  void _scheduleMidnightTimer() {
+    _midnightTimer?.cancel();
+    final now = DateTime.now();
+    final nextMidnight = DateTime(now.year, now.month, now.day + 1);
+    final durationToMidnight =
+        nextMidnight.difference(now) + const Duration(milliseconds: 500);
+
+    _midnightTimer = Timer(durationToMidnight, () async {
+      await checkAndResetDailyHabits();
+      _scheduleMidnightTimer();
+    });
   }
 
   Future<void> retry() => _initialize();
@@ -197,9 +232,9 @@ class HabitNotifier extends Notifier<HabitState> {
   Future<void> _loadHabits() async {
     final getHabits = ref.read(getHabitsUseCaseProvider);
     final result = await getHabits();
-    result.fold(
-      (failure) => state = state.copyWith(errorMessage: failure.message),
-      (loaded) => state = state.copyWith(habits: loaded),
+    await result.fold(
+      (failure) async => state = state.copyWith(errorMessage: failure.message),
+      (loaded) async => state = state.copyWith(habits: loaded),
     );
   }
 
@@ -242,9 +277,22 @@ class HabitNotifier extends Notifier<HabitState> {
   }
 
   Future<void> checkAndResetDailyHabits() async {
-    final resetUseCase = ref.read(resetDailyHabitsUseCaseProvider);
-    final result = await resetUseCase();
-    result.fold((_) => null, (_) => refreshData());
+    if (_isResetting) return;
+    _isResetting = true;
+    try {
+      final resetUseCase = ref.read(resetDailyHabitsUseCaseProvider);
+      final result = await resetUseCase();
+      result.fold(
+        (_) => null,
+        (didReset) {
+          if (didReset) {
+            refreshData();
+          }
+        },
+      );
+    } finally {
+      _isResetting = false;
+    }
   }
 
   Future<void> refreshData() async {
