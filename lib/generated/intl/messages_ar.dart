@@ -53,9 +53,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m14(time) => "تم ضبط التذكير في ${time}";
 
-  static String m15(streak) => "يوم ${streak}";
+  static String m15(current, total) => "خطوة ${current} من ${total}";
 
-  static String m16(category) => "خطتك في ${category}";
+  static String m16(streak) => "يوم ${streak}";
+
+  static String m17(category) => "خطتك في ${category}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -128,7 +130,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appUpdateLaterButton": MessageLookupByLibrary.simpleMessage("لاحقاً"),
     "appVersionAndInformation": MessageLookupByLibrary.simpleMessage(
-      "هذا التطبيق من تطوير دكستر",
+      "هذا التطبيق مصنوع بعناية وحب ",
     ),
     "appearance": MessageLookupByLibrary.simpleMessage("المظهر"),
     "areYouSureYouWantToDeleteThisHabit": MessageLookupByLibrary.simpleMessage(
@@ -409,6 +411,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseAnswerToContinue": MessageLookupByLibrary.simpleMessage(
       "يرجى الإجابة عن هذا السؤال للمتابعة.",
     ),
+    "quickHabitReading": MessageLookupByLibrary.simpleMessage("قراءة 15 دقيقة"),
+    "quickHabitWalking": MessageLookupByLibrary.simpleMessage("مشي 20 دقيقة"),
+    "quickHabitWater": MessageLookupByLibrary.simpleMessage("شرب 2 لتر ماء"),
     "ratepagetitle": MessageLookupByLibrary.simpleMessage("إحصائيات العادات"),
     "reliableAlarmsActive": MessageLookupByLibrary.simpleMessage(
       "التنبيهات الدقيقة مفعلة بنجاح",
@@ -441,6 +446,8 @@ class MessageLookup extends MessageLookupByLibrary {
           "ستتوفر ميزة الاستعادة في التحديثات القادمة",
         ),
     "retry": MessageLookupByLibrary.simpleMessage("إعادة المحاولة"),
+    "sampleHabit1": MessageLookupByLibrary.simpleMessage("قراءة 15 دقيقة"),
+    "sampleHabit2": MessageLookupByLibrary.simpleMessage("شرب 2 لتر ماء"),
     "save": MessageLookupByLibrary.simpleMessage("حفظ"),
     "saveSelected": MessageLookupByLibrary.simpleMessage("حفظ المحدد"),
     "scanHabitsDesc": MessageLookupByLibrary.simpleMessage(
@@ -459,6 +466,53 @@ class MessageLookup extends MessageLookupByLibrary {
       "تعيين تذكير يومي للعادات",
     ),
     "settingPageTitle": MessageLookupByLibrary.simpleMessage("الإعدادات"),
+    "showcaseAddDialogHint": MessageLookupByLibrary.simpleMessage(
+      "اكتب اسم عادتك أو اختر اقتراحاً ثم اضغط إضافة.",
+    ),
+    "showcaseAddHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "اضغط على زر (+) لإنشاء عادتك الأولى خطوة بخطوة.",
+    ),
+    "showcaseAddHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "إضافة عادة جديدة",
+    ),
+    "showcaseCompleteHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "اضغط نقرة واحدة على العادة لتعليمها كمنجزة لليوم.",
+    ),
+    "showcaseCompleteHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "إنجاز العادة بالضغط",
+    ),
+    "showcaseCompletedToast": MessageLookupByLibrary.simpleMessage(
+      "🎉 رائع! أتقنت الآن جميع خطوات إدارة العادات بنجاح.",
+    ),
+    "showcaseDeleteHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "اسحب العادة بالاتجاه المعاكس واضغط 🗑️ لحذفها.",
+    ),
+    "showcaseDeleteHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "حذف العادة بالسحب",
+    ),
+    "showcaseEditDialogHint": MessageLookupByLibrary.simpleMessage(
+      "عدّل اسم العادة ثم اضغط تعديل لحفظ التغييرات.",
+    ),
+    "showcaseEditHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "اسحب العادة واضغط على أيقونة التعديل ✏️ لتغيير تفاصيلها.",
+    ),
+    "showcaseEditHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "تعديل العادة بالسحب",
+    ),
+    "showcaseFinish": MessageLookupByLibrary.simpleMessage("ابدأ الآن"),
+    "showcaseNext": MessageLookupByLibrary.simpleMessage("التالي"),
+    "showcasePrev": MessageLookupByLibrary.simpleMessage("السابق"),
+    "showcaseReorderHabitDesc": MessageLookupByLibrary.simpleMessage(
+      "اضغط مطولاً على أي عادة واسحبها لأعلى أو لأسفل لتغيير ترتيب أولوياتك.",
+    ),
+    "showcaseReorderHabitTitle": MessageLookupByLibrary.simpleMessage(
+      "إعادة الترتيب بالضغط المطول",
+    ),
+    "showcaseSkip": MessageLookupByLibrary.simpleMessage("تخطي"),
+    "showcaseStepIndicator": m15,
+    "showcaseTutorial": MessageLookupByLibrary.simpleMessage(
+      "دليل استخدام التطبيق",
+    ),
     "signInWithGoogle": MessageLookupByLibrary.simpleMessage(
       "تسجيل الدخول بواسطة Google",
     ),
@@ -469,7 +523,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "skipNow": MessageLookupByLibrary.simpleMessage("تخطي الآن"),
     "somethingWentWrong": MessageLookupByLibrary.simpleMessage("حدث خطأ ما"),
     "streak": MessageLookupByLibrary.simpleMessage("الاستمرارية"),
-    "streakDay": m15,
+    "streakDay": m16,
     "success": MessageLookupByLibrary.simpleMessage("معدل النجاح"),
     "summary": MessageLookupByLibrary.simpleMessage("ملخص العادات"),
     "syncError": MessageLookupByLibrary.simpleMessage("فشلت المزامنة"),
@@ -504,6 +558,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "user": MessageLookupByLibrary.simpleMessage("مستخدم"),
     "weekly": MessageLookupByLibrary.simpleMessage("تقدم الأسبوعي"),
-    "yourPlanTitle": m16,
+    "yourPlanTitle": m17,
   };
 }
