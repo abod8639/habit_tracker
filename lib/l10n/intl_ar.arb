@@ -40,7 +40,7 @@
   "comingSoon": "قريباً",
   "restoreFeatureWillBeAvailableInFutureUpdates": "ستتوفر ميزة الاستعادة في التحديثات القادمة",
   "about": "حول التطبيق",
-  "appVersionAndInformation": "هذا التطبيق من تطوير دكستر",
+  "appVersionAndInformation": "هذا التطبيق مصنوع بعناية وحب ",
   "cancel": "إلغاء",
   "add": "إضافة عادة جديدة",
   "theFieldCantBeEmpty": "لا يمكن ترك الحقل فارغاً",
@@ -270,5 +270,39 @@
     }
   },
   "appUpdateDownloadButton": "تحميل التحديث",
-  "appUpdateLaterButton": "لاحقاً"
+  "appUpdateLaterButton": "لاحقاً",
+  "showcaseTutorial": "دليل استخدام التطبيق",
+  "showcaseStepIndicator": "خطوة {current} من {total}",
+  "@showcaseStepIndicator": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "showcaseAddHabitTitle": "إضافة عادة جديدة",
+  "showcaseAddHabitDesc": "اضغط على زر (+) لإنشاء عادتك الأولى خطوة بخطوة.",
+  "showcaseAddDialogHint": "اكتب اسم عادتك أو اختر اقتراحاً ثم اضغط إضافة.",
+  "showcaseCompleteHabitTitle": "إنجاز العادة بالضغط",
+  "showcaseCompleteHabitDesc": "اضغط نقرة واحدة على العادة لتعليمها كمنجزة لليوم.",
+  "showcaseEditHabitTitle": "تعديل العادة بالسحب",
+  "showcaseEditHabitDesc": "اسحب العادة واضغط على أيقونة التعديل ✏️ لتغيير تفاصيلها.",
+  "showcaseEditDialogHint": "عدّل اسم العادة ثم اضغط تعديل لحفظ التغييرات.",
+  "showcaseDeleteHabitTitle": "حذف العادة بالسحب",
+  "showcaseDeleteHabitDesc": "اسحب العادة بالاتجاه المعاكس واضغط 🗑️ لحذفها.",
+  "showcaseReorderHabitTitle": "إعادة الترتيب بالضغط المطول",
+  "showcaseReorderHabitDesc": "اضغط مطولاً على أي عادة واسحبها لأعلى أو لأسفل لتغيير ترتيب أولوياتك.",
+  "showcaseNext": "التالي",
+  "showcasePrev": "السابق",
+  "showcaseSkip": "تخطي",
+  "showcaseFinish": "ابدأ الآن",
+  "showcaseCompletedToast": "🎉 رائع! أتقنت الآن جميع خطوات إدارة العادات بنجاح.",
+  "quickHabitReading": "قراءة 15 دقيقة",
+  "quickHabitWater": "شرب 2 لتر ماء",
+  "quickHabitWalking": "مشي 20 دقيقة",
+  "sampleHabit1": "قراءة 15 دقيقة",
+  "sampleHabit2": "شرب 2 لتر ماء"
 }
