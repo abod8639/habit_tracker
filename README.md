@@ -101,6 +101,9 @@ Track your progress and stay on top of your daily routines directly from your de
 
 ## Screenshots and components
 
+![alt text](https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Section(3).png)
+![alt text](https://raw.githubusercontent.com/abod8639/media/main/habit_tracker/assets/image/Section(5).png)
+
 <div align="center">
 
 
