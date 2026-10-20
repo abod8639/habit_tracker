@@ -24,199 +24,164 @@ class LineChartBox extends ConsumerWidget {
       progression: progression,
     );
 
-    final viewKey = ValueKey(
-      '${state.isWeeklyView}_${state.showAllHabits}_${state.selectedHabitName}',
-    );
-
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 320),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        final fadeAnimation = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeInOutCubic,
-        );
-        final scaleAnimation = Tween<double>(
-          begin: 0.96,
-          end: 1.0,
-        ).animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-          ),
-        );
-        return FadeTransition(
-          opacity: fadeAnimation,
-          child: ScaleTransition(
-            scale: scaleAnimation,
-            child: child,
-          ),
-        );
-      },
-      child: SizedBox(
-        key: viewKey,
-        height: 240,
-        child: LineChart(
-          LineChartData(
-            lineTouchData: LineTouchData(
-              handleBuiltInTouches: true,
-              touchTooltipData: LineTouchTooltipData(
-                getTooltipColor: (spot) =>
-                    isDark ? const Color(0xFF1E293B) : Colors.white,
-                tooltipBorderRadius: BorderRadius.circular(8),
-                fitInsideHorizontally: true,
-                fitInsideVertically: true,
-                getTooltipItems: (touchedSpots) {
-                  return touchedSpots.map((barSpot) {
-                    final barIndex = barSpot.barIndex;
-                    if (barIndex < 0 || barIndex >= lineBars.length) return null;
-                    final bar = lineBars[barIndex];
-                    final isOverall = !state.showAllHabits;
-                    if (isOverall) {
-                      final percent = (barSpot.y * 100).toInt();
-                      return LineTooltipItem(
-                        '$percent%',
-                        TextStyle(
-                          color: bar.color ?? colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      );
-                    }
-                    final habitName =
-                        state.selectedHabitName ??
-                        (barIndex < state.habitNames.length
-                            ? state.habitNames[barIndex]
-                            : 'Habit');
-                    final isCompleted = barSpot.y >= 0.5;
-                    final isArabic =
-                        Localizations.localeOf(context).languageCode == 'ar';
-                    final statusText = isCompleted
-                        ? (isArabic ? 'مكتملة' : 'Completed')
-                        : (isArabic ? 'غير مكتملة' : 'Incomplete');
-
+    return SizedBox(
+      height: 240,
+      child: LineChart(
+        LineChartData(
+          lineTouchData: LineTouchData(
+            handleBuiltInTouches: true,
+            touchTooltipData: LineTouchTooltipData(
+              getTooltipColor: (spot) =>
+                  isDark ? const Color(0xFF1E293B) : Colors.white,
+              tooltipBorderRadius: BorderRadius.circular(8),
+              fitInsideHorizontally: true,
+              fitInsideVertically: true,
+              getTooltipItems: (touchedSpots) {
+                return touchedSpots.map((barSpot) {
+                  final barIndex = barSpot.barIndex;
+                  if (barIndex < 0 || barIndex >= lineBars.length) return null;
+                  final bar = lineBars[barIndex];
+                  final isOverall = !state.showAllHabits;
+                  if (isOverall) {
+                    final percent = (barSpot.y * 100).toInt();
                     return LineTooltipItem(
-                      '$habitName\n$statusText',
+                      '$percent%',
                       TextStyle(
                         color: bar.color ?? colorScheme.primary,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
                     );
-                  }).toList();
-                },
-              ),
-            ),
-            gridData: FlGridData(
-              show: true,
-              drawVerticalLine: false,
-              horizontalInterval: 0.25,
-              getDrawingHorizontalLine: (value) {
-                return FlLine(
-                  color: colorScheme.outlineVariant.withValues(
-                    alpha: isDark ? 0.12 : 0.22,
-                  ),
-                  strokeWidth: 0.8,
-                  dashArray: [4, 4],
-                );
+                  }
+                  final habitName =
+                      state.selectedHabitName ??
+                      (barIndex < state.habitNames.length
+                          ? state.habitNames[barIndex]
+                          : 'Habit');
+                  final isCompleted = barSpot.y >= 0.5;
+                  final isArabic =
+                      Localizations.localeOf(context).languageCode == 'ar';
+                  final statusText = isCompleted
+                      ? (isArabic ? 'مكتملة' : 'Completed')
+                      : (isArabic ? 'غير مكتملة' : 'Incomplete');
+
+                  return LineTooltipItem(
+                    '$habitName\n$statusText',
+                    TextStyle(
+                      color: bar.color ?? colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  );
+                }).toList();
               },
             ),
-
-            titlesData: FlTitlesData(
-              show: true,
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    if (index >= 0 && index < state.daysPeriod) {
-                      final date = now.subtract(
-                        Duration(days: state.daysPeriod - 1 - index),
-                      );
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 6.0),
-                        child: Text(
-                          '${date.day}/${date.month}',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.50)
-                                : const Color(0xFF64748B),
-                          ),
-                        ),
-                      );
-                    }
-                    return const SizedBox();
-                  },
-                  reservedSize: 28,
-                  interval: (state.daysPeriod / 7).ceilToDouble(),
+          ),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: 0.25,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: colorScheme.outlineVariant.withValues(
+                  alpha: isDark ? 0.12 : 0.22,
                 ),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    if (value == 0 ||
-                        value == 0.25 ||
-                        value == 0.5 ||
-                        value == 0.75 ||
-                        value == 1.0) {
-                      return Text(
-                        '${(value * 100).toInt()}%',
+                strokeWidth: 0.8,
+                dashArray: [4, 4],
+              );
+            },
+          ),
+          titlesData: FlTitlesData(
+            show: true,
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  if (index >= 0 && index < state.daysPeriod) {
+                    final date = now.subtract(
+                      Duration(days: state.daysPeriod - 1 - index),
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 6.0),
+                      child: Text(
+                        '${date.day}/${date.month}',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: isDark
-                              ? Colors.white.withValues(alpha: 0.45)
+                              ? Colors.white.withValues(alpha: 0.50)
                               : const Color(0xFF64748B),
                         ),
-                      );
-                    }
-                    return const SizedBox();
-                  },
-                  reservedSize: 34,
-                  interval: 0.25,
-                ),
-              ),
-              topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
+                reservedSize: 28,
+                interval: (state.daysPeriod / 7).ceilToDouble(),
               ),
             ),
-
-            borderData: FlBorderData(
-              show: true,
-              border: Border(
-                bottom: BorderSide(
-                  color: colorScheme.outlineVariant.withValues(
-                    alpha: isDark ? 0.20 : 0.35,
-                  ),
-                  width: 1,
-                ),
-                left: BorderSide(
-                  color: colorScheme.outlineVariant.withValues(
-                    alpha: isDark ? 0.20 : 0.35,
-                  ),
-                  width: 1,
-                ),
-                top: BorderSide.none,
-                right: BorderSide.none,
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  if (value == 0 ||
+                      value == 0.25 ||
+                      value == 0.5 ||
+                      value == 0.75 ||
+                      value == 1.0) {
+                    return Text(
+                      '${(value * 100).toInt()}%',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.45)
+                            : const Color(0xFF64748B),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
+                reservedSize: 34,
+                interval: 0.25,
               ),
             ),
-            minX: 0,
-            maxX: (state.daysPeriod - 1).toDouble(),
-            minY: -0.05,
-            maxY: 1.10,
-
-            lineBarsData: lineBars,
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOutCubic,
+          borderData: FlBorderData(
+            show: true,
+            border: Border(
+              bottom: BorderSide(
+                color: colorScheme.outlineVariant.withValues(
+                  alpha: isDark ? 0.20 : 0.35,
+                ),
+                width: 1,
+              ),
+              left: BorderSide(
+                color: colorScheme.outlineVariant.withValues(
+                  alpha: isDark ? 0.20 : 0.35,
+                ),
+                width: 1,
+              ),
+              top: BorderSide.none,
+              right: BorderSide.none,
+            ),
+          ),
+          minX: 0,
+          maxX: (state.daysPeriod - 1).toDouble(),
+          minY: -0.05,
+          maxY: 1.10,
+          lineBarsData: lineBars,
         ),
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeInOutCubic,
       ),
     );
   }
