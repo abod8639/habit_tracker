@@ -18,6 +18,8 @@ class HomeAppWidgetView extends StatelessWidget {
   final Map<DateTime, int> heatmapDatasets;
   final bool isDark;
   final Color primaryColor;
+  final bool asSliver;
+  final EdgeInsetsGeometry? sliverPadding;
 
   const HomeAppWidgetView({
     super.key,
@@ -25,7 +27,17 @@ class HomeAppWidgetView extends StatelessWidget {
     required this.heatmapDatasets,
     required this.isDark,
     required this.primaryColor,
-  });
+  })  : asSliver = false,
+        sliverPadding = null;
+
+  const HomeAppWidgetView.sliver({
+    super.key,
+    required this.habits,
+    required this.heatmapDatasets,
+    required this.isDark,
+    required this.primaryColor,
+    this.sliverPadding = const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+  }) : asSliver = true;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +58,7 @@ class HomeAppWidgetView extends StatelessWidget {
       10: primaryColor,
     };
 
-    return Container(
+    final content = Container(
       width: 360,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
@@ -227,6 +239,18 @@ class HomeAppWidgetView extends StatelessWidget {
         ],
       ),
     );
+
+    if (asSliver) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: sliverPadding ??
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Center(child: content),
+        ),
+      );
+    }
+
+    return content;
   }
 
   Widget _buildCompactHabitRow({
@@ -287,6 +311,36 @@ class HomeAppWidgetView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A Sliver wrapper for [HomeAppWidgetView] designed to be placed directly
+/// inside a [CustomScrollView].
+class SliverHomeAppWidgetView extends StatelessWidget {
+  final List<HabitEntity> habits;
+  final Map<DateTime, int> heatmapDatasets;
+  final bool isDark;
+  final Color primaryColor;
+  final EdgeInsetsGeometry padding;
+
+  const SliverHomeAppWidgetView({
+    super.key,
+    required this.habits,
+    required this.heatmapDatasets,
+    required this.isDark,
+    required this.primaryColor,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return HomeAppWidgetView.sliver(
+      habits: habits,
+      heatmapDatasets: heatmapDatasets,
+      isDark: isDark,
+      primaryColor: primaryColor,
+      sliverPadding: padding,
     );
   }
 }
