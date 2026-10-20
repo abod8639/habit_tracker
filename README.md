@@ -26,76 +26,32 @@ A **beautiful**, **responsive**, and **intuitive** habit tracking app built with
 
 </div>
 
-<!-- 
-[![downloads](https://img.shields.io/pub/dm/particles_network)](https://pub.dev/packages/particles_network/score) -->
----
-
-## Recent Updates & Features
-
-### AI Habit Coach & Interactive Chat (Powered by Google Gemini)
-Engage with an intelligent AI habit coach designed to keep you motivated and consistent.
-- **Conversational Habit Coaching**: Ask questions, troubleshoot routine plateaus, and seek advice on habit formation.
-- **Real-time Feedback**: Interactive chat UI featuring typing indicators, message bubbles, and smooth scrolling.
-- **Context-Aware Assistance**: Get tailored recommendations aligned with your goals.
-
-### Smart AI Plan Generator & Questionnaire
-Build a personalized routine in seconds through guided questionnaire flows.
-- **Category-Based Assessment**: Choose from diverse life pillars including Fitness, Productivity, Health, and Mindfulness.
-- **Targeted Questionnaires**: Answer focused questions to determine your routine needs, availability, and experience level.
-- **One-Click Plan Adoption**: Review AI-generated habit roadmaps and import selected habits directly into your tracker.
-
-### Bring Your Own Gemini API Key (BYOK) & Supported Models
-Full flexibility and control over your AI quota and capabilities.
-- **Custom Key Configuration**: Switch seamlessly between the built-in default Gemini key and your personal API key in Settings.
-- **Universal Key Acceptance**: Accepts any valid Gemini API key generated from [Google AI Studio](https://aistudio.google.com/app/apikey) with automatic sanitization (stripping accidental quotes, whitespace, and variable prefixes).
-- **Supported Gemini Models (Automatic Priority Order — Optimized for Speed)**:
-  - **`gemini-flash-lite-latest`** — Ultra low-latency, instantaneous response model (default).
-  - **`gemini-3.5-flash-lite`** — High-speed Flash-Lite model with zero reasoning overhead and sub-second generation.
-  - **`gemini-3-flash-preview`** — Reliable fallback model with high quota availability.
-  - **`gemini-3.5-flash`** / **`gemini-3.8-flash`** — Multimodal models with enhanced reasoning and high throughput.
-  - **`gemini-flash-latest`** — Automatic alias tracking Google's latest stable Flash releases.
-  - *Dynamic Forward-Compatibility*: Automatically queries Google's `/v1beta/models` endpoint for your key and activates any newer Gemini model supporting `generateContent`.
-- **Self-Healing Fallback Architecture**: If a specific model is deprecated or restricted on a user's Google Cloud project (e.g. legacy 2.5 or 2.0 models), the app seamlessly cascades to the next working model with zero disruption to the user experience.
-- **Direct Google AI Studio Link**: Open Google AI Studio with one click via `url_launcher` to generate your free key.
-- **Privacy & Masking**: Masked key display ensuring credentials remain protected on-screen.
-
-### AI Smart Scanner
-Automatically extract habits from physical notes, diet sheets, or invoices.
-- **Categorization**: Groups tasks (e.g., Breakfast, Lunch, Workout) with clear prefixes.
-- **Emoji Enrichment**: Automatically adds relevant emojis (e.g., 🍳 for eggs, 🏃 for running).
-- **Invoice Recognition**: Detects bills and merges amount, payee, and date into clean actionable habits.
-- **Smart Validation**: Interactive review dialog allows previewing and cherry-picking habits before adding them.
-
-### Data Isolation & Multi-User Safety
-- **Logout Cache Purge**: `ClearLocalHabitsUseCase` wipes local Hive caches and resets reactive state immediately upon logout to protect multi-user privacy on shared devices.
-- **Habit Deletion Confirmation**: Added explicit confirmation dialogs to prevent accidental loss of habit streaks.
-- **Auto-Recovery & Sync**: Hive self-healing against unexpected crashes combined with Firestore "Last Write Wins" cloud synchronization.
-
-### Material 3 Polish & Reactive Visualizations
-- **Material 3 Navigation Drawer**: Redesigned navigation adhering to Material 3 drawer guidelines.
-- **Dynamic Heatmap Synchronization**: Unique reactive keys guarantee immediate visual updates across monthly summaries and calendar heatmaps.
-- **Interactive Bar Charts & Stats**: Visualize completion trends, streak badges, and goal attainment rates with dynamic theming.
-
-### 📱 Android Home Screen Widget (Powered by `home_widget`)
-Track your progress and stay on top of your daily routines directly from your device's home screen.
-- **Live Habit Heatmap**: Displays your real-time progress using an integrated, compact calendar heatmap.
-- **Pending Habits at a Glance**: Shows only unfinished daily habits with tactile Neumorphic styling; completed habits automatically disappear upon completion.
-- **Instant Synchronization**: Automatically re-renders and refreshes whenever habits are checked off, added, or edited in the app.
-- **One-Tap App Launch**: Tap anywhere on the widget to open the app directly.
+<p align="center">
+  <a href="https://github.com/abod8639/habit_tracker/raw/refs/heads/main/APK/app-release.apk">
+    <img src="https://img.shields.io/badge/Direct_Download-Android_APK-3DDC84?logo=android&logoColor=white" alt="Download APK" height="42" />
+  </a>
+</p>
 
 ---
 
-##  Highlights
+## Features & Architecture
 
--  **Create & manage daily habits** with a smooth user experience  
--  **Track your progress** with simple checkmarks and visual feedback  
--  **Home screen widget** to view pending daily habits and live heatmap progress directly from your phone's home screen  
--  **View rich statistics** with animated and interactive charts  
--  **Weekly & monthly summaries** to visualize your growth over time  
--  **Multiple beautiful themes** with support for dark/light modes and custom color pickers  
--  **Animated UI transitions** and smooth interactions enhance the user experience  
--  **Local storage** powered by Hive for persistent, offline access  
--  **Fully responsive design** — works beautifully on phones, tablets, desktops, and web  
+### AI-Powered Productivity (Google Gemini)
+- **AI Habit Coach**: Real-time conversational guidance and motivation powered by Gemini models.
+- **Smart Plan Generator**: Tailored routine questionnaire flows to build and import habits in one click.
+- **AI Document Scanner**: Extract structured habits directly from notes, receipts, and meal plans.
+- **BYOK (Bring Your Own Key)**: Full support for custom Google AI Studio keys with automatic sanitization and model fallback.
+
+### Performance & UI Excellence
+- **Android Home Widget**: Live daily heatmap and pending habits glance powered by `home_widget`.
+- **Interactive Analytics**: Monthly heatmaps and animated progress charts via `fl_chart`.
+- **Neumorphic & Material 3 Design**: Refined tactile styling with dynamic theme color customization.
+- **Multi-Device Responsive**: Optimized layouts across mobile, tablet, and desktop viewports.
+
+### Reliability & Offline-First Persistence
+- **Drift (SQLite) Engine**: High-performance local relational caching with reactive streams.
+- **Cloud Synchronization**: Multi-device sync and backup via Firebase Authentication & Cloud Firestore.
+- **Multi-User Security**: Clean session teardown and instant cache isolation upon sign-out.
 
 ---
 
@@ -170,28 +126,57 @@ flutter run
 - **GoRouter** for declarative navigation & deep linking
 
 ### Key Packages
-- [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) — Reactive caching and state management  
-- [`drift`](https://pub.dev/packages/drift) & [`sqlite3_flutter_libs`](https://pub.dev/packages/sqlite3_flutter_libs) — Type-safe SQLite database and persistence  
-- [`home_widget`](https://pub.dev/packages/home_widget) — Android Home Screen Widget for quick access and live progress tracking  
-- [`google_generative_ai`](https://pub.dev/packages/google_generative_ai) — Google Gemini AI SDK for chat & smart scanning  
-- [`fl_chart`](https://pub.dev/packages/fl_chart) — Responsive and animated charts  
-- [`flutter_heatmap_calendar`](https://pub.dev/packages/flutter_heatmap_calendar) — Visual heatmap for habits  
-- [`go_router`](https://pub.dev/packages/go_router) — Declarative routing solution  
-- [`flutter_slidable`](https://pub.dev/packages/flutter_slidable) — Swipe-to-delete/edit functionality  
-- [`url_launcher`](https://pub.dev/packages/url_launcher) — External links (e.g. Google AI Studio)  
-- `flutter_local_notifications`, `flutter_dotenv`, `dartz`, and more
+
+#### State & Architecture
+- [`flutter_riverpod`](https://pub.dev/packages/flutter_riverpod) — Reactive caching, state management, and dependency injection
+- [`dartz`](https://pub.dev/packages/dartz) — Functional programming (`Either`, `Option`) for failure handling
+- [`equatable`](https://pub.dev/packages/equatable) — Value-based object equality for Clean Architecture entities
+- [`go_router`](https://pub.dev/packages/go_router) — Declarative routing and deep linking solution
+
+#### Database & Persistence
+- [`drift`](https://pub.dev/packages/drift) & [`sqlite3_flutter_libs`](https://pub.dev/packages/sqlite3_flutter_libs) — Type-safe relational SQLite database & reactive streams
+- [`path_provider`](https://pub.dev/packages/path_provider) & [`path`](https://pub.dev/packages/path) — File system path resolution and directory management
+
+#### Cloud & Backend
+- [`firebase_core`](https://pub.dev/packages/firebase_core) — Firebase integration backbone
+- [`firebase_auth`](https://pub.dev/packages/firebase_auth) & [`google_sign_in`](https://pub.dev/packages/google_sign_in) — Secure authentication & Google Sign-In
+- [`cloud_firestore`](https://pub.dev/packages/cloud_firestore) — Cloud database synchronization & remote backups
+- [`firebase_messaging`](https://pub.dev/packages/firebase_messaging) — Push notifications via FCM
+- [`firebase_analytics`](https://pub.dev/packages/firebase_analytics) — User behavior and crash telemetry
+
+#### AI & Machine Learning
+- [`google_generative_ai`](https://pub.dev/packages/google_generative_ai) — Official Google Gemini SDK for AI habit coaching & smart note scanning
+
+#### UI, Visualization & Hardware
+- [`fl_chart`](https://pub.dev/packages/fl_chart) — Highly customizable, animated performance & trend charts
+- [`flutter_heatmap_calendar`](https://pub.dev/packages/flutter_heatmap_calendar) — GitHub-style visual habit heatmap calendar
+- [`showcaseview`](https://pub.dev/packages/showcaseview) — Interactive onboarding & feature tours
+- [`flutter_slidable`](https://pub.dev/packages/flutter_slidable) — Actionable swipe controls for habit tiles
+- [`cached_network_image`](https://pub.dev/packages/cached_network_image) — Efficient image caching & placeholder handling
+- [`home_widget`](https://pub.dev/packages/home_widget) — Android Home Screen Widget integration for live progress
+- [`image_picker`](https://pub.dev/packages/image_picker) — Camera and gallery access for note scanning
+
+#### Notifications & Utilities
+- [`flutter_local_notifications`](https://pub.dev/packages/flutter_local_notifications) — Scheduled alarms and daily reminder alerts
+- [`timezone`](https://pub.dev/packages/timezone) & [`flutter_timezone`](https://pub.dev/packages/flutter_timezone) — Accurate timezone-aware notifications
+- [`flutter_dotenv`](https://pub.dev/packages/flutter_dotenv) — Secure environment variable management (`.env`)
+- [`intl`](https://pub.dev/packages/intl) — Date formatting and multi-language localization (i18n)
+- [`url_launcher`](https://pub.dev/packages/url_launcher) — In-app browser and external link dispatching
+- [`http`](https://pub.dev/packages/http) — Composable HTTP networking
 
 ---
 
-## 🛆 Dev Tools
-- `build_runner` & `hive_generator` — Code generation
-- `flutter_lints` — Linting for clean, maintainable code
+## Dev Tools
+- `build_runner` & `drift_dev` — Type-safe SQLite code generation
+- `icons_launcher` — Adaptive app icon generator
+- `intl_utils` — Arb-based localization code generator
+- `flutter_lints` — Lint rules for clean and maintainable code
 
 ---
 
-##  Contributing
+## Contributing
 
-Pull requests are welcome! Please check out our [Contributing Guide](CONTRIBUTING.md) for full details on our Clean Architecture guidelines, GetX standards, and submission workflow.
+Pull requests are welcome! Please ensure your contributions adhere to our Clean Architecture guidelines and Riverpod state management standards.
 
 1. Fork the repo  
 2. Create your feature branch (`git checkout -b feature/YourFeature`)  
