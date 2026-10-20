@@ -37,13 +37,12 @@ class _ThemePageState extends ConsumerState<ThemePage> {
       focusNode: _focusNode,
       onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
-        appBar: myAppBar(
-          context: context,
-          title: S.current.themepagetitle,
-        ),
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
+            MySliverAppBar(
+              title: S.current.themepagetitle,
+            ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 12.0),
               sliver: SliverToBoxAdapter(
