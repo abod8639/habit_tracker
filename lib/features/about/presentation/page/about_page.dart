@@ -56,13 +56,12 @@ class _AboutPageState extends State<AboutPage> {
       focusNode: _focusNode,
       onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
-        appBar: myAppBar(
-          context: context,
-          title: s.about,
-        ),
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
+            MySliverAppBar(
+              title: s.about,
+            ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 20.0,
