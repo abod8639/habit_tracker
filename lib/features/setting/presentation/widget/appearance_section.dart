@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/animated_setting_tile.dart';
-import 'package:habit_tracker/core/utils/restart_widget.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/lang_providers.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/animated_setting_lang.dart';
 import 'package:go_router/go_router.dart';
@@ -46,9 +45,6 @@ class AppearanceSection extends ConsumerWidget {
           onChanged: (value) async {
             if (value != null) {
               await langNotifier.changeLanguage(value);
-              if (context.mounted) {
-                RestartWidget.restartApp(context);
-              }
             }
           },
           textColor: Theme.of(context).colorScheme.onSurface,
