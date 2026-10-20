@@ -215,13 +215,17 @@ class HabitNotifier extends Notifier<HabitState> {
       state = state.copyWith(isLoading: true, errorMessage: '');
       final resetDaily = ref.read(resetDailyHabitsUseCaseProvider);
       await resetDaily();
+      if (!ref.mounted) return;
 
       await _loadHabits();
+      if (!ref.mounted) return;
       await _loadHeatmap();
+      if (!ref.mounted) return;
 
       _updateHomeWidget();
       state = state.copyWith(isInitialized: true, isLoading: false);
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Initialization failed: $e',
@@ -232,18 +236,30 @@ class HabitNotifier extends Notifier<HabitState> {
   Future<void> _loadHabits() async {
     final getHabits = ref.read(getHabitsUseCaseProvider);
     final result = await getHabits();
+    if (!ref.mounted) return;
     await result.fold(
-      (failure) async => state = state.copyWith(errorMessage: failure.message),
-      (loaded) async => state = state.copyWith(habits: loaded),
+      (failure) async {
+        if (!ref.mounted) return;
+        state = state.copyWith(errorMessage: failure.message);
+      },
+      (loaded) async {
+        if (!ref.mounted) return;
+        state = state.copyWith(habits: loaded);
+      },
     );
   }
 
   Future<void> _loadHeatmap() async {
     final getHeatmap = ref.read(getHeatmapDataUseCaseProvider);
     final result = await getHeatmap();
+    if (!ref.mounted) return;
     result.fold(
       (_) => null,
-      (data) => state = state.copyWith(localHeatmapDateSet: data),
+      (data) {
+        if (ref.mounted) {
+          state = state.copyWith(localHeatmapDateSet: data);
+        }
+      },
     );
 
     await _loadRemoteHeatmap();
@@ -257,6 +273,7 @@ class HabitNotifier extends Notifier<HabitState> {
       final remoteData = await firestore
           .downloadHabitHistory()
           .timeout(const Duration(seconds: 3));
+      if (!ref.mounted) return;
       final Map<DateTime, int> parsed = {};
 
       for (var entry in remoteData.entries) {
@@ -272,6 +289,7 @@ class HabitNotifier extends Notifier<HabitState> {
           parsed[DateTime(yyyy, mm, dd)] = parsedStrength;
         }
       }
+      if (!ref.mounted) return;
       state = state.copyWith(remoteHeatmapDateSet: parsed);
     } catch (_) {}
   }
@@ -282,10 +300,11 @@ class HabitNotifier extends Notifier<HabitState> {
     try {
       final resetUseCase = ref.read(resetDailyHabitsUseCaseProvider);
       final result = await resetUseCase();
+      if (!ref.mounted) return;
       result.fold(
         (_) => null,
         (didReset) {
-          if (didReset) {
+          if (didReset && ref.mounted) {
             refreshData();
           }
         },
@@ -297,7 +316,9 @@ class HabitNotifier extends Notifier<HabitState> {
 
   Future<void> refreshData() async {
     await _loadHabits();
+    if (!ref.mounted) return;
     await _loadHeatmap();
+    if (!ref.mounted) return;
     _updateHomeWidget();
   }
 
