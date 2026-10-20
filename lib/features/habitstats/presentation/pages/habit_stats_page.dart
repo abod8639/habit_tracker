@@ -61,45 +61,44 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
       onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: myAppBar(
-          context: context,
-          title: S.current.ratepagetitle,
-        ),
-        body: Builder(
-          builder: (context) {
-            if (state.stats == null && state.isLoading) {
-              return Center(
-                child: Container(
-                  width: 64,
-                  height: 64,
-                  decoration: StatsNeumorphicTheme.wellDecoration(
-                    context,
-                    borderRadius: AppRadius.dialog,
+        body: RefreshIndicator(
+          onRefresh: () =>
+              ref.read(habitStatsNotifierProvider.notifier).refreshStats(),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: [
+              MySliverAppBar(
+                title: S.current.ratepagetitle,
+              ),
+              if (state.stats == null && state.isLoading)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Container(
+                      width: 64,
+                      height: 64,
+                      decoration: StatsNeumorphicTheme.wellDecoration(
+                        context,
+                        borderRadius: AppRadius.dialog,
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.8,
+                        color: colorScheme.primary,
+                      ),
+                    ),
                   ),
-                  padding: const EdgeInsets.all(16),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.8,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              );
-            }
-
-            return RefreshIndicator(
-              onRefresh: () =>
-                  ref.read(habitStatsNotifierProvider.notifier).refreshStats(),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                child: Padding(
+                )
+              else
+                SliverPadding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 8.0,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
                       FadeAnimationSummaryCard(
                         animationController: _animationController,
                       ),
@@ -116,12 +115,11 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
                         animationController: _animationController,
                       ),
                       const SizedBox(height: 84), // extra padding for FAB
-                    ],
+                    ]),
                   ),
                 ),
-              ),
-            );
-          },
+            ],
+          ),
         ),
         floatingActionButton: _NeumorphicAiFab(
           onTap: () => AiGuard.protect(
