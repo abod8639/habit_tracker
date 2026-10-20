@@ -40,28 +40,25 @@ class PlanResultScreen extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: myAppBar(
-        title: S.current.yourPlanTitle(category?.displayName ?? ''),
-        context: context,
-        leading: Center(
-          child: NeumorphicIconButton.square(
-            customShadows: AppShadows.buttonResting(isDark: isDark),
-            size: 40,
-            iconSize: 18,
-            icon: Icons.close_rounded,
-            accentColor: theme.colorScheme.onSurface,
-            onPressed: () {
-              ref.read(planGeneratorNotifierProvider.notifier).reset();
-              context.go(AppRoutes.home);
-            },
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          MySliverAppBar(
+            title: S.current.yourPlanTitle(category?.displayName ?? ''),
+            leading: NeumorphicIconButton.square(
+              customShadows: AppShadows.buttonResting(isDark: isDark),
+              size: 40,
+              iconSize: 18,
+              icon: Icons.close_rounded,
+              accentColor: theme.colorScheme.onSurface,
+              onPressed: () {
+                ref.read(planGeneratorNotifierProvider.notifier).reset();
+                context.go(AppRoutes.home);
+              },
+            ),
           ),
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── Sub-header: items count & selection controls ───────────────
-            Padding(
+          SliverToBoxAdapter(
+            child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
               child: Row(
                 children: [
@@ -107,51 +104,52 @@ class PlanResultScreen extends ConsumerWidget {
                 ],
               ),
             ),
-
-            // ── Habit list ────────────────────────────────────────────────
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-                itemCount: state.suggestions.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (context, index) => PlanSuggestionCard(
-                  suggestion: state.suggestions[index],
-                  color: color,
-                  onToggle: () => ref
-                      .read(planGeneratorNotifierProvider.notifier)
-                      .toggleSuggestion(index),
-                ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+            sliver: SliverList.separated(
+              itemCount: state.suggestions.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              itemBuilder: (context, index) => PlanSuggestionCard(
+                suggestion: state.suggestions[index],
+                color: color,
+                onToggle: () => ref
+                    .read(planGeneratorNotifierProvider.notifier)
+                    .toggleSuggestion(index),
               ),
             ),
-
-            // ── Add button ────────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (state.hasError) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        state.errorMessage,
-                        style: TextStyle(
-                          color: theme.colorScheme.error,
-                          fontSize: 13,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (state.hasError) ...[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    state.errorMessage,
+                    style: TextStyle(
+                      color: theme.colorScheme.error,
+                      fontSize: 13,
                     ),
-                  ],
-                  NeumorphicButton(
-                    text: state.hasSelections
-                        ? S.current.addHabitsToTracker(state.selectedCount)
-                        : S.current.selectAtLeastOneHabit,
-                    icon: Icons.add_task_rounded,
-                    isLoading: state.isLoading,
-                    accentColor: color,
-                    onPressed: (state.hasSelections && !state.isLoading)
-                        ? () => _handleAddHabits(context, ref)
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+              NeumorphicButton(
+                text: state.hasSelections
+                    ? S.current.addHabitsToTracker(state.selectedCount)
+                    : S.current.selectAtLeastOneHabit,
+                icon: Icons.add_task_rounded,
+                isLoading: state.isLoading,
+                accentColor: color,
+                onPressed: (state.hasSelections && !state.isLoading)
+                    ? () => _handleAddHabits(context, ref)
+
                         : null,
                     width: double.infinity,
                     height: 52,
@@ -159,8 +157,6 @@ class PlanResultScreen extends ConsumerWidget {
                 ],
               ),
             ),
-          ],
-        ),
       ),
     );
   }
