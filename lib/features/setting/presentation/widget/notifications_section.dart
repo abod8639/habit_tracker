@@ -110,116 +110,116 @@ class NotificationsSection extends ConsumerWidget {
             ref,
           ),
         ),
-        if (isEnabled) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton.icon(
-                  onPressed: () async {
-                    await notificationNotifier.sendTestNotification();
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(s.notificationTestSent),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  },
-                  icon: Icon(
-                    Icons.notifications_active_outlined,
-                    size: 16,
-                    color: primaryColor,
-                  ),
-                  label: Text(
-                    s.testNotification,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-        if (isEnabled && !isBatteryIgnored) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Color.alphaBlend(
-                  Colors.amber.withValues(alpha: isDark ? 0.12 : 0.08),
-                  baseSurface,
-                ),
-                borderRadius: AppRadius.cardRadius,
-                border: Border.all(
-                  color: Colors.amber.withValues(
-                    alpha: isDark ? 0.35 : 0.25,
-                  ),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.battery_alert_rounded,
-                    color: Colors.amber,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          s.batteryOptimizationWarningTitle,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          s.batteryOptimizationWarningSubtitle,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: theme.textTheme.bodyMedium?.color
-                                ?.withValues(alpha: 0.75),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () =>
-                        notificationNotifier.requestBatteryOptimization(),
-                    style: TextButton.styleFrom(
-                      foregroundColor: primaryColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    child: Text(
-                      s.batteryOptimizationExemptAction,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        // if (isEnabled) ...[
+        //   Padding(
+        //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.end,
+        //       children: [
+        //         TextButton.icon(
+        //           onPressed: () async {
+        //             await notificationNotifier.sendTestNotification();
+        //             if (context.mounted) {
+        //               ScaffoldMessenger.of(context).showSnackBar(
+        //                 SnackBar(
+        //                   content: Text(s.notificationTestSent),
+        //                   duration: const Duration(seconds: 2),
+        //                 ),
+        //               );
+        //             }
+        //           },
+        //           icon: Icon(
+        //             Icons.notifications_active_outlined,
+        //             size: 16,
+        //             color: primaryColor,
+        //           ),
+        //           label: Text(
+        //             s.testNotification,
+        //             style: TextStyle(
+        //               fontSize: 12,
+        //               fontWeight: FontWeight.w600,
+        //               color: primaryColor,
+        //             ),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ],
+        // if (isEnabled && !isBatteryIgnored) ...[
+        //   Padding(
+        //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        //     child: Container(
+        //       padding: const EdgeInsets.all(12),
+        //       decoration: BoxDecoration(
+        //         color: Color.alphaBlend(
+        //           Colors.amber.withValues(alpha: isDark ? 0.12 : 0.08),
+        //           baseSurface,
+        //         ),
+        //         borderRadius: AppRadius.cardRadius,
+        //         border: Border.all(
+        //           color: Colors.amber.withValues(
+        //             alpha: isDark ? 0.35 : 0.25,
+        //           ),
+        //           width: 1,
+        //         ),
+        //       ),
+        //       child: Row(
+        //         children: [
+        //           const Icon(
+        //             Icons.battery_alert_rounded,
+        //             color: Colors.amber,
+        //             size: 24,
+        //           ),
+        //           const SizedBox(width: 12),
+        //           Expanded(
+        //             child: Column(
+        //               crossAxisAlignment: CrossAxisAlignment.start,
+        //               children: [
+        //                 Text(
+        //                   s.batteryOptimizationWarningTitle,
+        //                   style: const TextStyle(
+        //                     fontWeight: FontWeight.bold,
+        //                     fontSize: 13,
+        //                   ),
+        //                 ),
+        //                 const SizedBox(height: 2),
+        //                 Text(
+        //                   s.batteryOptimizationWarningSubtitle,
+        //                   style: TextStyle(
+        //                     fontSize: 11,
+        //                     color: theme.textTheme.bodyMedium?.color
+        //                         ?.withValues(alpha: 0.75),
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //           const SizedBox(width: 8),
+        //           TextButton(
+        //             onPressed: () =>
+        //                 notificationNotifier.requestBatteryOptimization(),
+        //             style: TextButton.styleFrom(
+        //               foregroundColor: primaryColor,
+        //               padding: const EdgeInsets.symmetric(
+        //                 horizontal: 8,
+        //                 vertical: 4,
+        //               ),
+        //               visualDensity: VisualDensity.compact,
+        //             ),
+        //             child: Text(
+        //               s.batteryOptimizationExemptAction,
+        //               style: const TextStyle(
+        //                 fontWeight: FontWeight.bold,
+        //                 fontSize: 12,
+        //               ),
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ],
     );
   }
