@@ -3,7 +3,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/features/generate_plan/data/datasources/questions_datasource.dart';
 import 'package:habit_tracker/features/generate_plan/domain/entities/category_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/providers/core_providers.dart';
+import 'package:habit_tracker/features/setting/data/datasources/lang_storage.dart';
+import 'package:habit_tracker/features/setting/domain/usecases/save_language_usecase.dart';
+import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/features/setting/presentation/providers/lang_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
+
+class FakeSaveLanguageUseCase extends Fake implements SaveLanguageUseCase {
+  @override
+  Future<Either<Failure, void>> call(String languageCode) async {
+    return const Right(null);
+  }
+}
+
+class FakeLangStorage extends Fake implements LangStorage {
+  String lang = 'sys';
+  @override
+  String getCurrentLanguage() => lang;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -68,5 +89,31 @@ void main() {
         expect(enQuestions.first.text, 'How old are you?');
       },
     );
+
+    test(
+      'LangNotifier updates locale without restarting or throwing disposed ref errors',
+      () async {
+        final container = ProviderContainer(
+          overrides: [
+            saveLanguageUseCaseProvider.overrideWithValue(FakeSaveLanguageUseCase()),
+            langStorageServiceProvider.overrideWithValue(FakeLangStorage()),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final notifier = container.read(langNotifierProvider.notifier);
+        await notifier.changeLanguage('ar');
+
+        expect(container.read(langNotifierProvider).languageCode, 'ar');
+        expect(container.read(langNotifierProvider).isArabic, true);
+        expect(container.read(langNotifierProvider).effectiveLocale, const Locale('ar'));
+
+        await notifier.changeLanguage('en');
+        expect(container.read(langNotifierProvider).languageCode, 'en');
+        expect(container.read(langNotifierProvider).isArabic, false);
+        expect(container.read(langNotifierProvider).effectiveLocale, const Locale('en'));
+      },
+    );
   });
 }
+
