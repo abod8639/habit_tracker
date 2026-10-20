@@ -18,63 +18,69 @@ class CategorySelectionScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: myAppBar(
-        title: S.current.generatePlan,
-        context: context,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Header ───────────────────────────────────────────────────
-              const SizedBox(height: 8),
-              Text(
-                S.current.generatePlanTitle,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                  height: 1.25,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                S.current.generatePlanSubtitle,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface.withValues(alpha: 0.65),
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 28),
-
-              // ── Category grid ─────────────────────────────────────────────
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 0.88,
-                  children: PlanCategory.values
-                      .map(
-                        (category) => CategoryCard(
-                          category: category,
-                          onTap: () {
-                            ref
-                                .read(planGeneratorNotifierProvider.notifier)
-                                .selectCategory(category);
-                            context.push(AppRoutes.questionnaire);
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
-            ],
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          MySliverAppBar(
+            title: S.current.generatePlan,
           ),
-        ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Text(
+                    S.current.generatePlanTitle,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    S.current.generatePlanSubtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.onSurface.withValues(alpha: 0.65),
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 0.88,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final category = PlanCategory.values[index];
+                  return CategoryCard(
+                    category: category,
+                    onTap: () {
+                      ref
+                          .read(planGeneratorNotifierProvider.notifier)
+                          .selectCategory(category);
+                      context.push(AppRoutes.questionnaire);
+                    },
+                  );
+                },
+                childCount: PlanCategory.values.length,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
