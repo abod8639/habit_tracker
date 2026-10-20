@@ -490,11 +490,11 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
                     : Colors.white.withValues(alpha: 0.35 + (progress * 0.35))),
           width: widget.isToday ? 1.5 : 1.0,
         ),
-        boxShadow: AppShadows.heatMapTile(
-          primary: primary,
-          isDark: isDark,
-          progress: progress,
-        ),
+        // boxShadow: AppShadows.heatMapTile(
+        //   primary: primary,
+        //   isDark: isDark,
+        //   progress: progress,
+        // ),
       );
 
       final Color textColor = isDark
