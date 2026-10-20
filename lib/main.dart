@@ -37,8 +37,8 @@ Future<void> main() async {
       await AppInitializer.init();
 
       runApp(
-        RestartWidget(
-          child: const ProviderScope(
+        const ProviderScope(
+          child: RestartWidget(
             child: MyApp(),
           ),
         ),
