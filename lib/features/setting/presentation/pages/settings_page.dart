@@ -48,22 +48,28 @@ class _SettingsPageState extends State<SettingsPage>
       focusNode: _focusNode,
       onKeyEvent: (KeyEvent event) => AppKeyboardShortcuts.handlePageKey(event),
       child: Scaffold(
-        appBar: myAppBar(
-          context: context,
-          title: S.current.settingPageTitle,
-        ),
-        body: ListView(
-          padding: const EdgeInsets.only(bottom: 24),
-          children: [
-            AccountSection(animationController: _animationController),
-            SyncSection(animationController: _animationController),
-            AppearanceSection(animationController: _animationController),
-            NotificationsSection(animationController: _animationController),
-            AiSection(animationController: _animationController),
-            AboutSection(animationController: _animationController),
-            DataSection(animationController: _animationController),
-            LogoutTile(animationController: _animationController),
-            AppUpdateTile(animationController: _animationController),
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            MySliverAppBar(
+              title: S.current.settingPageTitle,
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 24),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  AccountSection(animationController: _animationController),
+                  SyncSection(animationController: _animationController),
+                  AppearanceSection(animationController: _animationController),
+                  NotificationsSection(animationController: _animationController),
+                  AiSection(animationController: _animationController),
+                  AboutSection(animationController: _animationController),
+                  DataSection(animationController: _animationController),
+                  LogoutTile(animationController: _animationController),
+                  AppUpdateTile(animationController: _animationController),
+                ]),
+              ),
+            ),
           ],
         ),
       ),
