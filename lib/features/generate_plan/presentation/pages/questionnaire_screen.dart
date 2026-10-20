@@ -57,18 +57,14 @@ class QuestionnaireScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: myAppBar(
-          title: state.selectedCategory?.displayName ?? '',
-          context: context,
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── Progress indicator ──────────────────────────────────────────
-            Padding(
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          MySliverAppBar(
+            title: state.selectedCategory?.displayName ?? '',
+            pinned: true,
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Column(
                 children: [
@@ -102,60 +98,64 @@ class QuestionnaireScreen extends ConsumerWidget {
                 ],
               ),
             ),
+          ),
+        ],
+        body: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    final question = state.currentQuestion;
+                    if (question == null) return const SizedBox.shrink();
 
-            const SizedBox(height: 20),
-
-            // ── Question content ────────────────────────────────────────────
-            Expanded(
-              child: Builder(
-                builder: (context) {
-                  final question = state.currentQuestion;
-                  if (question == null) return const SizedBox.shrink();
-
-                  return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    transitionBuilder: (child, animation) => SlideTransition(
-                      position:
-                          Tween<Offset>(
-                            begin: const Offset(0.08, 0),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutCubic,
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      transitionBuilder: (child, animation) => SlideTransition(
+                        position:
+                            Tween<Offset>(
+                              begin: const Offset(0.08, 0),
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOutCubic,
+                              ),
                             ),
-                          ),
-                      child: FadeTransition(opacity: animation, child: child),
-                    ),
-                    child: QuestionContent(
-                      key: ValueKey(question.id),
-                      question: question,
-                    ),
-                  );
-                },
+                        child: FadeTransition(opacity: animation, child: child),
+                      ),
+                      child: QuestionContent(
+                        key: ValueKey(question.id),
+                        question: question,
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
 
-            // ── Next / Generate action button ───────────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
-              child: NeumorphicButton(
-                text: state.isLastQuestion
-                    ? S.current.generateMyPlan
-                    : S.current.continueButton,
-                icon: state.isLastQuestion
-                    ? Icons.auto_awesome_rounded
-                    : Icons.arrow_forward_rounded,
-                isLoading: state.isLoading,
-                accentColor: state.selectedCategory?.color,
-                onPressed: state.isLoading
-                    ? null
-                    : () => _handleNext(context, ref),
-                width: double.infinity,
-                height: 52,
+              // ── Next / Generate action button ───────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+                child: NeumorphicButton(
+                  text: state.isLastQuestion
+                      ? S.current.generateMyPlan
+                      : S.current.continueButton,
+                  icon: state.isLastQuestion
+                      ? Icons.auto_awesome_rounded
+                      : Icons.arrow_forward_rounded,
+                  isLoading: state.isLoading,
+                  accentColor: state.selectedCategory?.color,
+                  onPressed: state.isLoading
+                      ? null
+                      : () => _handleNext(context, ref),
+                  width: double.infinity,
+                  height: 52,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
