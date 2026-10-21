@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/core/utils/restart_widget.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -31,7 +32,7 @@ class ClearDataDialog {
 
       result.fold(
         (failure) {
-          if (context.mounted) _showErrorSnackBar(context, failure.message);
+          if (context.mounted) _showErrorSnackBar(context, failure.toMessage());
         },
         (_) async {
           if (context.mounted) _showSuccessSnackBar(context);
@@ -41,12 +42,13 @@ class ClearDataDialog {
           }
         },
       );
-    } catch (e) {
+    } catch (e, stack) {
       if (context.mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
       if (context.mounted) {
-        _showErrorSnackBar(context, e.toString());
+        final failure = NetworkErrorHandler.handle(e, stack);
+        _showErrorSnackBar(context, failure.toMessage());
       }
     }
   }
