@@ -14,7 +14,9 @@ class QuestionChoiceInput extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(planGeneratorNotifierProvider);
+    final state =
+        ref.watch(planGeneratorNotifierProvider).value ??
+        const PlanGeneratorState();
     final color = state.selectedCategory?.color ?? Colors.blue;
     final isMultiple = question.type == QuestionType.multipleChoice;
 
