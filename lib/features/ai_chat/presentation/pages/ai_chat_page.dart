@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/ai_chat_providers.dart';
 import '../widgets/ai_chat_app_bar.dart';
+import '../widgets/ai_chat_error_view.dart';
 import '../widgets/ai_empty_state.dart';
 import '../widgets/ai_message_bubble.dart';
 import '../widgets/ai_message_input.dart';
 import '../widgets/ai_typing_indicator.dart';
 
-/// Clean Architecture Presentation Page for AI Chat powered by Riverpod.
-/// Orchestrates the Neumorphic chat components while keeping UI declarative,
-/// clean, and decoupled from low-level widget details.
+/// Clean Architecture Presentation Page for AI Chat powered by Riverpod AsyncNotifier.
+/// Orchestrates the Neumorphic chat components while utilizing AsyncValue.when for robust
+/// error boundaries and zero-crash fallback states.
 class AiChatPage extends ConsumerStatefulWidget {
   const AiChatPage({super.key});
 
@@ -90,72 +92,116 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final chatState = ref.watch(aiChatNotifierProvider);
+    final asyncChatState = ref.watch(aiChatNotifierProvider);
     final theme = Theme.of(context);
 
-    ref.listen(aiChatNotifierProvider.select((s) => s.errorMessage), (
-      prev,
-      next,
-    ) {
-      if (next != null && next.isNotEmpty && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next),
-            backgroundColor: theme.colorScheme.error,
-          ),
-        );
-      }
-    });
+    // Listen to transient messaging failures and present elegant SnackBars
+    ref.listen<Failure?>(
+      aiChatNotifierProvider.select((s) => s.value?.activeFailure),
+      (prev, nextFailure) {
+        if (nextFailure != null && mounted) {
+          final errorMessage = nextFailure.toMessage();
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      errorMessage,
+                      style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: theme.colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      },
+    );
 
-    ref.listen(aiChatNotifierProvider.select((s) => s.messages), (prev, next) {
-      _scrollToBottom();
-    });
+    // Auto-scroll when messages count updates
+    ref.listen<int?>(
+      aiChatNotifierProvider.select((s) => s.value?.messages.length),
+      (prev, next) {
+        if (next != null && next != prev) {
+          _scrollToBottom();
+        }
+      },
+    );
+
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AiChatAppBar(
         onClearChat: _confirmClearChat,
       ),
-      body: Column(
-        children: [
-          // Main Messages Area
-          Expanded(
-            child: chatState.messages.isEmpty
-                ? AiEmptyState(
-                    onPromptSelected: _handlePromptSelected,
-                  )
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                    itemCount: chatState.messages.length,
-                    itemBuilder: (context, index) {
-                      final message = chatState.messages[index];
-                      final isLast = index == chatState.messages.length - 1;
-
-                      return AiMessageBubble(
-                        message: message,
-                        isLast: isLast,
-                        onRetry: () => ref
-                            .read(aiChatNotifierProvider.notifier)
-                            .retryMessage(message),
-                      );
-                    },
-                  ),
+      body: asyncChatState.when(
+        loading: () => Center(
+          child: CircularProgressIndicator.adaptive(
+            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
           ),
+        ),
+        error: (error, _) => AiChatErrorView(
+          errorMessage: error.toString(),
+          onRetry: () => ref.invalidate(aiChatNotifierProvider),
+        ),
+        data: (chatState) {
+          return Column(
+            children: [
+              // Main Messages View
+              Expanded(
+                child: chatState.messages.isEmpty
+                    ? AiEmptyState(
+                        onPromptSelected: _handlePromptSelected,
+                      )
+                    : ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                        itemCount: chatState.messages.length,
+                        itemBuilder: (context, index) {
+                          final message = chatState.messages[index];
+                          final isLast = index == chatState.messages.length - 1;
 
-          // Typing / Streaming Loading Indicator
-          if (chatState.isLoading)
-            AiTypingIndicator(
-              loadingMessage: chatState.loadingMessage,
-            ),
+                          return AiMessageBubble(
+                            message: message,
+                            isLast: isLast,
+                            onRetry: () => ref
+                                .read(aiChatNotifierProvider.notifier)
+                                .retryMessage(message),
+                          );
+                        },
+                      ),
+              ),
 
-          // Neumorphic Input Bar
-          AiMessageInput(
-            textController: _textController,
-            isLoading: chatState.isLoading,
-            onSend: _handleSend,
-          ),
-        ],
+              // Streaming / Typing indicator with status message
+              if (chatState.isStreaming)
+                AiTypingIndicator(
+                  loadingMessage: chatState.statusMessage,
+                ),
+
+              // Neumorphic Input Dock
+              AiMessageInput(
+                textController: _textController,
+                isLoading: chatState.isStreaming,
+                onSend: _handleSend,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
