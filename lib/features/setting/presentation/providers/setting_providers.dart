@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
@@ -134,12 +137,14 @@ class SyncState {
   final bool isAutoSyncEnabled;
   final DateTime? lastSyncTime;
   final String errorMessage;
+  final Failure? activeFailure;
 
   const SyncState({
     this.syncStatus = SyncStatus.idle,
     this.isAutoSyncEnabled = true,
     this.lastSyncTime,
     this.errorMessage = '',
+    this.activeFailure,
   });
 
   SyncState copyWith({
@@ -147,12 +152,15 @@ class SyncState {
     bool? isAutoSyncEnabled,
     DateTime? lastSyncTime,
     String? errorMessage,
+    Failure? activeFailure,
+    bool clearFailure = false,
   }) {
     return SyncState(
       syncStatus: syncStatus ?? this.syncStatus,
       isAutoSyncEnabled: isAutoSyncEnabled ?? this.isAutoSyncEnabled,
       lastSyncTime: lastSyncTime ?? this.lastSyncTime,
       errorMessage: errorMessage ?? this.errorMessage,
+      activeFailure: clearFailure ? null : (activeFailure ?? this.activeFailure),
     );
   }
 
@@ -167,7 +175,9 @@ class SyncState {
       case SyncStatus.success:
         return S.current.syncSuccess;
       case SyncStatus.error:
-        return S.current.syncFailed;
+        return errorMessage.isNotEmpty
+            ? errorMessage
+            : S.current.syncFailed;
     }
   }
 
@@ -186,8 +196,15 @@ class SyncState {
 }
 
 class SyncNotifier extends Notifier<SyncState> {
+  bool _isDisposed = false;
+
   @override
   SyncState build() {
+    _isDisposed = false;
+    ref.onDispose(() {
+      _isDisposed = true;
+    });
+
     Future.microtask(() => loadLastSyncTime());
     return const SyncState();
   }
@@ -195,9 +212,14 @@ class SyncNotifier extends Notifier<SyncState> {
   Future<void> loadLastSyncTime() async {
     final getLastSync = ref.read(getLastSyncTimeUseCaseProvider);
     final result = await getLastSync();
+    if (_isDisposed) return;
     result.fold(
       (_) => null,
-      (time) => state = state.copyWith(lastSyncTime: time),
+      (time) {
+        if (!_isDisposed) {
+          state = state.copyWith(lastSyncTime: time);
+        }
+      },
     );
   }
 
@@ -206,16 +228,25 @@ class SyncNotifier extends Notifier<SyncState> {
   }
 
   Future<void> syncHabits() async {
-    if (state.syncStatus == SyncStatus.syncing) return;
-    state = state.copyWith(syncStatus: SyncStatus.syncing, errorMessage: '');
+    if (_isDisposed || state.syncStatus == SyncStatus.syncing) return;
+    state = state.copyWith(
+      syncStatus: SyncStatus.syncing,
+      errorMessage: '',
+      clearFailure: true,
+    );
+
     final habitRepo = ref.read(habitRepositoryProvider);
     final localResult = await habitRepo.getHabits();
+    if (_isDisposed) return;
+
     final habits = localResult.fold(
       (_) => ref.read(habitNotifierProvider).habits,
       (list) => list,
     );
     final habitsModels = habits.map((e) => HabitModel.fromEntity(e)).toList();
     final result = await manualSync(habitsModels);
+    if (_isDisposed) return;
+
     if (result != null) {
       habitRepo.invalidateHeatmapCache();
       await ref.read(habitNotifierProvider.notifier).refreshData();
@@ -229,7 +260,11 @@ class SyncNotifier extends Notifier<SyncState> {
     }
 
     try {
-      state = state.copyWith(syncStatus: SyncStatus.syncing, errorMessage: '');
+      state = state.copyWith(
+        syncStatus: SyncStatus.syncing,
+        errorMessage: '',
+        clearFailure: true,
+      );
 
       final habitRepo = ref.read(habitRepositoryProvider);
       final localTombstones = habitRepo.getLocalTombstones();
@@ -244,30 +279,43 @@ class SyncNotifier extends Notifier<SyncState> {
         localStartDay: localStartDay,
       );
 
+      if (_isDisposed) return null;
+
       return result.fold<List<HabitModel>?>(
         (failure) {
-          state = state.copyWith(
-            syncStatus: SyncStatus.error,
-            errorMessage: failure.message,
-          );
+          if (!_isDisposed) {
+            state = state.copyWith(
+              syncStatus: SyncStatus.error,
+              errorMessage: failure.toMessage(),
+              activeFailure: failure,
+            );
+          }
           return null;
         },
         (mergedHabits) {
           habitRepo.clearLocalTombstones();
           habitRepo.markVaultSynced();
           final now = DateTime.now();
-          state = state.copyWith(
-            syncStatus: SyncStatus.success,
-            lastSyncTime: now,
-          );
+          if (!_isDisposed) {
+            state = state.copyWith(
+              syncStatus: SyncStatus.success,
+              lastSyncTime: now,
+              errorMessage: '',
+              clearFailure: true,
+            );
+          }
           return mergedHabits;
         },
       );
-    } catch (e) {
-      state = state.copyWith(
-        syncStatus: SyncStatus.error,
-        errorMessage: e.toString(),
-      );
+    } catch (e, stack) {
+      if (!_isDisposed) {
+        final failure = NetworkErrorHandler.handle(e, stack);
+        state = state.copyWith(
+          syncStatus: SyncStatus.error,
+          errorMessage: failure.toMessage(),
+          activeFailure: failure,
+        );
+      }
       return null;
     }
   }
@@ -293,30 +341,43 @@ class SyncNotifier extends Notifier<SyncState> {
         localStartDay: localStartDay,
       );
 
+      if (_isDisposed) return null;
+
       return result.fold<List<HabitModel>?>(
         (failure) {
-          state = state.copyWith(
-            syncStatus: SyncStatus.error,
-            errorMessage: failure.message,
-          );
+          if (!_isDisposed) {
+            state = state.copyWith(
+              syncStatus: SyncStatus.error,
+              errorMessage: failure.toMessage(),
+              activeFailure: failure,
+            );
+          }
           return null;
         },
         (mergedHabits) {
           habitRepo.clearLocalTombstones();
           habitRepo.markVaultSynced();
           final now = DateTime.now();
-          state = state.copyWith(
-            syncStatus: SyncStatus.success,
-            lastSyncTime: now,
-          );
+          if (!_isDisposed) {
+            state = state.copyWith(
+              syncStatus: SyncStatus.success,
+              lastSyncTime: now,
+              errorMessage: '',
+              clearFailure: true,
+            );
+          }
           return mergedHabits;
         },
       );
-    } catch (e) {
-      state = state.copyWith(
-        syncStatus: SyncStatus.error,
-        errorMessage: e.toString(),
-      );
+    } catch (e, stack) {
+      if (!_isDisposed) {
+        final failure = NetworkErrorHandler.handle(e, stack);
+        state = state.copyWith(
+          syncStatus: SyncStatus.error,
+          errorMessage: failure.toMessage(),
+          activeFailure: failure,
+        );
+      }
       return null;
     }
   }
@@ -324,6 +385,11 @@ class SyncNotifier extends Notifier<SyncState> {
 
 final syncNotifierProvider = NotifierProvider<SyncNotifier, SyncState>(() {
   return SyncNotifier();
+});
+
+/// Exposes active sync [Failure] for floating SnackBar notifications and retry actions.
+final syncFailureProvider = Provider<Failure?>((ref) {
+  return ref.watch(syncNotifierProvider.select((s) => s.activeFailure));
 });
 
 // ── NOTIFICATION STATE & NOTIFIER ──────────────────────────────────────────
@@ -354,8 +420,15 @@ class NotificationState {
 }
 
 class NotificationNotifier extends Notifier<NotificationState> {
+  bool _isDisposed = false;
+
   @override
   NotificationState build() {
+    _isDisposed = false;
+    ref.onDispose(() {
+      _isDisposed = true;
+    });
+
     Future.microtask(() => _loadSettings());
     return const NotificationState();
   }
@@ -367,6 +440,8 @@ class NotificationNotifier extends Notifier<NotificationState> {
     final enabledResult = await isEnabledUseCase();
     final timeResult = await getTimeUseCase();
 
+    if (_isDisposed) return;
+
     final isEnabled = enabledResult.getOrElse(() => false);
     final time = timeResult.getOrElse(() => null);
 
@@ -375,11 +450,13 @@ class NotificationNotifier extends Notifier<NotificationState> {
       notificationTime: time,
     );
 
-    if (isEnabled && time != null) {
+    if (isEnabled && time != null && !_isDisposed) {
       await _scheduleDailyReminder(time);
     }
 
-    await checkBatteryOptimization();
+    if (!_isDisposed) {
+      await checkBatteryOptimization();
+    }
   }
 
   Future<void> checkBatteryOptimization() async {
@@ -387,7 +464,9 @@ class NotificationNotifier extends Notifier<NotificationState> {
     if (notificationService != null) {
       final ignored = await notificationService
           .isIgnoringBatteryOptimizations();
-      state = state.copyWith(isBatteryOptimizationIgnored: ignored);
+      if (!_isDisposed) {
+        state = state.copyWith(isBatteryOptimizationIgnored: ignored);
+      }
     }
   }
 
@@ -395,7 +474,9 @@ class NotificationNotifier extends Notifier<NotificationState> {
     final notificationService = ref.read(notificationServiceProvider);
     if (notificationService != null) {
       await notificationService.requestIgnoreBatteryOptimizations();
-      await checkBatteryOptimization();
+      if (!_isDisposed) {
+        await checkBatteryOptimization();
+      }
     }
   }
 
@@ -434,15 +515,19 @@ class NotificationNotifier extends Notifier<NotificationState> {
       await notificationService.requestPermissions(
         requestBatteryExemption: true,
       );
-      await checkBatteryOptimization();
+      if (!_isDisposed) {
+        await checkBatteryOptimization();
+      }
     }
 
     final setEnabled = ref.read(setNotificationEnabledUseCaseProvider);
     await setEnabled(enabled);
+    if (_isDisposed) return;
+
     state = state.copyWith(isNotificationEnabled: enabled);
 
     if (enabled) {
-      if (state.notificationTime != null) {
+      if (state.notificationTime != null && !_isDisposed) {
         await _scheduleDailyReminder(state.notificationTime!);
       }
     } else {
@@ -455,9 +540,11 @@ class NotificationNotifier extends Notifier<NotificationState> {
   Future<void> setNotificationTime(TimeOfDay time) async {
     final setTime = ref.read(setNotificationTimeUseCaseProvider);
     await setTime(time);
+    if (_isDisposed) return;
+
     state = state.copyWith(notificationTime: time);
 
-    if (state.isNotificationEnabled) {
+    if (state.isNotificationEnabled && !_isDisposed) {
       await _scheduleDailyReminder(time);
     }
   }
@@ -476,6 +563,7 @@ class AiSettingsState {
   final bool isLoading;
   final bool isValidating;
   final ApiKeyStatus apiKeyStatus;
+  final Failure? activeFailure;
 
   const AiSettingsState({
     this.customApiKey = '',
@@ -484,6 +572,7 @@ class AiSettingsState {
     this.isLoading = false,
     this.isValidating = false,
     this.apiKeyStatus = ApiKeyStatus.unknown,
+    this.activeFailure,
   });
 
   bool get isKeyWorking => apiKeyStatus == ApiKeyStatus.valid;
@@ -501,6 +590,8 @@ class AiSettingsState {
     bool? isLoading,
     bool? isValidating,
     ApiKeyStatus? apiKeyStatus,
+    Failure? activeFailure,
+    bool clearFailure = false,
   }) {
     return AiSettingsState(
       customApiKey: customApiKey ?? this.customApiKey,
@@ -509,13 +600,21 @@ class AiSettingsState {
       isLoading: isLoading ?? this.isLoading,
       isValidating: isValidating ?? this.isValidating,
       apiKeyStatus: apiKeyStatus ?? this.apiKeyStatus,
+      activeFailure: clearFailure ? null : (activeFailure ?? this.activeFailure),
     );
   }
 }
 
 class AiSettingsNotifier extends Notifier<AiSettingsState> {
+  bool _isDisposed = false;
+
   @override
   AiSettingsState build() {
+    _isDisposed = false;
+    ref.onDispose(() {
+      _isDisposed = true;
+    });
+
     Future.microtask(() => loadApiKey());
     return const AiSettingsState();
   }
@@ -523,67 +622,115 @@ class AiSettingsNotifier extends Notifier<AiSettingsState> {
   Future<void> loadApiKey() async {
     final getCustomKey = ref.read(getCustomApiKeyUseCaseProvider);
     final result = await getCustomKey();
+    if (_isDisposed) return;
+
     result.fold(
       (_) => null,
       (key) {
-        state = state.copyWith(
-          customApiKey: key ?? '',
-          isCustom: key?.isNotEmpty ?? false,
-          apiKeyStatus: (key?.isNotEmpty ?? false)
-              ? ApiKeyStatus.valid
-              : ApiKeyStatus.unknown,
-        );
+        if (!_isDisposed) {
+          state = state.copyWith(
+            customApiKey: key ?? '',
+            isCustom: key?.isNotEmpty ?? false,
+            apiKeyStatus: (key?.isNotEmpty ?? false)
+                ? ApiKeyStatus.valid
+                : ApiKeyStatus.unknown,
+          );
+        }
       },
     );
   }
 
   Future<bool> saveApiKey(String key) async {
     final sanitizedKey = key.trim();
-    state = state.copyWith(isLoading: true, isValidating: true);
+    if (_isDisposed) return false;
 
-    final isValid = await GeminiService.validateApiKey(sanitizedKey);
-    if (!isValid) {
-      state = state.copyWith(
-        isLoading: false,
-        isValidating: false,
-        apiKeyStatus: ApiKeyStatus.invalid,
+    state = state.copyWith(
+      isLoading: true,
+      isValidating: true,
+      clearFailure: true,
+    );
+
+    try {
+      final isValid = await GeminiService.validateApiKey(sanitizedKey).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => false,
       );
-      return false;
-    }
 
-    final saveKey = ref.read(saveCustomApiKeyUseCaseProvider);
-    final result = await saveKey(sanitizedKey);
+      if (_isDisposed) return false;
 
-    return result.fold(
-      (_) {
-        state = state.copyWith(isLoading: false, isValidating: false);
-        return false;
-      },
-      (_) {
-        GeminiService.resetModelInstance();
+      if (!isValid) {
         state = state.copyWith(
-          customApiKey: sanitizedKey,
-          isCustom: true,
           isLoading: false,
           isValidating: false,
-          apiKeyStatus: ApiKeyStatus.valid,
+          apiKeyStatus: ApiKeyStatus.invalid,
+          activeFailure: const ServerFailure('Invalid Gemini API Key'),
         );
-        return true;
-      },
-    );
+        return false;
+      }
+
+      final saveKey = ref.read(saveCustomApiKeyUseCaseProvider);
+      final result = await saveKey(sanitizedKey);
+      if (_isDisposed) return false;
+
+      final savedSuccessfully = result.fold<bool>(
+        (failure) {
+          if (!_isDisposed) {
+            state = state.copyWith(
+              isLoading: false,
+              isValidating: false,
+              apiKeyStatus: ApiKeyStatus.invalid,
+              activeFailure: failure,
+            );
+          }
+          return false;
+        },
+        (_) {
+          GeminiService.resetModelInstance();
+          if (!_isDisposed) {
+            state = state.copyWith(
+              customApiKey: sanitizedKey,
+              isCustom: true,
+              isLoading: false,
+              isValidating: false,
+              apiKeyStatus: ApiKeyStatus.valid,
+              clearFailure: true,
+            );
+          }
+          return true;
+        },
+      );
+      return savedSuccessfully;
+    } catch (e, stack) {
+      if (!_isDisposed) {
+        final failure = NetworkErrorHandler.handle(e, stack);
+        state = state.copyWith(
+          isLoading: false,
+          isValidating: false,
+          apiKeyStatus: ApiKeyStatus.invalid,
+          activeFailure: failure,
+        );
+      }
+      return false;
+    }
   }
 
   Future<void> clearApiKey() async {
-    state = state.copyWith(isLoading: true);
+    if (_isDisposed) return;
+    state = state.copyWith(isLoading: true, clearFailure: true);
+
     final clearKey = ref.read(clearCustomApiKeyUseCaseProvider);
     await clearKey();
     GeminiService.resetModelInstance();
-    state = state.copyWith(
-      customApiKey: '',
-      isCustom: false,
-      isLoading: false,
-      apiKeyStatus: ApiKeyStatus.unknown,
-    );
+
+    if (!_isDisposed) {
+      state = state.copyWith(
+        customApiKey: '',
+        isCustom: false,
+        isLoading: false,
+        apiKeyStatus: ApiKeyStatus.unknown,
+        clearFailure: true,
+      );
+    }
   }
 
   void toggleObscure() {
