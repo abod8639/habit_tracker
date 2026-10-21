@@ -35,11 +35,13 @@ class AppUpdateTile extends ConsumerWidget {
 
     if (confirmed == true) {
       final targetUrl = downloadUrl.isNotEmpty ? downloadUrl : releaseUrl;
-      final uri = Uri.parse(targetUrl);
-      try {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } catch (e) {
-        debugPrint('Could not launch $targetUrl: $e');
+      final uri = Uri.tryParse(targetUrl);
+      if (uri != null) {
+        try {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } catch (e) {
+          debugPrint('Could not launch $targetUrl: $e');
+        }
       }
     }
   }
