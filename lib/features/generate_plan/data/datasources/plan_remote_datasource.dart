@@ -1,9 +1,11 @@
-import 'dart:convert';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'dart:async';
+import 'package:google_generative_ai/google_generative_ai.dart' hide ServerException;
 import 'package:intl/intl.dart';
+import 'package:habit_tracker/core/error/exceptions.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import '../../domain/entities/category_entity.dart';
 import '../models/plan_suggestion_model.dart';
+import 'plan_payload_processor.dart';
 
 abstract class PlanRemoteDataSource {
   Future<List<PlanSuggestionModel>> generatePlan({
@@ -15,6 +17,9 @@ abstract class PlanRemoteDataSource {
 /// Dedicated remote AI service for generating personalized habit plans via Gemini.
 class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
   final GeminiService geminiService;
+
+  /// Explicit timeout duration for plan generation requests to prevent UI freezing.
+  static const Duration requestTimeout = Duration(seconds: 30);
 
   PlanRemoteDataSourceImpl({required this.geminiService});
 
@@ -65,9 +70,16 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
         ),
       );
 
-      final response = await model.generateContent([Content.text(prompt)]);
+      final response = await model
+          .generateContent([Content.text(prompt)])
+          .timeout(
+            requestTimeout,
+            onTimeout: () => throw const TimeoutAppException(
+              'Plan generation request timed out. Please try again.',
+            ),
+          );
       final text = response.text ?? '';
-      return _parsePlanResponse(text, category);
+      return await PlanPayloadProcessor.parsePlanResponse(text);
     } catch (e) {
       if (GeminiService.isModelUnavailableError(e)) {
         final switched = await GeminiService.trySwitchToWorkingModel();
@@ -80,13 +92,26 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
                 temperature: 0.4,
               ),
             );
-            final response = await fallbackModel.generateContent([
-              Content.text(prompt),
-            ]);
+            final response = await fallbackModel
+                .generateContent([Content.text(prompt)])
+                .timeout(
+                  requestTimeout,
+                  onTimeout: () => throw const TimeoutAppException(
+                    'Plan generation fallback request timed out. Please try again.',
+                  ),
+                );
             final text = response.text ?? '';
-            return _parsePlanResponse(text, category);
+            return await PlanPayloadProcessor.parsePlanResponse(text);
           } catch (_) {}
         }
+      }
+      if (e is TimeoutAppException || e is TimeoutException) {
+        throw const TimeoutAppException(
+          'Plan generation timed out. Please check your connection and try again.',
+        );
+      }
+      if (e is FormatException) {
+        throw ParsingException('Failed to process AI plan response: ${e.message}');
       }
       GeminiService.handleException(e, 'generating plan');
     }
@@ -150,53 +175,5 @@ CRITICAL RULES:
 $languageInstruction
 ''';
   }
-
-  /// Parses the Gemini response text into a list of [PlanSuggestionModel].
-  List<PlanSuggestionModel> _parsePlanResponse(
-    String responseText,
-    PlanCategory category,
-  ) {
-    try {
-      String cleaned = responseText
-          .replaceAll(RegExp(r'```json\s*'), '')
-          .replaceAll(RegExp(r'```\s*'), '')
-          .trim();
-
-      final start = cleaned.indexOf('[');
-      final end = cleaned.lastIndexOf(']');
-
-      if (start != -1 && end != -1 && end >= start) {
-        cleaned = cleaned.substring(start, end + 1);
-      }
-
-      final dynamic decoded = json.decode(cleaned);
-
-      if (decoded is! List || decoded.isEmpty) {
-        throw const FormatException('AI returned an empty habit list.');
-      }
-
-      final list = decoded
-          .whereType<Map<String, dynamic>>()
-          .map(PlanSuggestionModel.fromJson)
-          .where((s) => s.name.trim().isNotEmpty)
-          .toList();
-
-      if (list.isEmpty) {
-        throw const FormatException('No valid habits parsed from response.');
-      }
-
-      return list;
-    } on FormatException catch (e) {
-      throw GeminiInvalidResponseException(
-        'Could not parse AI response.',
-        details: e.message,
-      );
-    } catch (e) {
-      if (e is GeminiException) rethrow;
-      throw GeminiUnknownException(
-        'Unexpected error parsing plan.',
-        originalError: e,
-      );
-    }
-  }
 }
+
