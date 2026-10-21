@@ -1,6 +1,7 @@
 import 'dart:math' as math;
+import 'package:equatable/equatable.dart';
 
-class AppUpdateInfo {
+class AppUpdateInfo extends Equatable {
   final bool hasUpdate;
   final String currentVersion;
   final String latestVersion;
@@ -16,6 +17,35 @@ class AppUpdateInfo {
     required this.downloadUrl,
     this.releaseNotes,
   });
+
+  factory AppUpdateInfo.empty({String currentVersion = '1.0.0'}) {
+    return AppUpdateInfo(
+      hasUpdate: false,
+      currentVersion: currentVersion,
+      latestVersion: currentVersion,
+      releaseUrl: '',
+      downloadUrl: '',
+      releaseNotes: null,
+    );
+  }
+
+  AppUpdateInfo copyWith({
+    bool? hasUpdate,
+    String? currentVersion,
+    String? latestVersion,
+    String? releaseUrl,
+    String? downloadUrl,
+    String? releaseNotes,
+  }) {
+    return AppUpdateInfo(
+      hasUpdate: hasUpdate ?? this.hasUpdate,
+      currentVersion: currentVersion ?? this.currentVersion,
+      latestVersion: latestVersion ?? this.latestVersion,
+      releaseUrl: releaseUrl ?? this.releaseUrl,
+      downloadUrl: downloadUrl ?? this.downloadUrl,
+      releaseNotes: releaseNotes ?? this.releaseNotes,
+    );
+  }
 
   /// Compares [remoteVersion] with [currentVersion].
   /// Returns `true` if [remoteVersion] is strictly newer than [currentVersion].
@@ -45,4 +75,14 @@ class AppUpdateInfo {
         .map((segment) => int.tryParse(segment) ?? 0)
         .toList();
   }
+
+  @override
+  List<Object?> get props => [
+    hasUpdate,
+    currentVersion,
+    latestVersion,
+    releaseUrl,
+    downloadUrl,
+    releaseNotes,
+  ];
 }
