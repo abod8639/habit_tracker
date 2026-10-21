@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import '../../domain/entities/chat_message_entity.dart';
 import '../../domain/repositories/ai_chat_repository.dart';
 import '../datasources/ai_chat_local_datasource.dart';
@@ -16,36 +17,28 @@ class AiChatRepositoryImpl implements AiChatRepository {
   });
 
   @override
-  Future<Either<Failure, List<ChatMessageEntity>>> getChatHistory() async {
-    try {
+  Future<Either<Failure, List<ChatMessageEntity>>> getChatHistory() {
+    return NetworkErrorHandler.guard(() async {
       final models = await localDataSource.getChatHistory();
-      return Right(models);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+      return models;
+    });
   }
 
   @override
   Future<Either<Failure, void>> saveChatHistory(
     List<ChatMessageEntity> messages,
-  ) async {
-    try {
+  ) {
+    return NetworkErrorHandler.guard(() async {
       final models = messages.map(ChatMessageModel.fromEntity).toList();
       await localDataSource.saveChatHistory(models);
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
-  Future<Either<Failure, void>> clearChatHistory() async {
-    try {
+  Future<Either<Failure, void>> clearChatHistory() {
+    return NetworkErrorHandler.guard(() async {
       await localDataSource.clearChatHistory();
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
@@ -60,7 +53,15 @@ class AiChatRepositoryImpl implements AiChatRepository {
   }
 
   @override
-  Stream<String> sendMessageStream(String message) {
-    return remoteDataSource.sendMessageStream(message);
+  Stream<Either<Failure, String>> sendMessageStream(String message) async* {
+    try {
+      final stream = remoteDataSource.sendMessageStream(message);
+      await for (final chunk in stream) {
+        yield Right(chunk);
+      }
+    } catch (e, stack) {
+      final failure = NetworkErrorHandler.handle(e, stack);
+      yield Left(failure);
+    }
   }
 }
