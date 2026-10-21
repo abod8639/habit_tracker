@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/build_error_screen.dart';
 import 'package:habit_tracker/core/components/build_loading_screen.dart';
 import 'package:habit_tracker/core/components/my_drawer.dart';
+import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/presentation/widget/habit_list.dart';
@@ -29,15 +30,35 @@ class _PhoneState extends ConsumerState<Phone> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(
-      habitNotifierProvider.select((s) => s.isLoading),
+    // Listen for transient or operational failures and present a SnackBar with Retry
+    ref.listen<Failure?>(
+      habitNotifierProvider.select((s) => s.activeFailure),
+      (previous, next) {
+        if (next != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(next.toMessage()),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              action: SnackBarAction(
+                label: 'Retry',
+                textColor: Theme.of(context).colorScheme.onError,
+                onPressed: () {
+                  ref.read(habitNotifierProvider.notifier).retry();
+                },
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          ref.read(habitNotifierProvider.notifier).clearActiveFailure();
+        }
+      },
     );
-    final errorMessage = ref.watch(
-      habitNotifierProvider.select((s) => s.errorMessage),
-    );
+
     final isSelectionMode = ref.watch(
       habitNotifierProvider.select((s) => s.isSelectionMode),
     );
+    final asyncHabit = ref.watch(asyncHabitProvider);
 
     return Scaffold(
       drawer: const MyDrawer(),
@@ -49,32 +70,24 @@ class _PhoneState extends ConsumerState<Phone> {
               onPressed: () => HabitDialogs.showAdd(context, ref: ref),
             ),
       body: SafeArea(
-        child: Builder(
-          builder: (context) {
-            if (isLoading) {
-              return buildLoadingScreen();
-            }
-
-            if (errorMessage.isNotEmpty) {
-              return ErrorView(
-                errorMessage: errorMessage,
-                onRetry: () => ref.read(habitNotifierProvider.notifier).retry(),
-              );
-            }
-
-            return CustomScrollView(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
-              slivers: const [
-                HomeAppBar(),
-                SliverMonthlySummary(),
-                HabitList(),
-                SliverToBoxAdapter(
-                  child: SizedBox(height: 85),
-                ),
-              ],
-            );
-          },
+        child: asyncHabit.when(
+          loading: () => buildLoadingScreen(),
+          error: (error, stackTrace) => ErrorView(
+            errorMessage: error is Failure ? error.toMessage() : error.toString(),
+            onRetry: () => ref.read(habitNotifierProvider.notifier).retry(),
+          ),
+          data: (habitState) => CustomScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(),
+            slivers: const [
+              HomeAppBar(),
+              SliverMonthlySummary(),
+              HabitList(),
+              SliverToBoxAdapter(
+                child: SizedBox(height: 85),
+              ),
+            ],
+          ),
         ),
       ),
     );
