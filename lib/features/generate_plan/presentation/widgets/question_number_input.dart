@@ -27,7 +27,8 @@ class _QuestionNumberInputState extends ConsumerState<QuestionNumberInput> {
     super.initState();
     final initialAnswer = ref
         .read(planGeneratorNotifierProvider)
-        .getAnswer(widget.question.id);
+        .value
+        ?.getAnswer(widget.question.id);
     _textController = TextEditingController(
       text: initialAnswer?.toString() ?? '',
     );
@@ -63,7 +64,7 @@ class _QuestionNumberInputState extends ConsumerState<QuestionNumberInput> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = ref.watch(
-      planGeneratorNotifierProvider.select((s) => s.selectedCategory?.color),
+      planGeneratorNotifierProvider.select((s) => s.value?.selectedCategory?.color),
     );
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
