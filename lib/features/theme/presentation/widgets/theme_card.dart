@@ -48,7 +48,7 @@ class _ThemeCardState extends State<ThemeCard>
     _endDate = today;
     _startDate = today.subtract(const Duration(days: 55));
 
-    final primary = widget.colors['primary']!;
+    final primary = widget.colors['primary'] ?? const Color(0xFF6750A4);
     _activeColorSet = {
       1: primary.withValues(alpha: 0.2),
       3: primary.withValues(alpha: 0.4),
@@ -102,8 +102,9 @@ class _ThemeCardState extends State<ThemeCard>
     final pageTheme = Theme.of(context);
     final pageIsDark = pageTheme.brightness == Brightness.dark;
 
-    final primary = widget.colors['primary']!;
-    final surface = widget.colors['surface']!;
+    final primary = widget.colors['primary'] ?? const Color(0xFF6750A4);
+    final surface = widget.colors['surface'] ??
+        (pageIsDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFFFF));
     final isCardDark = surface.computeLuminance() < 0.35;
 
     return RepaintBoundary(
