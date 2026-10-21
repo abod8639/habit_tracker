@@ -343,7 +343,10 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
       snapshot.dayCount.toString(),
     );
     if (snapshot.lastResetDate != null) {
-      await saveLastResetDate(DateTime.parse(snapshot.lastResetDate!));
+      final parsedDate = DateTime.tryParse(snapshot.lastResetDate!);
+      if (parsedDate != null) {
+        await saveLastResetDate(parsedDate);
+      }
     }
     if (snapshot.tombstones.isNotEmpty) {
       addLocalTombstones(snapshot.tombstones);
