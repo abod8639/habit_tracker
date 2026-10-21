@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:habit_tracker/features/auth/data/datasources/auth_local_datasource_impl.dart';
@@ -79,101 +81,105 @@ final getSkipLoginStatusUseCaseProvider = Provider<GetSkipLoginStatusUseCase>((
   return GetSkipLoginStatusUseCase(ref.watch(authRepositoryProvider));
 });
 
-// Auth State
+// Immutable State
 class AuthState {
   final AuthEntity? currentUser;
-  final bool isLoading;
-  final String? errorMessage;
   final bool hasSkippedLogin;
-  final bool isInitialized;
+  final Failure? failure;
+  final bool isActionLoading;
 
   const AuthState({
     this.currentUser,
-    this.isLoading = false,
-    this.errorMessage,
     this.hasSkippedLogin = false,
-    this.isInitialized = false,
+    this.failure,
+    this.isActionLoading = false,
   });
 
   bool get isLoggedIn => currentUser != null;
   AuthEntity? get user => currentUser;
+  bool get isLoading => isActionLoading;
+  String? get errorMessage => failure?.toMessage();
 
   AuthState copyWith({
     AuthEntity? currentUser,
-    bool? isLoading,
-    String? errorMessage,
     bool? hasSkippedLogin,
-    bool? isInitialized,
+    Failure? failure,
+    bool clearFailure = false,
+    bool? isActionLoading,
     bool clearUser = false,
   }) {
     return AuthState(
       currentUser: clearUser ? null : (currentUser ?? this.currentUser),
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage,
       hasSkippedLogin: hasSkippedLogin ?? this.hasSkippedLogin,
-      isInitialized: isInitialized ?? this.isInitialized,
+      failure: clearFailure ? null : (failure ?? this.failure),
+      isActionLoading: isActionLoading ?? this.isActionLoading,
     );
   }
 }
 
-// Auth Notifier
-class AuthNotifier extends Notifier<AuthState> {
+/// Convenience extensions for consuming [AsyncValue<AuthState>] without boilerplate
+extension AsyncValueAuthStateX on AsyncValue<AuthState> {
+  AuthEntity? get user => value?.currentUser;
+  bool get isLoggedIn => value?.isLoggedIn ?? false;
+  bool get hasSkippedLogin => value?.hasSkippedLogin ?? false;
+  bool get isInitialized => hasValue;
+  bool get isLoadingAction => isLoading || (value?.isActionLoading ?? false);
+}
+
+// Clean Architecture AsyncNotifier managing Authentication
+class AuthNotifier extends AsyncNotifier<AuthState> {
   StreamSubscription<AuthEntity?>? _authSubscription;
+  bool _isDisposed = false;
 
   @override
-  AuthState build() {
+  FutureOr<AuthState> build() async {
+    _isDisposed = false;
+    ref.onDispose(() {
+      _isDisposed = true;
+      _authSubscription?.cancel();
+    });
+
     final getAuthState = ref.watch(getAuthStateUseCaseProvider);
     final getSkipStatus = ref.watch(getSkipLoginStatusUseCaseProvider);
 
     _authSubscription?.cancel();
     _authSubscription = getAuthState().listen((user) {
-      if (!ref.mounted) return;
-      if (state.isLoading) {
-        // Explicit auth action in progress; it manages its own state and sync.
+      if (_isDisposed) return;
+      final current = state.value ?? const AuthState();
+      if (current.isActionLoading) {
         return;
       }
-      final previousUser = state.currentUser;
-      state = state.copyWith(
-        currentUser: user,
-        clearUser: user == null,
+      final previousUser = current.currentUser;
+      state = AsyncValue.data(
+        current.copyWith(
+          currentUser: user,
+          clearUser: user == null,
+        ),
       );
-      if (user != null) {
-        // Automatically sync cloud habits, theme, and habitstats on app startup / session restoration
-        if (previousUser?.uid != user.uid) {
-          unawaited(_syncUserDataAfterAuth());
-        }
+      if (user != null && previousUser?.uid != user.uid) {
+        unawaited(_syncUserDataAfterAuth());
       }
     });
 
-    ref.onDispose(() {
-      _authSubscription?.cancel();
-    });
+    final skipResult = await getSkipStatus();
+    final bool hasSkipped = skipResult.fold(
+      (failure) {
+        debugPrint('[AuthNotifier] Failed to load skip login status: ${failure.toMessage()}');
+        return false;
+      },
+      (status) => status,
+    );
 
-    // Check initial skip login status
-    Future.microtask(() async {
-      final result = await getSkipStatus();
-      if (!ref.mounted) return;
-      result.fold(
-        (_) =>
-            state = state.copyWith(hasSkippedLogin: false, isInitialized: true),
-        (status) => state = state.copyWith(
-          hasSkippedLogin: status,
-          isInitialized: true,
-        ),
-      );
-    });
-
-    return const AuthState();
+    return AuthState(hasSkippedLogin: hasSkipped);
   }
 
-  /// Synchronizes habits and theme from cloud, then refreshes habit statistics.
   Future<void> _syncUserDataAfterAuth() async {
-    if (!ref.mounted) return;
+    if (_isDisposed) return;
     final fcm = ref.read(fcmServiceProvider);
     fcm?.syncTokenToFirestore();
 
     try {
-      if (!ref.mounted) return;
+      if (_isDisposed) return;
       final syncNotifier = ref.read(syncNotifierProvider.notifier);
       final themeNotifier = ref.read(themeNotifierProvider.notifier);
       await Future.wait([
@@ -181,13 +187,13 @@ class AuthNotifier extends Notifier<AuthState> {
         themeNotifier.syncWithCloud(),
       ]);
     } catch (e) {
-      debugPrint('Auto sync after authentication failed: $e');
+      debugPrint('[AuthNotifier] Auto sync after authentication failed: $e');
     } finally {
-      if (ref.mounted) {
+      if (!_isDisposed) {
         try {
           await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
         } catch (e) {
-          debugPrint('Failed to refresh habit stats after authentication: $e');
+          debugPrint('[AuthNotifier] Failed to refresh habit stats after authentication: $e');
         }
       }
     }
@@ -197,20 +203,36 @@ class AuthNotifier extends Notifier<AuthState> {
     required String email,
     required String password,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    final current = state.value ?? const AuthState();
+    state = AsyncValue.data(
+      current.copyWith(isActionLoading: true, clearFailure: true),
+    );
+
     final useCase = ref.read(signInWithEmailUseCaseProvider);
     final result = await useCase(email, password);
 
     return await result.fold(
       (failure) async {
-        state = state.copyWith(isLoading: false, errorMessage: failure.message);
+        if (_isDisposed) return false;
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            isActionLoading: false,
+            failure: failure,
+          ),
+        );
         return false;
       },
       (user) async {
-        if (!ref.mounted) return false;
+        if (_isDisposed) return false;
         await _syncUserDataAfterAuth();
-        if (!ref.mounted) return true;
-        state = state.copyWith(isLoading: false, currentUser: user);
+        if (_isDisposed) return true;
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            isActionLoading: false,
+            currentUser: user,
+            clearFailure: true,
+          ),
+        );
         return true;
       },
     );
@@ -221,53 +243,84 @@ class AuthNotifier extends Notifier<AuthState> {
     required String password,
     String? displayName,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    final current = state.value ?? const AuthState();
+    state = AsyncValue.data(
+      current.copyWith(isActionLoading: true, clearFailure: true),
+    );
+
     final useCase = ref.read(signUpWithEmailUseCaseProvider);
     final result = await useCase(email, password, displayName);
 
     return await result.fold(
       (failure) async {
-        if (!ref.mounted) return false;
-        state = state.copyWith(isLoading: false, errorMessage: failure.message);
+        if (_isDisposed) return false;
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            isActionLoading: false,
+            failure: failure,
+          ),
+        );
         return false;
       },
       (user) async {
-        if (!ref.mounted) return false;
+        if (_isDisposed) return false;
         await _syncUserDataAfterAuth();
-        if (!ref.mounted) return true;
-        state = state.copyWith(isLoading: false, currentUser: user);
+        if (_isDisposed) return true;
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            isActionLoading: false,
+            currentUser: user,
+            clearFailure: true,
+          ),
+        );
         return true;
       },
     );
   }
 
   Future<bool> signInWithGoogle() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    final current = state.value ?? const AuthState();
+    state = AsyncValue.data(
+      current.copyWith(isActionLoading: true, clearFailure: true),
+    );
+
     final useCase = ref.read(signInWithGoogleUseCaseProvider);
     final result = await useCase();
 
     return await result.fold(
       (failure) async {
-        if (!ref.mounted) return false;
-        state = state.copyWith(isLoading: false, errorMessage: failure.message);
+        if (_isDisposed) return false;
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            isActionLoading: false,
+            failure: failure,
+          ),
+        );
         return false;
       },
       (user) async {
-        if (!ref.mounted) return false;
+        if (_isDisposed) return false;
         if (user != null) {
           await _syncUserDataAfterAuth();
         }
-        if (!ref.mounted) return user != null;
-        state = state.copyWith(isLoading: false, currentUser: user);
+        if (_isDisposed) return user != null;
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            isActionLoading: false,
+            currentUser: user,
+            clearFailure: true,
+          ),
+        );
         return user != null;
       },
     );
   }
 
   Future<void> signOut() async {
-    state = state.copyWith(isLoading: true);
+    final current = state.value ?? const AuthState();
+    state = AsyncValue.data(current.copyWith(isActionLoading: true));
     try {
-      final currentUid = state.currentUser?.uid ?? 'offline_user';
+      final currentUid = current.currentUser?.uid ?? 'offline_user';
       final habitRepo = ref.read(habitRepositoryProvider);
       await habitRepo.backupToVault(userId: currentUid);
 
@@ -282,43 +335,81 @@ class AuthNotifier extends Notifier<AuthState> {
       final localData = ref.read(habitLocalDataSourceProvider);
       await localData.clearAllData();
 
-      // Refresh in-memory habit state and stats so UI is immediately cleared
-      if (ref.mounted) {
+      if (!_isDisposed) {
         await ref.read(habitNotifierProvider.notifier).refreshData();
       }
-      if (ref.mounted) {
+      if (!_isDisposed) {
         await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
       }
 
       final signOutUseCase = ref.read(signOutUseCaseProvider);
-      await signOutUseCase();
+      final result = await signOutUseCase();
 
-      if (ref.mounted) {
-        state = state.copyWith(
-          isLoading: false,
-          clearUser: true,
-          hasSkippedLogin: false,
+      if (!_isDisposed) {
+        result.fold(
+          (failure) {
+            state = AsyncValue.data(
+              (state.value ?? current).copyWith(
+                isActionLoading: false,
+                failure: failure,
+              ),
+            );
+          },
+          (_) {
+            state = AsyncValue.data(
+              (state.value ?? current).copyWith(
+                isActionLoading: false,
+                clearUser: true,
+                hasSkippedLogin: false,
+                clearFailure: true,
+              ),
+            );
+          },
         );
       }
-    } catch (e) {
-      if (ref.mounted) {
-        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    } catch (e, stack) {
+      if (!_isDisposed) {
+        final failure = NetworkErrorHandler.handle(e, stack);
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            isActionLoading: false,
+            failure: failure,
+          ),
+        );
       }
     }
   }
 
   Future<bool> resetPassword({required String email}) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    final current = state.value ?? const AuthState();
+    state = AsyncValue.data(
+      current.copyWith(isActionLoading: true, clearFailure: true),
+    );
+
     final useCase = ref.read(resetPasswordUseCaseProvider);
     final result = await useCase(email);
 
     return result.fold(
       (failure) {
-        state = state.copyWith(isLoading: false, errorMessage: failure.message);
+        if (!_isDisposed) {
+          state = AsyncValue.data(
+            (state.value ?? current).copyWith(
+              isActionLoading: false,
+              failure: failure,
+            ),
+          );
+        }
         return false;
       },
       (_) {
-        state = state.copyWith(isLoading: false);
+        if (!_isDisposed) {
+          state = AsyncValue.data(
+            (state.value ?? current).copyWith(
+              isActionLoading: false,
+              clearFailure: true,
+            ),
+          );
+        }
         return true;
       },
     );
@@ -326,11 +417,20 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> setSkipLogin(bool skipped) async {
     final useCase = ref.read(setSkipLoginUseCaseProvider);
-    await useCase(skipped);
-    state = state.copyWith(hasSkippedLogin: skipped);
+    final result = await useCase(skipped);
+    if (!_isDisposed) {
+      result.fold(
+        (failure) => debugPrint(
+          '[AuthNotifier] Failed to persist skip login status: ${failure.toMessage()}',
+        ),
+        (_) {
+          final current = state.value ?? const AuthState();
+          state = AsyncValue.data(current.copyWith(hasSkippedLogin: skipped));
+        },
+      );
+    }
   }
 }
 
-final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(() {
-  return AuthNotifier();
-});
+final authNotifierProvider =
+    AsyncNotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new);
