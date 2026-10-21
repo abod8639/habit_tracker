@@ -23,7 +23,9 @@ class WarpHabitNames extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(habitStatsNotifierProvider);
+    final state =
+        ref.watch(habitStatsNotifierProvider).value ??
+        const HabitStatsState();
     final notifier = ref.read(habitStatsNotifierProvider.notifier);
     final habitNames = state.habitNames;
     final habits = state.todaySummary;
