@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import '../../domain/entities/theme_entity.dart';
 import '../../domain/repositories/theme_repository.dart';
 import '../datasources/theme_local_datasource.dart';
@@ -15,53 +17,44 @@ class ThemeRepositoryImpl implements ThemeRepository {
     required this.remoteDataSource,
   });
 
+  static const Duration _localTimeout = Duration(seconds: 4);
+
   @override
   ThemeEntity getCachedThemeSettings() {
     return localDataSource.getCachedThemeSettings();
   }
 
   @override
-  Future<Either<Failure, ThemeEntity>> getThemeSettings() async {
-    try {
-      final settings = await localDataSource.getThemeSettings();
-      return Right(settings);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+  Future<Either<Failure, ThemeEntity>> getThemeSettings() {
+    return NetworkErrorHandler.guard(() async {
+      return await localDataSource.getThemeSettings().timeout(_localTimeout);
+    });
   }
 
   @override
-  Future<Either<Failure, void>> saveThemeSettings(ThemeEntity settings) async {
-    try {
+  Future<Either<Failure, void>> saveThemeSettings(ThemeEntity settings) {
+    return NetworkErrorHandler.guard(() async {
       final model = ThemeModel.fromEntity(settings);
-      await localDataSource.saveThemeSettings(model);
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+      await localDataSource.saveThemeSettings(model).timeout(_localTimeout);
+    });
   }
 
   @override
-  Future<Either<Failure, ThemeEntity?>> syncWithCloud() async {
-    try {
+  Future<Either<Failure, ThemeEntity?>> syncWithCloud() {
+    return NetworkErrorHandler.guard(() async {
       final cloudSettings = await remoteDataSource.syncWithCloud();
       if (cloudSettings != null) {
-        await localDataSource.saveThemeSettings(cloudSettings);
+        await localDataSource.saveThemeSettings(cloudSettings).timeout(_localTimeout);
       }
-      return Right(cloudSettings);
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
+      return cloudSettings;
+    });
   }
 
   @override
-  Future<Either<Failure, void>> uploadThemeToCloud(ThemeEntity settings) async {
-    try {
+  Future<Either<Failure, void>> uploadThemeToCloud(ThemeEntity settings) {
+    return NetworkErrorHandler.guard(() async {
       final model = ThemeModel.fromEntity(settings);
       await remoteDataSource.uploadThemeToCloud(model);
-      return const Right(null);
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
+    });
   }
 }
