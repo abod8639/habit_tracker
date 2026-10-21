@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/core/theme/theme_utils.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
@@ -69,9 +70,18 @@ class ThemeNotifier extends Notifier<ThemeState> {
   final Map<String, ThemeData> _lightThemeCache = {};
   final Map<String, ThemeData> _darkThemeCache = {};
   Timer? _homeWidgetDebounceTimer;
+  bool _isDisposed = false;
 
   @override
   ThemeState build() {
+    _isDisposed = false;
+
+    ref.onDispose(() {
+      _isDisposed = true;
+      _homeWidgetDebounceTimer?.cancel();
+      _homeWidgetDebounceTimer = null;
+    });
+
     final getSettings = ref.watch(getThemeSettingsUseCaseProvider);
     final firestore = ref.watch(firestoreServiceProvider);
 
@@ -116,10 +126,6 @@ class ThemeNotifier extends Notifier<ThemeState> {
       Future.microtask(() => syncWithCloud());
     }
 
-    ref.onDispose(() {
-      _homeWidgetDebounceTimer?.cancel();
-    });
-
     return initialState;
   }
 
@@ -141,11 +147,22 @@ class ThemeNotifier extends Notifier<ThemeState> {
   }
 
   Future<void> syncWithCloud() async {
+    if (_isDisposed) return;
+    state = state.copyWith(isSyncing: true, clearFailure: true);
+
     final syncUseCase = ref.read(syncThemeWithCloudUseCaseProvider);
     final result = await syncUseCase();
+    if (_isDisposed) return;
+
     result.fold(
-      (failure) =>
-          debugPrint('Error syncing theme from cloud: ${failure.message}'),
+      (failure) {
+        if (!_isDisposed) {
+          state = state.copyWith(
+            isSyncing: false,
+            activeFailure: failure,
+          );
+        }
+      },
       (entity) {
         if (entity != null) {
           final themeData = themeColors[entity.themeName];
@@ -166,24 +183,33 @@ class ThemeNotifier extends Notifier<ThemeState> {
               state.customBackgroundColor !=
                   (entity.customBackgroundColor ?? Colors.transparent);
 
-          if (!hasChanged) return;
+          if (!hasChanged) {
+            if (!_isDisposed) {
+              state = state.copyWith(isSyncing: false, clearFailure: true);
+            }
+            return;
+          }
 
           _lightThemeCache.clear();
           _darkThemeCache.clear();
 
-          state = state.copyWith(
-            currentTheme: entity.themeName,
-            themeMode: mode,
-            useCustomBackground: entity.useCustomBackground,
-            customBackgroundColor:
-                entity.customBackgroundColor ?? Colors.transparent,
-            lightTheme: _buildThemeData(entity.themeName, false, customBg),
-            darkTheme: _buildThemeData(entity.themeName, true, customBg),
-          );
-          _updateHomeWidget();
+          if (!_isDisposed) {
+            state = state.copyWith(
+              currentTheme: entity.themeName,
+              themeMode: mode,
+              useCustomBackground: entity.useCustomBackground,
+              customBackgroundColor:
+                  entity.customBackgroundColor ?? Colors.transparent,
+              lightTheme: _buildThemeData(entity.themeName, false, customBg),
+              darkTheme: _buildThemeData(entity.themeName, true, customBg),
+              isSyncing: false,
+              clearFailure: true,
+            );
+            _updateHomeWidget();
+          }
         } else {
           final firestore = ref.read(firestoreServiceProvider);
-          if (firestore.isUserLoggedIn) {
+          if (firestore.isUserLoggedIn && !_isDisposed) {
             final uploadUseCase = ref.read(uploadThemeSettingsUseCaseProvider);
             uploadUseCase(
               ThemeEntity(
@@ -195,6 +221,7 @@ class ThemeNotifier extends Notifier<ThemeState> {
                     : null,
               ),
             );
+            state = state.copyWith(isSyncing: false, clearFailure: true);
           }
         }
       },
@@ -204,6 +231,7 @@ class ThemeNotifier extends Notifier<ThemeState> {
   void _updateHomeWidget() {
     _homeWidgetDebounceTimer?.cancel();
     _homeWidgetDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (_isDisposed) return;
       try {
         final homeWidget = ref.read(homeWidgetServiceProvider);
         final habitState = ref.read(habitNotifierProvider);
@@ -222,13 +250,13 @@ class ThemeNotifier extends Notifier<ThemeState> {
   }
 
   void changeThemeMode(ThemeMode mode) {
-    if (state.themeMode == mode) return;
+    if (state.themeMode == mode || _isDisposed) return;
     state = state.copyWith(themeMode: mode);
     _saveCurrentSettings();
   }
 
   void changeCustomTheme(String themeName) {
-    if (state.currentTheme == themeName) return;
+    if (state.currentTheme == themeName || _isDisposed) return;
     if (themeColors.containsKey(themeName)) {
       final isDark = ThemeUtils.isDarkTheme(themeColors[themeName]!);
       final mode = isDark ? ThemeMode.dark : ThemeMode.light;
@@ -247,6 +275,7 @@ class ThemeNotifier extends Notifier<ThemeState> {
   }
 
   void changeBackgroundColor(Color color) {
+    if (_isDisposed) return;
     _lightThemeCache.clear();
     _darkThemeCache.clear();
     state = state.copyWith(
@@ -259,6 +288,7 @@ class ThemeNotifier extends Notifier<ThemeState> {
   }
 
   void resetBackgroundColor() {
+    if (_isDisposed) return;
     _lightThemeCache.clear();
     _darkThemeCache.clear();
     state = state.copyWith(
@@ -270,6 +300,7 @@ class ThemeNotifier extends Notifier<ThemeState> {
   }
 
   Future<void> _saveCurrentSettings() async {
+    if (_isDisposed) return;
     final entity = ThemeEntity(
       themeName: state.currentTheme,
       themeMode: state.themeMode,
@@ -284,20 +315,32 @@ class ThemeNotifier extends Notifier<ThemeState> {
 
     final saveUseCase = ref.read(saveThemeSettingsUseCaseProvider);
     final result = await saveUseCase(entity);
+    if (_isDisposed) return;
+
     result.fold(
-      (failure) =>
-          debugPrint('Error saving theme settings locally: ${failure.message}'),
+      (failure) {
+        if (!_isDisposed) {
+          state = state.copyWith(activeFailure: failure);
+        }
+      },
       (_) {
         final firestore = ref.read(firestoreServiceProvider);
-        if (firestore.isUserLoggedIn) {
+        if (firestore.isUserLoggedIn && !_isDisposed) {
           final uploadUseCase = ref.read(uploadThemeSettingsUseCaseProvider);
           uploadUseCase(entity);
         }
       },
     );
   }
+
+  Future<void> retry() => syncWithCloud();
 }
 
 final themeNotifierProvider = NotifierProvider<ThemeNotifier, ThemeState>(() {
   return ThemeNotifier();
+});
+
+/// Exposes active [Failure] from theme operations for SnackBar or banner notifications.
+final themeFailureProvider = Provider<Failure?>((ref) {
+  return ref.watch(themeNotifierProvider.select((s) => s.activeFailure));
 });
