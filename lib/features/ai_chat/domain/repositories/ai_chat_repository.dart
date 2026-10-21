@@ -20,6 +20,6 @@ abstract class AiChatRepository {
     required List<ChatMessageEntity> history,
   });
 
-  /// Sends a message and receives streaming chunks from the AI model.
-  Stream<String> sendMessageStream(String message);
+  /// Sends a message and receives streaming chunks wrapped in Either to safely report failures.
+  Stream<Either<Failure, String>> sendMessageStream(String message);
 }
