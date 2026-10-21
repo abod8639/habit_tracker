@@ -39,7 +39,20 @@ class HabitVaultData {
     };
   }
 
-  factory HabitVaultData.fromMap(Map<dynamic, dynamic> map) {
+  factory HabitVaultData.fromMap(Map<dynamic, dynamic>? map) {
+    if (map == null) {
+      return HabitVaultData(
+        userId: '',
+        habits: const [],
+        habitStrengths: const {},
+        startDay: '',
+        dayCount: 1,
+        tombstones: const [],
+        backedUpAt: DateTime.now(),
+        isSynced: false,
+      );
+    }
+
     final rawHabits = map['habits'] as List? ?? [];
     final List<HabitModel> parsedHabits = [];
     for (var item in rawHabits) {
@@ -61,12 +74,19 @@ class HabitVaultData {
     final rawTombstones = map['tombstones'] as List? ?? [];
     final tombstones = rawTombstones.map((e) => e.toString()).toList();
 
+    int parseDayCount(dynamic val) {
+      if (val is int) return val;
+      if (val is num) return val.toInt();
+      if (val is String) return int.tryParse(val) ?? 1;
+      return 1;
+    }
+
     return HabitVaultData(
       userId: map['userId']?.toString() ?? '',
       habits: parsedHabits,
       habitStrengths: parsedStrengths,
       startDay: map['startDay']?.toString() ?? '',
-      dayCount: (map['dayCount'] as num?)?.toInt() ?? 1,
+      dayCount: parseDayCount(map['dayCount']),
       lastResetDate: map['lastResetDate']?.toString(),
       tombstones: tombstones,
       backedUpAt: map['backedUpAt'] != null
