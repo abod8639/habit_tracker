@@ -21,12 +21,32 @@ class HabitStatsModel extends HabitStatsEntity {
 
   factory HabitStatsModel.fromMap(Map<dynamic, dynamic> map) {
     return HabitStatsModel(
-      totalHabits: (map['totalHabits'] as num?)?.toInt() ?? 0,
-      completedHabits: (map['completedHabits'] as num?)?.toInt() ?? 0,
-      completionRate: (map['completionRate'] as num?)?.toDouble() ?? 0.0,
-      streak: (map['streak'] as num?)?.toInt() ?? 0,
-      bestStreak: (map['bestStreak'] as num?)?.toInt() ?? 0,
+      totalHabits: _parseInt(map['totalHabits'], fallback: 0),
+      completedHabits: _parseInt(map['completedHabits'], fallback: 0),
+      completionRate: _parseDouble(map['completionRate'], fallback: 0.0),
+      streak: _parseInt(map['streak'], fallback: 0),
+      bestStreak: _parseInt(map['bestStreak'], fallback: 0),
     );
+  }
+
+  static int _parseInt(dynamic value, {required int fallback}) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) {
+      return int.tryParse(value) ?? double.tryParse(value)?.toInt() ?? fallback;
+    }
+    return fallback;
+  }
+
+  static double _parseDouble(dynamic value, {required double fallback}) {
+    if (value == null) return fallback;
+    if (value is double) return value;
+    if (value is num) return value.toDouble();
+    if (value is String) {
+      return double.tryParse(value) ?? fallback;
+    }
+    return fallback;
   }
 
   Map<String, dynamic> toMap() {
