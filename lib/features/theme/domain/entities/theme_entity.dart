@@ -1,6 +1,9 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-class ThemeEntity {
+class ThemeEntity extends Equatable {
+  static const String defaultTheme = 'github_dark_green';
+
   final String themeName;
   final ThemeMode themeMode;
   final bool useCustomBackground;
@@ -12,6 +15,15 @@ class ThemeEntity {
     required this.useCustomBackground,
     this.customBackgroundColor,
   });
+
+  factory ThemeEntity.empty() {
+    return const ThemeEntity(
+      themeName: defaultTheme,
+      themeMode: ThemeMode.dark,
+      useCustomBackground: false,
+      customBackgroundColor: null,
+    );
+  }
 
   ThemeEntity copyWith({
     String? themeName,
@@ -27,4 +39,12 @@ class ThemeEntity {
           customBackgroundColor ?? this.customBackgroundColor,
     );
   }
+
+  @override
+  List<Object?> get props => [
+    themeName,
+    themeMode,
+    useCustomBackground,
+    customBackgroundColor,
+  ];
 }
