@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,8 +21,12 @@ class ImageScannerBottomSheet extends StatelessWidget {
       }
     } catch (e) {
       if (context.mounted) {
+        final failure = NetworkErrorHandler.handle(e);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error selecting image: $e')),
+          SnackBar(
+            content: Text(failure.toMessage()),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }
