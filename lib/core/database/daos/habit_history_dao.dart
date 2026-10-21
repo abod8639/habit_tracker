@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
 import '../app_database.dart';
 import '../tables/habits_table.dart';
@@ -7,23 +8,41 @@ import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart'
 
 part 'habit_history_dao.g.dart';
 
+/// Helper payload container for background isolate history processing
+class HistoryMapInput {
+  final List<Map<String, dynamic>> records;
+  final Map<String, String> idToName;
+  final Map<String, String> nameToId;
+
+  const HistoryMapInput({
+    required this.records,
+    required this.idToName,
+    required this.nameToId,
+  });
+}
+
 @DriftAccessor(tables: [Habits, HabitCompletions, AppMetadata])
 class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
     with _$HabitHistoryDaoMixin {
   HabitHistoryDao(super.db);
+
+  static const Duration _defaultTimeout = Duration(seconds: 5);
+  static const Duration _batchTimeout = Duration(seconds: 10);
 
   Future<void> recordCompletion(
     String habitId,
     String dateStr,
     bool isCompleted,
   ) {
-    return into(habitCompletions).insertOnConflictUpdate(
-      HabitCompletionsCompanion(
-        habitId: Value(habitId),
-        dateStr: Value(dateStr),
-        isCompleted: Value(isCompleted),
-      ),
-    );
+    return into(habitCompletions)
+        .insertOnConflictUpdate(
+          HabitCompletionsCompanion(
+            habitId: Value(habitId),
+            dateStr: Value(dateStr),
+            isCompleted: Value(isCompleted),
+          ),
+        )
+        .timeout(_defaultTimeout);
   }
 
   Future<void> recordCompletionsForDate(
@@ -42,11 +61,11 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
           mode: InsertMode.insertOrReplace,
         );
       }
-    });
+    }).timeout(_batchTimeout);
   }
 
   Future<Map<DateTime, int>> getHeatmapData() async {
-    // Query completion stats grouped by date
+    // Query completion stats grouped by date with safe null-handling
     final results = await customSelect(
       '''
       SELECT date_str, 
@@ -56,22 +75,40 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
       GROUP BY date_str
       ''',
       readsFrom: {habitCompletions},
-    ).get();
+    ).get().timeout(_batchTimeout);
 
+    final rawRows = results.map((row) {
+      return {
+        'date_str': row.readNullable<String>('date_str') ?? '',
+        'total_count': row.readNullable<int>('total_count') ?? 0,
+        'completed_count': row.readNullable<int>('completed_count') ?? 0,
+      };
+    }).toList();
+
+    // Isolate computation via compute if payload exceeds 250 daily items
+    if (rawRows.length > 250) {
+      return await compute(_processHeatmapRows, rawRows);
+    }
+    return _processHeatmapRows(rawRows);
+  }
+
+  static Map<DateTime, int> _processHeatmapRows(List<Map<String, dynamic>> rows) {
     final Map<DateTime, int> heatmap = {};
 
-    for (final row in results) {
-      final dateStr = row.read<String>('date_str');
+    for (final row in rows) {
+      final dateStr = (row['date_str'] as String?) ?? '';
       if (dateStr.length != 8) continue;
 
       try {
-        final yyyy = int.parse(dateStr.substring(0, 4));
-        final mm = int.parse(dateStr.substring(4, 6));
-        final dd = int.parse(dateStr.substring(6, 8));
-        final date = DateTime(yyyy, mm, dd);
+        final yyyy = int.tryParse(dateStr.substring(0, 4));
+        final mm = int.tryParse(dateStr.substring(4, 6));
+        final dd = int.tryParse(dateStr.substring(6, 8));
+        if (yyyy == null || mm == null || dd == null) continue;
+        if (mm < 1 || mm > 12 || dd < 1 || dd > 31) continue;
 
-        final total = row.read<int>('total_count');
-        final completed = row.read<int>('completed_count');
+        final date = DateTime(yyyy, mm, dd);
+        final total = (row['total_count'] as int?) ?? 0;
+        final completed = (row['completed_count'] as int?) ?? 0;
 
         if (total > 0) {
           final rate = completed / total;
@@ -92,37 +129,65 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
     final cutoffStr =
         '${cutoffDate.year}${cutoffDate.month.toString().padLeft(2, '0')}${cutoffDate.day.toString().padLeft(2, '0')}';
 
-    final habitRecords = await select(habits).get();
+    final habitRecords = await select(habits).get().timeout(_defaultTimeout);
     final idToName = {for (var h in habitRecords) h.id: h.name};
     final nameToId = {for (var h in habitRecords) h.name: h.id};
 
     final query = select(habitCompletions)
       ..where((t) => t.dateStr.isBiggerOrEqualValue(cutoffStr));
 
-    final records = await query.get();
+    final records = await query.get().timeout(_batchTimeout);
+
+    final rawRecords = records.map((r) => {
+      'habitId': r.habitId,
+      'dateStr': r.dateStr,
+      'isCompleted': r.isCompleted,
+    }).toList();
+
+    final input = HistoryMapInput(
+      records: rawRecords,
+      idToName: idToName,
+      nameToId: nameToId,
+    );
+
+    // Isolate calculation via compute for large date ranges preventing UI stutter
+    if (rawRecords.length > 300) {
+      return await compute(_processHistoryRecords, input);
+    }
+    return _processHistoryRecords(input);
+  }
+
+  static Map<String, Map<DateTime, bool>> _processHistoryRecords(HistoryMapInput input) {
     final Map<String, Map<DateTime, bool>> historyMap = {};
 
-    for (final rec in records) {
-      if (rec.dateStr.length != 8) continue;
+    for (final rec in input.records) {
+      final dateStr = (rec['dateStr'] as String?) ?? '';
+      if (dateStr.length != 8) continue;
+
       try {
-        final yyyy = int.parse(rec.dateStr.substring(0, 4));
-        final mm = int.parse(rec.dateStr.substring(4, 6));
-        final dd = int.parse(rec.dateStr.substring(6, 8));
+        final yyyy = int.tryParse(dateStr.substring(0, 4));
+        final mm = int.tryParse(dateStr.substring(4, 6));
+        final dd = int.tryParse(dateStr.substring(6, 8));
+        if (yyyy == null || mm == null || dd == null) continue;
+        if (mm < 1 || mm > 12 || dd < 1 || dd > 31) continue;
+
         final date = DateTime(yyyy, mm, dd);
+        final habitId = rec['habitId'] as String;
+        final isCompleted = (rec['isCompleted'] as bool?) ?? false;
 
         // Map by habitId
-        historyMap.putIfAbsent(rec.habitId, () => {})[date] = rec.isCompleted;
+        historyMap.putIfAbsent(habitId, () => {})[date] = isCompleted;
 
         // Also map by habit name
-        final habitName = idToName[rec.habitId];
+        final habitName = input.idToName[habitId];
         if (habitName != null) {
-          historyMap.putIfAbsent(habitName, () => {})[date] = rec.isCompleted;
+          historyMap.putIfAbsent(habitName, () => {})[date] = isCompleted;
         }
 
-        // Also map by habit ID if rec.habitId was saved as habit name
-        final habitId = nameToId[rec.habitId];
-        if (habitId != null) {
-          historyMap.putIfAbsent(habitId, () => {})[date] = rec.isCompleted;
+        // Also map by habit ID if habitId was saved as habit name
+        final habitIdResolved = input.nameToId[habitId];
+        if (habitIdResolved != null) {
+          historyMap.putIfAbsent(habitIdResolved, () => {})[date] = isCompleted;
         }
       } catch (_) {}
     }
@@ -131,61 +196,83 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<Map<String, int>> getCompletionStatusForDate(String dateStr) async {
-    final results = await customSelect(
-      '''
-      SELECT COUNT(*) as total_count, 
-             SUM(CASE WHEN is_completed = 1 THEN 1 ELSE 0 END) as completed_count
-      FROM habit_completions
-      WHERE date_str = ?
-      ''',
-      variables: [Variable.withString(dateStr)],
-      readsFrom: {habitCompletions},
-    ).getSingleOrNull();
+    try {
+      final results = await customSelect(
+        '''
+        SELECT COUNT(*) as total_count, 
+               SUM(CASE WHEN is_completed = 1 THEN 1 ELSE 0 END) as completed_count
+        FROM habit_completions
+        WHERE date_str = ?
+        ''',
+        variables: [Variable.withString(dateStr)],
+        readsFrom: {habitCompletions},
+      ).getSingleOrNull().timeout(_defaultTimeout);
 
-    if (results == null) return {'total': 0, 'completed': 0};
+      if (results == null) return {'total': 0, 'completed': 0};
 
-    return {
-      'total': results.read<int>('total_count'),
-      'completed': results.read<int>('completed_count'),
-    };
+      // Safely read nullable aggregate columns preventing DriftTypeException
+      final total = results.readNullable<int>('total_count') ?? 0;
+      final completed = results.readNullable<int>('completed_count') ?? 0;
+
+      return {
+        'total': total,
+        'completed': completed,
+      };
+    } catch (_) {
+      return {'total': 0, 'completed': 0};
+    }
   }
 
   Future<String?> getMetadata(String key) async {
-    final record = await (select(
-      appMetadata,
-    )..where((t) => t.key.equals(key))).getSingleOrNull();
-    return record?.value;
+    try {
+      final record = await (select(
+        appMetadata,
+      )..where((t) => t.key.equals(key))).getSingleOrNull().timeout(_defaultTimeout);
+      return record?.value;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> setMetadata(String key, String value) {
-    return into(appMetadata).insertOnConflictUpdate(
-      AppMetadataCompanion(
-        key: Value(key),
-        value: Value(value),
-      ),
-    );
+    return into(appMetadata)
+        .insertOnConflictUpdate(
+          AppMetadataCompanion(
+            key: Value(key),
+            value: Value(value),
+          ),
+        )
+        .timeout(_defaultTimeout);
   }
 
   Future<Map<String, String>> getAllStrengthMetadata() async {
-    final records = await (select(
-      appMetadata,
-    )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%'))).get();
+    try {
+      final records = await (select(
+        appMetadata,
+      )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%')))
+          .get()
+          .timeout(_defaultTimeout);
 
-    final Map<String, String> results = {};
-    for (final r in records) {
-      var dateKey = r.key.replaceFirst(HabitStorage.habitStrengthPrefix, '');
-      if (dateKey.startsWith('_')) {
-        dateKey = dateKey.substring(1);
+      final Map<String, String> results = {};
+      for (final r in records) {
+        var dateKey = r.key.replaceFirst(HabitStorage.habitStrengthPrefix, '');
+        if (dateKey.startsWith('_')) {
+          dateKey = dateKey.substring(1);
+        }
+        results[dateKey] = r.value;
       }
-      results[dateKey] = r.value;
+      return results;
+    } catch (_) {
+      return {};
     }
-    return results;
   }
 
   Future<void> clearAllHistory() async {
-    await delete(habitCompletions).go();
+    await delete(habitCompletions).go().timeout(_defaultTimeout);
     await (delete(
       appMetadata,
-    )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%'))).go();
+    )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%')))
+        .go()
+        .timeout(_defaultTimeout);
   }
 }
