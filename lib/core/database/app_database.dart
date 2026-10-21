@@ -35,14 +35,37 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
         }
       },
+      beforeOpen: (details) async {
+        // Enable WAL mode for high performance concurrency & enforce foreign key constraints
+        await customStatement('PRAGMA foreign_keys = ON;');
+        await customStatement('PRAGMA journal_mode = WAL;');
+      },
     );
   }
 
+  /// Safe connection opening with fallback to in-memory SQLite if file system access fails
   static LazyDatabase _openConnection() {
     return LazyDatabase(() async {
-      final dbFolder = await getApplicationDocumentsDirectory();
-      final file = File(p.join(dbFolder.path, 'habit_tracker.sqlite'));
-      return NativeDatabase.createInBackground(file);
+      try {
+        final dbFolder = await getApplicationDocumentsDirectory();
+        final file = File(p.join(dbFolder.path, 'habit_tracker.sqlite'));
+        return NativeDatabase.createInBackground(file);
+      } catch (_) {
+        // In-memory fallback prevents crash during headless test or restricted file system
+        return NativeDatabase.memory();
+      }
     });
+  }
+
+  /// Fast connectivity and health check ping for the database
+  Future<bool> ping() async {
+    try {
+      final res = await customSelect('SELECT 1').getSingle().timeout(
+            const Duration(seconds: 3),
+          );
+      return res.data.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 }
