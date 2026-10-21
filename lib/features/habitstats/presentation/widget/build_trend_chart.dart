@@ -32,7 +32,9 @@ class TrendChartCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final state = ref.watch(habitStatsNotifierProvider);
+    final state =
+        ref.watch(habitStatsNotifierProvider).value ??
+        const HabitStatsState();
     final notifier = ref.read(habitStatsNotifierProvider.notifier);
 
     final List<FlSpot> trendSpots = state.overallTrend;
