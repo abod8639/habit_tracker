@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/components/section_title.dart';
+import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -26,6 +27,28 @@ class _ThemePageState extends ConsumerState<ThemePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to theme failures and show floating SnackBar with Retry action
+    ref.listen<Failure?>(themeFailureProvider, (previous, next) {
+      if (next != null) {
+        final s = S.maybeOf(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(next.toMessage()),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            action: SnackBarAction(
+              label: s?.tryAgain ?? 'Retry',
+              textColor: Theme.of(context).colorScheme.onError,
+              onPressed: () {
+                ref.read(themeNotifierProvider.notifier).retry();
+              },
+            ),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    });
+
     final currentTheme = ref.watch(
       themeNotifierProvider.select((state) => state.currentTheme),
     );
@@ -57,7 +80,8 @@ class _ThemePageState extends ConsumerState<ThemePage> {
                     const SizedBox(height: 20),
                 itemBuilder: (context, index) {
                   final themeName = availableThemes[index];
-                  final colors = themeColors[themeName]!;
+                  final colors = themeColors[themeName] ??
+                      themeColors[ThemeNotifier.defaultTheme]!;
                   final isSelected = currentTheme == themeName;
 
                   return ThemeCard(
