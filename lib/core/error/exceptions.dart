@@ -26,3 +26,20 @@ class AuthException implements Exception {
   @override
   String toString() => message;
 }
+
+class TimeoutAppException implements Exception {
+  final String message;
+  const TimeoutAppException([this.message = 'Operation timed out']);
+
+  @override
+  String toString() => message;
+}
+
+class ParsingException implements Exception {
+  final String message;
+  const ParsingException([this.message = 'Failed to process data payload']);
+
+  @override
+  String toString() => message;
+}
+
