@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/contracts/habit_facade_contract.dart';
+import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/ai_chat/data/datasources/ai_chat_local_datasource.dart';
@@ -11,7 +14,6 @@ import 'package:habit_tracker/features/ai_chat/domain/repositories/ai_chat_repos
 import 'package:habit_tracker/features/ai_chat/domain/usecases/clear_chat_history_usecase.dart';
 import 'package:habit_tracker/features/ai_chat/domain/usecases/get_chat_history_usecase.dart';
 import 'package:habit_tracker/features/ai_chat/domain/usecases/save_chat_history_usecase.dart';
-import 'package:habit_tracker/core/contracts/habit_facade_contract.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/lang_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -54,42 +56,37 @@ final clearChatHistoryUseCaseProvider = Provider<ClearChatHistoryUseCase>((
 // State
 class AiChatState {
   final List<ChatMessageEntity> messages;
-  final bool isLoading;
-  final String loadingMessage;
-  final String? errorMessage;
+  final bool isStreaming;
+  final String statusMessage;
+  final Failure? activeFailure;
 
   const AiChatState({
     this.messages = const [],
-    this.isLoading = false,
-    this.loadingMessage = '',
-    this.errorMessage,
+    this.isStreaming = false,
+    this.statusMessage = '',
+    this.activeFailure,
   });
 
   AiChatState copyWith({
     List<ChatMessageEntity>? messages,
-    bool? isLoading,
-    String? loadingMessage,
-    String? errorMessage,
-    bool clearErrorMessage = false,
+    bool? isStreaming,
+    String? statusMessage,
+    Failure? activeFailure,
+    bool clearFailure = false,
   }) {
     return AiChatState(
       messages: messages ?? this.messages,
-      isLoading: isLoading ?? this.isLoading,
-      loadingMessage: loadingMessage ?? this.loadingMessage,
-      errorMessage: clearErrorMessage
-          ? null
-          : (errorMessage ?? this.errorMessage),
+      isStreaming: isStreaming ?? this.isStreaming,
+      statusMessage: statusMessage ?? this.statusMessage,
+      activeFailure: clearFailure ? null : (activeFailure ?? this.activeFailure),
     );
   }
 }
 
-// Notifier
-class AiChatNotifier extends Notifier<AiChatState> {
-  @override
-  AiChatState build() {
-    Future.microtask(() => initializeChat());
-    return const AiChatState();
-  }
+// AsyncNotifier with proper cancellation and Either mapping
+class AiChatNotifier extends AsyncNotifier<AiChatState> {
+  StreamSubscription<dynamic>? _activeStreamSubscription;
+  bool _isDisposed = false;
 
   AiChatRepository get _chatRepository => ref.read(aiChatRepositoryProvider);
   GetChatHistoryUseCase get _getChatHistoryUseCase =>
@@ -98,6 +95,363 @@ class AiChatNotifier extends Notifier<AiChatState> {
       ref.read(saveChatHistoryUseCaseProvider);
   ClearChatHistoryUseCase get _clearChatHistoryUseCase =>
       ref.read(clearChatHistoryUseCaseProvider);
+
+  @override
+  FutureOr<AiChatState> build() async {
+    _isDisposed = false;
+    ref.onDispose(() {
+      _isDisposed = true;
+      _cancelActiveStream();
+    });
+
+    return _initialize();
+  }
+
+  void _cancelActiveStream() {
+    _activeStreamSubscription?.cancel();
+    _activeStreamSubscription = null;
+  }
+
+  Future<HabitContextDto?> _getHabitContextSafe() async {
+    try {
+      return await ref.read(habitFacadeProvider).getHabitContext();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<AiChatState> _initialize() async {
+    final habitContext = await _getHabitContextSafe();
+    final result = await _getChatHistoryUseCase();
+
+    return result.fold(
+      (failure) {
+        debugPrint('[AiChatNotifier] Failed to load chat history: ${failure.toMessage()}');
+        _initSession(habitContext, const []);
+        return AiChatState(activeFailure: failure);
+      },
+      (entities) {
+        _initSession(habitContext, entities);
+        if (entities.isEmpty) {
+          Future.microtask(() => _generateInitialGreeting());
+        }
+        return AiChatState(messages: entities);
+      },
+    );
+  }
+
+  void _initSession(HabitContextDto? habitContext, List<ChatMessageEntity> history) {
+    _chatRepository.initChatSession(
+      systemInstruction: _buildSystemInstruction(habitContext),
+      history: history,
+    );
+  }
+
+  Future<void> _generateInitialGreeting() async {
+    if (_isDisposed) return;
+    final greetingPlaceholder = const ChatMessageEntity(text: '', isUser: false);
+    final currentState = state.value ?? const AiChatState();
+    final updated = [...currentState.messages, greetingPlaceholder];
+
+    state = AsyncValue.data(currentState.copyWith(messages: updated));
+
+    await _sendChatMessageWithRetry(
+      text: S.current.initialGreeting,
+      targetIndex: updated.length - 1,
+      isGreeting: true,
+    );
+
+    if (_isDisposed) return;
+
+    final latestMessages = state.value?.messages ?? [];
+    if (latestMessages.isNotEmpty && latestMessages.last.hasError) {
+      state = AsyncValue.data(
+        (state.value ?? currentState).copyWith(
+          messages: latestMessages.sublist(0, latestMessages.length - 1),
+        ),
+      );
+    }
+  }
+
+  Future<void> sendMessage(String text) async {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
+
+    final currentState = state.value ?? const AiChatState();
+    if (currentState.isStreaming) return;
+
+    final userMessage = ChatMessageEntity(
+      text: trimmed,
+      isUser: true,
+      timestamp: DateTime.now(),
+    );
+    final responsePlaceholder = const ChatMessageEntity(text: '', isUser: false);
+
+    final updatedMessages = [...currentState.messages, userMessage, responsePlaceholder];
+    state = AsyncValue.data(
+      currentState.copyWith(
+        messages: updatedMessages,
+        clearFailure: true,
+      ),
+    );
+
+    final targetIndex = updatedMessages.length - 1;
+    await _sendChatMessageWithRetry(
+      text: trimmed,
+      targetIndex: targetIndex,
+    );
+
+    if (_isDisposed) return;
+
+    final currentMessages = state.value?.messages ?? [];
+    if (currentMessages.length > targetIndex &&
+        currentMessages[targetIndex].hasError) {
+      final list = List<ChatMessageEntity>.from(currentMessages);
+      list.removeAt(targetIndex);
+      final userIndex = targetIndex - 1;
+      if (userIndex >= 0 && userIndex < list.length) {
+        list[userIndex] = list[userIndex].copyWith(hasError: true);
+      }
+      state = AsyncValue.data(
+        (state.value ?? currentState).copyWith(messages: list),
+      );
+      await _saveHistory();
+    }
+  }
+
+  Future<void> retryMessage(ChatMessageEntity userMessage) async {
+    final currentState = state.value ?? const AiChatState();
+    final index = currentState.messages.indexOf(userMessage);
+    if (index == -1 || currentState.isStreaming) return;
+
+    final pruned = currentState.messages.sublist(0, index + 1);
+    pruned[index] = pruned[index].copyWith(hasError: false);
+
+    final responsePlaceholder = const ChatMessageEntity(text: '', isUser: false);
+    final nextList = [...pruned, responsePlaceholder];
+    state = AsyncValue.data(
+      currentState.copyWith(
+        messages: nextList,
+        clearFailure: true,
+      ),
+    );
+
+    final List<ChatMessageEntity> historyEntities = [];
+    for (int i = 0; i < index; i++) {
+      final msg = nextList[i];
+      if (!msg.hasError) {
+        historyEntities.add(msg);
+      }
+    }
+
+    final habitContext = await _getHabitContextSafe();
+    _initSession(habitContext, historyEntities);
+
+    final targetIndex = nextList.length - 1;
+    await _sendChatMessageWithRetry(
+      text: userMessage.text,
+      targetIndex: targetIndex,
+    );
+
+    if (_isDisposed) return;
+
+    final currentMessages = state.value?.messages ?? [];
+    if (currentMessages.length > targetIndex &&
+        currentMessages[targetIndex].hasError) {
+      final list = List<ChatMessageEntity>.from(currentMessages);
+      list.removeAt(targetIndex);
+      final uIndex = targetIndex - 1;
+      if (uIndex >= 0 && uIndex < list.length) {
+        list[uIndex] = list[uIndex].copyWith(hasError: true);
+      }
+      state = AsyncValue.data(
+        (state.value ?? currentState).copyWith(messages: list),
+      );
+      await _saveHistory();
+    }
+  }
+
+  Future<void> _sendChatMessageWithRetry({
+    required String text,
+    required int targetIndex,
+    bool isGreeting = false,
+  }) async {
+    const int maxAttempts = 3;
+    int attempt = 0;
+
+    while (attempt < maxAttempts) {
+      if (_isDisposed) return;
+      attempt++;
+
+      final current = state.value ?? const AiChatState();
+      state = AsyncValue.data(
+        current.copyWith(
+          isStreaming: true,
+          statusMessage: '',
+          clearFailure: true,
+        ),
+      );
+
+      Failure? encounteredFailure;
+      String accumulatedText = '';
+      final completer = Completer<void>();
+
+      _cancelActiveStream();
+
+      final stream = _chatRepository.sendMessageStream(text);
+      _activeStreamSubscription = stream.listen(
+        (either) {
+          if (_isDisposed) return;
+          either.fold(
+            (failure) {
+              encounteredFailure = failure;
+              _cancelActiveStream();
+              if (!completer.isCompleted) completer.complete();
+            },
+            (chunk) {
+              if (chunk.isNotEmpty) {
+                accumulatedText += chunk;
+                final latest = state.value ?? current;
+                if (targetIndex < latest.messages.length) {
+                  final updated = List<ChatMessageEntity>.from(latest.messages);
+                  updated[targetIndex] = updated[targetIndex].copyWith(
+                    text: accumulatedText,
+                    hasError: false,
+                  );
+                  state = AsyncValue.data(
+                    latest.copyWith(messages: updated, isStreaming: false),
+                  );
+                }
+              }
+            },
+          );
+        },
+        onError: (err, stack) {
+          encounteredFailure = NetworkErrorHandler.handle(err, stack);
+          if (!completer.isCompleted) completer.complete();
+        },
+        onDone: () {
+          if (!completer.isCompleted) completer.complete();
+        },
+        cancelOnError: true,
+      );
+
+      await completer.future;
+
+      if (_isDisposed) {
+        _cancelActiveStream();
+        return;
+      }
+
+      if (encounteredFailure == null) {
+        await _saveHistory();
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            isStreaming: false,
+            statusMessage: '',
+          ),
+        );
+        return;
+      }
+
+      final failure = encounteredFailure!;
+      final failureMsg = failure.toMessage().toLowerCase();
+      final isModelError = failureMsg.contains('model') ||
+          failureMsg.contains('not found') ||
+          failureMsg.contains('deprecated');
+      final isRateLimit = failureMsg.contains('quota') ||
+          failureMsg.contains('rate limit') ||
+          failureMsg.contains('429');
+      final isBusy = failureMsg.contains('503') ||
+          failureMsg.contains('busy') ||
+          failureMsg.contains('demand');
+
+      if (isModelError && attempt < maxAttempts) {
+        final isArabic = ref.read(langNotifierProvider).isArabic;
+        state = AsyncValue.data(
+          (state.value ?? current).copyWith(
+            statusMessage: isArabic
+                ? 'جاري الاتصال بنموذج ذكاء اصطناعي بديل...'
+                : 'Connecting to alternative AI model...',
+          ),
+        );
+        final switched = await GeminiService.trySwitchToWorkingModel();
+        if (switched != null) {
+          final habitContext = await _getHabitContextSafe();
+          _initSession(habitContext, state.value?.messages ?? []);
+          continue;
+        }
+      }
+
+      if ((isRateLimit || isBusy) && attempt < maxAttempts) {
+        final double retrySeconds = 3.0 * attempt;
+        for (int sec = retrySeconds.ceil(); sec > 0; sec--) {
+          if (_isDisposed) return;
+          final isArabic = ref.read(langNotifierProvider).isArabic;
+          state = AsyncValue.data(
+            (state.value ?? current).copyWith(
+              statusMessage: isArabic
+                  ? (isRateLimit
+                        ? 'تم تجاوز حد الطلبات. جاري إعادة المحاولة خلال $sec ثانية...'
+                        : 'الخدمة مشغولة مؤقتاً. جاري إعادة المحاولة خلال $sec ثانية...')
+                  : (isRateLimit
+                        ? 'Rate limit exceeded. Retrying in $sec seconds...'
+                        : 'Service temporarily busy. Retrying in $sec seconds...'),
+            ),
+          );
+          await Future.delayed(const Duration(seconds: 1));
+        }
+        continue;
+      }
+
+      final latest = state.value ?? current;
+      if (targetIndex < latest.messages.length) {
+        final updated = List<ChatMessageEntity>.from(latest.messages);
+        updated[targetIndex] = updated[targetIndex].copyWith(hasError: true);
+        state = AsyncValue.data(
+          latest.copyWith(
+            messages: updated,
+            isStreaming: false,
+            statusMessage: '',
+            activeFailure: isGreeting ? null : failure,
+          ),
+        );
+      }
+      break;
+    }
+
+    if (!_isDisposed) {
+      final latest = state.value ?? const AiChatState();
+      state = AsyncValue.data(
+        latest.copyWith(isStreaming: false, statusMessage: ''),
+      );
+    }
+  }
+
+  Future<void> _saveHistory() async {
+    final messages = state.value?.messages ?? [];
+    final saveResult = await _saveChatHistoryUseCase(messages);
+    saveResult.fold(
+      (failure) => debugPrint('[AiChatNotifier] Failed to save history: ${failure.toMessage()}'),
+      (_) => null,
+    );
+  }
+
+  Future<void> clearChat() async {
+    _cancelActiveStream();
+    final currentState = state.value ?? const AiChatState();
+    state = AsyncValue.data(currentState.copyWith(messages: const []));
+
+    final clearResult = await _clearChatHistoryUseCase();
+    clearResult.fold(
+      (failure) => debugPrint('[AiChatNotifier] Failed to clear history: ${failure.toMessage()}'),
+      (_) => null,
+    );
+
+    final habitContext = await _getHabitContextSafe();
+    _initSession(habitContext, const []);
+    _generateInitialGreeting();
+  }
 
   String _buildSystemInstruction([HabitContextDto? habitContext]) {
     final List<HabitSummaryDto> habits = habitContext?.habits ?? const [];
@@ -293,273 +647,6 @@ TONE & EMOTION DETECTION
 ''';
   }
 
-  Future<void> initializeChat() async {
-    try {
-      HabitContextDto? habitContext;
-      try {
-        habitContext = await ref.read(habitFacadeProvider).getHabitContext();
-      } catch (_) {}
-
-      final result = await _getChatHistoryUseCase();
-      final List<ChatMessageEntity> loadedEntities = result.fold(
-        (failure) => [],
-        (entities) => entities,
-      );
-
-      state = state.copyWith(messages: loadedEntities);
-
-      _chatRepository.initChatSession(
-        systemInstruction: _buildSystemInstruction(habitContext),
-        history: loadedEntities,
-      );
-
-      if (loadedEntities.isEmpty) {
-        _generateInitialGreeting();
-      }
-    } catch (e) {
-      final userFriendlyError = GeminiService.getErrorMessage(e);
-      state = state.copyWith(errorMessage: userFriendlyError);
-      debugPrint('Error Failed to initialize chat: $e');
-    }
-  }
-
-  Future<void> _generateInitialGreeting() async {
-    final greetingMessage = const ChatMessageEntity(text: '', isUser: false);
-    state = state.copyWith(messages: [...state.messages, greetingMessage]);
-
-    await _sendChatMessageWithRetry(
-      text: S.current.initialGreeting,
-      targetIndex: state.messages.length - 1,
-      isGreeting: true,
-    );
-
-    // If greeting encountered an error, remove it
-    if (state.messages.isNotEmpty && state.messages.last.hasError) {
-      state = state.copyWith(
-        messages: state.messages.sublist(0, state.messages.length - 1),
-      );
-    }
-  }
-
-  Future<void> sendMessage(String text) async {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) return;
-
-    final userMessage = ChatMessageEntity(text: trimmed, isUser: true);
-    final responseMessage = const ChatMessageEntity(text: '', isUser: false);
-
-    final updatedMessages = [...state.messages, userMessage, responseMessage];
-    state = state.copyWith(messages: updatedMessages);
-
-    final targetIndex = updatedMessages.length - 1;
-    await _sendChatMessageWithRetry(
-      text: trimmed,
-      targetIndex: targetIndex,
-    );
-
-    // If response failed, flag user message with error and remove response
-    if (state.messages.length > targetIndex &&
-        state.messages[targetIndex].hasError) {
-      final currentList = List<ChatMessageEntity>.from(state.messages);
-      currentList.removeAt(targetIndex);
-      final userIndex = targetIndex - 1;
-      if (userIndex >= 0 && userIndex < currentList.length) {
-        currentList[userIndex] = currentList[userIndex].copyWith(
-          hasError: true,
-        );
-      }
-      state = state.copyWith(messages: currentList);
-      await _saveHistory();
-    }
-  }
-
-  Future<void> retryMessage(ChatMessageEntity userMessage) async {
-    final index = state.messages.indexOf(userMessage);
-    if (index == -1) return;
-
-    // Remove any trailing messages after this user message
-    final pruned = state.messages.sublist(0, index + 1);
-    pruned[index] = pruned[index].copyWith(hasError: false);
-
-    final responseMessage = const ChatMessageEntity(text: '', isUser: false);
-    final nextList = [...pruned, responseMessage];
-    state = state.copyWith(messages: nextList);
-
-    final List<ChatMessageEntity> historyEntities = [];
-    for (int i = 0; i < index; i++) {
-      final msg = nextList[i];
-      if (msg.hasError) continue;
-      historyEntities.add(msg);
-    }
-
-    _chatRepository.initChatSession(
-      systemInstruction: _buildSystemInstruction(),
-      history: historyEntities,
-    );
-
-    final targetIndex = nextList.length - 1;
-    await _sendChatMessageWithRetry(
-      text: userMessage.text,
-      targetIndex: targetIndex,
-    );
-
-    if (state.messages.length > targetIndex &&
-        state.messages[targetIndex].hasError) {
-      final currentList = List<ChatMessageEntity>.from(state.messages);
-      currentList.removeAt(targetIndex);
-      final uIndex = targetIndex - 1;
-      if (uIndex >= 0 && uIndex < currentList.length) {
-        currentList[uIndex] = currentList[uIndex].copyWith(hasError: true);
-      }
-      state = state.copyWith(messages: currentList);
-      await _saveHistory();
-    }
-  }
-
-  double? _extractRetrySeconds(dynamic error) {
-    final errorStr = error.toString();
-    final regex = RegExp(r'retry in\s+([0-9.]+)\s*s', caseSensitive: false);
-    final match = regex.firstMatch(errorStr);
-    if (match != null) {
-      return double.tryParse(match.group(1) ?? '');
-    }
-    return null;
-  }
-
-  Future<void> _sendChatMessageWithRetry({
-    required String text,
-    required int targetIndex,
-    bool isGreeting = false,
-  }) async {
-    const int maxAttempts = 3;
-    int attempt = 0;
-
-    while (attempt < maxAttempts) {
-      attempt++;
-      state = state.copyWith(
-        isLoading: true,
-        loadingMessage: '',
-        clearErrorMessage: true,
-      );
-
-      try {
-        final stream = _chatRepository.sendMessageStream(text);
-        String accumulatedText = '';
-        bool isFirstChunk = true;
-
-        await for (final chunkText in stream) {
-          if (chunkText.isNotEmpty) {
-            if (isFirstChunk) {
-              isFirstChunk = false;
-              accumulatedText = chunkText;
-            } else {
-              accumulatedText += chunkText;
-            }
-
-            if (targetIndex < state.messages.length) {
-              final updated = List<ChatMessageEntity>.from(state.messages);
-              updated[targetIndex] = updated[targetIndex].copyWith(
-                text: accumulatedText,
-                hasError: false,
-              );
-              state = state.copyWith(messages: updated, isLoading: false);
-            }
-          }
-        }
-
-        await _saveHistory();
-        return;
-      } catch (e) {
-        debugPrint('Attempt $attempt failed with error: $e');
-
-        final errorStr = e.toString().toLowerCase();
-        final isRateLimit =
-            errorStr.contains('quota') ||
-            errorStr.contains('limit') ||
-            errorStr.contains('429') ||
-            errorStr.contains('resource exhausted');
-
-        final isModelError = GeminiService.isModelUnavailableError(e);
-
-        final isTransientServiceUnavailable =
-            errorStr.contains('503') ||
-            errorStr.contains('unavailable') ||
-            errorStr.contains('high demand');
-
-        if (isModelError && attempt < maxAttempts) {
-          final isArabic = ref.read(langNotifierProvider).isArabic;
-          state = state.copyWith(
-            loadingMessage: isArabic
-                ? 'جاري الاتصال بنموذج ذكاء اصطناعي بديل...'
-                : 'Connecting to alternative AI model...',
-          );
-          final switched = await GeminiService.trySwitchToWorkingModel();
-          if (switched != null) {
-            _chatRepository.initChatSession(
-              systemInstruction: _buildSystemInstruction(),
-              history: state.messages,
-            );
-            continue;
-          }
-        }
-
-        if ((isRateLimit || isTransientServiceUnavailable) &&
-            attempt < maxAttempts) {
-          double? retrySeconds = _extractRetrySeconds(e);
-          retrySeconds ??= (3.0 * attempt);
-
-          for (int sec = retrySeconds.ceil(); sec > 0; sec--) {
-            final isArabic = ref.read(langNotifierProvider).isArabic;
-            state = state.copyWith(
-              loadingMessage: isArabic
-                  ? (isRateLimit
-                        ? 'تم تجاوز حد الطلبات. جاري إعادة المحاولة خلال $sec ثانية...'
-                        : 'الخدمة مشغولة مؤقتاً. جاري إعادة المحاولة خلال $sec ثانية...')
-                  : (isRateLimit
-                        ? 'Rate limit exceeded. Retrying in $sec seconds...'
-                        : 'Service temporarily busy. Retrying in $sec seconds...'),
-            );
-            await Future.delayed(const Duration(seconds: 1));
-          }
-          continue;
-        } else {
-          if (targetIndex < state.messages.length) {
-            final updated = List<ChatMessageEntity>.from(state.messages);
-            updated[targetIndex] = updated[targetIndex].copyWith(
-              hasError: true,
-            );
-            state = state.copyWith(messages: updated);
-          }
-          if (!isGreeting) {
-            final userFriendlyError = GeminiService.getErrorMessage(e);
-            state = state.copyWith(errorMessage: userFriendlyError);
-          }
-          break;
-        }
-      } finally {
-        state = state.copyWith(isLoading: false, loadingMessage: '');
-      }
-    }
-  }
-
-  Future<void> _saveHistory() async {
-    try {
-      await _saveChatHistoryUseCase(state.messages);
-    } catch (e) {
-      debugPrint('Error saving chat history: $e');
-    }
-  }
-
-  Future<void> clearChat() async {
-    state = state.copyWith(messages: const []);
-    try {
-      await _clearChatHistoryUseCase();
-    } catch (e) {
-      debugPrint('Error clearing chat history: $e');
-    }
-    initializeChat();
-  }
-
   String _getHeatmapContext(Map<DateTime, int> heatmap, bool isArabic) {
     if (heatmap.isEmpty) {
       return isArabic
@@ -583,8 +670,6 @@ TONE & EMOTION DETECTION
   }
 }
 
-final aiChatNotifierProvider = NotifierProvider<AiChatNotifier, AiChatState>(
-  () {
-    return AiChatNotifier();
-  },
+final aiChatNotifierProvider = AsyncNotifierProvider<AiChatNotifier, AiChatState>(
+  AiChatNotifier.new,
 );
