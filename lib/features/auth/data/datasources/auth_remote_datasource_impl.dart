@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:habit_tracker/core/error/exceptions.dart';
-import 'package:habit_tracker/generated/l10n.dart'; // لاستخدام الترجمة في الأخطاء
+import 'package:habit_tracker/generated/l10n.dart';
 import '../models/auth_model.dart';
 import '../datasources/auth_remote_datasource.dart';
 
@@ -9,11 +10,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
 
+  static const Duration authTimeout = Duration(seconds: 25);
+
   AuthRemoteDataSourceImpl({
     FirebaseAuth? auth,
     GoogleSignIn? googleSignIn,
   }) : _auth = auth ?? FirebaseAuth.instance,
-       // استخدام .instance كما في الكود الذي يعمل لديك
        _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   @override
@@ -22,27 +24,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthModel?> signInWithGoogle() async {
     try {
-      // 1. التهيئة (كما في الكود الناجح لديك)
-      await _googleSignIn.initialize(
-        serverClientId:
-            '575224289908-h8s7sbtfj2bm6f0hiddld65cvauehk93.apps.googleusercontent.com',
-      );
+      await _googleSignIn
+          .initialize(
+            serverClientId:
+                '575224289908-h8s7sbtfj2bm6f0hiddld65cvauehk93.apps.googleusercontent.com',
+          )
+          .timeout(authTimeout);
 
-      // 2. بدء عملية المصادقة باستخدام authenticate() بدلاً من signIn()
-      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+      final GoogleSignInAccount googleUser = await _googleSignIn
+          .authenticate()
+          .timeout(authTimeout);
 
-      // 3. الحصول على تفاصيل التوثيق
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
-      // 4. إنشاء الكريدنشال (لاحظ استخدام idToken فقط كما في كودك)
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
 
-      // 5. تسجيل الدخول في فيربيز
-      final UserCredential result = await _auth.signInWithCredential(
-        credential,
-      );
+      final UserCredential result = await _auth
+          .signInWithCredential(credential)
+          .timeout(authTimeout);
 
       if (result.user == null) return null;
 
@@ -56,7 +57,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
     } on FirebaseAuthException catch (e) {
       throw AuthException(_handleAuthException(e));
+    } on TimeoutException {
+      throw const TimeoutAppException(
+        'Google authentication timed out. Please check your network.',
+      );
     } catch (e) {
+      if (e is AuthException || e is TimeoutAppException) rethrow;
       throw AuthException('${S.current.authErrorGoogle}: $e');
     }
   }
@@ -64,13 +70,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthModel> signInWithEmail(String email, String password) async {
     try {
-      final UserCredential result = await _auth.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password,
-      );
+      final UserCredential result = await _auth
+          .signInWithEmailAndPassword(
+            email: email.trim(),
+            password: password,
+          )
+          .timeout(authTimeout);
+
+      if (result.user == null) {
+        throw const AuthException('Failed to retrieve authenticated user profile');
+      }
+
       return AuthModel.fromFirebaseUser(result.user!);
     } on FirebaseAuthException catch (e) {
       throw AuthException(_handleAuthException(e));
+    } on TimeoutException {
+      throw const TimeoutAppException(
+        'Sign in timed out. Please check your network connection.',
+      );
     }
   }
 
@@ -81,20 +98,34 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? displayName,
   ) async {
     try {
-      final UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password,
-      );
+      final UserCredential result = await _auth
+          .createUserWithEmailAndPassword(
+            email: email.trim(),
+            password: password,
+          )
+          .timeout(authTimeout);
 
-      if (displayName != null && displayName.isNotEmpty) {
-        await result.user?.updateDisplayName(displayName);
-        await result.user?.reload();
+      if (result.user == null) {
+        throw const AuthException('Failed to create user account');
       }
 
-      final user = _auth.currentUser;
-      return AuthModel.fromFirebaseUser(user!);
+      if (displayName != null && displayName.isNotEmpty) {
+        await result.user?.updateDisplayName(displayName).timeout(authTimeout);
+        await result.user?.reload().timeout(authTimeout);
+      }
+
+      final user = _auth.currentUser ?? result.user;
+      if (user == null) {
+        throw const AuthException('User account created but profile is unavailable');
+      }
+
+      return AuthModel.fromFirebaseUser(user);
     } on FirebaseAuthException catch (e) {
       throw AuthException(_handleAuthException(e));
+    } on TimeoutException {
+      throw const TimeoutAppException(
+        'Sign up timed out. Please check your network connection.',
+      );
     }
   }
 
@@ -104,7 +135,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await Future.wait([
         _auth.signOut(),
         _googleSignIn.signOut(),
-      ]);
+      ]).timeout(authTimeout);
+    } on TimeoutException {
+      throw const TimeoutAppException('Sign out timed out. Please try again.');
     } catch (e) {
       throw AuthException('${S.current.authErrorSignOut}: $e');
     }
@@ -113,18 +146,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> resetPassword(String email) async {
     try {
-      await _auth.sendPasswordResetEmail(email: email.trim());
+      await _auth
+          .sendPasswordResetEmail(email: email.trim())
+          .timeout(authTimeout);
     } on FirebaseAuthException catch (e) {
       throw AuthException(_handleAuthException(e));
+    } on TimeoutException {
+      throw const TimeoutAppException(
+        'Password reset timed out. Please check your network.',
+      );
     }
   }
 
-  // دالة معالجة الأخطاء لتوحيد الرسائل بناءً على ملفات الترجمة لديك
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
         return S.current.authErrorUserNotFound;
       case 'wrong-password':
+      case 'invalid-credential':
         return S.current.authErrorWrongPassword;
       case 'email-already-in-use':
         return S.current.authErrorEmailInUse;
@@ -137,7 +176,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       case 'network-request-failed':
         return S.current.authErrorNetworkFailed;
       default:
-        return '${S.current.authErrorDefault}: ${e.message ?? e.code}';
+        return e.message ?? S.current.authErrorDefault;
     }
   }
 }
