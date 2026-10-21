@@ -9,20 +9,22 @@ class AuthWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authNotifierProvider);
+    final asyncAuthState = ref.watch(authNotifierProvider);
 
-    if (!authState.isInitialized) {
-      return const Scaffold(
+    return asyncAuthState.when(
+      loading: () => const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator.adaptive(),
         ),
-      );
-    }
-
-    if (authState.isLoggedIn || authState.hasSkippedLogin) {
-      return const HomeScreen();
-    } else {
-      return const LoginPage();
-    }
+      ),
+      error: (e, _) => const LoginPage(),
+      data: (authState) {
+        if (authState.isLoggedIn || authState.hasSkippedLogin) {
+          return const HomeScreen();
+        } else {
+          return const LoginPage();
+        }
+      },
+    );
   }
 }
