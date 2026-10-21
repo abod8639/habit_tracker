@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 import 'exceptions.dart';
 import 'failures.dart';
 
@@ -46,6 +47,32 @@ class NetworkErrorHandler {
       return AuthFailure(error.message);
     }
 
+    final errorStr = error.toString().toLowerCase();
+
+    // Direct Firebase Auth error classification
+    if (errorStr.contains('user-not-found')) {
+      return AuthFailure(S.current.authErrorUserNotFound);
+    }
+    if (errorStr.contains('wrong-password') || errorStr.contains('invalid-credential')) {
+      return AuthFailure(S.current.authErrorWrongPassword);
+    }
+    if (errorStr.contains('email-already-in-use')) {
+      return AuthFailure(S.current.authErrorEmailInUse);
+    }
+    if (errorStr.contains('invalid-email')) {
+      return AuthFailure(S.current.authErrorInvalidEmail);
+    }
+    if (errorStr.contains('weak-password')) {
+      return AuthFailure(S.current.authErrorWeakPassword);
+    }
+    if (errorStr.contains('too-many-requests')) {
+      return AuthFailure(S.current.authErrorTooManyRequests);
+    }
+    if (errorStr.contains('network-request-failed')) {
+      return AuthFailure(S.current.authErrorNetworkFailed);
+    }
+
+
     if (error is ServerException) {
       return ServerFailure(error.message);
     }
@@ -54,7 +81,6 @@ class NetworkErrorHandler {
       return ServerFailure(error.message);
     }
 
-    final errorStr = error.toString().toLowerCase();
     if (errorStr.contains('socket') ||
         errorStr.contains('network') ||
         errorStr.contains('connection refused') ||
