@@ -8,6 +8,7 @@ import 'package:habit_tracker/features/auth/presentation/widgets/login_page_icon
 import 'package:habit_tracker/features/auth/presentation/widgets/neumorphic_google_button.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:go_router/go_router.dart';
+import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -32,9 +33,45 @@ class LoginPage extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = theme.cardColor;
 
+    ref.listen<Failure?>(
+      authNotifierProvider.select((s) => s.value?.failure),
+      (prev, failure) {
+        if (failure != null && context.mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      failure.toMessage(),
+                      style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: theme.colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      },
+    );
+
     final authState = ref.watch(authNotifierProvider);
     final syncState = ref.watch(syncNotifierProvider);
-    final bool isAuthLoading = authState.isLoading;
+    final bool isAuthLoading = authState.isLoadingAction;
     final bool isSyncing = syncState.syncStatus == SyncStatus.syncing;
     final bool isLoading = isAuthLoading || isSyncing;
 
