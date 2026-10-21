@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
+import 'package:habit_tracker/core/components/neumorphic_button.dart';
+import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/guards/ai_guard.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
@@ -53,7 +55,57 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final state = ref.watch(habitStatsNotifierProvider);
+    final asyncVal = ref.watch(habitStatsNotifierProvider);
+    final state = asyncVal.value ?? const HabitStatsState();
+
+    // Listen to transient failures and show floating SnackBar with retry
+    ref.listen<Failure?>(
+      habitStatsNotifierProvider.select((s) => s.value?.activeFailure),
+      (prev, nextFailure) {
+        if (nextFailure != null && mounted) {
+          final errorMessage = nextFailure.toMessage();
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      errorMessage,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              action: SnackBarAction(
+                label: S.of(context).retry,
+                textColor: Colors.white,
+                onPressed: () => ref
+                    .read(habitStatsNotifierProvider.notifier)
+                    .refreshStats(),
+              ),
+              backgroundColor: theme.colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      },
+    );
+
+    final bool isInitialLoading =
+        state.stats == null && (asyncVal.isLoading || state.isLoading);
+    final bool isFatalError =
+        state.stats == null && (asyncVal.hasError || state.hasError);
 
     return KeyboardListener(
       autofocus: true,
@@ -72,7 +124,7 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
               MySliverAppBar(
                 title: S.current.ratepagetitle,
               ),
-              if (state.stats == null && state.isLoading)
+              if (isInitialLoading)
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
@@ -91,6 +143,46 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
                     ),
                   ),
                 )
+              else if (isFatalError)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            size: 56,
+                            color: theme.colorScheme.error,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            state.activeFailure?.toMessage() ??
+                                (asyncVal.error is Failure
+                                    ? (asyncVal.error as Failure).toMessage()
+                                    : S.current.unexpectedError),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          NeumorphicButton(
+                            text: S.current.retry,
+                            onPressed: () => ref
+                                .read(habitStatsNotifierProvider.notifier)
+                                .refreshStats(),
+                            width: 160,
+                            height: 48,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
               else
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(
@@ -99,6 +191,59 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
                   ),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
+                      if (state.hasError && state.activeFailure != null) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.errorContainer
+                                  .withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: theme.colorScheme.error
+                                    .withValues(alpha: 0.4),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.error_outline_rounded,
+                                  color: theme.colorScheme.error,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    state.activeFailure!.toMessage(),
+                                    style: TextStyle(
+                                      color: theme.colorScheme.error,
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => ref
+                                      .read(habitStatsNotifierProvider.notifier)
+                                      .refreshStats(),
+                                  child: Text(
+                                    S.current.retry,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.error,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                       FadeAnimationSummaryCard(
                         animationController: _animationController,
                       ),
