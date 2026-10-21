@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
@@ -102,10 +103,12 @@ class _MyalartdState extends State<MyalartDialog>
               setState(() {
                 _isScanning = false;
               });
+              final failure = NetworkErrorHandler.handle(e);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Error: $e'),
+                  content: Text(failure.toMessage()),
                   backgroundColor: Colors.red.shade700,
+                  behavior: SnackBarBehavior.floating,
                 ),
               );
             }
