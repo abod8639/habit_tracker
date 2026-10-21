@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/features/auth/presentation/providers/auth_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -30,6 +31,13 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           );
 
       if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.current.sendResetLink),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) {
           context.pop();
@@ -42,6 +50,24 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
+
+    ref.listen<Failure?>(
+      authNotifierProvider.select((s) => s.value?.failure),
+      (prev, failure) {
+        if (failure != null && mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(failure.toMessage()),
+              backgroundColor: theme.colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      },
+    );
+
+    final bool isLoading = authState.isLoadingAction;
 
     return Scaffold(
       appBar: AppBar(
@@ -103,7 +129,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                   const SizedBox(height: 24),
 
                   ElevatedButton(
-                    onPressed: authState.isLoading
+                    onPressed: isLoading
                         ? null
                         : _handleResetPassword,
                     style: ElevatedButton.styleFrom(
@@ -112,7 +138,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: authState.isLoading
+                    child: isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
