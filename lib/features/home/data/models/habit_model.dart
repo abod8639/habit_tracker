@@ -22,50 +22,91 @@ class HabitModel {
     this.updatedAt,
   });
 
+  static String _parseString(dynamic value, {required String fallback}) {
+    if (value == null) return fallback;
+    final str = value.toString().trim();
+    return str.isEmpty ? fallback : str;
+  }
+
+  static bool _parseBool(dynamic value, {required bool fallback}) {
+    if (value == null) return fallback;
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      final lower = value.trim().toLowerCase();
+      if (lower == 'true' || lower == '1') return true;
+      if (lower == 'false' || lower == '0') return false;
+    }
+    return fallback;
+  }
+
+  static int? _parseInt(dynamic value, {int? fallback}) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) {
+      return int.tryParse(value) ?? double.tryParse(value)?.toInt() ?? fallback;
+    }
+    return fallback;
+  }
+
   static DateTime _parseDate(dynamic dateData, {DateTime? fallback}) {
     if (dateData == null) return fallback ?? DateTime.now();
     if (dateData is Timestamp) return dateData.toDate();
+    if (dateData is DateTime) return dateData;
     if (dateData is String) {
-      try {
-        return DateTime.parse(dateData);
-      } catch (e) {
-        return fallback ?? DateTime.now();
-      }
+      final parsed = DateTime.tryParse(dateData);
+      if (parsed != null) return parsed;
     }
     return fallback ?? DateTime.now();
   }
 
-  factory HabitModel.fromMap(Map<String, dynamic> map) {
+  factory HabitModel.fromMap(Map<dynamic, dynamic>? map) {
+    if (map == null) {
+      final now = DateTime.now();
+      return HabitModel(
+        id: '',
+        name: 'Unnamed Habit',
+        isCompleted: false,
+        createdAt: now,
+      );
+    }
+
     return HabitModel(
-      id: map['id']?.toString() ?? '',
-      name: map['name']?.toString() ?? 'Unnamed Habit',
-      isCompleted: map['isCompleted'] ?? map['is_completed'] ?? false,
+      id: _parseString(map['id'], fallback: ''),
+      name: _parseString(map['name'], fallback: 'Unnamed Habit'),
+      isCompleted: _parseBool(
+        map['isCompleted'] ?? map['is_completed'],
+        fallback: false,
+      ),
       createdAt: _parseDate(map['createdAt'] ?? map['created_at']),
-      completedAt: map['completedAt'] != null || map['completed_at'] != null
+      completedAt: (map['completedAt'] != null || map['completed_at'] != null)
           ? _parseDate(map['completedAt'] ?? map['completed_at'])
           : null,
-      colorValue: map['colorValue'] ?? map['color_value'],
-      index: map['index'] ?? 0,
-      updatedAt: map['updatedAt'] != null || map['updated_at'] != null
+      colorValue: _parseInt(map['colorValue'] ?? map['color_value']),
+      index: _parseInt(map['index'], fallback: 0) ?? 0,
+      updatedAt: (map['updatedAt'] != null || map['updated_at'] != null)
           ? _parseDate(map['updatedAt'] ?? map['updated_at'])
           : null,
     );
   }
 
-  // Modern Firestore-specific factory
+  // Modern Firestore-specific factory with safe parsing
   factory HabitModel.fromFirestore(DocumentSnapshot doc) {
-    final map = doc.data() as Map<String, dynamic>? ?? {};
+    final rawData = doc.data();
+    final map = rawData is Map<String, dynamic> ? rawData : <String, dynamic>{};
+
     return HabitModel(
       id: doc.id,
-      name: map['name']?.toString() ?? 'Unnamed Habit',
-      isCompleted: map['isCompleted'] ?? false,
+      name: _parseString(map['name'], fallback: 'Unnamed Habit'),
+      isCompleted: _parseBool(map['isCompleted'], fallback: false),
       createdAt: _parseDate(map['createdAt']),
-      completedAt: map['completedAt'] != null
-          ? _parseDate(map['completedAt'])
-          : null,
-      colorValue: map['colorValue'] as int?,
-      index: map['index'] as int? ?? 0,
-      updatedAt: map['updatedAt'] != null ? _parseDate(map['updatedAt']) : null,
+      completedAt:
+          map['completedAt'] != null ? _parseDate(map['completedAt']) : null,
+      colorValue: _parseInt(map['colorValue']),
+      index: _parseInt(map['index'], fallback: 0) ?? 0,
+      updatedAt:
+          map['updatedAt'] != null ? _parseDate(map['updatedAt']) : null,
     );
   }
 
@@ -93,8 +134,7 @@ class HabitModel {
           : null,
       'colorValue': colorValue,
       'index': index,
-      'updatedAt':
-          FieldValue.serverTimestamp(), // Always use server time for updates
+      'updatedAt': FieldValue.serverTimestamp(),
     };
   }
 
@@ -124,12 +164,15 @@ class HabitModel {
     );
   }
 
-  // Deprecated: Used for migration from old list format
+  // Deprecated: Used for migration from old list format with safety bounds
   factory HabitModel.fromLocalFormat(List<dynamic> data) {
+    final name = data.isNotEmpty ? data[0]?.toString() ?? 'Unnamed Habit' : 'Unnamed Habit';
+    final isCompleted = data.length > 1 ? _parseBool(data[1], fallback: false) : false;
+
     return HabitModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: data[0],
-      isCompleted: data[1],
+      name: name,
+      isCompleted: isCompleted,
       createdAt: DateTime.now(),
     );
   }
