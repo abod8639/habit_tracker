@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
+import 'package:habit_tracker/core/error/exceptions.dart';
 import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
+import 'package:habit_tracker/features/home/data/datasources/habit_payload_processor.dart';
 import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_source.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
@@ -21,15 +25,14 @@ class HabitRepositoryImpl implements HabitRepository {
     this.vaultDataSource,
   });
 
+  static const Duration _cloudTimeout = Duration(seconds: 15);
+
   @override
   Future<Either<Failure, List<HabitEntity>>> getHabits() async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final models = localDataSource.loadHabits();
-      final entities = models.map((m) => m.toEntity()).toList();
-      return Right(entities);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+      return await HabitPayloadProcessor.modelsToEntities(models);
+    });
   }
 
   @override
@@ -39,7 +42,7 @@ class HabitRepositoryImpl implements HabitRepository {
 
   @override
   Future<Either<Failure, void>> addMultipleHabits(List<String> names) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       final now = DateTime.now();
 
@@ -68,30 +71,24 @@ class HabitRepositoryImpl implements HabitRepository {
         addedCount++;
       }
 
-      if (addedCount == 0) {
-        return const Right(null);
-      }
+      if (addedCount == 0) return;
 
       await localDataSource.saveHabits(models);
       _cachedHeatmapData = null;
 
       if (firestoreService.isUserLoggedIn) {
         try {
-          await firestoreService.uploadHabits(models);
+          await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
         } catch (e) {
           debugPrint('Cloud sync error (habits saved locally): $e');
         }
       }
-
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
   Future<Either<Failure, void>> editHabit(String id, String newName) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       final index = models.indexWhere((m) => m.id == id);
 
@@ -118,17 +115,13 @@ class HabitRepositoryImpl implements HabitRepository {
 
         if (firestoreService.isUserLoggedIn) {
           try {
-            await firestoreService.uploadHabits(models);
+            await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
           } catch (e) {
             debugPrint('Cloud sync error (habits updated locally): $e');
           }
         }
       }
-
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
@@ -138,8 +131,8 @@ class HabitRepositoryImpl implements HabitRepository {
 
   @override
   Future<Either<Failure, void>> deleteMultipleHabits(List<String> ids) async {
-    try {
-      if (ids.isEmpty) return const Right(null);
+    return NetworkErrorHandler.guard(() async {
+      if (ids.isEmpty) return;
 
       final idSet = ids.toSet();
       final models = List<HabitModel>.from(localDataSource.loadHabits());
@@ -151,22 +144,18 @@ class HabitRepositoryImpl implements HabitRepository {
 
       if (firestoreService.isUserLoggedIn) {
         try {
-          await firestoreService.deleteHabits(ids);
-          await firestoreService.uploadHabits(models);
+          await firestoreService.deleteHabits(ids).timeout(_cloudTimeout);
+          await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
         } catch (e) {
           debugPrint('Cloud sync error (habits deleted locally): $e');
         }
       }
-
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
   Future<Either<Failure, void>> toggleHabit(String id, bool isCompleted) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
       final index = models.indexWhere((m) => m.id == id);
 
@@ -201,18 +190,18 @@ class HabitRepositoryImpl implements HabitRepository {
         );
 
         if (firestoreService.isUserLoggedIn) {
-          await firestoreService.uploadHabits(models);
-          await firestoreService.uploadHabitHistory(
-            todaysDateFormatted(),
-            completionRate.toString(),
-          );
+          try {
+            await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
+            await firestoreService.uploadHabitHistory(
+              todaysDateFormatted(),
+              completionRate.toString(),
+            ).timeout(_cloudTimeout);
+          } catch (e) {
+            debugPrint('Cloud sync error on toggle: $e');
+          }
         }
       }
-
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
@@ -220,7 +209,7 @@ class HabitRepositoryImpl implements HabitRepository {
     int oldIndex,
     int newIndex,
   ) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final models = List<HabitModel>.from(localDataSource.loadHabits());
 
       if (newIndex > oldIndex) {
@@ -246,13 +235,13 @@ class HabitRepositoryImpl implements HabitRepository {
       await localDataSource.saveHabits(models);
 
       if (firestoreService.isUserLoggedIn) {
-        await firestoreService.uploadHabits(models);
+        try {
+          await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
+        } catch (e) {
+          debugPrint('Cloud sync error on reorder: $e');
+        }
       }
-
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   Map<DateTime, int>? _cachedHeatmapData;
@@ -264,7 +253,7 @@ class HabitRepositoryImpl implements HabitRepository {
 
   @override
   Future<Either<Failure, Map<DateTime, int>>> getHeatmapData() async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final habits = localDataSource.loadHabits();
       final today = DateTime.now();
       final normalizedToday = DateTime(today.year, today.month, today.day);
@@ -280,28 +269,26 @@ class HabitRepositoryImpl implements HabitRepository {
       if (_cachedHeatmapData != null) {
         final cached = Map<DateTime, int>.from(_cachedHeatmapData!);
         cached[normalizedToday] = todayStrength;
-        return Right(cached);
+        return cached;
       }
 
       // 1. Get historical data directly from local storage
       final rawHeatmap = await localDataSource.getHeatmapData();
-      final Map<DateTime, int> heatmapData = Map<DateTime, int>.from(
-        rawHeatmap,
+
+      // 2. Offload processing to background isolate
+      final heatmapData = await HabitPayloadProcessor.processHeatmapData(
+        rawHeatmap: rawHeatmap,
+        habits: habits,
       );
 
-      // 2. Recalculate TODAY's strength based on LIVE habits
-      heatmapData[normalizedToday] = todayStrength;
-
       _cachedHeatmapData = Map<DateTime, int>.from(heatmapData);
-      return Right(heatmapData);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+      return heatmapData;
+    });
   }
 
   @override
   Future<Either<Failure, void>> updateHabitOrder(List<String> ids) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final models = localDataSource.loadHabits();
       final Map<String, HabitModel> modelMap = {for (var m in models) m.id: m};
       final List<HabitModel> reorderedModels = [];
@@ -327,13 +314,13 @@ class HabitRepositoryImpl implements HabitRepository {
       await localDataSource.saveHabits(reorderedModels);
 
       if (firestoreService.isUserLoggedIn) {
-        await firestoreService.uploadHabits(reorderedModels);
+        try {
+          await firestoreService.uploadHabits(reorderedModels).timeout(_cloudTimeout);
+        } catch (e) {
+          debugPrint('Cloud sync error on updateHabitOrder: $e');
+        }
       }
-
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
@@ -346,10 +333,10 @@ class HabitRepositoryImpl implements HabitRepository {
     String id,
     int colorValue,
   ) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final models = localDataSource.loadHabits();
       final index = models.indexWhere((h) => h.id == id);
-      if (index == -1) return Left(const CacheFailure('Habit not found'));
+      if (index == -1) throw const CacheException('Habit not found');
 
       final m = models[index];
       models[index] = HabitModel(
@@ -366,13 +353,13 @@ class HabitRepositoryImpl implements HabitRepository {
       await localDataSource.saveHabits(models);
 
       if (firestoreService.isUserLoggedIn) {
-        await firestoreService.uploadHabits(models);
+        try {
+          await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
+        } catch (e) {
+          debugPrint('Cloud sync error on updateHabitColor: $e');
+        }
       }
-
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
@@ -387,27 +374,21 @@ class HabitRepositoryImpl implements HabitRepository {
 
   @override
   Future<Either<Failure, DateTime?>> getLastResetDate() async {
-    try {
-      final date = await localDataSource.getLastResetDate();
-      return Right(date);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    return NetworkErrorHandler.guard(() async {
+      return await localDataSource.getLastResetDate();
+    });
   }
 
   @override
   Future<Either<Failure, void>> saveLastResetDate(DateTime date) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       await localDataSource.saveLastResetDate(date);
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
   Future<Either<Failure, void>> resetHabitsCompletion() async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final habits = localDataSource.loadHabits();
       final resetHabits = habits
           .map(
@@ -429,26 +410,19 @@ class HabitRepositoryImpl implements HabitRepository {
 
       if (firestoreService.isUserLoggedIn) {
         try {
-          await firestoreService.uploadHabits(resetHabits);
+          await firestoreService.uploadHabits(resetHabits).timeout(_cloudTimeout);
         } catch (e) {
           debugPrint('Cloud sync error on reset: $e');
         }
       }
-
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
   Future<Either<Failure, void>> incrementDayCount([int amount = 1]) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       await localDataSource.incrementDayCount(amount);
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
@@ -458,41 +432,32 @@ class HabitRepositoryImpl implements HabitRepository {
     DateTime date, {
     String? habitName,
   }) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       await localDataSource.saveHabitCompletionToHistory(
         habitIdOrName,
         isCompleted,
         date,
         habitName: habitName,
       );
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
   Future<Either<Failure, Map<String, int>>> getCompletionStatusForDate(
     DateTime date,
   ) async {
-    try {
-      final status = await localDataSource.getCompletionStatusForDate(date);
-      return Right(status);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    return NetworkErrorHandler.guard(() async {
+      return await localDataSource.getCompletionStatusForDate(date);
+    });
   }
 
   @override
   Future<Either<Failure, Map<String, Map<DateTime, bool>>>> getHabitHistoryMap(
     int days,
   ) async {
-    try {
-      final result = await localDataSource.getHabitHistoryMap(days);
-      return Right(result);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    return NetworkErrorHandler.guard(() async {
+      return await localDataSource.getHabitHistoryMap(days);
+    });
   }
 
   @override
@@ -504,18 +469,15 @@ class HabitRepositoryImpl implements HabitRepository {
   Future<Either<Failure, void>> clearLocalData({
     String? earliestDateStr,
   }) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       await localDataSource.clearAllData(earliestDateStr: earliestDateStr);
       _cachedHeatmapData = null;
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
   Future<Either<Failure, void>> backupToVault({String? userId}) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       String? authUid;
       try {
         if (firestoreService.isUserLoggedIn) {
@@ -536,17 +498,14 @@ class HabitRepositoryImpl implements HabitRepository {
       if (vault != null) {
         await vault.saveBackup(snapshot);
       }
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure('Failed to backup habits to vault: $e'));
-    }
+    });
   }
 
   @override
   Future<Either<Failure, bool>> restoreFromVault({String? userId}) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final vault = vaultDataSource ?? localDataSource.vaultDataSource;
-      if (vault == null) return const Right(false);
+      if (vault == null) return false;
 
       String? authUid;
       try {
@@ -564,28 +523,24 @@ class HabitRepositoryImpl implements HabitRepository {
       if (snapshot != null) {
         await localDataSource.restoreFromSnapshot(snapshot);
         _cachedHeatmapData = null;
-        return const Right(true);
+        return true;
       }
-      return const Right(false);
-    } catch (e) {
-      return Left(CacheFailure('Failed to restore habits from vault: $e'));
-    }
+      return false;
+    });
   }
 
   @override
   Future<Either<Failure, bool>> hasPendingVaultData({String? userId}) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final vault = vaultDataSource ?? localDataSource.vaultDataSource;
-      if (vault == null) return const Right(false);
-      return Right(vault.hasUnsyncedBackup(userId: userId));
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+      if (vault == null) return false;
+      return vault.hasUnsyncedBackup(userId: userId);
+    });
   }
 
   @override
   Future<Either<Failure, void>> markVaultSynced({String? userId}) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final vault = vaultDataSource ?? localDataSource.vaultDataSource;
       if (vault != null) {
         String? authUid;
@@ -602,22 +557,16 @@ class HabitRepositoryImpl implements HabitRepository {
             'offline_user';
         await vault.markBackupSynced(effectiveUid);
       }
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 
   @override
   Future<Either<Failure, void>> clearVault({String? userId}) async {
-    try {
+    return NetworkErrorHandler.guard(() async {
       final vault = vaultDataSource ?? localDataSource.vaultDataSource;
       if (vault != null && userId != null) {
         await vault.clearBackup(userId);
       }
-      return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    });
   }
 }
