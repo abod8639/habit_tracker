@@ -1,3 +1,4 @@
+import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 
@@ -8,6 +9,7 @@ class HabitState {
   final List<String> selectedHabitIds;
   final bool isLoading;
   final String errorMessage;
+  final Failure? activeFailure;
   final bool isInitialized;
 
   const HabitState({
@@ -17,6 +19,7 @@ class HabitState {
     this.selectedHabitIds = const [],
     this.isLoading = false,
     this.errorMessage = '',
+    this.activeFailure,
     this.isInitialized = false,
   });
 
@@ -26,6 +29,8 @@ class HabitState {
   };
 
   bool get isSelectionMode => selectedHabitIds.isNotEmpty;
+  bool get hasError => activeFailure != null || errorMessage.isNotEmpty;
+  String get displayErrorMessage => activeFailure?.toMessage() ?? errorMessage;
 
   /// Calculates the current active streak (consecutive days of habit completion).
   int calculateStreak() {
@@ -138,6 +143,8 @@ class HabitState {
     List<String>? selectedHabitIds,
     bool? isLoading,
     String? errorMessage,
+    Failure? activeFailure,
+    bool clearActiveFailure = false,
     bool? isInitialized,
   }) {
     return HabitState(
@@ -147,6 +154,7 @@ class HabitState {
       selectedHabitIds: selectedHabitIds ?? this.selectedHabitIds,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      activeFailure: clearActiveFailure ? null : (activeFailure ?? this.activeFailure),
       isInitialized: isInitialized ?? this.isInitialized,
     );
   }
