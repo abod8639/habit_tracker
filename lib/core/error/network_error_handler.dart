@@ -49,6 +49,13 @@ class NetworkErrorHandler {
 
     final errorStr = error.toString().toLowerCase();
 
+    if (errorStr.contains('sqlite') ||
+        errorStr.contains('database') ||
+        errorStr.contains('drift') ||
+        errorStr.contains('disk i/o')) {
+      return CacheFailure('Database error: ${error.toString()}');
+    }
+
     // Direct Firebase Auth error classification
     if (errorStr.contains('user-not-found')) {
       return AuthFailure(S.current.authErrorUserNotFound);
