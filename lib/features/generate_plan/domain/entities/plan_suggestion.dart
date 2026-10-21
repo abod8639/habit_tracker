@@ -15,11 +15,17 @@ class PlanSuggestion {
 
   factory PlanSuggestion.fromJson(Map<String, dynamic> json) {
     return PlanSuggestion(
-      name: (json['name'] as String?)?.trim() ?? 'Unnamed Habit',
-      description: (json['description'] as String?)?.trim() ?? '',
-      frequency: (json['frequency'] as String?)?.trim() ?? 'daily',
-      category: (json['category'] as String?)?.trim() ?? '',
+      name: _parseString(json['name'], fallback: 'Unnamed Habit'),
+      description: _parseString(json['description'], fallback: ''),
+      frequency: _parseString(json['frequency'], fallback: 'daily'),
+      category: _parseString(json['category'], fallback: ''),
     );
+  }
+
+  static String _parseString(dynamic value, {required String fallback}) {
+    if (value == null) return fallback;
+    final str = value.toString().trim();
+    return str.isEmpty ? fallback : str;
   }
 
   /// Converts to the Map your existing Habit model/service expects.
