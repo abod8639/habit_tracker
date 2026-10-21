@@ -1,23 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/components/build_error_screen.dart';
+import 'package:habit_tracker/core/components/build_loading_screen.dart';
+import 'package:habit_tracker/core/components/my_drawer.dart';
+import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/utils/responsive_utils.dart';
 import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/presentation/widget/drawer_menu_button.dart';
 import 'package:habit_tracker/features/home/presentation/widget/expanded_checkbox_list.dart';
-import 'package:habit_tracker/features/home/presentation/widget/no_habits_yet.dart';
 import 'package:habit_tracker/features/home/presentation/widget/monthly_summary.dart';
-import 'package:habit_tracker/core/components/build_error_screen.dart';
-import 'package:habit_tracker/core/components/build_loading_screen.dart';
-import 'package:habit_tracker/core/components/my_drawer.dart';
 import 'package:habit_tracker/features/home/presentation/widget/my_fab.dart';
-import 'package:habit_tracker/core/utils/responsive_utils.dart';
+import 'package:habit_tracker/features/home/presentation/widget/no_habits_yet.dart';
 
 class Tablet extends ConsumerWidget {
   const Tablet({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final habitState = ref.watch(habitNotifierProvider);
+    // Listen for failures and show floating SnackBar with retry
+    ref.listen<Failure?>(
+      habitNotifierProvider.select((s) => s.activeFailure),
+      (previous, next) {
+        if (next != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(next.toMessage()),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              action: SnackBarAction(
+                label: 'Retry',
+                textColor: Theme.of(context).colorScheme.onError,
+                onPressed: () {
+                  ref.read(habitNotifierProvider.notifier).retry();
+                },
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          ref.read(habitNotifierProvider.notifier).clearActiveFailure();
+        }
+      },
+    );
+
+    final asyncHabit = ref.watch(asyncHabitProvider);
     final habitNotifier = ref.watch(habitNotifierProvider.notifier);
 
     return Scaffold(
@@ -27,19 +53,13 @@ class Tablet extends ConsumerWidget {
       floatingActionButton: MyfloatingActionButton(
         onPressed: () => HabitDialogs.showAdd(context, ref: ref),
       ),
-      body: Builder(
-        builder: (context) {
-          if (habitState.isLoading) {
-            return buildLoadingScreen();
-          }
-
-          if (habitState.errorMessage.isNotEmpty) {
-            return ErrorView(
-              errorMessage: habitState.errorMessage,
-              onRetry: habitNotifier.retry,
-            );
-          }
-
+      body: asyncHabit.when(
+        loading: () => buildLoadingScreen(),
+        error: (error, stackTrace) => ErrorView(
+          errorMessage: error is Failure ? error.toMessage() : error.toString(),
+          onRetry: habitNotifier.retry,
+        ),
+        data: (habitState) {
           final datasets = habitState.heatmapDateSet;
           final startDay = habitNotifier.getStartDay();
 
