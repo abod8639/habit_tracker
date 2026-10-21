@@ -4,9 +4,13 @@ import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/generated/l10n.dart';
+import 'domain/entities/home_app_widget_data_entity.dart';
+
+export 'presentation/widgets/home_app_widget_card.dart';
+export 'presentation/widgets/home_app_widget_error_card.dart';
 
 /// Simplified Home Screen Widget view designed to be rendered into an image
-/// and displayed on the Android/iOS Home Screen via `home_widget`.
+/// and displayed on the Android/iOS Home Screen via `home_widget` or in-app preview.
 ///
 /// Features:
 /// 1. Simplified tactile Neumorphic container sized strictly to prevent RenderFlex overflow.
@@ -36,14 +40,44 @@ class HomeAppWidgetView extends StatelessWidget {
     required this.heatmapDatasets,
     required this.isDark,
     required this.primaryColor,
-    this.sliverPadding = const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+    this.sliverPadding = const EdgeInsets.symmetric(
+      horizontal: 16.0,
+      vertical: 8.0,
+    ),
   }) : asSliver = true;
+
+  factory HomeAppWidgetView.fromEntity({
+    Key? key,
+    required HomeAppWidgetDataEntity entity,
+    required bool isDark,
+    required Color primaryColor,
+    bool asSliver = false,
+    EdgeInsetsGeometry? sliverPadding,
+  }) {
+    if (asSliver) {
+      return HomeAppWidgetView.sliver(
+        key: key,
+        habits: entity.uncompletedHabits,
+        heatmapDatasets: entity.heatmapDatasets,
+        isDark: isDark,
+        primaryColor: primaryColor,
+        sliverPadding: sliverPadding,
+      );
+    }
+    return HomeAppWidgetView(
+      key: key,
+      habits: entity.uncompletedHabits,
+      heatmapDatasets: entity.heatmapDatasets,
+      isDark: isDark,
+      primaryColor: primaryColor,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final s = S.maybeOf(context) ?? S.current;
+    final s = S.maybeOf(context);
 
-    // Only display uncompleted habits
+    // Only display uncompleted habits defensively
     final uncompletedHabits = habits.where((h) => !h.isCompleted).toList();
 
     final today = DateTime.now();
@@ -106,7 +140,7 @@ class HomeAppWidgetView extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      s.today,
+                      s?.today ?? 'Today',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -128,8 +162,8 @@ class HomeAppWidgetView extends StatelessWidget {
                   ),
                   child: Text(
                     uncompletedHabits.isEmpty
-                        ? '✓ ${s.completedLabel}'
-                        : '${uncompletedHabits.length} ${s.pending}',
+                        ? '✓ ${s?.completedLabel ?? 'Done'}'
+                        : '${uncompletedHabits.length} ${s?.pending ?? 'Pending'}',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -201,7 +235,7 @@ class HomeAppWidgetView extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      s.allHabitsCompletedToday,
+                      s?.allHabitsCompletedToday ?? 'All habits completed today',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -226,7 +260,8 @@ class HomeAppWidgetView extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 3, bottom: 1),
                 child: Center(
                   child: Text(
-                    s.moreHabitsCount(uncompletedHabits.length - 2),
+                    s?.moreHabitsCount(uncompletedHabits.length - 2) ??
+                        '+${uncompletedHabits.length - 2} more',
                     style: TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w500,
@@ -261,6 +296,8 @@ class HomeAppWidgetView extends StatelessWidget {
     final habitColor = habit.colorValue != null
         ? Color(habit.colorValue!)
         : primaryColor;
+
+    final displayName = habit.name.trim().isEmpty ? 'Habit' : habit.name;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2.0),
@@ -297,7 +334,7 @@ class HomeAppWidgetView extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              habit.name,
+              displayName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
