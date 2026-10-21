@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
@@ -74,6 +77,7 @@ class HabitStatsState {
   final String? selectedHabitName;
   final List<String> habitNames;
   final bool isLoading;
+  final Failure? activeFailure;
 
   const HabitStatsState({
     this.stats,
@@ -86,7 +90,10 @@ class HabitStatsState {
     this.selectedHabitName,
     this.habitNames = const [],
     this.isLoading = false,
+    this.activeFailure,
   });
+
+  bool get hasError => activeFailure != null;
 
   HabitStatsState copyWith({
     HabitStatsEntity? stats,
@@ -99,6 +106,8 @@ class HabitStatsState {
     String? Function()? selectedHabitName,
     List<String>? habitNames,
     bool? isLoading,
+    Failure? activeFailure,
+    bool clearFailure = false,
   }) {
     return HabitStatsState(
       stats: stats ?? this.stats,
@@ -113,21 +122,33 @@ class HabitStatsState {
           : this.selectedHabitName,
       habitNames: habitNames ?? this.habitNames,
       isLoading: isLoading ?? this.isLoading,
+      activeFailure: clearFailure
+          ? null
+          : (activeFailure ?? this.activeFailure),
     );
   }
 }
 
 // Habit Stats Notifier
-class HabitStatsNotifier extends Notifier<HabitStatsState> {
+class HabitStatsNotifier extends AsyncNotifier<HabitStatsState> {
   List<FlSpot> _weeklyOverallTrend = const [];
   List<FlSpot> _monthlyOverallTrend = const [];
   Map<String, List<FlSpot>> _weeklyIndividualTrends = const {};
   Map<String, List<FlSpot>> _monthlyIndividualTrends = const {};
+  bool _isDisposed = false;
+  Future<void>? _activeRefreshFuture;
 
   @override
-  HabitStatsState build() {
+  FutureOr<HabitStatsState> build() {
+    _isDisposed = false;
+    ref.onDispose(() {
+      _isDisposed = true;
+      _activeRefreshFuture = null;
+    });
+
     // 1. Reactive listener: immediately syncs stats when habits change (0 ms lag)
     ref.listen(habitNotifierProvider, (previous, next) {
+      if (_isDisposed) return;
       if (previous?.habits != next.habits ||
           previous?.localHeatmapDateSet != next.localHeatmapDateSet) {
         _updateLiveStats(next);
@@ -180,7 +201,9 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
 
     // 4. Schedule fresh historical data fetch
     Future.microtask(() {
-      refreshStats();
+      if (!_isDisposed) {
+        refreshStats();
+      }
     });
 
     return HabitStatsState(
@@ -194,6 +217,8 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
   }
 
   void _updateLiveStats(HabitState habitState) {
+    if (_isDisposed) return;
+    final current = state.value ?? const HabitStatsState();
     final habits = habitState.habits;
     final int totalHabits = habits.length;
     final int completedHabits = habits.where((h) => h.isCompleted).length;
@@ -254,16 +279,19 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
     }
 
     final activeOverall =
-        state.isWeeklyView ? _weeklyOverallTrend : _monthlyOverallTrend;
-    final activeInd =
-        state.isWeeklyView ? _weeklyIndividualTrends : _monthlyIndividualTrends;
+        current.isWeeklyView ? _weeklyOverallTrend : _monthlyOverallTrend;
+    final activeInd = current.isWeeklyView
+        ? _weeklyIndividualTrends
+        : _monthlyIndividualTrends;
 
-    state = state.copyWith(
-      stats: updatedStats,
-      todaySummary: habits,
-      overallTrend: activeOverall,
-      individualTrends: activeInd,
-      habitNames: habits.map((h) => h.name).toList(),
+    state = AsyncValue.data(
+      current.copyWith(
+        stats: updatedStats,
+        todaySummary: habits,
+        overallTrend: activeOverall,
+        individualTrends: activeInd,
+        habitNames: habits.map((h) => h.name).toList(),
+      ),
     );
   }
 
@@ -301,8 +329,6 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
     });
   }
 
-  Future<void>? _activeRefreshFuture;
-
   Future<void> refreshStats() {
     if (_activeRefreshFuture != null) {
       return _activeRefreshFuture!;
@@ -313,13 +339,25 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
   }
 
   Future<void> _executeRefresh() async {
+    final current = state.value ?? const HabitStatsState();
+    state = AsyncValue.data(
+      current.copyWith(isLoading: true, clearFailure: true),
+    );
+
     try {
       final getBundle = ref.read(getHabitStatsBundleUseCaseProvider);
       final result = await getBundle(30);
 
+      if (_isDisposed) return;
+
       result.fold(
         (failure) {
-          state = state.copyWith(isLoading: false);
+          state = AsyncValue.data(
+            current.copyWith(
+              isLoading: false,
+              activeFailure: failure,
+            ),
+          );
         },
         (bundle) {
           _monthlyOverallTrend = bundle.overallTrend
@@ -338,20 +376,32 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
               _extractWeeklyIndividualTrends(_monthlyIndividualTrends);
 
           final activeOverall =
-              state.isWeeklyView ? _weeklyOverallTrend : _monthlyOverallTrend;
-          final activeInd = state.isWeeklyView
+              current.isWeeklyView ? _weeklyOverallTrend : _monthlyOverallTrend;
+          final activeInd = current.isWeeklyView
               ? _weeklyIndividualTrends
               : _monthlyIndividualTrends;
 
-          state = state.copyWith(
-            stats: bundle.overallStats,
-            overallTrend: activeOverall,
-            individualTrends: activeInd,
-            habitNames: bundle.individualTrends.keys.toList(),
-            todaySummary: bundle.todayHabits,
-            isLoading: false,
+          state = AsyncValue.data(
+            current.copyWith(
+              stats: bundle.overallStats,
+              overallTrend: activeOverall,
+              individualTrends: activeInd,
+              habitNames: bundle.individualTrends.keys.toList(),
+              todaySummary: bundle.todayHabits,
+              isLoading: false,
+              clearFailure: true,
+            ),
           );
         },
+      );
+    } catch (e, stack) {
+      if (_isDisposed) return;
+      final failure = NetworkErrorHandler.handle(e, stack);
+      state = AsyncValue.data(
+        current.copyWith(
+          isLoading: false,
+          activeFailure: failure,
+        ),
       );
     } finally {
       _activeRefreshFuture = null;
@@ -359,7 +409,8 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
   }
 
   void togglePeriod() {
-    final newIsWeekly = !state.isWeeklyView;
+    final current = state.value ?? const HabitStatsState();
+    final newIsWeekly = !current.isWeeklyView;
     final newDays = newIsWeekly ? 7 : 30;
 
     final targetOverallTrend =
@@ -367,11 +418,13 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
     final targetIndividualTrends =
         newIsWeekly ? _weeklyIndividualTrends : _monthlyIndividualTrends;
 
-    state = state.copyWith(
-      isWeeklyView: newIsWeekly,
-      daysPeriod: newDays,
-      overallTrend: targetOverallTrend,
-      individualTrends: targetIndividualTrends,
+    state = AsyncValue.data(
+      current.copyWith(
+        isWeeklyView: newIsWeekly,
+        daysPeriod: newDays,
+        overallTrend: targetOverallTrend,
+        individualTrends: targetIndividualTrends,
+      ),
     );
 
     if (targetOverallTrend.isEmpty) {
@@ -380,22 +433,30 @@ class HabitStatsNotifier extends Notifier<HabitStatsState> {
   }
 
   void toggleShowAllHabits() {
-    state = state.copyWith(showAllHabits: !state.showAllHabits);
+    final current = state.value ?? const HabitStatsState();
+    state = AsyncValue.data(
+      current.copyWith(showAllHabits: !current.showAllHabits),
+    );
   }
 
   void selectHabit(String? habitName) {
-    if (state.selectedHabitName == habitName) {
-      state = state.copyWith(selectedHabitName: () => null);
+    final current = state.value ?? const HabitStatsState();
+    if (current.selectedHabitName == habitName) {
+      state = AsyncValue.data(
+        current.copyWith(selectedHabitName: () => null),
+      );
     } else {
-      state = state.copyWith(
-        selectedHabitName: () => habitName,
-        showAllHabits: true,
+      state = AsyncValue.data(
+        current.copyWith(
+          selectedHabitName: () => habitName,
+          showAllHabits: true,
+        ),
       );
     }
   }
 }
 
 final habitStatsNotifierProvider =
-    NotifierProvider<HabitStatsNotifier, HabitStatsState>(() {
-      return HabitStatsNotifier();
-    });
+    AsyncNotifierProvider<HabitStatsNotifier, HabitStatsState>(() {
+  return HabitStatsNotifier();
+});
