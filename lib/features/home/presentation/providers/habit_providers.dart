@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_offline_vault_datasource.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
@@ -210,9 +211,13 @@ class HabitNotifier extends Notifier<HabitState> {
 
   Future<void> retry() => _initialize();
 
+  void clearActiveFailure() {
+    state = state.copyWith(clearActiveFailure: true, errorMessage: '');
+  }
+
   Future<void> _initialize() async {
     try {
-      state = state.copyWith(isLoading: true, errorMessage: '');
+      state = state.copyWith(isLoading: true, errorMessage: '', clearActiveFailure: true);
       final resetDaily = ref.read(resetDailyHabitsUseCaseProvider);
       await resetDaily();
       if (!ref.mounted) return;
@@ -224,11 +229,13 @@ class HabitNotifier extends Notifier<HabitState> {
 
       _updateHomeWidget();
       state = state.copyWith(isInitialized: true, isLoading: false);
-    } catch (e) {
+    } catch (e, stack) {
       if (!ref.mounted) return;
+      final failure = NetworkErrorHandler.handle(e, stack);
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Initialization failed: $e',
+        activeFailure: failure,
+        errorMessage: failure.toMessage(),
       );
     }
   }
@@ -237,14 +244,17 @@ class HabitNotifier extends Notifier<HabitState> {
     final getHabits = ref.read(getHabitsUseCaseProvider);
     final result = await getHabits();
     if (!ref.mounted) return;
-    await result.fold(
-      (failure) async {
+    result.fold(
+      (failure) {
         if (!ref.mounted) return;
-        state = state.copyWith(errorMessage: failure.message);
+        state = state.copyWith(
+          activeFailure: failure,
+          errorMessage: failure.toMessage(),
+        );
       },
-      (loaded) async {
+      (loaded) {
         if (!ref.mounted) return;
-        state = state.copyWith(habits: loaded);
+        state = state.copyWith(habits: loaded, clearActiveFailure: true);
       },
     );
   }
@@ -254,7 +264,14 @@ class HabitNotifier extends Notifier<HabitState> {
     final result = await getHeatmap();
     if (!ref.mounted) return;
     result.fold(
-      (_) => null,
+      (failure) {
+        if (ref.mounted) {
+          state = state.copyWith(
+            activeFailure: failure,
+            errorMessage: failure.toMessage(),
+          );
+        }
+      },
       (data) {
         if (ref.mounted) {
           state = state.copyWith(localHeatmapDateSet: data);
@@ -272,7 +289,7 @@ class HabitNotifier extends Notifier<HabitState> {
     try {
       final remoteData = await firestore
           .downloadHabitHistory()
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 5));
       if (!ref.mounted) return;
       final Map<DateTime, int> parsed = {};
 
@@ -326,8 +343,12 @@ class HabitNotifier extends Notifier<HabitState> {
     if (name.trim().isEmpty) return;
     final addUseCase = ref.read(addHabitUseCaseProvider);
     final result = await addUseCase(name);
+    if (!ref.mounted) return;
     result.fold(
-      (failure) => state = state.copyWith(errorMessage: failure.message),
+      (failure) => state = state.copyWith(
+        activeFailure: failure,
+        errorMessage: failure.toMessage(),
+      ),
       (_) => refreshData(),
     );
   }
@@ -336,9 +357,13 @@ class HabitNotifier extends Notifier<HabitState> {
     if (names.isEmpty) return false;
     final addUseCase = ref.read(addMultipleHabitsUseCaseProvider);
     final result = await addUseCase(names);
+    if (!ref.mounted) return false;
     return result.fold(
       (failure) {
-        state = state.copyWith(errorMessage: failure.message);
+        state = state.copyWith(
+          activeFailure: failure,
+          errorMessage: failure.toMessage(),
+        );
         return false;
       },
       (_) async {
@@ -364,12 +389,15 @@ class HabitNotifier extends Notifier<HabitState> {
 
     final editUseCase = ref.read(editHabitUseCaseProvider);
     final result = await editUseCase(id, trimmedName);
+    if (!ref.mounted) return;
     await result.fold(
       (failure) async {
+        if (!ref.mounted) return;
         currentHabits[index] = oldHabit;
         state = state.copyWith(
           habits: currentHabits,
-          errorMessage: failure.message,
+          activeFailure: failure,
+          errorMessage: failure.toMessage(),
         );
       },
       (_) async => refreshData(),
@@ -388,13 +416,15 @@ class HabitNotifier extends Notifier<HabitState> {
 
     final deleteUseCase = ref.read(deleteHabitUseCaseProvider);
     final result = await deleteUseCase(id);
+    if (!ref.mounted) return;
 
     result.fold(
       (failure) {
         currentHabits.insert(index, oldHabit);
         state = state.copyWith(
           habits: currentHabits,
-          errorMessage: failure.message,
+          activeFailure: failure,
+          errorMessage: failure.toMessage(),
         );
         _updateOptimisticHeatmap();
       },
@@ -415,13 +445,15 @@ class HabitNotifier extends Notifier<HabitState> {
 
     final toggleUseCase = ref.read(toggleHabitUseCaseProvider);
     final result = await toggleUseCase(id, value);
+    if (!ref.mounted) return;
 
     result.fold(
       (failure) {
         currentHabits[index] = oldHabit;
         state = state.copyWith(
           habits: currentHabits,
-          errorMessage: failure.message,
+          activeFailure: failure,
+          errorMessage: failure.toMessage(),
         );
         _updateOptimisticHeatmap();
         _updateHomeWidget();
@@ -477,7 +509,17 @@ class HabitNotifier extends Notifier<HabitState> {
 
     final updateOrder = ref.read(updateHabitOrderUseCaseProvider);
     final result = await updateOrder(currentHabits.map((h) => h.id).toList());
-    result.fold((_) => _loadHabits(), (_) => null);
+    if (!ref.mounted) return;
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          activeFailure: failure,
+          errorMessage: failure.toMessage(),
+        );
+        _loadHabits();
+      },
+      (_) => null,
+    );
   }
 
   void toggleHabitSelection(String id) {
@@ -506,8 +548,15 @@ class HabitNotifier extends Notifier<HabitState> {
 
     final deleteMultiple = ref.read(deleteMultipleHabitsUseCaseProvider);
     final result = await deleteMultiple(idsToDelete);
+    if (!ref.mounted) return;
     result.fold(
-      (failure) => refreshData(),
+      (failure) {
+        state = state.copyWith(
+          activeFailure: failure,
+          errorMessage: failure.toMessage(),
+        );
+        refreshData();
+      },
       (_) => refreshData(),
     );
   }
@@ -583,4 +632,17 @@ class HabitNotifier extends Notifier<HabitState> {
 
 final habitNotifierProvider = NotifierProvider<HabitNotifier, HabitState>(() {
   return HabitNotifier();
+});
+
+/// Exposes the habit state as an [AsyncValue<HabitState>] for safe, declarative UI rendering
+/// and crash prevention with fallback UI support.
+final asyncHabitProvider = Provider<AsyncValue<HabitState>>((ref) {
+  final state = ref.watch(habitNotifierProvider);
+  if (state.isLoading && !state.isInitialized) {
+    return const AsyncValue.loading();
+  }
+  if (state.activeFailure != null && !state.isInitialized && state.habits.isEmpty) {
+    return AsyncValue.error(state.activeFailure!, StackTrace.current);
+  }
+  return AsyncValue.data(state);
 });
