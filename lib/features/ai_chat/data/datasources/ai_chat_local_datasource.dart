@@ -1,5 +1,7 @@
+import 'package:habit_tracker/core/error/exceptions.dart';
 import 'package:habit_tracker/core/storage/key_value_storage.dart';
 import '../models/chat_message_model.dart';
+import 'ai_chat_payload_processor.dart';
 
 abstract class AiChatLocalDataSource {
   Future<List<ChatMessageModel>> getChatHistory();
@@ -16,24 +18,31 @@ class AiChatLocalDataSourceImpl implements AiChatLocalDataSource {
 
   @override
   Future<List<ChatMessageModel>> getChatHistory() async {
-    final storedList = _storage.getJsonList(historyKey);
-    if (storedList == null) return [];
-    return storedList.map((item) {
-      final map = Map<String, dynamic>.from(item as Map);
-      return ChatMessageModel.fromJson(map);
-    }).toList();
+    try {
+      final storedList = _storage.getJsonList(historyKey);
+      if (storedList == null || storedList.isEmpty) return [];
+      return await AiChatPayloadProcessor.parseMessages(storedList);
+    } catch (e) {
+      throw CacheException('Failed to read chat history from storage: $e');
+    }
   }
 
   @override
   Future<void> saveChatHistory(List<ChatMessageModel> messages) async {
-    // Keep only the last 10 messages for token and memory efficiency
-    final start = messages.length > 10 ? messages.length - 10 : 0;
-    final listToSave = messages.sublist(start).map((m) => m.toJson()).toList();
-    await _storage.setJson(historyKey, listToSave);
+    try {
+      final listToSave = await AiChatPayloadProcessor.serializeMessages(messages);
+      await _storage.setJson(historyKey, listToSave);
+    } catch (e) {
+      throw CacheException('Failed to write chat history to storage: $e');
+    }
   }
 
   @override
   Future<void> clearChatHistory() async {
-    await _storage.remove(historyKey);
+    try {
+      await _storage.remove(historyKey);
+    } catch (e) {
+      throw CacheException('Failed to clear chat history in storage: $e');
+    }
   }
 }
