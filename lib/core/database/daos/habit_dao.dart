@@ -8,30 +8,42 @@ part 'habit_dao.g.dart';
 class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   HabitDao(super.db);
 
+  static const Duration _defaultTimeout = Duration(seconds: 5);
+  static const Duration _batchTimeout = Duration(seconds: 10);
+
   Future<List<HabitRecord>> getAllHabits() {
     return (select(
       habits,
-    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)])).get();
+    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
+        .get()
+        .timeout(_defaultTimeout);
   }
 
   Stream<List<HabitRecord>> watchAllHabits() {
     return (select(
       habits,
-    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)])).watch();
+    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
+        .watch()
+        .handleError((error, stackTrace) {
+          // Prevent stream controller crash by emitting safe empty list
+          return <HabitRecord>[];
+        });
   }
 
   Future<HabitRecord?> getHabitById(String id) {
-    return (select(habits)..where((t) => t.id.equals(id))).getSingleOrNull();
+    return (select(habits)..where((t) => t.id.equals(id)))
+        .getSingleOrNull()
+        .timeout(_defaultTimeout);
   }
 
   Future<void> upsertHabit(HabitsCompanion habit) {
-    return into(habits).insertOnConflictUpdate(habit);
+    return into(habits).insertOnConflictUpdate(habit).timeout(_defaultTimeout);
   }
 
   Future<void> insertMultipleHabits(List<HabitsCompanion> habitList) async {
     await batch((b) {
       b.insertAllOnConflictUpdate(habits, habitList);
-    });
+    }).timeout(_batchTimeout);
   }
 
   Future<void> syncHabits(List<HabitsCompanion> habitList) async {
@@ -45,21 +57,27 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
           b.insertAllOnConflictUpdate(habits, habitList);
         });
       }
-    });
+    }).timeout(_batchTimeout);
   }
 
   Future<void> updateHabit(HabitsCompanion habit) {
     return (update(
       habits,
-    )..where((t) => t.id.equals(habit.id.value))).write(habit);
+    )..where((t) => t.id.equals(habit.id.value)))
+        .write(habit)
+        .timeout(_defaultTimeout);
   }
 
   Future<void> deleteHabitById(String id) {
-    return (delete(habits)..where((t) => t.id.equals(id))).go();
+    return (delete(habits)..where((t) => t.id.equals(id)))
+        .go()
+        .timeout(_defaultTimeout);
   }
 
   Future<void> deleteMultipleHabits(List<String> ids) {
-    return (delete(habits)..where((t) => t.id.isIn(ids))).go();
+    return (delete(habits)..where((t) => t.id.isIn(ids)))
+        .go()
+        .timeout(_defaultTimeout);
   }
 
   Future<void> updateHabitOrder(List<String> ids) async {
@@ -72,7 +90,7 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
           ),
         );
       }
-    });
+    }).timeout(_batchTimeout);
   }
 
   Future<void> toggleHabitCompletion(
@@ -80,26 +98,30 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
     bool isCompleted,
     DateTime? completedAt,
   ) {
-    return (update(habits)..where((t) => t.id.equals(id))).write(
-      HabitsCompanion(
-        isCompleted: Value(isCompleted),
-        completedAt: Value(completedAt),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
+    return (update(habits)..where((t) => t.id.equals(id)))
+        .write(
+          HabitsCompanion(
+            isCompleted: Value(isCompleted),
+            completedAt: Value(completedAt),
+            updatedAt: Value(DateTime.now()),
+          ),
+        )
+        .timeout(_defaultTimeout);
   }
 
   Future<void> resetAllHabitsCompletion() {
-    return (update(habits)).write(
-      HabitsCompanion(
-        isCompleted: const Value(false),
-        completedAt: const Value(null),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
+    return (update(habits))
+        .write(
+          HabitsCompanion(
+            isCompleted: const Value(false),
+            completedAt: const Value(null),
+            updatedAt: Value(DateTime.now()),
+          ),
+        )
+        .timeout(_defaultTimeout);
   }
 
   Future<void> clearAllHabits() {
-    return delete(habits).go();
+    return delete(habits).go().timeout(_defaultTimeout);
   }
 }
