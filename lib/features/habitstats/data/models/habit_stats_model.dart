@@ -19,7 +19,16 @@ class HabitStatsModel extends HabitStatsEntity {
     );
   }
 
-  factory HabitStatsModel.fromMap(Map<dynamic, dynamic> map) {
+  factory HabitStatsModel.fromMap(Map<dynamic, dynamic>? map) {
+    if (map == null) {
+      return const HabitStatsModel(
+        totalHabits: 0,
+        completedHabits: 0,
+        completionRate: 0.0,
+        streak: 0,
+        bestStreak: 0,
+      );
+    }
     return HabitStatsModel(
       totalHabits: _parseInt(map['totalHabits'], fallback: 0),
       completedHabits: _parseInt(map['completedHabits'], fallback: 0),
