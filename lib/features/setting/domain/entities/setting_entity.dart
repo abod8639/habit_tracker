@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-class SettingEntity {
+class SettingEntity extends Equatable {
   static const String defaultLanguage = 'sys';
 
   final String languageCode;
@@ -12,6 +13,14 @@ class SettingEntity {
     required this.isNotificationEnabled,
     this.notificationTime,
   });
+
+  factory SettingEntity.empty() {
+    return const SettingEntity(
+      languageCode: defaultLanguage,
+      isNotificationEnabled: false,
+      notificationTime: null,
+    );
+  }
 
   SettingEntity copyWith({
     String? languageCode,
@@ -25,4 +34,11 @@ class SettingEntity {
       notificationTime: notificationTime ?? this.notificationTime,
     );
   }
+
+  @override
+  List<Object?> get props => [
+    languageCode,
+    isNotificationEnabled,
+    notificationTime,
+  ];
 }
