@@ -274,22 +274,7 @@ class _NeumorphicRetryButtonState extends State<_NeumorphicRetryButton>
                 color: theme.colorScheme.error.withValues(alpha: 0.3),
                 width: 1,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.04)
-                      : Colors.white.withValues(alpha: 0.8),
-                  offset: const Offset(-1.5, -1.5),
-                  blurRadius: 3,
-                ),
-                BoxShadow(
-                  color: isDark
-                      ? Colors.black.withValues(alpha: 0.4)
-                      : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
-                  offset: const Offset(1.5, 1.5),
-                  blurRadius: 3,
-                ),
-              ],
+              boxShadow: AppShadows.badge(isDark: isDark),
             ),
             child: Icon(
               Icons.refresh_rounded,
