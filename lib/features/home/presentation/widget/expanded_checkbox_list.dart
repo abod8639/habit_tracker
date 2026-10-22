@@ -23,12 +23,13 @@ class CheckboxList extends ConsumerWidget {
 
           return MyTextTaile(
             key: ValueKey(habit.id),
+            habitId: habit.id,
             habitName: habit.name,
             habitCompleted: habit.isCompleted,
             onTap: () =>
                 habitNotifier.toggleHabit(habit.id, !habit.isCompleted),
-            onDelete: (context) => habitNotifier.deleteHabit(habit.id),
-            onEdit: (context) => HabitDialogs.showEdit(
+            onDelete: (_) => habitNotifier.deleteHabit(habit.id),
+            onEdit: (_) => HabitDialogs.showEdit(
               context,
               id: habit.id,
               currentName: habit.name,
