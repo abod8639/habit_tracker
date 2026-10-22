@@ -5,6 +5,7 @@ import 'package:habit_tracker/core/components/build_loading_screen.dart';
 import 'package:habit_tracker/core/components/my_drawer.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/utils/responsive_utils.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/presentation/widget/drawer_menu_button.dart';
@@ -29,7 +30,7 @@ class Tablet extends ConsumerWidget {
               content: Text(next.toMessage()),
               backgroundColor: Theme.of(context).colorScheme.error,
               action: SnackBarAction(
-                label: 'Retry',
+                label: S.of(context).retry,
                 textColor: Theme.of(context).colorScheme.onError,
                 onPressed: () {
                   ref.read(habitNotifierProvider.notifier).retry();
