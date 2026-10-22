@@ -13,3 +13,9 @@
 * **Strict Layer Separation:** Presentation controllers must strictly communicate through Domain Use Cases and Entities. Never inject, import, or call Data Sources or raw Storage services directly in Controllers.
 * **Modular Widget Classes (No Helper Functions):** Never create top-level builder functions returning `Widget` (e.g., `buildSummaryCard()`, `buildChartsSection()`). Always declare dedicated `StatelessWidget` or `StatefulWidget` classes to enable `const` instantiation, optimize Flutter element reconciliation, and ensure clear widget tree inspector hierarchy.
 * **Extract Compound Widgets & Dialogs:** Decompose complex compound widgets and modal dialogs (e.g., `ThemeCard`, `AiApiKeyDialog`) into dedicated files in `presentation/widgets/`.
+
+## 4. Error Handling, Resilience & Resource Safety
+* **Central Error Fallback (`ErrorView`):** Never implement ad-hoc full-screen or card-level error views inside features. Always delegate to or reuse `ErrorView` from `lib/core/components/build_error_screen.dart` with localized message extraction (`failure.toMessage()`).
+* **Resilient `AsyncValue.when` Handling:** Never assume errors are plain strings. Always handle error boundaries safely: `error is Failure ? error.toMessage() : error.toString()`.
+* **Explicit Timeouts & Cancellation:** All network, WebSocket, and SSE streaming calls MUST declare explicit `.timeout(...)` guards to prevent permanent UI freezes. In Riverpod Notifiers, always bind cancellations to `ref.onDispose` with `_isDisposed` guards.
+* **Heavy Payload Offloading:** Payloads exceeding memory or parsing thresholds (e.g., large JSONs, markdown parsing) must be offloaded to background Isolates via `compute` with timeout protection.
