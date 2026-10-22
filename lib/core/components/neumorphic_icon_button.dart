@@ -89,8 +89,7 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
 
     final Color effectiveIconColor =
         widget.iconColor ?? widget.accentColor ?? colorScheme.onSurface;
-
-    final double effectiveIconSize = widget.iconSize ?? (widget.size * 0.48);
+    // final double effectiveIconSize = widget.iconSize ?? (widget.size * 0.48);
 
     final BorderRadius? effectiveBorderRadius = widget.shape == BoxShape.circle
         ? null
@@ -169,7 +168,7 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
           child: Center(
             child: Icon(
               widget.icon,
-              size: effectiveIconSize,
+              size:  22,
               color: effectiveIconColor,
               shadows: AppShadows.buttonResting(isDark: isDark),
             ),

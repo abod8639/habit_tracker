@@ -60,9 +60,12 @@ class AiMessageInput extends StatelessWidget {
             const SizedBox(width: 10),
 
             // 3D Convex Neumorphic send button
-            AiSendButton(
-              isLoading: isLoading,
-              onPressed: onSend,
+            Hero(
+              tag: 'ai_button',
+              child: AiSendButton(
+                isLoading: isLoading,
+                onPressed: onSend,
+              ),
             ),
           ],
         ),

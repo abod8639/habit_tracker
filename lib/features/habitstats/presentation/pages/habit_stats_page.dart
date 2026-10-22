@@ -266,10 +266,13 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
             ],
           ),
         ),
-        floatingActionButton: _NeumorphicAiFab(
-          onTap: () => AiGuard.protect(
-            context,
-            onValid: () => context.push(AppRoutes.aiCoach),
+        floatingActionButton: Hero(
+          tag: 'ai_button',
+          child: _NeumorphicAiFab(
+            onTap: () => AiGuard.protect(
+              context,
+              onValid: () => context.push(AppRoutes.aiCoach),
+            ),
           ),
         ),
       ),

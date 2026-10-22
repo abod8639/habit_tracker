@@ -50,8 +50,11 @@ class Tablet extends ConsumerWidget {
       drawer: const MyDrawer(),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: MyfloatingActionButton(
-        onPressed: () => HabitDialogs.showAdd(context, ref: ref),
+      floatingActionButton: Hero(
+        tag: 'ai_button',
+        child: MyfloatingActionButton(
+          onPressed: () => HabitDialogs.showAdd(context, ref: ref),
+        ),
       ),
       body: asyncHabit.when(
         loading: () => buildLoadingScreen(),
