@@ -45,6 +45,7 @@ class HabitList extends ConsumerWidget {
           index: index,
           enabled: true,
           child: MyTextTaile(
+            habitId: habit.id,
             habitName: habit.name,
             habitCompleted: habit.isCompleted,
             isSelected: isSelected,
@@ -57,8 +58,8 @@ class HabitList extends ConsumerWidget {
                 habitNotifier.toggleHabit(habit.id, !habit.isCompleted);
               }
             },
-            onDelete: (context) => habitNotifier.deleteHabit(habit.id),
-            onEdit: (context) => HabitDialogs.showEdit(
+            onDelete: (_) => habitNotifier.deleteHabit(habit.id),
+            onEdit: (_) => HabitDialogs.showEdit(
               context,
               id: habit.id,
               currentName: habit.name,
