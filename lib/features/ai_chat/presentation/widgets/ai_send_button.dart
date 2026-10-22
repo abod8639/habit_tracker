@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 
 /// Clean Architecture component: 3D Convex Neumorphic send button with
@@ -98,7 +99,7 @@ class _AiSendButtonState extends State<AiSendButton>
                           surface,
                         )
                       : const Color(0xFFF0F3F8)),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppRadius.lgRadius,
             border: Border.all(
               color: isActive
                   ? Colors.white.withValues(alpha: isDark ? 0.25 : 0.4)
