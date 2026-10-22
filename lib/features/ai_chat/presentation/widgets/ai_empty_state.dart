@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'ai_avatar.dart';
 
@@ -47,29 +49,14 @@ class AiEmptyState extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
               decoration: BoxDecoration(
                 color: surface,
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: AppRadius.dialogRadius,
                 border: Border.all(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.08)
                       : Colors.black.withValues(alpha: 0.05),
                   width: 1,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.035)
-                        : Colors.white.withValues(alpha: 0.9),
-                    offset: const Offset(-4, -4),
-                    blurRadius: 10,
-                  ),
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.black.withValues(alpha: 0.45)
-                        : const Color(0xFFA3B1C6).withValues(alpha: 0.32),
-                    offset: const Offset(4, 4),
-                    blurRadius: 10,
-                  ),
-                ],
+                boxShadow: AppShadows.softCard(isDark: isDark),
               ),
               child: Column(
                 children: [
@@ -196,29 +183,14 @@ class _SuggestionChipState extends State<_SuggestionChip>
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppRadius.lgRadius,
             border: Border.all(
               color: isDark
                   ? Colors.white.withValues(alpha: 0.06)
                   : Colors.black.withValues(alpha: 0.04),
               width: 1,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.025)
-                    : Colors.white.withValues(alpha: 0.8),
-                offset: const Offset(-2, -2),
-                blurRadius: 4,
-              ),
-              BoxShadow(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.35)
-                    : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
-                offset: const Offset(2, 2),
-                blurRadius: 4,
-              ),
-            ],
+            boxShadow: AppShadows.subtleCard(isDark: isDark),
           ),
           child: Row(
             children: [
