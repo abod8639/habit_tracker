@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/components/page_entrance_transition.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -45,74 +46,83 @@ class AiEmptyState extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Soft Neumorphic Hero Card
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-              decoration: BoxDecoration(
-                color: surface,
-                borderRadius: AppRadius.dialogRadius,
-                border: Border.all(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.black.withValues(alpha: 0.05),
-                  width: 1,
-                ),
-                boxShadow: AppShadows.softCard(isDark: isDark),
-              ),
-              child: Column(
-                children: [
-                  const AiAvatar(size: 76),
-                  const SizedBox(height: 20),
-                  Text(
-                    S.current.aiCoach,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.3,
-                      color: theme.colorScheme.onSurface,
-                    ),
+            PageEntranceTransition(
+              index: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: AppRadius.dialogRadius,
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.05),
+                    width: 1,
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    S.current.aiGreeting,
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 1.5,
-                      color: theme.colorScheme.onSurface.withValues(
-                        alpha: 0.65,
+                  boxShadow: AppShadows.softCard(isDark: isDark),
+                ),
+                child: Column(
+                  children: [
+                    const AiAvatar(size: 76),
+                    const SizedBox(height: 20),
+                    Text(
+                      S.current.aiCoach,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    Text(
+                      S.current.aiGreeting,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.65,
+                        ),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
 
             // Starter Suggestions Title
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Padding(
-                padding: const EdgeInsetsDirectional.only(start: 6, bottom: 12),
-                child: Text(
-                  Localizations.localeOf(context).languageCode == 'ar'
-                      ? 'اقتراحات للبدء:'
-                      : 'Suggested prompts:',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            PageEntranceTransition(
+              index: 1,
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 6, bottom: 12),
+                  child: Text(
+                    Localizations.localeOf(context).languageCode == 'ar'
+                        ? 'اقتراحات للبدء:'
+                        : 'Suggested prompts:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
                   ),
                 ),
               ),
             ),
 
             // Suggestion Chips
-            ...suggestions.map(
-              (prompt) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _SuggestionChip(
-                  text: prompt,
-                  onTap: () => onPromptSelected(prompt),
+            ...suggestions.asMap().entries.map(
+              (entry) => PageEntranceTransition(
+                index: 2 + entry.key,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _SuggestionChip(
+                    text: entry.value,
+                    onTap: () => onPromptSelected(entry.value),
+                  ),
                 ),
               ),
             ),
