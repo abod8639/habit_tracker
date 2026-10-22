@@ -130,7 +130,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appUpdateLaterButton": MessageLookupByLibrary.simpleMessage("لاحقاً"),
     "appVersionAndInformation": MessageLookupByLibrary.simpleMessage(
-      "هذا التطبيق مصنوع بعناية وحب ",
+      "لمعرفة المزيد من المعلومات",
     ),
     "appearance": MessageLookupByLibrary.simpleMessage("المظهر"),
     "areYouSureYouWantToDeleteThisHabit": MessageLookupByLibrary.simpleMessage(
