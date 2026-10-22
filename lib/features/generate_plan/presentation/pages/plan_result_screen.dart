@@ -5,6 +5,7 @@ import 'package:habit_tracker/core/components/build_error_screen.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/components/neumorphic_button.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
+import 'package:habit_tracker/core/components/page_entrance_transition.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
@@ -130,51 +131,54 @@ class PlanResultScreen extends ConsumerWidget {
               ),
               if (state.suggestions.isNotEmpty)
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            S.current.itemsSelected(state.selectedCount),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: color,
+                  child: PageEntranceTransition(
+                    index: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              S.current.itemsSelected(state.selectedCount),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: color,
+                              ),
                             ),
                           ),
-                        ),
-                        const Spacer(),
-                        TextButton(
-                          onPressed: () => ref
-                              .read(planGeneratorNotifierProvider.notifier)
-                              .selectAll(),
-                          style: TextButton.styleFrom(
-                            foregroundColor: color,
-                            textStyle:
-                                const TextStyle(fontWeight: FontWeight.w600),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () => ref
+                                .read(planGeneratorNotifierProvider.notifier)
+                                .selectAll(),
+                            style: TextButton.styleFrom(
+                              foregroundColor: color,
+                              textStyle:
+                                  const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            child: Text(S.current.selectAll),
                           ),
-                          child: Text(S.current.selectAll),
-                        ),
-                        const SizedBox(width: 4),
-                        TextButton(
-                          onPressed: () => ref
-                              .read(planGeneratorNotifierProvider.notifier)
-                              .deselectAll(),
-                          style: TextButton.styleFrom(
-                            foregroundColor: theme.hintColor,
+                          const SizedBox(width: 4),
+                          TextButton(
+                            onPressed: () => ref
+                                .read(planGeneratorNotifierProvider.notifier)
+                                .deselectAll(),
+                            style: TextButton.styleFrom(
+                              foregroundColor: theme.hintColor,
+                            ),
+                            child: Text(S.current.clear),
                           ),
-                          child: Text(S.current.clear),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -184,12 +188,15 @@ class PlanResultScreen extends ConsumerWidget {
                   sliver: SliverList.separated(
                     itemCount: state.suggestions.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) => PlanSuggestionCard(
-                      suggestion: state.suggestions[index],
-                      color: color,
-                      onToggle: () => ref
-                          .read(planGeneratorNotifierProvider.notifier)
-                          .toggleSuggestion(index),
+                    itemBuilder: (context, index) => PageEntranceTransition(
+                      index: index + 1,
+                      child: PlanSuggestionCard(
+                        suggestion: state.suggestions[index],
+                        color: color,
+                        onToggle: () => ref
+                            .read(planGeneratorNotifierProvider.notifier)
+                            .toggleSuggestion(index),
+                      ),
                     ),
                   ),
                 )
@@ -197,98 +204,104 @@ class PlanResultScreen extends ConsumerWidget {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inbox_rounded,
-                          size: 48,
-                          color: theme.hintColor.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          S.current.noHabitsYet,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: theme.hintColor,
+                    child: PageEntranceTransition(
+                      index: 0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.inbox_rounded,
+                            size: 48,
+                            color: theme.hintColor.withValues(alpha: 0.5),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 12),
+                          Text(
+                            S.current.noHabitsYet,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: theme.hintColor,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
             ],
           ),
           bottomNavigationBar: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (hasInlineError && errorMessage.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.errorContainer
-                              .withValues(alpha: 0.2),
-                          borderRadius: AppRadius.mdRadius,
-                          border: Border.all(
-                            color: theme.colorScheme.error
-                                .withValues(alpha: 0.4),
+            child: PageEntranceTransition(
+              index: 2,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (hasInlineError && errorMessage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.errorContainer
+                                .withValues(alpha: 0.2),
+                            borderRadius: AppRadius.mdRadius,
+                            border: Border.all(
+                              color: theme.colorScheme.error
+                                  .withValues(alpha: 0.4),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.error_outline_rounded,
+                                color: theme.colorScheme.error,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  errorMessage,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => _handleAddHabits(context, ref),
+                                child: Text(
+                                  S.current.retry,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12.5,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.error_outline_rounded,
-                              color: theme.colorScheme.error,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                errorMessage,
-                                style: TextStyle(
-                                  color: theme.colorScheme.error,
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () => _handleAddHabits(context, ref),
-                              child: Text(
-                                S.current.retry,
-                                style: TextStyle(
-                                  color: theme.colorScheme.error,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
+                    NeumorphicButton(
+                      text: state.hasSelections
+                          ? S.current.addHabitsToTracker(state.selectedCount)
+                          : S.current.selectAtLeastOneHabit,
+                      icon: Icons.add_task_rounded,
+                      isLoading: isLoading,
+                      accentColor: color,
+                      onPressed: (state.hasSelections && !isLoading)
+                          ? () => _handleAddHabits(context, ref)
+                          : null,
+                      width: double.infinity,
+                      height: 52,
                     ),
-                  NeumorphicButton(
-                    text: state.hasSelections
-                        ? S.current.addHabitsToTracker(state.selectedCount)
-                        : S.current.selectAtLeastOneHabit,
-                    icon: Icons.add_task_rounded,
-                    isLoading: isLoading,
-                    accentColor: color,
-                    onPressed: (state.hasSelections && !isLoading)
-                        ? () => _handleAddHabits(context, ref)
-                        : null,
-                    width: double.infinity,
-                    height: 52,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
