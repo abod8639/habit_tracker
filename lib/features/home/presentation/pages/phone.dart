@@ -4,6 +4,7 @@ import 'package:habit_tracker/core/components/build_error_screen.dart';
 import 'package:habit_tracker/core/components/build_loading_screen.dart';
 import 'package:habit_tracker/core/components/my_drawer.dart';
 import 'package:habit_tracker/core/error/failures.dart';
+import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
 import 'package:habit_tracker/features/home/presentation/widget/habit_list.dart';
@@ -41,7 +42,7 @@ class _PhoneState extends ConsumerState<Phone> {
               content: Text(next.toMessage()),
               backgroundColor: Theme.of(context).colorScheme.error,
               action: SnackBarAction(
-                label: 'Retry',
+                label: S.of(context).retry,
                 textColor: Theme.of(context).colorScheme.onError,
                 onPressed: () {
                   ref.read(habitNotifierProvider.notifier).retry();
