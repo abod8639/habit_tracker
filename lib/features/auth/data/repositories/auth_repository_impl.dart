@@ -29,6 +29,19 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
   @override
+  AuthEntity? get currentUser {
+    final user = remoteDataSource.currentUser;
+    return user != null
+        ? AuthEntity(
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoUrl: user.photoURL,
+          )
+        : null;
+  }
+
+  @override
   Future<Either<Failure, AuthEntity>> signInWithEmail(
     String email,
     String password,
