@@ -365,10 +365,10 @@ class S {
     return Intl.message('About', name: 'about', desc: '', args: []);
   }
 
-  /// `This app made with care and love `
+  /// `for more information`
   String get appVersionAndInformation {
     return Intl.message(
-      'This app made with care and love ',
+      'for more information',
       name: 'appVersionAndInformation',
       desc: '',
       args: [],
