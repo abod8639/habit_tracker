@@ -195,7 +195,7 @@ class _AnimatedSettingTileState extends State<AnimatedSettingTile>
         curve: Interval(
           0.05 * (widget.index % 10),
           math.min(0.05 * (widget.index % 10) + 0.5, 1.0),
-          curve: Curves.easeOut,
+          curve: Curves.easeOutCubic,
         ),
       );
 
@@ -203,7 +203,7 @@ class _AnimatedSettingTileState extends State<AnimatedSettingTile>
         opacity: entryAnimation,
         child: SlideTransition(
           position: Tween<Offset>(
-            begin: const Offset(0.25, 0),
+            begin: const Offset(0, 0.08),
             end: Offset.zero,
           ).animate(entryAnimation),
           child: content,
