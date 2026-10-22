@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'ai_avatar.dart';
 
 /// Neumorphic recessed typing indicator with animated bouncing dots.
@@ -34,10 +36,10 @@ class AiTypingIndicator extends StatelessWidget {
                     )
                   : const Color(0xFFF3F5F9),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(18),
-                topRight: Radius.circular(18),
-                bottomRight: Radius.circular(18),
-                bottomLeft: Radius.circular(4),
+                topLeft: Radius.circular(AppRadius.well),
+                topRight: Radius.circular(AppRadius.well),
+                bottomRight: Radius.circular(AppRadius.well),
+                bottomLeft: Radius.circular(AppRadius.xs),
               ),
               border: Border.all(
                 color: isDark
@@ -45,22 +47,7 @@ class AiTypingIndicator extends StatelessWidget {
                     : Colors.black.withValues(alpha: 0.04),
                 width: 1,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: isDark
-                      ? Colors.black.withValues(alpha: 0.35)
-                      : const Color(0xFFA3B1C6).withValues(alpha: 0.25),
-                  offset: const Offset(1.5, 1.5),
-                  blurRadius: 3,
-                ),
-                BoxShadow(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.03)
-                      : Colors.white.withValues(alpha: 0.8),
-                  offset: const Offset(-1.5, -1.5),
-                  blurRadius: 2.5,
-                ),
-              ],
+              boxShadow: AppShadows.insetInput(isDark: isDark),
             ),
             child: loadingMessage.isNotEmpty
                 ? Text(
