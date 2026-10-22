@@ -313,18 +313,14 @@ class _MyalartdState extends State<MyalartDialog>
                                 LogicalKeyboardKey.numpadEnter) {
                           if (HardwareKeyboard.instance.isControlPressed) {
                             final currentText = widget.controller.text;
-                            final currentPosition =
-                                widget.controller.selection.base.offset;
-                            final validPosition = currentPosition.clamp(
-                              0,
-                              currentText.length,
-                            );
-                            final newText =
-                                '${currentText.substring(0, validPosition)}\n${currentText.substring(validPosition)}';
+                            final selection = widget.controller.selection;
+                            final start = selection.start.clamp(0, currentText.length);
+                            final end = selection.end.clamp(0, currentText.length);
+                            final newText = currentText.replaceRange(start, end, '\n');
                             widget.controller.value = TextEditingValue(
                               text: newText,
                               selection: TextSelection.collapsed(
-                                offset: validPosition + 1,
+                                offset: start + 1,
                               ),
                             );
                           } else {
@@ -347,11 +343,11 @@ class _MyalartdState extends State<MyalartDialog>
                       ),
                       child: TextFormField(
                         maxLength: 100,
+                        maxLengthEnforcement: MaxLengthEnforcement.enforced,
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 15.5,
                           color: colorScheme.onSurface,
-                          letterSpacing: 0.2,
                         ),
                         minLines: 1,
                         maxLines: 4,
