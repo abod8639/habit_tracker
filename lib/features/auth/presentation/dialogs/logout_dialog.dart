@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
+import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/features/auth/presentation/providers/auth_providers.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -25,6 +27,9 @@ class LogoutDialog {
 
     if (confirmed == true) {
       await ref.read(authNotifierProvider.notifier).signOut();
+      if (context.mounted) {
+        context.go(AppRoutes.root);
+      }
     }
   }
 }
