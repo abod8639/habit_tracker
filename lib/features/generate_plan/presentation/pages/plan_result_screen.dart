@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:habit_tracker/core/components/build_error_screen.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/components/neumorphic_button.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/plan_generator_providers.dart';
@@ -90,36 +92,9 @@ class PlanResultScreen extends ConsumerWidget {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline_rounded,
-                    size: 56,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    message,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  NeumorphicButton(
-                    text: S.current.retry,
-                    onPressed: () => _handleAddHabits(context, ref),
-                    width: 160,
-                    height: 48,
-                  ),
-                ],
-              ),
-            ),
+          body: ErrorView(
+            errorMessage: message,
+            onRetry: () => _handleAddHabits(context, ref),
           ),
         );
       },
@@ -261,7 +236,7 @@ class PlanResultScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: theme.colorScheme.errorContainer
                               .withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppRadius.mdRadius,
                           border: Border.all(
                             color: theme.colorScheme.error
                                 .withValues(alpha: 0.4),
