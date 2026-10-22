@@ -29,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 650),
     );
     _animationController.forward();
   }
