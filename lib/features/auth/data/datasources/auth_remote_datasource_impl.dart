@@ -22,6 +22,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   @override
+  User? get currentUser => _auth.currentUser;
+
+  @override
   Future<AuthModel?> signInWithGoogle() async {
     try {
       await _googleSignIn
