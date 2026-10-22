@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
+import 'package:habit_tracker/core/components/page_entrance_transition.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/ai_chat_providers.dart';
@@ -158,22 +159,25 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                     ? AiEmptyState(
                         onPromptSelected: _handlePromptSelected,
                       )
-                    : ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                        itemCount: chatState.messages.length,
-                        itemBuilder: (context, index) {
-                          final message = chatState.messages[index];
-                          final isLast = index == chatState.messages.length - 1;
+                    : PageEntranceTransition(
+                        index: 0,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                          itemCount: chatState.messages.length,
+                          itemBuilder: (context, index) {
+                            final message = chatState.messages[index];
+                            final isLast = index == chatState.messages.length - 1;
 
-                          return AiMessageBubble(
-                            message: message,
-                            isLast: isLast,
-                            onRetry: () => ref
-                                .read(aiChatNotifierProvider.notifier)
-                                .retryMessage(message),
-                          );
-                        },
+                            return AiMessageBubble(
+                              message: message,
+                              isLast: isLast,
+                              onRetry: () => ref
+                                  .read(aiChatNotifierProvider.notifier)
+                                  .retryMessage(message),
+                            );
+                          },
+                        ),
                       ),
               ),
 
@@ -184,10 +188,13 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                 ),
 
               // Neumorphic Input Dock
-              AiMessageInput(
-                textController: _textController,
-                isLoading: chatState.isStreaming,
-                onSend: _handleSend,
+              PageEntranceTransition(
+                index: 1,
+                child: AiMessageInput(
+                  textController: _textController,
+                  isLoading: chatState.isStreaming,
+                  onSend: _handleSend,
+                ),
               ),
             ],
           );
