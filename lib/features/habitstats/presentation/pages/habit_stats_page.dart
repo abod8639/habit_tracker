@@ -33,7 +33,7 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 650),
       vsync: this,
     );
     _animationController.forward();
