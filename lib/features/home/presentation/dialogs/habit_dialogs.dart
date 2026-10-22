@@ -28,7 +28,7 @@ class HabitDialogs {
             final String habitName = textController.text.trim();
             if (habitName.isEmpty) {
               _showSnackBar(context, S.current.theFieldCantBeEmpty);
-            } else if (habitName.length > 100) {
+            } else if (habitName.characters.length > 100) {
               final isAr = Localizations.localeOf(context).languageCode == 'ar';
               _showSnackBar(
                 context,
@@ -46,17 +46,20 @@ class HabitDialogs {
                   final targetContext = dialogContext.mounted
                       ? dialogContext
                       : context;
-                  final container = ProviderScope.containerOf(targetContext);
-                  await container
-                      .read(habitNotifierProvider.notifier)
-                      .addHabit(habitName);
+                  if (targetContext.mounted) {
+                    final container = ProviderScope.containerOf(targetContext);
+                    await container
+                        .read(habitNotifierProvider.notifier)
+                        .addHabit(habitName);
+                  }
                 }
               } catch (e, st) {
                 debugPrint('Failed to add habit: $e\n$st');
               }
 
-              if (dialogContext.mounted) {
-                Navigator.of(dialogContext).pop();
+              if (dialogContext.mounted &&
+                  Navigator.of(dialogContext, rootNavigator: true).canPop()) {
+                Navigator.of(dialogContext, rootNavigator: true).pop();
               }
             }
           }.throttle(),
@@ -86,7 +89,17 @@ class HabitDialogs {
           controller: textController,
           onSave: () async {
             final String habitName = textController.text.trim();
-            if (habitName.isNotEmpty) {
+            if (habitName.isEmpty) {
+              _showSnackBar(context, S.current.theFieldCantBeEmpty);
+            } else if (habitName.characters.length > 100) {
+              final isAr = Localizations.localeOf(context).languageCode == 'ar';
+              _showSnackBar(
+                context,
+                isAr
+                    ? 'لا يمكن أن يتجاوز اسم العادة 100 حرف'
+                    : 'Habit name cannot exceed 100 characters',
+              );
+            } else {
               try {
                 if (ref != null) {
                   await ref
@@ -96,29 +109,33 @@ class HabitDialogs {
                   final targetContext = dialogContext.mounted
                       ? dialogContext
                       : context;
-                  final container = ProviderScope.containerOf(targetContext);
-                  await container
-                      .read(habitNotifierProvider.notifier)
-                      .editHabit(id, habitName);
+                  if (targetContext.mounted) {
+                    final container = ProviderScope.containerOf(targetContext);
+                    await container
+                        .read(habitNotifierProvider.notifier)
+                        .editHabit(id, habitName);
+                  }
                 }
               } catch (e, st) {
                 debugPrint('Failed to edit habit: $e\n$st');
               }
 
-              if (dialogContext.mounted) {
-                Navigator.of(dialogContext).pop();
+              if (dialogContext.mounted &&
+                  Navigator.of(dialogContext, rootNavigator: true).canPop()) {
+                Navigator.of(dialogContext, rootNavigator: true).pop();
               }
-            } else {
-              _showSnackBar(context, S.current.theFieldCantBeEmpty);
             }
-          },
+          }.throttle(),
         );
       },
     );
   }
 
   static void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    if (!context.mounted) return;
+    final scaffoldMessenger = ScaffoldMessenger.maybeOf(context);
+    scaffoldMessenger?.hideCurrentSnackBar();
+    scaffoldMessenger?.showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red.withValues(alpha: 0.85),
