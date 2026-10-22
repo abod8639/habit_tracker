@@ -205,7 +205,7 @@ class _MyTextTaileState extends State<MyTextTaile>
         endActionPane: _buildNeumorphicActionPane(
           icon: Icons.edit_outlined,
           baseColor: themeColors.secondary,
-          tooltip: 'Edit',
+          tooltip: S.of(context).editThisHabit,
           isDark: isDark,
           onPressed: widget.onEdit,
         ),
