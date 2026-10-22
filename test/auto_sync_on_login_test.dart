@@ -8,6 +8,7 @@ import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/features/auth/domain/entities/auth_entity.dart';
 import 'package:habit_tracker/features/auth/domain/repositories/auth_repository.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/get_auth_state_usecase.dart';
+import 'package:habit_tracker/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/get_skip_login_status_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/set_skip_login_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
@@ -31,6 +32,7 @@ import 'package:drift/drift.dart';
 class MockAuthRepository implements AuthRepository {
   final StreamController<AuthEntity?> _authStream =
       StreamController<AuthEntity?>.broadcast();
+  @override
   AuthEntity? currentUser;
 
   void emitUser(AuthEntity? user) {
@@ -209,6 +211,9 @@ void main() {
         getAuthStateUseCaseProvider.overrideWithValue(
           GetAuthStateUseCase(mockAuthRepo),
         ),
+        getCurrentUserUseCaseProvider.overrideWithValue(
+          GetCurrentUserUseCase(mockAuthRepo),
+        ),
         getSkipLoginStatusUseCaseProvider.overrideWithValue(
           GetSkipLoginStatusUseCase(mockAuthRepo),
         ),
@@ -320,6 +325,24 @@ void main() {
       // Theme is immediately updated to the Google account's stored theme
       expect(container.read(themeNotifierProvider).currentTheme, 'github');
       expect(container.read(themeNotifierProvider).themeMode, ThemeMode.light);
+    },
+  );
+
+  test(
+    'App launch with existing authenticated session preserves user and sets isLoggedIn to true',
+    () async {
+      mockAuthRepo.currentUser = const AuthEntity(
+        uid: 'restored_uid',
+        email: 'restored@example.com',
+        displayName: 'Restored User',
+      );
+
+      final container = createContainer();
+      final authState = await container.read(authNotifierProvider.future);
+
+      expect(authState.isLoggedIn, true);
+      expect(authState.currentUser?.uid, 'restored_uid');
+      expect(authState.currentUser?.email, 'restored@example.com');
     },
   );
 }
