@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
+import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Clean Architecture component: Neumorphic debossed text field with
@@ -51,7 +53,7 @@ class _AiTextInputFieldState extends State<AiTextInputField> {
     final scaffoldBg = theme.scaffoldBackgroundColor;
     final primary = theme.colorScheme.primary;
 
-    const borderRadius = BorderRadius.all(Radius.circular(30));
+    final borderRadius = AppRadius.pillRadius;
 
     return Container(
       decoration: BoxDecoration(
@@ -68,24 +70,7 @@ class _AiTextInputFieldState extends State<AiTextInputField> {
               : const Color(0xFFA3B1C6).withValues(alpha: 0.35),
           width: 1,
         ),
-        boxShadow: [
-          // Top-left sunken depth shadow
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.5)
-                : const Color(0xFFA3B1C6).withValues(alpha: 0.4),
-            offset: const Offset(-2, -2),
-            blurRadius: 4,
-          ),
-          // Bottom-right inner highlight
-          BoxShadow(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.035)
-                : Colors.white.withValues(alpha: 0.95),
-            offset: const Offset(2, 2),
-            blurRadius: 3,
-          ),
-        ],
+        boxShadow: AppShadows.insetInput(isDark: isDark),
       ),
       child: ClipRRect(
         borderRadius: borderRadius,
@@ -109,27 +94,27 @@ class _AiTextInputFieldState extends State<AiTextInputField> {
               color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               fontSize: 14.5,
             ),
-            border: const OutlineInputBorder(
+            border: OutlineInputBorder(
               borderRadius: borderRadius,
               borderSide: BorderSide.none,
             ),
-            enabledBorder: const OutlineInputBorder(
+            enabledBorder: OutlineInputBorder(
               borderRadius: borderRadius,
               borderSide: BorderSide.none,
             ),
-            focusedBorder: const OutlineInputBorder(
+            focusedBorder: OutlineInputBorder(
               borderRadius: borderRadius,
               borderSide: BorderSide.none,
             ),
-            errorBorder: const OutlineInputBorder(
+            errorBorder: OutlineInputBorder(
               borderRadius: borderRadius,
               borderSide: BorderSide.none,
             ),
-            focusedErrorBorder: const OutlineInputBorder(
+            focusedErrorBorder: OutlineInputBorder(
               borderRadius: borderRadius,
               borderSide: BorderSide.none,
             ),
-            disabledBorder: const OutlineInputBorder(
+            disabledBorder: OutlineInputBorder(
               borderRadius: borderRadius,
               borderSide: BorderSide.none,
             ),
