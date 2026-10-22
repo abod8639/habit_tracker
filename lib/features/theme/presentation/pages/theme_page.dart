@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
+import 'package:habit_tracker/core/components/page_entrance_transition.dart';
 import 'package:habit_tracker/core/components/section_title.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
@@ -69,7 +70,10 @@ class _ThemePageState extends ConsumerState<ThemePage> {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 12.0),
               sliver: SliverToBoxAdapter(
-                child: SectionTitle(title: S.current.themepage),
+                child: PageEntranceTransition(
+                  index: 0,
+                  child: SectionTitle(title: S.current.themepage),
+                ),
               ),
             ),
             SliverPadding(
@@ -84,12 +88,15 @@ class _ThemePageState extends ConsumerState<ThemePage> {
                       themeColors[ThemeNotifier.defaultTheme]!;
                   final isSelected = currentTheme == themeName;
 
-                  return ThemeCard(
-                    key: ValueKey(themeName),
-                    themeName: themeName,
-                    colors: colors,
-                    isSelected: isSelected,
-                    onTap: () => themeNotifier.changeCustomTheme(themeName),
+                  return PageEntranceTransition(
+                    index: index + 1,
+                    child: ThemeCard(
+                      key: ValueKey(themeName),
+                      themeName: themeName,
+                      colors: colors,
+                      isSelected: isSelected,
+                      onTap: () => themeNotifier.changeCustomTheme(themeName),
+                    ),
                   );
                 },
               ),
