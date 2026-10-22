@@ -12,4 +12,5 @@ abstract class AuthRemoteDataSource {
   Future<void> signOut();
   Future<void> resetPassword(String email);
   Stream<User?> get authStateChanges;
+  User? get currentUser;
 }
