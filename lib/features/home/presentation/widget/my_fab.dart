@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
@@ -88,7 +89,7 @@ class _MyfloatingActionButtonState extends State<MyfloatingActionButton>
               width: size * 1.6,
               height: size,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: AppRadius.lgRadius,
                 shape: BoxShape.rectangle,
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
