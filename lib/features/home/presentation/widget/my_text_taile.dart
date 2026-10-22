@@ -23,6 +23,7 @@ class MyTextTaile extends StatefulWidget {
   final bool isSelectionMode;
   final int? colorValue;
   final bool enableSlidable;
+  final String? habitId;
 
   const MyTextTaile({
     required this.habitName,
@@ -36,6 +37,7 @@ class MyTextTaile extends StatefulWidget {
     this.isSelectionMode = false,
     this.colorValue,
     this.enableSlidable = true,
+    this.habitId,
     super.key,
   });
 
@@ -192,7 +194,7 @@ class _MyTextTaileState extends State<MyTextTaile>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5.5),
       child: Slidable(
-        key: ValueKey(widget.habitName),
+        key: ValueKey(widget.habitId ?? widget.habitName),
         startActionPane: _buildNeumorphicActionPane(
           icon: Icons.delete_outline_rounded,
           baseColor: themeColors.error,
@@ -580,7 +582,6 @@ class _MyTextTaileState extends State<MyTextTaile>
       style: (textTheme.titleMedium ?? const TextStyle()).copyWith(
         fontWeight: widget.habitCompleted ? FontWeight.w500 : FontWeight.w600,
         fontSize: 15.5,
-        letterSpacing: 0.2,
         color: textColor,
         decoration: widget.habitCompleted
             ? TextDecoration.lineThrough
