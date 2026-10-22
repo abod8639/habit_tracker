@@ -16,6 +16,7 @@ abstract class AuthRepository {
   Future<Either<Failure, void>> signOut();
   Future<Either<Failure, void>> resetPassword(String email);
   Stream<AuthEntity?> get authStateChanges;
+  AuthEntity? get currentUser;
 
   // Local Auth Settings
   Future<Either<Failure, void>> setSkipLogin(bool skipped);
