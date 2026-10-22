@@ -12,6 +12,7 @@ import 'package:habit_tracker/features/auth/data/repositories/auth_repository_im
 import 'package:habit_tracker/features/auth/domain/entities/auth_entity.dart';
 import 'package:habit_tracker/features/auth/domain/repositories/auth_repository.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/get_auth_state_usecase.dart';
+import 'package:habit_tracker/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/get_skip_login_status_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:habit_tracker/features/auth/domain/usecases/set_skip_login_usecase.dart';
@@ -69,6 +70,10 @@ final resetPasswordUseCaseProvider = Provider<ResetPasswordUseCase>((ref) {
 
 final getAuthStateUseCaseProvider = Provider<GetAuthStateUseCase>((ref) {
   return GetAuthStateUseCase(ref.watch(authRepositoryProvider));
+});
+
+final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>((ref) {
+  return GetCurrentUserUseCase(ref.watch(authRepositoryProvider));
 });
 
 final setSkipLoginUseCaseProvider = Provider<SetSkipLoginUseCase>((ref) {
@@ -139,6 +144,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       _authSubscription?.cancel();
     });
 
+    final getCurrentUser = ref.watch(getCurrentUserUseCaseProvider);
     final getAuthState = ref.watch(getAuthStateUseCaseProvider);
     final getSkipStatus = ref.watch(getSkipLoginStatusUseCaseProvider);
 
@@ -170,7 +176,15 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       (status) => status,
     );
 
-    return AuthState(hasSkippedLogin: hasSkipped);
+    final initialUser = state.value?.currentUser ?? getCurrentUser();
+    if (initialUser != null) {
+      unawaited(_syncUserDataAfterAuth());
+    }
+
+    return AuthState(
+      currentUser: initialUser,
+      hasSkippedLogin: hasSkipped,
+    );
   }
 
   Future<void> _syncUserDataAfterAuth() async {
