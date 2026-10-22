@@ -2311,6 +2311,46 @@ class S {
       args: [],
     );
   }
+
+  /// `Incorrect Date & Time`
+  String get invalidTimeTitle {
+    return Intl.message(
+      'Incorrect Date & Time',
+      name: 'invalidTimeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A date or time discrepancy was detected on your device. Please enable automatic date & time in your device settings, then try again.`
+  String get invalidTimeDesc {
+    return Intl.message(
+      'A date or time discrepancy was detected on your device. Please enable automatic date & time in your device settings, then try again.',
+      name: 'invalidTimeDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Date and time are still not synchronized. Please adjust them in Settings.`
+  String get invalidTimeStillIncorrect {
+    return Intl.message(
+      'Date and time are still not synchronized. Please adjust them in Settings.',
+      name: 'invalidTimeStillIncorrect',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Device Time: {time}`
+  String invalidTimeDeviceTime(String time) {
+    return Intl.message(
+      'Device Time: $time',
+      name: 'invalidTimeDeviceTime',
+      desc: '',
+      args: [time],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -304,5 +304,16 @@
   "quickHabitWater": "شرب 2 لتر ماء",
   "quickHabitWalking": "مشي 20 دقيقة",
   "sampleHabit1": "قراءة 15 دقيقة",
-  "sampleHabit2": "شرب 2 لتر ماء"
+  "sampleHabit2": "شرب 2 لتر ماء",
+  "invalidTimeTitle": "الوقت غير صحيح",
+  "invalidTimeDesc": "تم اكتشاف عدم تطابق أو تلاعب في تاريخ أو وقت جهازك. لضمان دقة العادات والإحصائيات، يرجى تفعيل ضبط التاريخ والوقت تلقائياً من إعدادات الهاتف ثم إعادة المحاولة.",
+  "invalidTimeStillIncorrect": "التاريخ والوقت لا يزالان غير متطابقين، يرجى ضبطهما من الإعدادات.",
+  "invalidTimeDeviceTime": "وقت الجهاز: {time}",
+  "@invalidTimeDeviceTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

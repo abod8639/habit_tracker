@@ -59,6 +59,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m17(category) => "خطتك في ${category}";
 
+  static String m18(time) => "وقت الجهاز: ${time}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "about": MessageLookupByLibrary.simpleMessage("حول التطبيق"),
@@ -333,6 +335,16 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "invalidApiKeyFormat": MessageLookupByLibrary.simpleMessage(
       "يرجى إدخال مفتاح API صالح",
+    ),
+    "invalidTimeDesc": MessageLookupByLibrary.simpleMessage(
+      "تم اكتشاف عدم تطابق أو تلاعب في تاريخ أو وقت جهازك. لضمان دقة العادات والإحصائيات، يرجى تفعيل ضبط التاريخ والوقت تلقائياً من إعدادات الهاتف ثم إعادة المحاولة.",
+    ),
+    "invalidTimeDeviceTime": m18,
+    "invalidTimeStillIncorrect": MessageLookupByLibrary.simpleMessage(
+      "التاريخ والوقت لا يزالان غير متطابقين، يرجى ضبطهما من الإعدادات.",
+    ),
+    "invalidTimeTitle": MessageLookupByLibrary.simpleMessage(
+      "الوقت غير صحيح",
     ),
     "isEmpty": MessageLookupByLibrary.simpleMessage("لا توجد عادات مسجلة بعد"),
     "itemsSelected": m10,

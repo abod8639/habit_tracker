@@ -388,5 +388,16 @@
   "quickHabitWater": "Drink 2L water",
   "quickHabitWalking": "Walk for 20 mins",
   "sampleHabit1": "Read for 15 minutes",
-  "sampleHabit2": "Drink 2L of water"
+  "sampleHabit2": "Drink 2L of water",
+  "invalidTimeTitle": "Incorrect Date & Time",
+  "invalidTimeDesc": "A date or time discrepancy was detected on your device. Please enable automatic date & time in your device settings, then try again.",
+  "invalidTimeStillIncorrect": "Date and time are still not synchronized. Please adjust them in Settings.",
+  "invalidTimeDeviceTime": "Device Time: {time}",
+  "@invalidTimeDeviceTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

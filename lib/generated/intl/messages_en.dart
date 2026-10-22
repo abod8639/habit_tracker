@@ -59,6 +59,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m17(category) => "Your ${category} Plan";
 
+  static String m18(time) => "Device Time: ${time}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "about": MessageLookupByLibrary.simpleMessage("About"),
@@ -329,6 +331,16 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "invalidApiKeyFormat": MessageLookupByLibrary.simpleMessage(
       "Please enter a valid API key",
+    ),
+    "invalidTimeDesc": MessageLookupByLibrary.simpleMessage(
+      "A date or time discrepancy was detected on your device. Please enable automatic date & time in your device settings, then try again.",
+    ),
+    "invalidTimeDeviceTime": m18,
+    "invalidTimeStillIncorrect": MessageLookupByLibrary.simpleMessage(
+      "Date and time are still not synchronized. Please adjust them in Settings.",
+    ),
+    "invalidTimeTitle": MessageLookupByLibrary.simpleMessage(
+      "Incorrect Date & Time",
     ),
     "isEmpty": MessageLookupByLibrary.simpleMessage("No habits tracked yet"),
     "itemsSelected": m10,
