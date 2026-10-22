@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/ai_chat_providers.dart';
@@ -64,25 +65,14 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
   }
 
   Future<void> _confirmClearChat() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AppConfirmationDialog.show(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(S.current.clearChatTitle),
-        content: Text(S.current.clearChatConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(S.current.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(
-              S.current.delete,
-              style: const TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
+      title: S.current.clearChatTitle,
+      message: S.current.clearChatConfirm,
+      confirmText: S.current.delete,
+      cancelText: S.current.cancel,
+      isDestructive: true,
+      icon: Icons.delete_sweep_rounded,
     );
 
     if (confirmed == true && mounted) {
@@ -156,7 +146,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
           ),
         ),
         error: (error, _) => AiChatErrorView(
-          errorMessage: error.toString(),
+          errorMessage: error is Failure ? error.toMessage() : error.toString(),
           onRetry: () => ref.invalidate(aiChatNotifierProvider),
         ),
         data: (chatState) {
