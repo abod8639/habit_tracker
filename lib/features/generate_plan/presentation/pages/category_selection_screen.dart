@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
+import 'package:habit_tracker/core/components/page_entrance_transition.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../../domain/entities/category_entity.dart';
@@ -25,32 +26,35 @@ class CategorySelectionScreen extends ConsumerWidget {
             title: S.current.generatePlan,
           ),
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8),
-                  Text(
-                    S.current.generatePlanTitle,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
-                      height: 1.25,
+            child: PageEntranceTransition(
+              index: 0,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+                    Text(
+                      S.current.generatePlanTitle,
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                        height: 1.25,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    S.current.generatePlanSubtitle,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.onSurface.withValues(alpha: 0.65),
-                      height: 1.5,
+                    const SizedBox(height: 8),
+                    Text(
+                      S.current.generatePlanSubtitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: colorScheme.onSurface.withValues(alpha: 0.65),
+                        height: 1.5,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 28),
-                ],
+                    const SizedBox(height: 28),
+                  ],
+                ),
               ),
             ),
           ),
@@ -66,14 +70,17 @@ class CategorySelectionScreen extends ConsumerWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final category = PlanCategory.values[index];
-                  return CategoryCard(
-                    category: category,
-                    onTap: () {
-                      ref
-                          .read(planGeneratorNotifierProvider.notifier)
-                          .selectCategory(category);
-                      context.push(AppRoutes.questionnaire);
-                    },
+                  return PageEntranceTransition(
+                    index: index + 1,
+                    child: CategoryCard(
+                      category: category,
+                      onTap: () {
+                        ref
+                            .read(planGeneratorNotifierProvider.notifier)
+                            .selectCategory(category);
+                        context.push(AppRoutes.questionnaire);
+                      },
+                    ),
                   );
                 },
                 childCount: PlanCategory.values.length,
