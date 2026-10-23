@@ -104,11 +104,11 @@ class PlanSuggestionCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
-                        vertical: 4,
+                        vertical: 5,
                       ),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.black.withValues(alpha: 0.25)
+                            ? Colors.black.withValues(alpha: 0.20)
                             : Colors.white.withValues(alpha: 0.70),
                         borderRadius: AppRadius.pillRadius,
                         border: Border.all(
