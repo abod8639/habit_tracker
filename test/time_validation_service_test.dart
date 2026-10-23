@@ -101,5 +101,33 @@ void main() {
       expect(result.isTampered, isFalse);
       expect(result.trustedTime, isNotNull);
     });
+
+    test('Heals poisoned future timestamp when network confirms current time is real', () async {
+      // Simulate stored timestamp set to year 2099 from an earlier forward jump
+      final futureTimestamp = DateTime(2099, 1, 1).toUtc().millisecondsSinceEpoch;
+      await storage.setInt(TimeValidationService.keyLastValidTimestampMs, futureTimestamp);
+
+      // Real network time matches current device time
+      final serverUtc = DateTime.now().toUtc();
+      final rfc1123Date = HttpDate.format(serverUtc);
+      final parsedServerUtc = HttpDate.parse(rfc1123Date);
+
+      final mockClient = MockClient((request) async {
+        return http.Response('', 200, headers: {'date': rfc1123Date});
+      });
+
+      final service = TimeValidationService(
+        storage: storage,
+        db: db,
+        httpClient: mockClient,
+      );
+
+      final result = await service.validateTime();
+      expect(result.isTampered, isFalse);
+
+      // Verify that the poisoned future timestamp was healed in storage
+      final healedMs = storage.getInt(TimeValidationService.keyLastValidTimestampMs);
+      expect(healedMs, equals(parsedServerUtc.millisecondsSinceEpoch));
+    });
   });
 }
