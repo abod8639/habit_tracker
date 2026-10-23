@@ -112,20 +112,12 @@ class NeumorphicSwitch extends StatelessWidget {
                   width: 1.0,
                 ),
                 boxShadow: value
-                    ? [
-                        ...AppShadows.buttonResting(isDark: isDark),
-                        BoxShadow(
-                          color: primary.withValues(
-                            alpha: isDark ? 0.45 : 0.30,
-                          ),
-                          blurRadius: 6,
-                          offset: const Offset(0, 1.5),
-                        ),
-                      ]
+                    ? AppShadows.buttonPressed(isDark: isDark)
                     : AppShadows.buttonResting(isDark: isDark),
               ),
               child: Center(
                 child: AnimatedSwitcher(
+                  
                   duration: const Duration(milliseconds: 180),
                   transitionBuilder: (child, animation) =>
                       ScaleTransition(scale: animation, child: child),
