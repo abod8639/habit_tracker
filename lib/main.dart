@@ -13,6 +13,7 @@ import 'package:habit_tracker/core/routes/app_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/components/time_guard_wrapper.dart';
 import 'package:habit_tracker/core/services/fcm_service.dart';
 
 Future<void> main() async {
@@ -80,6 +81,11 @@ class MyApp extends ConsumerWidget {
       theme: themeState.lightTheme,
       darkTheme: themeState.darkTheme,
       themeMode: themeState.themeMode,
+      builder: (context, child) {
+        return TimeGuardWrapper(
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
