@@ -97,13 +97,7 @@ class _CategoryCardState extends State<CategoryCard> {
                             color,
                       ],
                     ),
-                    boxShadow: AppShadows.bloom(
-                      color: color,
-                      isDark: isDark,
-                      blur: 7,
-                      spread: 0.5,
-                      offset: const Offset(0, 2),
-                    ),
+                    boxShadow: AppShadows.insetInput(isDark: isDark),
                   ),
                   child: Center(
                     child: Icon(
