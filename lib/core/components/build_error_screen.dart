@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/core/components/neumorphic_button.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Reusable clean Neumorphic error view component for displaying errors with a retry action.
@@ -95,9 +94,7 @@ class ErrorView extends StatelessWidget {
             color: theme.scaffoldBackgroundColor,
             borderRadius: AppRadius.cardRadius,
             border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.white.withValues(alpha: 0.8),
+              color: ThemeUtils.subtleBorderColor(isDark),
               width: 1.2,
             ),
             boxShadow: AppShadows.softCard(isDark: isDark),
