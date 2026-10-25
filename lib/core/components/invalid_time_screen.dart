@@ -40,16 +40,19 @@ class _InvalidTimeScreenState extends ConsumerState<InvalidTimeScreen> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.warning_amber_rounded,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onError,
                   size: 20,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     S.of(context).invalidTimeStillIncorrect,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onError,
+                    ),
                   ),
                 ),
               ],
