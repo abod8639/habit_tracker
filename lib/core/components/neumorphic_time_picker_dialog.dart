@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
-import 'package:habit_tracker/core/theme/theme_utils.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Shows a deeply tactile Neumorphic / Soft UI Time Picker Dialog.
@@ -10,9 +8,10 @@ Future<TimeOfDay?> showNeumorphicTimePicker({
   required BuildContext context,
   required TimeOfDay initialTime,
 }) {
+  final theme = Theme.of(context);
   return showDialog<TimeOfDay>(
     context: context,
-    barrierColor: Colors.black.withValues(alpha: 0.45),
+    barrierColor: theme.colorScheme.scrim.withValues(alpha: 0.45),
     builder: (dialogContext) => NeumorphicTimePickerDialog(
       initialTime: initialTime,
     ),
@@ -147,13 +146,11 @@ class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
     final is24Hour = MediaQuery.of(context).alwaysUse24HourFormat;
     final localizations = MaterialLocalizations.of(context);
 
-    final Color surfaceGradientStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+    final Color surfaceGradientStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
 
-    final Color surfaceGradientEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+    final Color surfaceGradientEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -174,9 +171,7 @@ class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
                 colors: [surfaceGradientStart, surfaceGradientEnd],
               ),
               border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.07)
-                    : Colors.white.withValues(alpha: 0.85),
+                color: ThemeUtils.subtleBorderColor(isDark),
                 width: 1.2,
               ),
               boxShadow: AppShadows.softCard(isDark: isDark),
@@ -195,9 +190,7 @@ class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
                 //       baseColor,
                 //     ),
                 //     border: Border.all(
-                //       color: isDark
-                //           ? Colors.white.withValues(alpha: 0.08)
-                //           : Colors.white.withValues(alpha: 0.90),
+                //       color: ThemeUtils.subtleBorderColor(isDark),
                 //       width: 1.0,
                 //     ),
                 //     boxShadow: [
@@ -249,20 +242,10 @@ class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? (Color.lerp(baseColor, Colors.black, 0.25) ??
-                              baseColor)
-                        : (Color.lerp(
-                                baseColor,
-                                const Color(0xFFDCE2EC),
-                                0.35,
-                              ) ??
-                              baseColor),
+                    color: ThemeUtils.debossedSurfaceColor(baseColor, isDark),
                     borderRadius: BorderRadius.circular(AppRadius.well),
                     border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.white.withValues(alpha: 0.70),
+                      color: ThemeUtils.subtleBorderColor(isDark),
                       width: 1.0,
                     ),
                     boxShadow: AppShadows.wellDual(isDark: isDark),
@@ -392,14 +375,10 @@ class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.black.withValues(alpha: 0.22)
-            : const Color(0xFFDCE2EC).withValues(alpha: 0.45),
+        color: ThemeUtils.debossedSurfaceColor(Theme.of(context).cardColor, isDark),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.04)
-              : Colors.white.withValues(alpha: 0.70),
+          color: ThemeUtils.subtleBorderColor(isDark),
           width: 0.8,
         ),
         boxShadow: AppShadows.wellDual(isDark: isDark),
@@ -505,9 +484,7 @@ class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
           ),
           borderRadius: BorderRadius.circular(AppRadius.badge),
           border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.white.withValues(alpha: 0.70),
+            color: ThemeUtils.subtleBorderColor(isDark),
             width: 0.9,
           ),
           boxShadow: AppShadows.badge(isDark: isDark),
@@ -556,13 +533,11 @@ class _TimeStepperColumn extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = theme.cardColor;
 
-    final Color surfaceStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.06) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.65) ?? baseColor);
+    final Color surfaceStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
 
-    final Color surfaceEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.18) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.12) ?? baseColor);
+    final Color surfaceEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -584,9 +559,7 @@ class _TimeStepperColumn extends StatelessWidget {
               colors: [surfaceStart, surfaceEnd],
             ),
             border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.white.withValues(alpha: 0.90),
+              color: ThemeUtils.subtleBorderColor(isDark),
               width: 1.0,
             ),
             boxShadow: AppShadows.buttonResting(isDark: isDark),
@@ -635,13 +608,11 @@ class _StepperButtonState extends State<_StepperButton> {
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = theme.cardColor;
 
-    final Color surfaceStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.05) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.55) ?? baseColor);
+    final Color surfaceStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
 
-    final Color surfaceEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.16) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.10) ?? baseColor);
+    final Color surfaceEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -665,14 +636,13 @@ class _StepperButtonState extends State<_StepperButton> {
                   colors: [surfaceStart, surfaceEnd],
                 ),
           color: _isPressed
-              ? (isDark
-                    ? Colors.black.withValues(alpha: 0.32)
-                    : const Color(0xFFD3DCE8))
+              ? ThemeUtils.debossedSurfaceColor(baseColor, isDark)
               : null,
           border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
-                : Colors.white.withValues(alpha: _isPressed ? 0.40 : 0.85),
+            color: ThemeUtils.subtleBorderColor(
+              isDark,
+              isPressed: _isPressed,
+            ),
             width: 1.0,
           ),
           boxShadow: _isPressed
@@ -731,13 +701,11 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
     if (widget.isPrimary) {
       surfaceColor = primaryColor;
     } else {
-      surfaceColor = isDark
-          ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-          : (Color.lerp(baseColor, Colors.white, 0.50) ?? baseColor);
+      surfaceColor = ThemeUtils.surfaceGradientStart(baseColor, isDark);
     }
 
     final Color textColor = widget.isPrimary
-        ? ThemeUtils.getContrastColor(primaryColor)
+        ? colorScheme.onPrimary
         : colorScheme.onSurfaceVariant;
 
     final Color iconColor = widget.isPrimary
@@ -757,9 +725,7 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
           offset: const Offset(0, 2.5),
         ),
         BoxShadow(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.white.withValues(alpha: 0.85),
+          color: AppShadows.lightShadowColor(isDark),
           offset: const Offset(-2, -2),
           blurRadius: 4,
         ),
@@ -792,12 +758,11 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: widget.isPrimary
-                ? Colors.white.withValues(alpha: isDark ? 0.25 : 0.85)
-                : (isDark
-                      ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
-                      : Colors.white.withValues(
-                          alpha: _isPressed ? 0.40 : 0.85,
-                        )),
+                ? ThemeUtils.subtleBorderColor(isDark, isPressed: true)
+                : ThemeUtils.subtleBorderColor(
+                    isDark,
+                    isPressed: _isPressed,
+                  ),
             width: 1.0,
           ),
           boxShadow: shadows,
