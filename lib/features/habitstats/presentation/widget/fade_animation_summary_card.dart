@@ -14,7 +14,7 @@ class FadeAnimationSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return PageEntranceTransition(
       animationController: _animationController,
-      index: 0,
+      index: 1,
       child: const SummaryCard(),
     );
   }
