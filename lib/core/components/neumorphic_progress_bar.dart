@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A tactile Neumorphic progress indicator featuring a debossed recessed well
 /// track and an extruded glowing gradient progress fill.
@@ -26,11 +25,7 @@ class NeumorphicProgressBar extends StatelessWidget {
     final effectiveAccent = accentColor ?? theme.colorScheme.primary;
 
     final Color wellColor =
-        trackColor ??
-        (isDark
-            ? (Color.lerp(baseColor, Colors.black, 0.28) ?? baseColor)
-            : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.40) ??
-                  baseColor));
+        trackColor ?? ThemeUtils.debossedSurfaceColor(baseColor, isDark);
 
     final clampedValue = value.clamp(0.0, 1.0);
 
@@ -42,9 +37,7 @@ class NeumorphicProgressBar extends StatelessWidget {
         borderRadius: AppRadius.pillRadius,
         boxShadow: AppShadows.wellDual(isDark: isDark),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.03)
-              : Colors.white.withValues(alpha: 0.70),
+          color: ThemeUtils.subtleBorderColor(isDark),
           width: 0.8,
         ),
       ),
@@ -64,8 +57,7 @@ class NeumorphicProgressBar extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color.lerp(effectiveAccent, Colors.white, 0.15) ??
-                        effectiveAccent,
+                    ThemeUtils.accentGradientStart(effectiveAccent, isDark),
                     effectiveAccent,
                   ],
                 ),
