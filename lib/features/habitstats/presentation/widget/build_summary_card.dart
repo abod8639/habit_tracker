@@ -13,8 +13,7 @@ class SummaryCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state =
-        ref.watch(habitStatsNotifierProvider).value ??
-        const HabitStatsState();
+        ref.watch(habitStatsNotifierProvider).value ?? const HabitStatsState();
     final stats = state.stats;
     if (stats == null) return const SizedBox.shrink();
 
