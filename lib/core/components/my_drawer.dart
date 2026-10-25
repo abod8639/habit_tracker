@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/core/guards/ai_guard.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 import 'my_drawer_list_tile.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/presentation/widget/image_scanner_bottom_sheet.dart';
@@ -69,7 +70,7 @@ class _DrawerListState extends State<DrawerList> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Error: $e'),
-                  backgroundColor: Colors.red.shade700,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
               );
             }
@@ -81,18 +82,24 @@ class _DrawerListState extends State<DrawerList> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final colorScheme = context.colorScheme;
+
     return ListView(
       children: [
         const SizedBox(height: 20),
         MyDrawerListTile(
           icon: _isScanning
-              ? const SizedBox(
+              ? SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.primary,
+                  ),
                 )
-              : const Icon(
-                  color: Colors.lightBlue,
+              : Icon(
+                  color: colors.drawerScanIcon,
                   Icons.document_scanner_rounded,
                 ),
           onTap: () => _isScanning
@@ -104,7 +111,7 @@ class _DrawerListState extends State<DrawerList> {
           title: S.current.scanImage,
         ),
         MyDrawerListTile(
-          icon: const Icon(color: Colors.blueAccent, Icons.auto_graph_sharp),
+          icon: Icon(color: colors.drawerStatsIcon, Icons.auto_graph_sharp),
           onTap: () {
             Navigator.of(context).canPop();
             context.push(AppRoutes.stats);
@@ -113,7 +120,7 @@ class _DrawerListState extends State<DrawerList> {
         ),
         MyDrawerListTile(
           icon: Icon(
-            color: Theme.of(context).primaryColor,
+            color: colorScheme.primary,
             Icons.color_lens_outlined,
           ),
           onTap: () {
@@ -124,7 +131,7 @@ class _DrawerListState extends State<DrawerList> {
         ),
 
         MyDrawerListTile(
-          icon: const Icon(color: Colors.purpleAccent, Icons.psychology),
+          icon: Icon(color: colors.drawerAiIcon, Icons.psychology),
           onTap: () {
             final navigator = Navigator.of(context);
             final router = GoRouter.of(context);
@@ -139,7 +146,7 @@ class _DrawerListState extends State<DrawerList> {
           title: S.current.aiCoach,
         ),
         MyDrawerListTile(
-          icon: const Icon(color: Colors.blueGrey, Icons.settings),
+          icon: Icon(color: colors.drawerSettingsIcon, Icons.settings),
           onTap: () {
             Navigator.of(context).canPop();
             context.push(AppRoutes.settings);
