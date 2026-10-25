@@ -180,6 +180,18 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
   }
 
   @override
+  Future<Map<String, Map<String, bool>>> getAllHabitCompletions() async {
+    return await db.habitHistoryDao.getAllCompletionsGroupedByDate();
+  }
+
+  @override
+  Future<void> saveAllHabitCompletions(
+    Map<String, Map<String, bool>> completions,
+  ) async {
+    await db.habitHistoryDao.saveBulkCompletions(completions);
+  }
+
+  @override
   Future<Map<String, int>> getCompletionStatusForDate(DateTime date) async {
     final dateStr = convertDateTimeToString(date);
     return await db.habitHistoryDao.getCompletionStatusForDate(dateStr);
