@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/core/routes/app_router.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
-import 'package:habit_tracker/core/theme/theme_utils.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 /// Fully tactile Neumorphic / Soft UI Confirmation Dialog.
@@ -49,9 +47,10 @@ class AppConfirmationDialog extends StatefulWidget {
     final targetContext = context ?? AppRouter.navigatorKey.currentContext;
     if (targetContext == null) return Future.value(false);
 
+    final theme = Theme.of(targetContext);
     return showDialog<bool>(
       context: targetContext,
-      barrierColor: Colors.black.withValues(alpha: 0.45),
+      barrierColor: theme.colorScheme.scrim.withValues(alpha: 0.45),
       builder: (dialogContext) => AppConfirmationDialog(
         title: title,
         message: message,
@@ -114,13 +113,11 @@ class _AppConfirmationDialogState extends State<AppConfirmationDialog>
         ? themeColors.error
         : themeColors.primary;
 
-    final Color surfaceGradientStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+    final Color surfaceGradientStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
 
-    final Color surfaceGradientEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+    final Color surfaceGradientEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -141,10 +138,8 @@ class _AppConfirmationDialogState extends State<AppConfirmationDialog>
                 colors: [surfaceGradientStart, surfaceGradientEnd],
               ),
               border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.07)
-                    : Colors.white.withValues(alpha: 0.85),
-                width: 1.2,
+                color: ThemeUtils.subtleBorderColor(isDark),
+                width: 1.0,
               ),
               boxShadow: AppShadows.softCard(isDark: isDark),
             ),
@@ -163,9 +158,7 @@ class _AppConfirmationDialogState extends State<AppConfirmationDialog>
                         baseColor,
                       ),
                       border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.white.withValues(alpha: 0.90),
+                        color: ThemeUtils.subtleBorderColor(isDark),
                         width: 1.0,
                       ),
                       boxShadow: AppShadows.activeDot(
@@ -296,13 +289,13 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
     if (widget.isPrimary) {
       surfaceColor = primaryColor;
     } else {
-      surfaceColor = isDark
-          ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-          : (Color.lerp(baseColor, Colors.white, 0.50) ?? baseColor);
+      surfaceColor = ThemeUtils.surfaceGradientStart(baseColor, isDark);
     }
 
     final Color textColor = widget.isPrimary
-        ? ThemeUtils.getContrastColor(primaryColor)
+        ? (primaryColor == colorScheme.error
+            ? colorScheme.onError
+            : colorScheme.onPrimary)
         : colorScheme.onSurfaceVariant;
 
     final Color iconColor = widget.isPrimary
@@ -334,41 +327,18 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
           color: surfaceColor,
           borderRadius: AppRadius.mdRadius,
           gradient: widget.isPrimary
-              ? LinearGradient(
-                  colors: [
-                    primaryColor,
-                    Color.lerp(
-                          primaryColor,
-                          Colors.black,
-                          isDark ? 0.20 : 0.10,
-                        ) ??
-                        primaryColor,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+              ? ThemeUtils.accentGradient(
+                  accentColor: primaryColor,
+                  isDark: isDark,
                 )
-              : LinearGradient(
-                  colors: [
-                    Color.lerp(
-                      surfaceColor,
-                      Colors.white,
-                      isDark ? 0.04 : 0.40,
-                    )!,
-                    Color.lerp(
-                      surfaceColor,
-                      isDark ? Colors.black : const Color(0xFFA3B1C6),
-                      isDark ? 0.12 : 0.08,
-                    )!,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+              : ThemeUtils.softGradient(
+                  baseColor: surfaceColor,
+                  isDark: isDark,
                 ),
           border: Border.all(
             color: widget.isPrimary
-                ? Colors.white.withValues(alpha: isDark ? 0.15 : 0.40)
-                : (isDark
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.white.withValues(alpha: 0.85)),
+                ? textColor.withValues(alpha: isDark ? 0.15 : 0.40)
+                : ThemeUtils.subtleBorderColor(isDark),
             width: 1.0,
           ),
           boxShadow: shadows,
