@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A reusable, tactile Neumorphic icon button.
 /// Supports both squircle (rounded rectangle) and circular shapes,
@@ -79,13 +79,11 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
     final baseColor = theme.cardColor;
     final colorScheme = theme.colorScheme;
 
-    final Color surfaceStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+    final Color surfaceStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
 
-    final Color surfaceEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.16) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+    final Color surfaceEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     final Color effectiveIconColor =
         widget.iconColor ?? widget.accentColor ?? colorScheme.onSurface;
@@ -147,20 +145,15 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
                     colors: [surfaceStart, surfaceEnd],
                   ),
             color: _isPressed
-                ? (isDark
-                      ? Colors.black.withValues(alpha: 0.32)
-                      : const Color(0xFFD3DCE8))
+                ? ThemeUtils.debossedSurfaceColor(baseColor, isDark)
                 : null,
             border: Border.all(
               color: (widget.glowWithAccent && widget.accentColor != null)
                   ? widget.accentColor!.withValues(alpha: isDark ? 0.35 : 0.25)
-                  : (isDark
-                        ? Colors.white.withValues(
-                            alpha: _isPressed ? 0.03 : 0.06,
-                          )
-                        : Colors.white.withValues(
-                            alpha: _isPressed ? 0.35 : 0.80,
-                          )),
+                  : ThemeUtils.subtleBorderColor(
+                      isDark,
+                      isPressed: _isPressed,
+                    ),
               width: 1.0,
             ),
             boxShadow: effectiveShadows,
