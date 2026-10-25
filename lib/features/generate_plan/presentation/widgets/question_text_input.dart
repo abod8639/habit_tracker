@@ -40,7 +40,9 @@ class _QuestionTextInputState extends ConsumerState<QuestionTextInput> {
   @override
   Widget build(BuildContext context) {
     final color = ref.watch(
-      planGeneratorNotifierProvider.select((s) => s.value?.selectedCategory?.color),
+      planGeneratorNotifierProvider.select(
+        (s) => s.value?.selectedCategory?.color,
+      ),
     );
 
     return NeumorphicInput(
