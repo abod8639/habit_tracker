@@ -5,7 +5,7 @@ import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import '../providers/habitstats_providers.dart';
 import 'build_trend_chart.dart';
-import 'stats_neumorphic_utils.dart';
+import 'package:habit_tracker/core/components/neu_surface.dart';
 
 Color resolveHabitColor(String habitName, int index, List<HabitEntity> habits) {
   final habit = habits
@@ -24,8 +24,7 @@ class WarpHabitNames extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state =
-        ref.watch(habitStatsNotifierProvider).value ??
-        const HabitStatsState();
+        ref.watch(habitStatsNotifierProvider).value ?? const HabitStatsState();
     final notifier = ref.read(habitStatsNotifierProvider.notifier);
     final habitNames = state.habitNames;
     final habits = state.todaySummary;
@@ -99,64 +98,41 @@ class _HabitLegendChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    // Selected chip rises and glows; the rest stay engraved in the surface.
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 200),
-      opacity: isDimmed ? 0.38 : 1.0,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppRadius.well),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-            decoration:
-                StatsNeumorphicTheme.wellDecoration(
-                  context,
-                  borderRadius: AppRadius.well,
-                  accentColor: isSelected
-                      ? color
-                      : color.withValues(alpha: 0.3),
-                  accentAlpha: isSelected
-                      ? (isDark ? 0.22 : 0.14)
-                      : (isDark ? 0.06 : 0.03),
-                ).copyWith(
-                  border: isSelected
-                      ? Border.all(
-                          color: color.withValues(alpha: 0.8),
-                          width: 1.5,
-                        )
-                      : null,
-                ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                    boxShadow: isSelected
-                        ? AppShadows.activeDot(color: color)
-                        : null,
-                  ),
-                ),
-                const SizedBox(width: 7),
-                Text(
-                  name,
-                  style: textStyle?.copyWith(
-                    color: isSelected ? color : textColor,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+      opacity: isDimmed ? 0.45 : 1.0,
+      child: NeuSurface(
+        onTap: onTap,
+        depth: isSelected ? NeuDepth.raised : NeuDepth.inset,
+        accentColor: color,
+        highlighted: isSelected,
+        borderRadius: AppRadius.pillRadius,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: isSelected
+                    ? AppShadows.activeDot(color: color)
+                    : null,
+              ),
             ),
-          ),
+            const SizedBox(width: 7),
+            Text(
+              name,
+              style: textStyle?.copyWith(
+                color: isSelected ? color : textColor,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
       ),
     );
