@@ -29,9 +29,15 @@ class PlanRepositoryImpl implements PlanRepository {
     required Map<String, dynamic> userAnswers,
   }) {
     return NetworkErrorHandler.guard(() async {
+      // Existing habits let the AI avoid duplicates and stack onto real routines.
+      List<String> existingHabits = const [];
+      try {
+        existingHabits = await habitFacade.getExistingHabitNames();
+      } catch (_) {}
       return await remoteDataSource.generatePlan(
         category: category,
         userAnswers: userAnswers,
+        existingHabits: existingHabits,
       );
     });
   }
