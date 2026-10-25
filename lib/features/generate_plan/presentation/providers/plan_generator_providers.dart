@@ -78,8 +78,8 @@ class PlanGeneratorState {
 
   QuestionEntity? get currentQuestion =>
       questions.isNotEmpty && currentIndex < questions.length
-          ? questions[currentIndex]
-          : null;
+      ? questions[currentIndex]
+      : null;
 
   double get progress =>
       questions.isEmpty ? 0 : (currentIndex + 1) / questions.length;
@@ -91,6 +91,19 @@ class PlanGeneratorState {
 
   int get selectedCount => selectedSuggestions.length;
   bool get hasSelections => selectedCount > 0;
+
+  /// Honest daily time commitment of the selected habits (replaces fake XP:
+  /// Octalysis warns that points with no real use erode trust).
+  int get totalDailyMinutes =>
+      selectedSuggestions.fold<int>(0, (sum, s) => sum + s.dailyMinutes);
+
+  /// The tiny starter habit the user should do right now to bank a day-one win.
+  PlanSuggestion? get firstWinHabit {
+    for (final s in selectedSuggestions) {
+      if (s.tier == HabitTier.ignition) return s;
+    }
+    return selectedSuggestions.isEmpty ? null : selectedSuggestions.first;
+  }
 
   bool isOptionSelected(String questionId, String option) {
     final value = answers[questionId];
@@ -152,16 +165,18 @@ class PlanGeneratorNotifier extends AsyncNotifier<PlanGeneratorState> {
 
   void selectCategory(PlanCategory category) {
     final questions = _getQuestionsUseCase(category);
-    state = AsyncValue.data(PlanGeneratorState(
-      selectedCategory: category,
-      questions: List<QuestionEntity>.from(questions),
-      answers: const {},
-      currentIndex: 0,
-      suggestions: const [],
-      status: PlanGeneratorStatus.idle,
-      errorMessage: '',
-      activeFailure: null,
-    ));
+    state = AsyncValue.data(
+      PlanGeneratorState(
+        selectedCategory: category,
+        questions: List<QuestionEntity>.from(questions),
+        answers: const {},
+        currentIndex: 0,
+        suggestions: const [],
+        status: PlanGeneratorStatus.idle,
+        errorMessage: '',
+        activeFailure: null,
+      ),
+    );
   }
 
   void setAnswer(String questionId, dynamic value) {
@@ -247,10 +262,12 @@ class PlanGeneratorNotifier extends AsyncNotifier<PlanGeneratorState> {
     final category = current.selectedCategory;
     if (category == null) return false;
 
-    state = AsyncValue.data(current.copyWith(
-      status: PlanGeneratorStatus.loading,
-      clearFailure: true,
-    ));
+    state = AsyncValue.data(
+      current.copyWith(
+        status: PlanGeneratorStatus.loading,
+        clearFailure: true,
+      ),
+    );
 
     final result = await _generatePlanUseCase(
       category: category,
@@ -262,23 +279,43 @@ class PlanGeneratorNotifier extends AsyncNotifier<PlanGeneratorState> {
     return result.fold(
       (failure) {
         final errorMsg = failure.toMessage();
-        state = AsyncValue.data(current.copyWith(
-          status: PlanGeneratorStatus.error,
-          errorMessage: errorMsg,
-          activeFailure: failure,
-        ));
+        state = AsyncValue.data(
+          current.copyWith(
+            status: PlanGeneratorStatus.error,
+            errorMessage: errorMsg,
+            activeFailure: failure,
+          ),
+        );
         return false;
       },
       (suggestions) {
-        state = AsyncValue.data(current.copyWith(
-          suggestions: suggestions,
-          status: PlanGeneratorStatus.success,
-          errorMessage: '',
-          clearFailure: true,
-        ));
+        state = AsyncValue.data(
+          current.copyWith(
+            suggestions: suggestions,
+            status: PlanGeneratorStatus.success,
+            errorMessage: '',
+            clearFailure: true,
+          ),
+        );
         return true;
       },
     );
+  }
+
+  /// Re-rolls the plan from the same answers. Previous suggestions are restored
+  /// if generation fails so the user never loses a plan they liked.
+  Future<bool> regeneratePlan() async {
+    final previous = state.value ?? const PlanGeneratorState();
+    if (previous.selectedCategory == null) return false;
+    state = AsyncValue.data(previous.copyWith(suggestions: const []));
+    final success = await generatePlan();
+    if (!success && !_isDisposed) {
+      final failed = state.value ?? previous;
+      state = AsyncValue.data(
+        failed.copyWith(suggestions: previous.suggestions),
+      );
+    }
+    return success;
   }
 
   void toggleSuggestion(int index) {
@@ -307,18 +344,38 @@ class PlanGeneratorNotifier extends AsyncNotifier<PlanGeneratorState> {
     state = AsyncValue.data(current.copyWith(suggestions: updated));
   }
 
+  void updateSuggestion(
+    int index, {
+    String? name,
+    String? description,
+    String? frequency,
+  }) {
+    final current = state.value ?? const PlanGeneratorState();
+    if (index < 0 || index >= current.suggestions.length) return;
+    final updated = List<PlanSuggestion>.from(current.suggestions);
+    updated[index] = updated[index].copyWith(
+      name: name,
+      description: description,
+      frequency: frequency,
+    );
+    state = AsyncValue.data(current.copyWith(suggestions: updated));
+  }
+
   Future<int?> addSelectedHabits() async {
     final current = state.value ?? const PlanGeneratorState();
     if (!current.hasSelections) return null;
 
-    state = AsyncValue.data(current.copyWith(
-      status: PlanGeneratorStatus.loading,
-      clearFailure: true,
-    ));
+    state = AsyncValue.data(
+      current.copyWith(
+        status: PlanGeneratorStatus.loading,
+        clearFailure: true,
+      ),
+    );
 
     try {
-      final habitNames =
-          current.selectedSuggestions.map((s) => s.name).toList();
+      final habitNames = current.selectedSuggestions
+          .map((s) => s.name)
+          .toList();
       final result = await _savePlanHabitsUseCase(habitNames);
 
       if (_isDisposed) return null;
@@ -326,11 +383,13 @@ class PlanGeneratorNotifier extends AsyncNotifier<PlanGeneratorState> {
       final count = result.fold<int?>(
         (failure) {
           final errorMsg = failure.toMessage();
-          state = AsyncValue.data(current.copyWith(
-            status: PlanGeneratorStatus.error,
-            errorMessage: errorMsg,
-            activeFailure: failure,
-          ));
+          state = AsyncValue.data(
+            current.copyWith(
+              status: PlanGeneratorStatus.error,
+              errorMessage: errorMsg,
+              activeFailure: failure,
+            ),
+          );
           return null;
         },
         (_) {
@@ -343,11 +402,13 @@ class PlanGeneratorNotifier extends AsyncNotifier<PlanGeneratorState> {
     } catch (e, stack) {
       debugPrint('[PlanGeneratorNotifier] addSelectedHabits error: $e\n$stack');
       final failure = ServerFailure(e.toString());
-      state = AsyncValue.data(current.copyWith(
-        status: PlanGeneratorStatus.error,
-        errorMessage: failure.toMessage(),
-        activeFailure: failure,
-      ));
+      state = AsyncValue.data(
+        current.copyWith(
+          status: PlanGeneratorStatus.error,
+          errorMessage: failure.toMessage(),
+          activeFailure: failure,
+        ),
+      );
       return null;
     }
   }
@@ -359,5 +420,5 @@ class PlanGeneratorNotifier extends AsyncNotifier<PlanGeneratorState> {
 
 final planGeneratorNotifierProvider =
     AsyncNotifierProvider<PlanGeneratorNotifier, PlanGeneratorState>(() {
-  return PlanGeneratorNotifier();
-});
+      return PlanGeneratorNotifier();
+    });
