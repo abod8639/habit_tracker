@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 import 'app_radius.dart';
+import 'app_theme_colors.dart';
 
 class ThemeUtils {
   static Color getContrastColor(Color backgroundColor) {
@@ -65,12 +67,18 @@ class ThemeUtils {
         secondary: colors['secondary']!,
         onSecondary: colors['onSecondary']!,
         error: colors['error']!,
-        onError: Colors.white,
+        onError: getContrastColor(colors['error']!),
         surface: surfaceColor,
         onSurface: onSurfaceColor,
         surfaceContainerLowest: surfaceColor,
         surfaceContainerHighest: surfaceColor.withValues(alpha: 0.7),
       ),
+      extensions: [
+        AppThemeColors.fromTheme(
+          isDark: brightness == Brightness.dark,
+          surfaceColor: surfaceColor,
+        ),
+      ],
       appBarTheme: AppBarTheme(
         backgroundColor: colors['primary'],
         foregroundColor: colors['onPrimary'],
@@ -211,5 +219,39 @@ class ThemeUtils {
     return isDark
         ? (Color.lerp(baseColor, Colors.black, 0.28) ?? baseColor)
         : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.35) ?? baseColor);
+  }
+
+  /// Unified disabled container surface color adapted for light/dark theme.
+  static Color disabledSurfaceColor(bool isDark) {
+    return AppColors.disabledSurface(isDark);
+  }
+
+  /// Calculates top-left light highlight tone for primary / accent convex buttons.
+  static Color accentGradientStart(Color accentColor, bool isDark) {
+    return Color.lerp(accentColor, Colors.white, isDark ? 0.12 : 0.18) ??
+        accentColor;
+  }
+
+  /// Calculates bottom-right depth shadow tone for primary / accent convex buttons.
+  static Color accentGradientEnd(Color accentColor, bool isDark) {
+    return Color.lerp(accentColor, Colors.black, isDark ? 0.18 : 0.12) ??
+        accentColor;
+  }
+
+  /// Returns a pre-configured [LinearGradient] for primary/accent Neumorphic buttons.
+  static LinearGradient accentGradient({
+    required Color accentColor,
+    required bool isDark,
+    AlignmentGeometry begin = Alignment.topLeft,
+    AlignmentGeometry end = Alignment.bottomRight,
+  }) {
+    return LinearGradient(
+      begin: begin,
+      end: end,
+      colors: [
+        accentGradientStart(accentColor, isDark),
+        accentGradientEnd(accentColor, isDark),
+      ],
+    );
   }
 }
