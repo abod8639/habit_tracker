@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A reusable tactile Neumorphic header for cards, sections, and dialogs.
 /// Displays an embossed circular icon, clean title, and optional trailing widget.
@@ -27,13 +27,11 @@ class NeumorphicCardHeader extends StatelessWidget {
     final effectiveIconColor = iconColor ?? colorScheme.primary;
 
     final baseColor = theme.cardColor;
-    final Color surfaceGradientStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.45) ?? baseColor);
+    final Color surfaceGradientStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
 
-    final Color surfaceGradientEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+    final Color surfaceGradientEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14.0),
@@ -55,14 +53,7 @@ class NeumorphicCardHeader extends StatelessWidget {
                       colors: [surfaceGradientStart, surfaceGradientEnd],
                     ),
                     border: Border.all(
-                      color: isDark
-                          ? const Color.fromARGB(
-                              255,
-                              20,
-                              20,
-                              20,
-                            ).withValues(alpha: 0.08)
-                          : Colors.white.withValues(alpha: 0.90),
+                      color: ThemeUtils.subtleBorderColor(isDark),
                       width: 1.0,
                     ),
                     boxShadow: AppShadows.dotIndicator(isDark: isDark),
