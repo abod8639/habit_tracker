@@ -11,8 +11,7 @@ class LineChartBox extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state =
-        ref.watch(habitStatsNotifierProvider).value ??
-        const HabitStatsState();
+        ref.watch(habitStatsNotifierProvider).value ?? const HabitStatsState();
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
