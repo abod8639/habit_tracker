@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:google_generative_ai/google_generative_ai.dart' hide ServerException;
+import 'package:google_generative_ai/google_generative_ai.dart'
+    hide ServerException;
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/error/exceptions.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
@@ -11,6 +12,7 @@ abstract class PlanRemoteDataSource {
   Future<List<PlanSuggestionModel>> generatePlan({
     required PlanCategory category,
     required Map<String, dynamic> userAnswers,
+    List<String> existingHabits = const [],
   });
 }
 
@@ -28,9 +30,12 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
   Future<List<PlanSuggestionModel>> generatePlan({
     required PlanCategory category,
     required Map<String, dynamic> userAnswers,
+    List<String> existingHabits = const [],
   }) async {
-    final stringAnswers = userAnswers.map((k, v) => MapEntry(k, v.toString()));
-    final prompt = _buildPlanPrompt(category, stringAnswers);
+    final stringAnswers = userAnswers.map(
+      (k, v) => MapEntry(k, v is List ? v.join(' + ') : v.toString()),
+    );
+    final prompt = _buildPlanPrompt(category, stringAnswers, existingHabits);
     final systemInstruction = _buildSystemInstruction(category);
 
     try {
@@ -38,7 +43,7 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
         systemInstruction: Content.system(systemInstruction),
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
-          temperature: 0.4,
+          temperature: 0.5,
           responseSchema: Schema.array(
             description:
                 'List of 3 to 4 personalized, Octalysis-engineered habit suggestions designed for high intrinsic motivation and effortless daily adherence',
@@ -46,18 +51,35 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
               properties: {
                 'name': Schema.string(
                   description:
-                      'Concise, inspiring habit title (3-6 words) starting with a relevant motivating emoji that evokes competence and ownership',
+                      'Emoji + the concrete action, amount and anchor cue in 3-8 words. This is the ONLY text saved to the daily tracker, so it must stand alone (e.g. "💧 كأسا ماء فور الاستيقاظ")',
                 ),
                 'description': Schema.string(
                   description:
-                      '1-2 impactful sentences combining the exact implementation trigger (when/where) with an Octalysis White Hat psychological reward (identity, mastery, or immediate win state)',
+                      '1-2 sentences: the exact anchor moment, how to do it, and the immediate win the user feels afterwards',
                 ),
                 'frequency': Schema.string(
                   description:
-                      'Realistic frequency calibrated to user capacity and sustainable momentum (e.g. "يومياً", "3 مرات أسبوعياً", "Daily", "3 times a week")',
+                      'Daily-checkable rhythm (e.g. "يومياً", "Daily", "يومياً (جلسة كاملة 3 أيام)")',
                 ),
                 'category': Schema.string(
                   description: 'Category identifier string',
+                ),
+                'tier': Schema.enumString(
+                  enumValues: ['ignition', 'mastery', 'recovery'],
+                  description:
+                      '"ignition" (tiny 2-minute starter), "mastery" (main skill builder), or "recovery" (reflection, environment or rest)',
+                ),
+                'personalReason': Schema.string(
+                  description:
+                      'One short sentence in second person explaining why this habit fits THIS user, quoting or paraphrasing one specific answer they gave',
+                ),
+                'levelUp': Schema.string(
+                  description:
+                      'One short sentence describing the next, slightly harder version to unlock after ~2 weeks of consistency',
+                ),
+                'dailyMinutes': Schema.integer(
+                  description:
+                      'Realistic minutes this habit takes on a normal day (1-120)',
                 ),
               },
               requiredProperties: [
@@ -65,6 +87,10 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
                 'description',
                 'frequency',
                 'category',
+                'tier',
+                'personalReason',
+                'levelUp',
+                'dailyMinutes',
               ],
             ),
           ),
@@ -90,7 +116,7 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
               systemInstruction: Content.system(systemInstruction),
               generationConfig: GenerationConfig(
                 responseMimeType: 'application/json',
-                temperature: 0.4,
+                temperature: 0.5,
               ),
             );
             final response = await fallbackModel
@@ -112,87 +138,93 @@ class PlanRemoteDataSourceImpl implements PlanRemoteDataSource {
         );
       }
       if (e is FormatException) {
-        throw ParsingException('Failed to process AI plan response: ${e.message}');
+        throw ParsingException(
+          'Failed to process AI plan response: ${e.message}',
+        );
       }
       GeminiService.handleException(e, 'generating plan');
     }
   }
 
-  /// Constructs an elite Octalysis-aligned behavioral science system instruction for habit architecture.
+  /// System instruction encoding the Octalysis core drives as concrete, testable
+  /// habit-design rules (White Hat first, Black Hat only in ethical doses).
   String _buildSystemInstruction(PlanCategory category) {
     return '''
-You are an elite Human-Focused Behavioral Architect and ${category.coachRole}, combining the **Octalysis Gamification Framework** (pioneered by Yu-kai Chou / The Octalysis Group) with evidence-based habit science (BJ Fogg's Tiny Habits & James Clear's Atomic Habits).
+You are a ${category.coachRole} and behavioral designer. You design habits using the Octalysis Framework (Yu-kai Chou) together with BJ Fogg's Tiny Habits and James Clear's Atomic Habits.
 
-Your mission is to engineer a hyper-personalized portfolio of **3 to 4 sustainable habits** that transform the user's goals into an engaging daily journey driven by intrinsic motivation rather than exhausting willpower.
+PRODUCT CONTEXT (hard constraints):
+- The habits go into a simple daily tracker: each habit is ONE checkbox per day and ONLY its `name` is saved. Description, frequency and other fields are shown once, on the plan screen.
+- Therefore every `name` must stand alone: emoji + action + amount + anchor cue (e.g. "📖 صفحتان بعد صلاة الفجر", "🚶 10 دقائق مشي بعد الغداء").
+- Every habit must be checkable EVERY day. If the full activity is not daily (e.g. 3 workouts a week), make the daily habit the minimum version that keeps the identity alive (e.g. "🧘 دقيقتا إطالة بعد الاستيقاظ") and mention the full sessions in `frequency`/`description`.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OCTALYSIS HABIT ARCHITECTURE PRINCIPLES (MANDATORY)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. COGNITIVE LOAD & PORTFOLIO BALANCE (3–4 Habits Only):
-   - Never overwhelm the user. Construct a balanced portfolio of 3 to 4 synergistic habits:
-     • At least ONE **2-Minute Ignition Habit** (frictionless daily win to protect their streak and trigger Core Drive 2: Accomplishment).
-     • One or two **Core Mastery Habits** calibrated to their exact level and schedule.
-     • One **Recovery, Environment, or Reflection Habit** that reinforces Core Drive 3 (Empowerment & Feedback) and prevents burnout.
+PORTFOLIO (3–4 habits, in this order):
+1. Exactly ONE "ignition" habit: ≤ 2 minutes, impossible to fail, anchored to something the user already does daily. It protects the streak on bad days (CD2 Accomplishment, ethical CD8 – the streak is worth keeping, never guilt).
+2. One or two "mastery" habits: the real progress engine, calibrated to the user's CURRENT level, slightly above comfort (CD2 Accomplishment + CD3 Creativity/Feedback). For at least one of them, offer 2–3 interchangeable variations in the description so the user picks each day (CD3 Empowerment of choice, CD7 freshness).
+3. One "recovery" habit: reflection, environment design, preparation or rest that makes the others easier and prevents burnout (CD4 Ownership of their space/tools, CD1 identity reflection).
 
-2. WHITE HAT MOTIVATION & EPIC MEANING (Core Drive 1 & Core Drive 2):
-   - Frame every habit around *who the user is becoming* and the immediate *Win State* they will feel upon completion—not as a dry chore or punishment.
-   - Do NOT mention technical Octalysis jargon (like "Core Drive 1" or "White Hat") inside the JSON output; weave the psychology naturally into the habit title and description.
+PERSONALIZATION RULES (most important):
+- Every habit must be traceable to specific answers. Use the user's own goal, motivation, level, schedule, equipment and obstacle – never generic advice that could fit anyone.
+- `personalReason` must cite one concrete answer in second person ("لأنك ذكرت أن وقتك المتاح 15 دقيقة..." / "Because you said evenings are your free time..."). This is CD3 feedback: the user sees their answers shaped the plan.
+- Time budget: the sum of `dailyMinutes` must fit within the time the user said they have. If they gave no time, keep the total ≤ 30 minutes. Beginners: total ≤ 20 minutes.
+- The user's reported biggest obstacle must be neutralized by at least one habit (name the obstacle in that habit's personalReason).
+- Anchors: prefer the daily anchor moment the user selected. Use real-life Arabic/Islamic daily anchors (prayer times, meals, commute) when the user's language is Arabic and it fits naturally.
+- Existing habits: never duplicate a habit the user already tracks; you MAY stack a new habit right after an existing one ("بعد [existing habit]").
+- Safety: strictly respect injuries, physical limitations, dietary restrictions and religious dietary rules. If unsure, choose the safer option.
 
-3. IMPLEMENTATION INTENTIONS & HABIT STACKING (Trigger + Action + Reward):
-   - Every habit `description` MUST specify a concrete daily anchor/cue ("فور الاستيقاظ...", "بعد وجبة الغداء مباشرة...", "قبل فتح الحاسوب...", "Right after pouring your morning coffee...") paired with its emotional or physical payoff.
-
-4. ETHICAL SCARCITY & MICRO-BOXING (Core Drive 6 & 2-Minute Rule):
-   - Especially for beginners or busy users, bound habits with clear, non-intimidating time/quantity limits (e.g., "10 دقائق مركزة", "كأسين من الماء", "صفحتين فقط") so starting feels effortless.
-
-5. ZERO-TOLERANCE SAFETY & CONSTRAINT ADHERENCE:
-   - Strictly honor all reported physical limitations, injuries (e.g., knee pain, lower back issues), and dietary restrictions. Never suggest a movement or food that conflicts with the user's safety profile.
-
-6. PUNCHY, EMOJI-LED TITLES:
-   - Every habit `name` MUST begin with ONE motivating, context-accurate emoji followed by a crisp, action-oriented title (3 to 6 words) suitable for a mobile habit tracker card.
+MOTIVATION STYLE:
+- White Hat first: frame habits around who the user is becoming (CD1 Epic Meaning) and the immediate win they feel (CD2).
+- `levelUp` shows the next tier of mastery to unlock after ~2 weeks (CD2 progression, CD7 anticipation). Keep it a small step, not a leap.
+- No shame, fear, punishment or guilt language. No Octalysis jargon ("Core Drive", "White Hat") in any output field.
 ''';
   }
 
-  /// Builds a structured prompt organizing user answers into an Octalysis-informed behavioral profile.
+  /// Builds the user-specific prompt: answers, existing habits and language rules.
   String _buildPlanPrompt(
     PlanCategory category,
     Map<String, String> answers,
+    List<String> existingHabits,
   ) {
     final isArabic = Intl.getCurrentLocale().startsWith('ar');
 
     final answersBlock = answers.entries
+        .where((e) => e.value.trim().isNotEmpty)
         .map((e) => '  - ${e.key.replaceAll("_", " ")}: ${e.value}')
         .join('\n');
 
+    final existingBlock = existingHabits.isEmpty
+        ? '  (none yet – this is their first plan)'
+        : existingHabits.take(25).map((h) => '  - $h').join('\n');
+
     final languageInstruction = isArabic
         ? '''
-LANGUAGE & TONE REQUIREMENT (CRITICAL - ARABIC):
-- Generate all habit "name", "description", and "frequency" fields exclusively in eloquent, warm, modern standard Arabic (لغة عربية بيضاء راقية، محفزة، وسلسة، خالية من الركاكة أو الترجمة الحرفية).
-- "name": MUST start with one relevant emoji followed by 3–6 inspiring words (e.g., "💧 كأسا ماء لتنشيط الجسد صباحاً", "🚶‍♂️ مشي نشط 20 دقيقة بعد الغداء", "🎯 25 دقيقة تركيز عميق بلا مشتتات").
-- "description": 1–2 rich sentences that state (1) the exact trigger/anchor moment in their day, and (2) the immediate sense of accomplishment or identity gain (بدون استخدام مصطلحات تقنية).
-- "frequency": Clear Arabic frequency matching their availability (e.g., "يومياً", "3 مرات أسبوعياً", "4 أيام أسبوعياً").
+LANGUAGE (ARABIC):
+- Write every text field in warm, natural Modern Standard Arabic (عربية بيضاء سلسة، بلا ترجمة حرفية أو مصطلحات تقنية).
+- "name": emoji + 3–8 words containing action + amount + cue (e.g. "💧 كأسا ماء فور الاستيقاظ", "🎯 25 دقيقة تركيز بعد العصر").
+- "personalReason": يبدأ بـ "لأنك..." ويذكر إجابة محددة للمستخدم.
+- "levelUp": يبدأ بـ "بعد أسبوعين:".
+- "frequency": e.g. "يومياً"، "يومياً (جلسة كاملة 3 أيام أسبوعياً)".
 '''
         : '''
-LANGUAGE & TONE REQUIREMENT (CRITICAL - ENGLISH):
-- Generate all habit "name", "description", and "frequency" fields exclusively in natural, inspiring, human-focused English.
-- "name": MUST start with one relevant emoji followed by 3–6 punchy, motivating words (e.g., "💧 Two glasses of water upon waking", "🚶‍♂️ 20-min brisk walk after lunch", "🎯 25-min deep focus sprint").
-- "description": 1–2 crisp sentences stating (1) the exact daily trigger/anchor cue, and (2) the immediate win state or identity benefit they unlock.
-- "frequency": Clear English frequency calibrated to their schedule (e.g., "Daily", "3 times a week", "4 days a week").
+LANGUAGE (ENGLISH):
+- Write every text field in natural, encouraging English without jargon.
+- "name": emoji + 3–8 words containing action + amount + cue (e.g. "💧 Two glasses of water on waking", "🎯 25-min focus after lunch").
+- "personalReason": starts with "Because you..." and cites one specific answer.
+- "levelUp": starts with "After 2 weeks:".
+- "frequency": e.g. "Daily", "Daily (full session 3x/week)".
 ''';
 
     return '''
-TARGET GROWTH DOMAIN: ${category.displayName} (${category.name})
+GROWTH AREA: ${category.displayName} (${category.name})
 
-USER ONBOARDING & BEHAVIORAL PROFILE:
+USER ANSWERS:
 $answersBlock
 
-ARCHITECTURAL TASK:
-Analyze the user's starting baseline, deeper motivation, schedule capacity, and friction points above. Design an interconnected system of **3 to 4 high-adherence habits** tailored specifically to this human being.
+HABITS THE USER ALREADY TRACKS:
+$existingBlock
 
-CRITICAL EXECUTION RULES:
-- Quantity: Return strictly 3 to 4 habits.
-- Progressive Calibration: Match their current fitness/study/skill stage so they experience an immediate "Early Win" on Day 1 without feeling overwhelmed.
-- Obstacle Bypass: If the user mentioned a specific challenge (e.g., procrastination, low focus, low water intake) or physical/dietary constraint, design at least one habit specifically engineered to neutralize that friction point safely.
-- Output Format: Return ONLY a valid JSON array matching the required schema.
+TASK:
+Design 3–4 habits for this specific person following every rule in the system instruction. Before writing, silently check: (1) total dailyMinutes fits their time, (2) their obstacle is addressed, (3) each habit is checkable daily, (4) no duplicates with existing habits, (5) each personalReason cites a real answer.
+Return ONLY the JSON array, ignition habit first.
 
 $languageInstruction
 ''';
