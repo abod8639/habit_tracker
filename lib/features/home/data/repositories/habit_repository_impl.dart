@@ -192,9 +192,11 @@ class HabitRepositoryImpl implements HabitRepository {
         if (firestoreService.isUserLoggedIn) {
           try {
             await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
-            await firestoreService.uploadHabitHistory(
+            await firestoreService.uploadHabitCompletion(
+              m.id,
               todaysDateFormatted(),
-              completionRate.toString(),
+              isCompleted,
+              completionRate: completionRate.toString(),
             ).timeout(_cloudTimeout);
           } catch (e) {
             debugPrint('Cloud sync error on toggle: $e');
@@ -439,6 +441,17 @@ class HabitRepositoryImpl implements HabitRepository {
         date,
         habitName: habitName,
       );
+
+      if (firestoreService.isUserLoggedIn) {
+        final dateStr = convertDateTimeToString(date);
+        try {
+          await firestoreService
+              .uploadHabitCompletion(habitIdOrName, dateStr, isCompleted)
+              .timeout(_cloudTimeout);
+        } catch (e) {
+          debugPrint('Cloud sync error on saveHabitCompletionToHistory: $e');
+        }
+      }
     });
   }
 
