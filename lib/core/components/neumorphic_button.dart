@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// An elite, tactile Neumorphic / Soft UI action button.
 /// Features authentic dual-light extrusion physics, radiant primary blooms,
@@ -76,20 +75,15 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
 
     // ── Primary Gradient Tokens (Convex Curved Sheen) ────────────────────────
     final Color primaryStart =
-        Color.lerp(effectiveAccent, Colors.white, isDark ? 0.12 : 0.18) ??
-        effectiveAccent;
+        ThemeUtils.accentGradientStart(effectiveAccent, isDark);
     final Color primaryEnd =
-        Color.lerp(effectiveAccent, Colors.black, isDark ? 0.18 : 0.12) ??
-        effectiveAccent;
+        ThemeUtils.accentGradientEnd(effectiveAccent, isDark);
 
     // ── Secondary / Surface Gradient Tokens ──────────────────────────────────
-    final Color surfaceStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.05) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.40) ?? baseColor);
-
-    final Color surfaceEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.18) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.12) ?? baseColor);
+    final Color surfaceStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     // ── Background Gradients ─────────────────────────────────────────────────
     final Gradient? backgroundGradient = !_isEnabled
@@ -119,9 +113,7 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
           );
 
     final Color? solidDisabledColor = !_isEnabled
-        ? (isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : const Color(0xFFE2E8F0))
+        ? ThemeUtils.disabledSurfaceColor(isDark)
         : null;
 
     // ── Neumorphic Shadow Engine with Radiant Primary Bloom ───────────────────
@@ -148,7 +140,7 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
         (!_isEnabled
             ? theme.disabledColor
             : widget.isPrimary
-            ? Colors.white
+            ? colorScheme.onPrimary
             : colorScheme.onSurface);
 
     // Dynamic Scale: Pressed (indented) vs Hovered (slight float) vs Resting
@@ -191,18 +183,15 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                   color: !_isEnabled
                       ? Colors.transparent
                       : widget.isPrimary
-                      ? Colors.white.withValues(
+                      ? colorScheme.onPrimary.withValues(
                           alpha: _isPressed
                               ? (isDark ? 0.10 : 0.20)
                               : (isDark ? 0.22 : 0.42),
                         )
-                      : (isDark
-                            ? Colors.white.withValues(
-                                alpha: _isPressed ? 0.03 : 0.08,
-                              )
-                            : Colors.white.withValues(
-                                alpha: _isPressed ? 0.35 : 0.90,
-                              )),
+                      : ThemeUtils.subtleBorderColor(
+                          isDark,
+                          isPressed: _isPressed,
+                        ),
                   width: 1.2,
                 ),
                 boxShadow: effectiveShadows,
@@ -245,9 +234,10 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                                 shadows: widget.isPrimary && _isEnabled
                                     ? [
                                         Shadow(
-                                          color: Colors.black.withValues(
-                                            alpha: isDark ? 0.35 : 0.20,
-                                          ),
+                                          color: AppShadows.darkShadowColor(isDark)
+                                              .withValues(
+                                                alpha: isDark ? 0.35 : 0.20,
+                                              ),
                                           offset: const Offset(0, 1),
                                           blurRadius: 2,
                                         ),
@@ -269,7 +259,9 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                                       shadows: widget.isPrimary && _isEnabled
                                           ? [
                                               Shadow(
-                                                color: Colors.black.withValues(
+                                                color: AppShadows.darkShadowColor(
+                                                  isDark,
+                                                ).withValues(
                                                   alpha: isDark ? 0.35 : 0.20,
                                                 ),
                                                 offset: const Offset(0, 1),
@@ -291,7 +283,9 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                                 shadows: widget.isPrimary && _isEnabled
                                     ? [
                                         Shadow(
-                                          color: Colors.black.withValues(
+                                          color: AppShadows.darkShadowColor(
+                                            isDark,
+                                          ).withValues(
                                             alpha: isDark ? 0.35 : 0.20,
                                           ),
                                           offset: const Offset(0, 1),
