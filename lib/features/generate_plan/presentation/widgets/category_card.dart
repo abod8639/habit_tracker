@@ -1,136 +1,98 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
-import 'package:habit_tracker/core/theme/theme_utils.dart';
+import 'package:intl/intl.dart';
 import '../../domain/entities/category_entity.dart';
+import 'neu_surface.dart';
 
-class CategoryCard extends StatefulWidget {
+/// Extruded category tile that presses into the surface when tapped.
+class CategoryCard extends StatelessWidget {
   final PlanCategory category;
+  final int questionCount;
   final VoidCallback onTap;
 
   const CategoryCard({
     super.key,
     required this.category,
+    required this.questionCount,
     required this.onTap,
   });
 
   @override
-  State<CategoryCard> createState() => _CategoryCardState();
-}
-
-class _CategoryCardState extends State<CategoryCard> {
-  bool _isPressed = false;
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-    final baseColor = theme.cardColor;
-    final color = widget.category.color;
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = category.color;
+    final isArabic = Intl.getCurrentLocale().startsWith('ar');
 
-    final surfaceGradientStart = ThemeUtils.surfaceGradientStart(
-      baseColor,
-      isDark,
-    );
-    final surfaceGradientEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: (_) => setState(() => _isPressed = true),
-        onTapCancel: () => setState(() => _isPressed = false),
-        onTapUp: (_) => setState(() => _isPressed = false),
-        onTap: widget.onTap,
-        child: AnimatedScale(
-          scale: _isPressed ? 0.96 : 1.0,
-          duration: const Duration(milliseconds: 120),
-          curve: Curves.easeOutCubic,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 140),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              borderRadius: AppRadius.cardRadius,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color.alphaBlend(
-                    color.withValues(alpha: isDark ? 0.08 : 0.06),
-                    surfaceGradientStart,
-                  ),
-                  Color.alphaBlend(
-                    color.withValues(alpha: isDark ? 0.12 : 0.08),
-                    surfaceGradientEnd,
-                  ),
-                ],
+    return NeuSurface(
+      onTap: onTap,
+      padding: const EdgeInsets.all(15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top row: extruded icon orb + engraved archetype tag (CD1 identity)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              NeuOrb(size: 46, icon: category.icon, color: color),
+              const SizedBox(width: 6),
+              Flexible(
+                child: NeuChip(
+                  emoji: category.badgeEmoji,
+                  label: category.archetypeTitle,
+                  color: color,
+                  fontSize: 9.5,
+                ),
               ),
-              border: Border.all(
-                color: isDark
-                    ? color.withValues(alpha: 0.25)
-                    : Colors.white.withValues(alpha: 0.85),
-                width: 1.2,
-              ),
-              boxShadow: _isPressed
-                  ? AppShadows.buttonPressed(isDark: isDark)
-                  :AppShadows.buttonResting(isDark: isDark)
-
-            ),
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Embossed Neumorphic icon bubble
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: AppRadius.lgRadius,
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color.lerp(color, Colors.white, isDark ? 0.08 : 0.20) ??
-                            color,
-                        Color.lerp(color, Colors.black, isDark ? 0.15 : 0.08) ??
-                            color,
-                      ],
-                    ),
-                    boxShadow: AppShadows.insetInput(isDark: isDark),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      widget.category.icon,
-                      color: Colors.white,
-                      size: 26,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  widget.category.displayName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.category.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurface.withValues(alpha: 0.65),
-                    height: 1.35,
-                  ),
-                ),
-              ],
+            ],
+          ),
+          const Spacer(),
+          Text(
+            category.displayName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
             ),
           ),
-        ),
+          const SizedBox(height: 3),
+          Text(
+            category.questTagline,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 11,
+              color: colorScheme.onSurface.withValues(alpha: 0.65),
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(
+                Icons.quiz_outlined,
+                size: 12,
+                color: color.withValues(alpha: 0.85),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  isArabic
+                      ? '$questionCount أسئلة • دقيقة تقريباً'
+                      : '$questionCount questions • ~1 min',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
