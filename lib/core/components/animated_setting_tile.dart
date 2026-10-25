@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A reusable Neumorphic animated setting and action tile.
 /// Features tactile press feedback, smooth hover states, and unified design tokens.
@@ -72,7 +71,7 @@ class _AnimatedSettingTileState extends State<AnimatedSettingTile>
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final baseSurface = theme.cardColor;
-    final primaryColor = widget.textColor ?? theme.primaryColor;
+    final primaryColor = widget.textColor ?? colorScheme.primary;
 
     final Color surfaceColor = _isHovered
         ? Color.alphaBlend(
@@ -91,20 +90,13 @@ class _AnimatedSettingTileState extends State<AnimatedSettingTile>
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        surfaceColor,
-        Color.alphaBlend(
-          isDark
-              ? Colors.black.withValues(alpha: 0.12)
-              : Colors.black.withValues(alpha: 0.03),
-          surfaceColor,
-        ),
+        ThemeUtils.surfaceGradientStart(surfaceColor, isDark),
+        ThemeUtils.surfaceGradientEnd(surfaceColor, isDark),
       ],
     );
 
     final Border border = Border.all(
-      color: isDark
-          ? Colors.white.withValues(alpha: 0.04)
-          : Colors.white.withValues(alpha: 0.70),
+      color: ThemeUtils.subtleBorderColor(isDark),
       width: 1.0,
     );
 
@@ -265,9 +257,7 @@ class _AnimatedSettingTileState extends State<AnimatedSettingTile>
           ),
           boxShadow: AppShadows.dotIndicator(isDark: isDark),
           border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.04)
-                : Colors.white.withValues(alpha: 0.6),
+            color: ThemeUtils.subtleBorderColor(isDark),
             width: 0.8,
           ),
         ),
