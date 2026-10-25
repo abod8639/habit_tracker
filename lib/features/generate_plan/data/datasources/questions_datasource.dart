@@ -11,29 +11,139 @@ class QuestionsDataSource {
   static bool get _isArabic => Intl.getCurrentLocale().startsWith('ar');
 
   static List<QuestionEntity> forCategory(PlanCategory category) {
+    final base = _baseQuestions(category);
+    // Personalization anchors shared by every path: an obstacle question where the
+    // category lacks one, then the daily cue every habit gets stacked onto.
+    return [
+      ...base,
+      if (category != PlanCategory.study)
+        _isArabic ? _obstacleAr(category) : _obstacleEn(category),
+      _isArabic ? _dailyAnchorAr : _dailyAnchorEn,
+    ];
+  }
+
+  static List<QuestionEntity> _baseQuestions(PlanCategory category) {
     if (_isArabic) {
       switch (category) {
         case PlanCategory.nutrition:
-          return List<QuestionEntity>.from(_nutritionAr);
+          return _nutritionAr;
         case PlanCategory.sports:
-          return List<QuestionEntity>.from(_sportsAr);
+          return _sportsAr;
         case PlanCategory.study:
-          return List<QuestionEntity>.from(_studyAr);
+          return _studyAr;
         case PlanCategory.learning:
-          return List<QuestionEntity>.from(_learningAr);
-      }
-    } else {
-      switch (category) {
-        case PlanCategory.nutrition:
-          return List<QuestionEntity>.from(_nutritionEn);
-        case PlanCategory.sports:
-          return List<QuestionEntity>.from(_sportsEn);
-        case PlanCategory.study:
-          return List<QuestionEntity>.from(_studyEn);
-        case PlanCategory.learning:
-          return List<QuestionEntity>.from(_learningEn);
+          return _learningAr;
       }
     }
+    switch (category) {
+      case PlanCategory.nutrition:
+        return _nutritionEn;
+      case PlanCategory.sports:
+        return _sportsEn;
+      case PlanCategory.study:
+        return _studyEn;
+      case PlanCategory.learning:
+        return _learningEn;
+    }
+  }
+
+  // ─── SHARED PERSONALIZATION QUESTIONS ──────────────────────────────────────
+  static const QuestionEntity _dailyAnchorAr = QuestionEntity(
+    id: 'daily_anchor',
+    text: 'ما اللحظة الأكثر ثباتاً في يومك لنربط بها عاداتك الجديدة؟',
+    subtitle: 'العادة المرتبطة بشيء تفعله أصلاً كل يوم تصبح تلقائية أسرع',
+    type: QuestionType.singleChoice,
+    choices: [
+      'فور الاستيقاظ صباحاً',
+      'بعد صلاة الفجر',
+      'مع قهوة أو إفطار الصباح',
+      'بعد الغداء أو العودة من العمل/الدراسة',
+      'بعد صلاة العشاء أو وجبة المساء',
+      'قبل النوم مباشرة',
+    ],
+  );
+
+  static const QuestionEntity _dailyAnchorEn = QuestionEntity(
+    id: 'daily_anchor',
+    text:
+        'Which moment of your day is the most reliable to anchor new habits to?',
+    subtitle:
+        'Habits attached to something you already do every day stick faster',
+    type: QuestionType.singleChoice,
+    choices: [
+      'Right after waking up',
+      'With my morning coffee or breakfast',
+      'During my commute',
+      'After lunch or getting home',
+      'After dinner',
+      'Right before bed',
+    ],
+  );
+
+  static QuestionEntity _obstacleAr(PlanCategory category) {
+    final choices = switch (category) {
+      PlanCategory.sports => const [
+        'ضيق الوقت وكثرة الانشغال',
+        'فقدان الحماس بعد أيام قليلة',
+        'التعب وانخفاض الطاقة',
+        'لا أعرف من أين أبدأ أو ماذا أفعل',
+        'الملل من تكرار نفس التمارين',
+      ],
+      PlanCategory.nutrition => const [
+        'الأكل العاطفي أو عند التوتر',
+        'الوجبات السريعة بسبب ضيق الوقت',
+        'الرغبة الشديدة في السكريات',
+        'الأكل الاجتماعي والعزائم',
+        'نسيان شرب الماء أو الوجبات',
+      ],
+      _ => const [
+        'التسويف وصعوبة البدء',
+        'ضيق الوقت',
+        'الملل وفقدان الحماس',
+        'عدم رؤية تقدم واضح',
+        'تشتت الانتباه بالهاتف',
+      ],
+    };
+    return QuestionEntity(
+      id: 'biggest_obstacle',
+      text: 'ما العقبة التي أوقفتك سابقاً أكثر من غيرها؟',
+      subtitle: 'سنصمم عادة واحدة على الأقل لتتجاوز هذه العقبة تحديداً',
+      type: QuestionType.singleChoice,
+      choices: choices,
+    );
+  }
+
+  static QuestionEntity _obstacleEn(PlanCategory category) {
+    final choices = switch (category) {
+      PlanCategory.sports => const [
+        'Not enough time',
+        'Losing motivation after a few days',
+        'Feeling tired or low energy',
+        'Not knowing where to start',
+        'Getting bored of the same routine',
+      ],
+      PlanCategory.nutrition => const [
+        'Emotional or stress eating',
+        'Fast food because I am busy',
+        'Strong sugar cravings',
+        'Social meals and gatherings',
+        'Forgetting to drink water or eat regularly',
+      ],
+      _ => const [
+        'Procrastinating on starting',
+        'Not enough time',
+        'Boredom and fading motivation',
+        'Not seeing clear progress',
+        'Phone distractions',
+      ],
+    };
+    return QuestionEntity(
+      id: 'biggest_obstacle',
+      text: 'What has stopped you most often in the past?',
+      subtitle: 'At least one habit will be designed to beat exactly this',
+      type: QuestionType.singleChoice,
+      choices: choices,
+    );
   }
 
   // ─── NUTRITION (ARABIC) ────────────────────────────────────────────────────
@@ -132,7 +242,8 @@ class QuestionsDataSource {
     QuestionEntity(
       id: 'age',
       text: 'Let’s calibrate your personal baseline—how old are you?',
-      subtitle: 'Helps us align your habits with your natural energy and metabolism',
+      subtitle:
+          'Helps us align your habits with your natural energy and metabolism',
       type: QuestionType.number,
       hint: '25',
       unit: 'years',
@@ -314,7 +425,8 @@ class QuestionsDataSource {
     QuestionEntity(
       id: 'fitness_level',
       text: 'What stage of your athletic journey are you currently in?',
-      subtitle: 'Every master started at level 1—pick your honest starting line',
+      subtitle:
+          'Every master started at level 1—pick your honest starting line',
       type: QuestionType.singleChoice,
       choices: [
         'Foundation Stage — rarely exercise right now, ready for an easy start',
@@ -325,7 +437,8 @@ class QuestionsDataSource {
     ),
     QuestionEntity(
       id: 'goal',
-      text: 'What physical superpower or transformation are you building toward?',
+      text:
+          'What physical superpower or transformation are you building toward?',
       type: QuestionType.singleChoice,
       choices: [
         'Torch fat & build a lean, agile physique',
@@ -405,7 +518,8 @@ class QuestionsDataSource {
       id: 'goal',
       text: 'ما هو الإنجاز الأكاديمي أو المعرفي الذي سيجعلك فخوراً بنفسك؟',
       type: QuestionType.text,
-      hint: 'مثال: التفوق في الاختبار القادم، الحصول على شهادة احترافية، بناء مشروع',
+      hint:
+          'مثال: التفوق في الاختبار القادم، الحصول على شهادة احترافية، بناء مشروع',
     ),
     QuestionEntity(
       id: 'available_hours',
@@ -483,7 +597,8 @@ class QuestionsDataSource {
       id: 'goal',
       text: 'What academic victory or milestone will make you genuinely proud?',
       type: QuestionType.text,
-      hint: 'e.g., Ace my upcoming finals, earn a certification, master the curriculum',
+      hint:
+          'e.g., Ace my upcoming finals, earn a certification, master the curriculum',
     ),
     QuestionEntity(
       id: 'available_hours',
@@ -544,7 +659,8 @@ class QuestionsDataSource {
       id: 'skill',
       text: 'ما هي المهارة الجديدة التي تريد إضافتها إلى قدراتك الشخصية؟',
       type: QuestionType.text,
-      hint: 'مثال: التحدث بالإسبانية، البرمجة بلغة بايثون، التصميم، الإلقاء، العزف',
+      hint:
+          'مثال: التحدث بالإسبانية، البرمجة بلغة بايثون، التصميم، الإلقاء، العزف',
     ),
     QuestionEntity(
       id: 'current_level',
@@ -559,7 +675,8 @@ class QuestionsDataSource {
     QuestionEntity(
       id: 'motivation',
       text: 'ما هو المحرك الداخلي الذي يدفعك لاكتساب هذه المهارة الآن؟',
-      subtitle: 'ربط العادة بغاية عميقة يضمن لك الاستمرار حين يقل الحماس المؤقت',
+      subtitle:
+          'ربط العادة بغاية عميقة يضمن لك الاستمرار حين يقل الحماس المؤقت',
       type: QuestionType.singleChoice,
       choices: [
         'فتح آفاق مهنية وفرص وظيفية أقوى',
@@ -596,10 +713,12 @@ class QuestionsDataSource {
     ),
     QuestionEntity(
       id: 'milestone',
-      text: 'تخيّل نفسك بعد 90 يوماً من الالتزام.. ما هو الإنجاز الملموس الذي سيبرهن لك نجاحك؟',
+      text:
+          'تخيّل نفسك بعد 90 يوماً من الالتزام.. ما هو الإنجاز الملموس الذي سيبرهن لك نجاحك؟',
       subtitle: 'تحديد صورة النجاح يجعل عقلك يرى الهدف بوضوح كل يوم',
       type: QuestionType.text,
-      hint: 'مثال: إجراء محادثة كاملة لمدة 10 دقائق، إطلاق تطبيقي الأول، عزف مقطوعة كاملة',
+      hint:
+          'مثال: إجراء محادثة كاملة لمدة 10 دقائق، إطلاق تطبيقي الأول، عزف مقطوعة كاملة',
       isRequired: false,
     ),
   ];
@@ -625,7 +744,8 @@ class QuestionsDataSource {
     QuestionEntity(
       id: 'motivation',
       text: 'What deeper purpose is fueling your desire to master this skill?',
-      subtitle: 'Connecting habits to an Epic Meaning keeps you going when willpower dips',
+      subtitle:
+          'Connecting habits to an Epic Meaning keeps you going when willpower dips',
       type: QuestionType.singleChoice,
       choices: [
         'Accelerate my career & unlock new professional doors',
@@ -662,10 +782,13 @@ class QuestionsDataSource {
     ),
     QuestionEntity(
       id: 'milestone',
-      text: 'Fast-forward 90 days of consistent action—what tangible win will prove you succeeded?',
-      subtitle: 'Defining your Win State makes every daily micro-habit feel rewarding',
+      text:
+          'Fast-forward 90 days of consistent action—what tangible win will prove you succeeded?',
+      subtitle:
+          'Defining your Win State makes every daily micro-habit feel rewarding',
       type: QuestionType.text,
-      hint: 'e.g., Hold a 10-minute conversation in Spanish, ship my first app, play 5 songs',
+      hint:
+          'e.g., Hold a 10-minute conversation in Spanish, ship my first app, play 5 songs',
       isRequired: false,
     ),
   ];
