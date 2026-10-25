@@ -110,6 +110,7 @@ class _DrawerListState extends State<DrawerList> {
                 ),
           title: S.current.scanImage,
         ),
+
         MyDrawerListTile(
           icon: Icon(color: colors.drawerStatsIcon, Icons.auto_graph_sharp),
           onTap: () {
@@ -118,6 +119,7 @@ class _DrawerListState extends State<DrawerList> {
           },
           title: S.current.drawerReat,
         ),
+
         MyDrawerListTile(
           icon: Icon(
             color: colorScheme.primary,
@@ -129,6 +131,22 @@ class _DrawerListState extends State<DrawerList> {
           },
           title: S.current.drawerTheme,
         ),
+
+        // MyDrawerListTile(
+        //   icon: Icon(color: colors.drawerAiIcon, Icons.auto_awesome_rounded),
+        //   onTap: () {
+        //     final navigator = Navigator.of(context);
+        //     final router = GoRouter.of(context);
+        //     AiGuard.protect(
+        //       context,
+        //       onValid: () {
+        //         navigator.canPop();
+        //         router.push(AppRoutes.categorySelection);
+        //       },
+        //     );
+        //   },
+        //   title: S.current.generatePlan,
+        // ),
 
         MyDrawerListTile(
           icon: Icon(color: colors.drawerAiIcon, Icons.psychology),
