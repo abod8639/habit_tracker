@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/components/my_app_bar.dart';
 import 'package:habit_tracker/core/components/page_entrance_transition.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../../domain/entities/category_entity.dart';
 import '../providers/plan_generator_providers.dart';
@@ -90,11 +89,6 @@ class CategorySelectionScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 18),
-
-                    // ── How it works (CD2 clear progress path, ethical CD8:
-                    // no fake urgency or invented social proof) ─────────────
-                    _HowItWorks(isArabic: isArabic),
-                    const SizedBox(height: 22),
                   ],
                 ),
               ),
@@ -107,7 +101,7 @@ class CategorySelectionScreen extends ConsumerWidget {
                 crossAxisCount: 2,
                 mainAxisSpacing: 18,
                 crossAxisSpacing: 18,
-                childAspectRatio: 0.90,
+                childAspectRatio: 0.84,
               ),
               delegate: SliverChildBuilderDelegate((context, index) {
                 final category = PlanCategory.values[index];
@@ -187,62 +181,6 @@ class CategorySelectionScreen extends ConsumerWidget {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Three engraved steps showing the whole journey up front.
-class _HowItWorks extends StatelessWidget {
-  final bool isArabic;
-
-  const _HowItWorks({required this.isArabic});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final steps = isArabic
-        ? const [
-            (Icons.quiz_outlined, 'أسئلة قصيرة'),
-            (Icons.tune_rounded, '3–4 عادات تناسب وقتك'),
-            (Icons.bolt_rounded, 'فوز سريع اليوم'),
-          ]
-        : const [
-            (Icons.quiz_outlined, 'A few questions'),
-            (Icons.tune_rounded, '3–4 habits that fit'),
-            (Icons.bolt_rounded, 'A quick win today'),
-          ];
-
-    return NeuSurface(
-      depth: NeuDepth.inset,
-      borderRadius: AppRadius.wellRadius,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-      child: Row(
-        children: [
-          for (var i = 0; i < steps.length; i++)
-            Expanded(
-              child: Column(
-                children: [
-                  NeuOrb(
-                    size: 38,
-                    icon: steps[i].$1,
-                    color: colorScheme.primary,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    steps[i].$2,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 11,
-                      height: 1.3,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface.withValues(alpha: 0.80),
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );
