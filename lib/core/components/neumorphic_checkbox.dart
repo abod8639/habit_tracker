@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A tactile Neumorphic checkbox widget featuring a debossed recessed well
 /// when unselected and a vibrant embossed blooming accent when selected.
@@ -15,7 +15,7 @@ class NeumorphicCheckbox extends StatelessWidget {
     required this.value,
     this.onChanged,
     this.activeColor,
-    this.size = 22.0,
+    this.size = 24.0,
     this.borderRadius,
   });
 
@@ -29,9 +29,7 @@ class NeumorphicCheckbox extends StatelessWidget {
     final effectiveColor = activeColor ?? colorScheme.primary;
     final effectiveRadius = borderRadius ?? BorderRadius.circular(6.0);
 
-    final Color wellColor = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.28) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.35) ?? baseColor);
+    final Color wellColor = ThemeUtils.debossedSurfaceColor(baseColor, isDark);
 
     return MouseRegion(
       cursor: onChanged != null
@@ -51,9 +49,7 @@ class NeumorphicCheckbox extends StatelessWidget {
             border: Border.all(
               color: value
                   ? effectiveColor
-                  : (isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : const Color(0xFFA3B1C6).withValues(alpha: 0.50)),
+                  : ThemeUtils.subtleBorderColor(isDark),
               width: 1.2,
             ),
             boxShadow: AppShadows.insetWell(isDark: isDark),
@@ -67,7 +63,7 @@ class NeumorphicCheckbox extends StatelessWidget {
                     Icons.check_rounded,
                     key: const ValueKey('checked'),
                     size: size * 0.68,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                   )
                 : const SizedBox.shrink(key: ValueKey('unchecked')),
           ),
