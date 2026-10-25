@@ -1,8 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A premium Neumorphic Pill Segmented Toggle with deep physical recess,
 /// smooth sliding indicator animation, tactile haptics, and directional RTL/LTR support.
@@ -49,23 +48,17 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
     final primary = widget.activeColor ?? colorScheme.primary;
     final secondary =
         widget.activeSecondaryColor ??
-        (Color.lerp(primary, Colors.black, isDark ? 0.22 : 0.12) ?? primary);
+        ThemeUtils.accentGradientEnd(primary, isDark);
 
     // Deep recessed track color and ambient inner shadow gradient
-    final wellBase = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.28) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.35) ?? baseColor);
+    final wellBase = ThemeUtils.debossedSurfaceColor(baseColor, isDark);
 
     final trackGradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
-        isDark
-            ? (Color.lerp(wellBase, Colors.black, 0.30) ?? wellBase)
-            : (Color.lerp(wellBase, const Color(0xFFC5D1E0), 0.38) ?? wellBase),
-        isDark
-            ? (Color.lerp(wellBase, Colors.white, 0.04) ?? wellBase)
-            : (Color.lerp(wellBase, Colors.white, 0.50) ?? wellBase),
+        ThemeUtils.surfaceGradientEnd(wellBase, isDark),
+        ThemeUtils.surfaceGradientStart(wellBase, isDark),
       ],
     );
 
@@ -164,9 +157,7 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
           gradient: trackGradient,
           borderRadius: BorderRadius.circular(AppRadius.button),
           border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.06)
-                : Colors.white.withValues(alpha: 0.85),
+            color: ThemeUtils.subtleBorderColor(isDark),
             width: 1.0,
           ),
           boxShadow: AppShadows.wellDual(isDark: isDark),
@@ -196,20 +187,16 @@ class _NeumorphicPillToggleState extends State<NeumorphicPillToggle> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Color.lerp(
-                                primary,
-                                Colors.white,
-                                isDark ? 0.20 : 0.28,
-                              ) ??
-                              primary,
+                          ThemeUtils.accentGradientStart(primary, isDark),
                           primary,
                           secondary,
                         ],
                         stops: const [0.0, 0.55, 1.0],
                       ),
                       border: Border.all(
-                        color: Colors.white.withValues(
-                          alpha: isDark ? 0.32 : 0.90,
+                        color: ThemeUtils.subtleBorderColor(
+                          isDark,
+                          isPressed: _isPressed,
                         ),
                         width: 1.0,
                       ),
