@@ -121,17 +121,29 @@ class SettingRepositoryImpl implements SettingRepository {
         }
 
         final localHistory = await habitLocalDataSource.getAllHabitStrengths();
-        final mergedHistory = await firestoreService
-            .syncHabitHistory(localHistory)
+        final localCompletions =
+            await habitLocalDataSource.getAllHabitCompletions();
+
+        final historyBundle = await firestoreService
+            .syncHabitHistoryWithCompletions(
+              localRates: localHistory,
+              localCompletions: localCompletions,
+            )
             .timeout(
               _remoteTimeout,
               onTimeout: () {
-                throw const TimeoutAppException('Syncing habit history timed out');
+                throw const TimeoutAppException(
+                  'Syncing habit history timed out',
+                );
               },
             );
 
         await habitLocalDataSource
-            .saveAllHabitStrengths(mergedHistory)
+            .saveAllHabitStrengths(historyBundle.rates)
+            .timeout(_localTimeout);
+
+        await habitLocalDataSource
+            .saveAllHabitCompletions(historyBundle.completions)
             .timeout(_localTimeout);
 
         // 5. Sync AI API key
