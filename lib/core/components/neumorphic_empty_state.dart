@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A reusable Neumorphic empty state presentation widget.
 /// Displays an embossed circular well with an icon and contextual message.
@@ -24,9 +24,7 @@ class NeumorphicEmptyState extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final baseColor = theme.cardColor;
-    final wellBase = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.22) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.30) ?? baseColor);
+    final wellBase = ThemeUtils.debossedSurfaceColor(baseColor, isDark);
 
     return SizedBox(
       height: height,
@@ -41,9 +39,7 @@ class NeumorphicEmptyState extends StatelessWidget {
                 color: wellBase,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.white.withValues(alpha: 0.70),
+                  color: ThemeUtils.subtleBorderColor(isDark),
                   width: 1.0,
                 ),
                 boxShadow: AppShadows.wellDual(isDark: isDark),
