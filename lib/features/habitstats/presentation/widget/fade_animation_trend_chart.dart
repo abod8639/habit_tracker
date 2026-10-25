@@ -14,7 +14,7 @@ class FadeAnimationTrendChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return PageEntranceTransition(
       animationController: _animationController,
-      index: 2,
+      index: 5,
       child: const TrendChartCard(),
     );
   }
