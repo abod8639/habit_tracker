@@ -59,17 +59,8 @@ class _NeuSurfaceState extends State<NeuSurface> {
     final isInset = widget.depth == NeuDepth.inset || _isPressed;
     final isCircle = widget.shape == BoxShape.circle;
 
-    final List<BoxShadow> shadows;
-    if (isInset) {
-      shadows = AppShadows.insetInput(isDark: isDark);
-    } else if (widget.highlighted && widget.accentColor != null) {
-      shadows = AppShadows.selectedCard(
-        primary: widget.accentColor!,
-        isDark: isDark,
-      );
-    } else {
-      shadows = AppShadows.softCard(isDark: isDark);
-    }
+    final shadows= AppShadows.softCard(isDark: isDark);
+
 
     Widget surface = AnimatedContainer(
       duration: const Duration(milliseconds: 160),
