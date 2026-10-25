@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// Clean Architecture component: Neumorphic debossed input field matching
 /// the exact aesthetic of [AiTextInputField] with inverted ambient shadows,
@@ -128,19 +128,12 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
     final effectiveRadius =
         widget.borderRadius ?? const BorderRadius.all(Radius.circular(30));
 
-    // Matching AiTextInputField's exact Neumorphic debossed container
-    final Color backgroundColor = isDark
-        ? Color.alphaBlend(
-            Colors.black.withValues(alpha: 0.32),
-            scaffoldBg,
-          )
-        : const Color(0xFFEFF2F8);
+    final Color backgroundColor =
+        ThemeUtils.debossedSurfaceColor(scaffoldBg, isDark);
 
     final Color borderColor = _isFocused
         ? effectiveAccent.withValues(alpha: isDark ? 0.70 : 0.50)
-        : (isDark
-              ? Colors.black.withValues(alpha: 0.5)
-              : const Color(0xFFA3B1C6).withValues(alpha: 0.35));
+        : ThemeUtils.subtleBorderColor(isDark);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
@@ -261,13 +254,11 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.black.withValues(alpha: 0.25)
-                        : Colors.white.withValues(alpha: 0.85),
+                        ? ThemeUtils.debossedSurfaceColor(scaffoldBg, isDark)
+                        : ThemeUtils.surfaceGradientStart(theme.cardColor, isDark),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.06)
-                          : const Color(0xFFA3B1C6).withValues(alpha: 0.35),
+                      color: ThemeUtils.subtleBorderColor(isDark),
                       width: 0.8,
                     ),
                     boxShadow: AppShadows.badge(isDark: isDark),
