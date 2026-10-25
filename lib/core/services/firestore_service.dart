@@ -4,6 +4,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 
+class HabitHistoryCloudBundle {
+  final Map<String, String> rates; // dateStr -> completionRate
+  final Map<String, Map<String, bool>> completions; // dateStr -> {habitId: isCompleted}
+
+  const HabitHistoryCloudBundle({
+    this.rates = const {},
+    this.completions = const {},
+  });
+}
+
 class FirestoreService {
   final FirebaseFirestore? _firestoreInstance;
   final FirebaseAuth? _authInstance;
@@ -251,41 +261,101 @@ class FirestoreService {
     await deleteHabits([habitId]);
   }
 
-  // Upload habit history (Heatmap data)
-  Future<void> uploadHabitHistory(String date, String completionRate) async {
+  // Upload individual habit completion or daily completion to Firestore
+  Future<void> uploadHabitCompletion(
+    String habitId,
+    String date,
+    bool isCompleted, {
+    String? completionRate,
+  }) async {
     if (!isUserLoggedIn) return;
 
     try {
-      await _userDoc!.collection('habitHistory').doc(date).set({
+      final docRef = _userDoc!.collection('habitHistory').doc(date);
+      final updateData = <String, dynamic>{
+        'date': date,
+        'completions': {
+          habitId: isCompleted,
+        },
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      if (completionRate != null) {
+        updateData['completionRate'] = completionRate;
+      }
+      await docRef.set(updateData, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error uploading habit completion to Firestore: $e');
+    }
+  }
+
+  // Upload habit history (Heatmap data + optional completions map)
+  Future<void> uploadHabitHistory(
+    String date,
+    String completionRate, {
+    Map<String, bool>? completions,
+  }) async {
+    if (!isUserLoggedIn) return;
+
+    try {
+      final data = <String, dynamic>{
         'date': date,
         'completionRate': completionRate,
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      };
+      if (completions != null && completions.isNotEmpty) {
+        data['completions'] = completions;
+      }
+      await _userDoc!.collection('habitHistory').doc(date).set(
+        data,
+        SetOptions(merge: true),
+      );
     } catch (e) {
       // Ignored
     }
   }
 
-  // Download habit history
-  Future<Map<String, String>> downloadHabitHistory() async {
-    if (!isUserLoggedIn) return {};
+  // Download comprehensive habit history bundle (both heatmap rates and per-habit completions)
+  Future<HabitHistoryCloudBundle> downloadHabitHistoryBundle() async {
+    if (!isUserLoggedIn) return const HabitHistoryCloudBundle();
 
     try {
       final snapshot = await _userDoc!.collection('habitHistory').get();
-      final Map<String, String> history = {};
+      final Map<String, String> rates = {};
+      final Map<String, Map<String, bool>> completions = {};
 
       for (var doc in snapshot.docs) {
         final data = doc.data();
-        final date = data['date'] as String?;
+        final date = data['date'] as String? ?? doc.id;
         final rate = data['completionRate']?.toString();
-        if (date != null && rate != null) {
-          history[date] = rate;
+        if (date.isNotEmpty && rate != null) {
+          rates[date] = rate;
+        }
+
+        final rawComps = data['completions'];
+        if (rawComps is Map) {
+          final Map<String, bool> habitMap = {};
+          rawComps.forEach((k, v) {
+            habitMap[k.toString()] = v == true || v == 'true' || v == 1;
+          });
+          if (habitMap.isNotEmpty) {
+            completions[date] = habitMap;
+          }
         }
       }
-      return history;
+      return HabitHistoryCloudBundle(
+        rates: rates,
+        completions: completions,
+      );
     } catch (e) {
-      return {};
+      debugPrint('Error downloading habit history bundle: $e');
+      return const HabitHistoryCloudBundle();
     }
+  }
+
+  // Download habit history rates (Heatmap compatibility)
+  Future<Map<String, String>> downloadHabitHistory() async {
+    final bundle = await downloadHabitHistoryBundle();
+    return bundle.rates;
   }
 
   // Theme Management
@@ -360,46 +430,97 @@ class FirestoreService {
     }
   }
 
-  Future<Map<String, String>> syncHabitHistory(
-    Map<String, String> localHistory,
-  ) async {
-    if (!isUserLoggedIn) return localHistory;
+  // Sync full habit history including both daily rates and per-habit completions
+  Future<HabitHistoryCloudBundle> syncHabitHistoryWithCompletions({
+    required Map<String, String> localRates,
+    required Map<String, Map<String, bool>> localCompletions,
+  }) async {
+    if (!isUserLoggedIn) {
+      return HabitHistoryCloudBundle(
+        rates: localRates,
+        completions: localCompletions,
+      );
+    }
 
     try {
-      final cloudHistory = await downloadHabitHistory();
-      final mergedHistory = Map<String, String>.from(localHistory);
+      final cloudBundle = await downloadHabitHistoryBundle();
 
-      for (var entry in cloudHistory.entries) {
-        if (!mergedHistory.containsKey(entry.key)) {
-          mergedHistory[entry.key] = entry.value;
+      // Merge daily completion rates
+      final mergedRates = Map<String, String>.from(localRates);
+      for (var entry in cloudBundle.rates.entries) {
+        if (!mergedRates.containsKey(entry.key)) {
+          mergedRates[entry.key] = entry.value;
         }
       }
 
-      // Collect entries that need to be uploaded to cloud
-      final toUpload = <String, String>{};
-      for (var entry in mergedHistory.entries) {
-        if (!cloudHistory.containsKey(entry.key) ||
-            cloudHistory[entry.key] != entry.value) {
-          toUpload[entry.key] = entry.value;
+      // Merge per-habit completions
+      final mergedCompletions = <String, Map<String, bool>>{};
+      // 1. Seed with cloud completions
+      for (var dateEntry in cloudBundle.completions.entries) {
+        mergedCompletions[dateEntry.key] = Map<String, bool>.from(dateEntry.value);
+      }
+      // 2. Merge local completions
+      for (var dateEntry in localCompletions.entries) {
+        final date = dateEntry.key;
+        final localMap = dateEntry.value;
+        if (!mergedCompletions.containsKey(date)) {
+          mergedCompletions[date] = Map<String, bool>.from(localMap);
+        } else {
+          final targetMap = mergedCompletions[date]!;
+          for (var habitEntry in localMap.entries) {
+            targetMap.putIfAbsent(habitEntry.key, () => habitEntry.value);
+          }
         }
       }
 
-      // Batch upload history to avoid N sequential network requests
-      if (toUpload.isNotEmpty) {
-        final entriesList = toUpload.entries.toList();
-        for (var i = 0; i < entriesList.length; i += 400) {
-          final chunk = entriesList.sublist(
+      // Collect items to upload to Cloud Firestore
+      final allDates = {...mergedRates.keys, ...mergedCompletions.keys};
+      final List<Map<String, dynamic>> updates = [];
+
+      for (var date in allDates) {
+        final cloudRate = cloudBundle.rates[date];
+        final mergedRate = mergedRates[date];
+        final cloudComps = cloudBundle.completions[date] ?? {};
+        final mergedComps = mergedCompletions[date] ?? {};
+
+        bool needsUpload = false;
+        if (mergedRate != null && cloudRate != mergedRate) {
+          needsUpload = true;
+        }
+        if (mergedComps.isNotEmpty) {
+          for (var entry in mergedComps.entries) {
+            if (cloudComps[entry.key] != entry.value) {
+              needsUpload = true;
+              break;
+            }
+          }
+        }
+
+        if (needsUpload) {
+          updates.add({
+            'date': date,
+            'completionRate': ?mergedRate,
+            if (mergedComps.isNotEmpty) 'completions': mergedComps,
+          });
+        }
+      }
+
+      // Batch upload history updates to avoid sequential requests
+      if (updates.isNotEmpty) {
+        for (var i = 0; i < updates.length; i += 400) {
+          final chunk = updates.sublist(
             i,
-            i + 400 > entriesList.length ? entriesList.length : i + 400,
+            i + 400 > updates.length ? updates.length : i + 400,
           );
           final batch = _firestore.batch();
-          for (var entry in chunk) {
-            final docRef = _userDoc!.collection('habitHistory').doc(entry.key);
+          for (var update in chunk) {
+            final docRef = _userDoc!
+                .collection('habitHistory')
+                .doc(update['date'] as String);
             batch.set(
               docRef,
               {
-                'date': entry.key,
-                'completionRate': entry.value,
+                ...update,
                 'updatedAt': FieldValue.serverTimestamp(),
               },
               SetOptions(merge: true),
@@ -409,11 +530,27 @@ class FirestoreService {
         }
       }
 
-      return mergedHistory;
+      return HabitHistoryCloudBundle(
+        rates: mergedRates,
+        completions: mergedCompletions,
+      );
     } catch (e) {
-      debugPrint('Error syncing habit history: $e');
-      return localHistory;
+      debugPrint('Error syncing full habit history: $e');
+      return HabitHistoryCloudBundle(
+        rates: localRates,
+        completions: localCompletions,
+      );
     }
+  }
+
+  Future<Map<String, String>> syncHabitHistory(
+    Map<String, String> localHistory,
+  ) async {
+    final bundle = await syncHabitHistoryWithCompletions(
+      localRates: localHistory,
+      localCompletions: const {},
+    );
+    return bundle.rates;
   }
 
   Future<DateTime?> getLastSyncTime() async {
