@@ -34,16 +34,17 @@ class HabitStatsRepositoryImpl implements HabitStatsRepository {
     int days,
   ) {
     return NetworkErrorHandler.guard(() async {
-      final results = await Future.wait([
-        habitRepository.getHabits(),
-        habitRepository.getHeatmapData(),
-        habitRepository.getHabitHistoryMap(days),
-      ]).timeout(
-        requestTimeout,
-        onTimeout: () => throw const TimeoutAppException(
-          'Habit stats calculation request timed out. Please try again.',
-        ),
-      );
+      final results =
+          await Future.wait([
+            habitRepository.getHabits(),
+            habitRepository.getHeatmapData(),
+            habitRepository.getHabitHistoryMap(days),
+          ]).timeout(
+            requestTimeout,
+            onTimeout: () => throw const TimeoutAppException(
+              'Habit stats calculation request timed out. Please try again.',
+            ),
+          );
 
       final habitsEither = results[0] as Either<Failure, List<HabitEntity>>;
       final heatmapEither = results[1] as Either<Failure, Map<DateTime, int>>;
