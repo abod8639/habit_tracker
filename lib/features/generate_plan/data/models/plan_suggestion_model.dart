@@ -6,6 +6,10 @@ class PlanSuggestionModel extends PlanSuggestion {
     required super.description,
     required super.frequency,
     required super.category,
+    super.tier,
+    super.personalReason,
+    super.levelUp,
+    super.dailyMinutes,
     super.isSelected = true,
   });
 
@@ -15,6 +19,10 @@ class PlanSuggestionModel extends PlanSuggestion {
       description: _parseString(json['description'], fallback: ''),
       frequency: _parseString(json['frequency'], fallback: 'daily'),
       category: _parseString(json['category'], fallback: ''),
+      tier: HabitTier.fromString(json['tier']?.toString()),
+      personalReason: _parseString(json['personalReason'], fallback: ''),
+      levelUp: _parseString(json['levelUp'], fallback: ''),
+      dailyMinutes: PlanSuggestion.parseMinutes(json['dailyMinutes']),
       isSelected: _parseBool(json['isSelected'], fallback: true),
     );
   }
@@ -42,6 +50,10 @@ class PlanSuggestionModel extends PlanSuggestion {
       'description': description,
       'frequency': frequency,
       'category': category,
+      'tier': tier.name,
+      'personalReason': personalReason,
+      'levelUp': levelUp,
+      'dailyMinutes': dailyMinutes,
       'isSelected': isSelected,
     };
   }
@@ -52,6 +64,10 @@ class PlanSuggestionModel extends PlanSuggestion {
       description: entity.description,
       frequency: entity.frequency,
       category: entity.category,
+      tier: entity.tier,
+      personalReason: entity.personalReason,
+      levelUp: entity.levelUp,
+      dailyMinutes: entity.dailyMinutes,
       isSelected: entity.isSelected,
     );
   }
