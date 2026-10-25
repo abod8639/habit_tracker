@@ -32,7 +32,10 @@ class CompletionPieChartCard extends ConsumerWidget {
     final isPhone = ResponsiveUtils.isPhone(context);
 
     final Color completedColor = colorScheme.primary; // Emerald
-    final Color incompleteColor = colorScheme.error.withValues(alpha: 0.85);
+    // "Not yet" is an engraved neutral track, not an error (no shame, CD8).
+    final Color incompleteColor = isDark
+        ? Colors.black.withValues(alpha: 0.35)
+        : const Color(0xFFA3B1C6).withValues(alpha: 0.35);
 
     if (stats == null || stats.totalHabits <= 0) {
       if (isCompact) {
@@ -147,7 +150,7 @@ class CompletionPieChartCard extends ConsumerWidget {
                               value: incompleteHabits.toDouble(),
                               showTitle: false,
                               radius: 6,
-                              color: Theme.of(context).colorScheme.error,
+                              color: incompleteColor,
                             ),
                         ],
                       ),
