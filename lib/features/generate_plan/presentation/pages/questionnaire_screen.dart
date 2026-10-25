@@ -10,6 +10,8 @@ import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/plan_generator_providers.dart';
+import 'package:habit_tracker/core/components/neu_surface.dart';
+import '../widgets/octalysis_generation_loader.dart';
 import '../widgets/question_content.dart';
 
 class QuestionnaireScreen extends ConsumerWidget {
@@ -48,8 +50,8 @@ class QuestionnaireScreen extends ConsumerWidget {
             (errorObj is Failure
                 ? errorObj.toMessage()
                 : (asyncVal.value?.errorMessage.isNotEmpty == true
-                    ? asyncVal.value!.errorMessage
-                    : S.current.planGenerationFailed));
+                      ? asyncVal.value!.errorMessage
+                      : S.current.planGenerationFailed));
 
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -95,11 +97,12 @@ class QuestionnaireScreen extends ConsumerWidget {
     return asyncPlan.when(
       loading: () => Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        body: const Center(child: CircularProgressIndicator.adaptive()),
+        body: const OctalysisGenerationLoader(),
       ),
       error: (err, _) {
-        final message =
-            err is Failure ? err.toMessage() : S.current.planGenerationFailed;
+        final message = err is Failure
+            ? err.toMessage()
+            : S.current.planGenerationFailed;
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
@@ -117,6 +120,42 @@ class QuestionnaireScreen extends ConsumerWidget {
             (asyncPlan.error is Failure
                 ? (asyncPlan.error as Failure).toMessage()
                 : state.errorMessage);
+
+        // ── CD7: Labor Illusion Ritual Screen during generation ──────────────
+        if (isLoading && state.isLastQuestion) {
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: SafeArea(
+              child: OctalysisGenerationLoader(
+                category: state.selectedCategory,
+              ),
+            ),
+          );
+        }
+
+        final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+        final progressVal = state.progress;
+        final String stepMilestone;
+        if (progressVal <= 0.35) {
+          stepMilestone = isArabic
+              ? '🏁 نقطة البداية • قياس الوضع الحالي'
+              : '🏁 Calibration • Starting Point';
+        } else if (progressVal <= 0.70) {
+          stepMilestone = isArabic
+              ? '⏱️ موازنة الوقت • تنظيم الروتين'
+              : '⏱️ Capacity • Daily Rhythm';
+        } else if (progressVal < 1.0) {
+          stepMilestone = isArabic
+              ? '🎯 الأهداف • ضبط الاستمرارية'
+              : '🎯 Trajectory • Core Targets';
+        } else {
+          stepMilestone = isArabic
+              ? '🚀 المحطة الأخيرة • جاهز للهندسة!'
+              : '🚀 Final Lap • Ready to Architect!';
+        }
+
+        final categoryColor =
+            state.selectedCategory?.color ?? theme.colorScheme.primary;
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
@@ -137,28 +176,28 @@ class QuestionnaireScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            state.selectedCategory?.displayName ?? '',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: theme.hintColor,
-                              fontWeight: FontWeight.w500,
+                          Expanded(
+                            child: Text(
+                              stepMilestone,
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.75,
+                                ),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                          Text(
-                            state.progressLabel,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: theme.hintColor,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          NeuChip(
+                            label: state.progressLabel,
+                            color: categoryColor,
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
                       NeumorphicProgressBar(
                         value: state.progress,
-                        accentColor: state.selectedCategory?.color,
+                        accentColor: categoryColor,
                         height: 8,
                       ),
                     ],
@@ -181,18 +220,21 @@ class QuestionnaireScreen extends ConsumerWidget {
                           duration: const Duration(milliseconds: 250),
                           transitionBuilder: (child, animation) =>
                               SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0.08, 0),
-                              end: Offset.zero,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeOutCubic,
+                                position:
+                                    Tween<Offset>(
+                                      begin: const Offset(0.08, 0),
+                                      end: Offset.zero,
+                                    ).animate(
+                                      CurvedAnimation(
+                                        parent: animation,
+                                        curve: Curves.easeOutCubic,
+                                      ),
+                                    ),
+                                child: FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                ),
                               ),
-                            ),
-                            child:
-                                FadeTransition(opacity: animation, child: child),
-                          ),
                           child: QuestionContent(
                             key: ValueKey(question.id),
                             question: question,
@@ -206,19 +248,12 @@ class QuestionnaireScreen extends ConsumerWidget {
                   if (hasInlineError && errorMessage.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                      child: Container(
+                      child: NeuSurface(
+                        depth: NeuDepth.inset,
+                        borderRadius: AppRadius.mdRadius,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.errorContainer
-                              .withValues(alpha: 0.2),
-                          borderRadius: AppRadius.mdRadius,
-                          border: Border.all(
-                            color: theme.colorScheme.error
-                                .withValues(alpha: 0.4),
-                          ),
                         ),
                         child: Row(
                           children: [
@@ -238,8 +273,13 @@ class QuestionnaireScreen extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            TextButton(
-                              onPressed: () => _handleNext(context, ref),
+                            NeuSurface(
+                              onTap: () => _handleNext(context, ref),
+                              borderRadius: AppRadius.pillRadius,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 7,
+                              ),
                               child: Text(
                                 S.current.retry,
                                 style: TextStyle(
@@ -266,8 +306,9 @@ class QuestionnaireScreen extends ConsumerWidget {
                           : Icons.arrow_forward_rounded,
                       isLoading: isLoading,
                       accentColor: state.selectedCategory?.color,
-                      onPressed:
-                          isLoading ? null : () => _handleNext(context, ref),
+                      onPressed: isLoading
+                          ? null
+                          : () => _handleNext(context, ref),
                       width: double.infinity,
                       height: 52,
                     ),
