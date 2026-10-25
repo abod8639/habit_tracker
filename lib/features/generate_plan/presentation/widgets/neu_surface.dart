@@ -24,6 +24,7 @@ class NeuSurface extends StatefulWidget {
   final Color? accentColor;
   final bool highlighted;
   final VoidCallback? onTap;
+  final List<BoxShadow>? shadows;
 
   const NeuSurface({
     super.key,
@@ -37,6 +38,7 @@ class NeuSurface extends StatefulWidget {
     this.accentColor,
     this.highlighted = false,
     this.onTap,
+    this.shadows,
   });
 
   @override
@@ -59,17 +61,7 @@ class _NeuSurfaceState extends State<NeuSurface> {
     final isInset = widget.depth == NeuDepth.inset || _isPressed;
     final isCircle = widget.shape == BoxShape.circle;
 
-    final List<BoxShadow> shadows;
-    if (isInset) {
-      shadows = AppShadows.insetInput(isDark: isDark);
-    } else if (widget.highlighted && widget.accentColor != null) {
-      shadows = AppShadows.selectedCard(
-        primary: widget.accentColor!,
-        isDark: isDark,
-      );
-    } else {
-      shadows = AppShadows.softCard(isDark: isDark);
-    }
+    final List<BoxShadow> shadows = widget.shadows ?? AppShadows.softCard(isDark: isDark);
 
     Widget surface = AnimatedContainer(
       duration: const Duration(milliseconds: 160),
@@ -196,6 +188,7 @@ class NeuOrb extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveColor = color ?? Theme.of(context).colorScheme.primary;
     return NeuSurface(
+
       shape: BoxShape.circle,
       depth: depth,
       width: size,
