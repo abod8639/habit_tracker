@@ -53,6 +53,7 @@ class WarpHabitNames extends ConsumerWidget {
           textColor: colorScheme.onSurface,
           textStyle: textTheme.labelMedium,
           isSelected: isAllSelected,
+          isDimmed: !isAllSelected,
           onTap: () => notifier.selectHabit(null),
         ),
         for (int i = 0; i < habitNames.length; i++) ...[
