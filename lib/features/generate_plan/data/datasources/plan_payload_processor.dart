@@ -49,7 +49,9 @@ class PlanPayloadProcessor {
   PlanPayloadProcessor._();
 
   /// Offloads parsing of Gemini response text to a background isolate.
-  static Future<List<PlanSuggestionModel>> parsePlanResponse(String responseText) {
+  static Future<List<PlanSuggestionModel>> parsePlanResponse(
+    String responseText,
+  ) {
     if (responseText.trim().isEmpty) {
       return Future.error(const FormatException('AI response was empty.'));
     }
