@@ -64,6 +64,41 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
     }).timeout(_batchTimeout);
   }
 
+  Future<Map<String, Map<String, bool>>> getAllCompletionsGroupedByDate() async {
+    try {
+      final records = await select(habitCompletions).get().timeout(_batchTimeout);
+      final Map<String, Map<String, bool>> result = {};
+      for (final r in records) {
+        result.putIfAbsent(r.dateStr, () => {})[r.habitId] = r.isCompleted;
+      }
+      return result;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> saveBulkCompletions(
+    Map<String, Map<String, bool>> completionsByDate,
+  ) async {
+    if (completionsByDate.isEmpty) return;
+    await batch((b) {
+      for (final dateEntry in completionsByDate.entries) {
+        final dateStr = dateEntry.key;
+        for (final habitEntry in dateEntry.value.entries) {
+          b.insert(
+            habitCompletions,
+            HabitCompletionsCompanion(
+              habitId: Value(habitEntry.key),
+              dateStr: Value(dateStr),
+              isCompleted: Value(habitEntry.value),
+            ),
+            mode: InsertMode.insertOrReplace,
+          );
+        }
+      }
+    }).timeout(_batchTimeout);
+  }
+
   Future<Map<DateTime, int>> getHeatmapData() async {
     // Query completion stats grouped by date with safe null-handling
     final results = await customSelect(
