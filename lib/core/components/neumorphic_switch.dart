@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A tactile Neumorphic / Soft UI toggle switch.
 /// Features a recessed debossed well track, extruded sliding thumb,
@@ -34,9 +33,7 @@ class NeumorphicSwitch extends StatelessWidget {
     final secondary = activeSecondaryColor ?? colorScheme.secondary;
 
     // Recessed well surface for the track
-    final Color wellBase = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.28) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.35) ?? baseColor);
+    final Color wellBase = ThemeUtils.debossedSurfaceColor(baseColor, isDark);
 
     final Color trackColor = value
         ? Color.alphaBlend(
@@ -46,13 +43,10 @@ class NeumorphicSwitch extends StatelessWidget {
         : wellBase;
 
     // Convex surface for inactive thumb
-    final Color surfaceStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.08) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.70) ?? baseColor);
-
-    final Color surfaceEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.20) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.12) ?? baseColor);
+    final Color surfaceStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     final double thumbSize = height - 6.0;
 
@@ -72,9 +66,7 @@ class NeumorphicSwitch extends StatelessWidget {
             border: Border.all(
               color: value
                   ? primary.withValues(alpha: isDark ? 0.40 : 0.28)
-                  : (isDark
-                        ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.white.withValues(alpha: 0.70)),
+                  : ThemeUtils.subtleBorderColor(isDark),
               width: 1.0,
             ),
             boxShadow: AppShadows.wellDual(isDark: isDark),
@@ -105,10 +97,8 @@ class NeumorphicSwitch extends StatelessWidget {
                       ),
                 border: Border.all(
                   color: value
-                      ? Colors.white.withValues(alpha: isDark ? 0.35 : 0.85)
-                      : (isDark
-                            ? Colors.white.withValues(alpha: 0.10)
-                            : Colors.white.withValues(alpha: 0.95)),
+                      ? colorScheme.onPrimary.withValues(alpha: isDark ? 0.35 : 0.85)
+                      : ThemeUtils.subtleBorderColor(isDark),
                   width: 1.0,
                 ),
                 boxShadow: value
@@ -135,9 +125,9 @@ class NeumorphicSwitch extends StatelessWidget {
                           height: 4,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.30)
-                                : Colors.black.withValues(alpha: 0.25),
+                            color: colorScheme.onSurface.withValues(
+                              alpha: isDark ? 0.30 : 0.25,
+                            ),
                           ),
                         ),
                 ),
