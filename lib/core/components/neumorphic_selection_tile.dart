@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// A reusable, tactile Neumorphic / Soft UI selection tile.
 /// Used for single choice options, multiple choice selections,
@@ -57,19 +56,14 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
     final effectiveAccent = widget.accentColor ?? colorScheme.primary;
     final effectiveRadius = widget.borderRadius ?? AppRadius.mdRadius;
 
-    final Color surfaceStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.35) ?? baseColor);
-
-    final Color surfaceEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.16) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.08) ?? baseColor);
+    final Color surfaceStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     final Color borderColor = widget.isSelected
         ? effectiveAccent.withValues(alpha: isDark ? 0.65 : 0.45)
-        : (isDark
-              ? Colors.white.withValues(alpha: _isPressed ? 0.03 : 0.06)
-              : Colors.white.withValues(alpha: _isPressed ? 0.35 : 0.85));
+        : ThemeUtils.subtleBorderColor(isDark, isPressed: _isPressed);
 
     final List<BoxShadow> effectiveShadows = widget.isSelected
         ? AppShadows.buttonPressed(isDark: isDark)
@@ -97,9 +91,7 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
                   border: Border.all(
                     color: widget.isSelected
                         ? effectiveAccent
-                        : (isDark
-                              ? Colors.white.withValues(alpha: 0.20)
-                              : const Color(0xFFA3B1C6)),
+                        : ThemeUtils.subtleBorderColor(isDark),
                     width: 1.5,
                   ),
                   boxShadow: widget.isSelected
@@ -107,11 +99,11 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
                       : null,
                 ),
                 child: widget.isSelected
-                    ? const Center(
+                    ? Center(
                         child: Icon(
                           Icons.check_rounded,
                           size: 14,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                         ),
                       )
                     : null,
