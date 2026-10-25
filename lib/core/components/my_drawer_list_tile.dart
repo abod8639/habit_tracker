@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 /// Reusable tactile Neumorphic navigation tile for App Drawers and side menus.
 class MyDrawerListTile extends StatefulWidget {
@@ -114,13 +113,10 @@ class _MyDrawerListTileState extends State<MyDrawerListTile>
             border: Border.all(
               color: widget.isSelected
                   ? colorScheme.primary.withValues(alpha: isDark ? 0.40 : 0.30)
-                  : (isDark
-                        ? Colors.white.withValues(
-                            alpha: _isHovered ? 0.08 : 0.03,
-                          )
-                        : Colors.white.withValues(
-                            alpha: _isHovered ? 0.90 : 0.70,
-                          )),
+                  : ThemeUtils.subtleBorderColor(
+                      isDark,
+                      isPressed: _isHovered,
+                    ),
               width: widget.isSelected ? 1.4 : 1.0,
             ),
           ),
