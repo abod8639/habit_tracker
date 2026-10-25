@@ -64,7 +64,9 @@ class _QuestionNumberInputState extends ConsumerState<QuestionNumberInput> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = ref.watch(
-      planGeneratorNotifierProvider.select((s) => s.value?.selectedCategory?.color),
+      planGeneratorNotifierProvider.select(
+        (s) => s.value?.selectedCategory?.color,
+      ),
     );
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
