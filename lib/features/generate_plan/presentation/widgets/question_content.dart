@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/page_entrance_transition.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../../domain/entities/question_entity.dart';
 import '../providers/plan_generator_providers.dart';
+import 'package:habit_tracker/core/components/neu_surface.dart';
 import 'question_choice_input.dart';
 import 'question_number_input.dart';
 import 'question_text_input.dart';
@@ -24,7 +24,8 @@ class QuestionContent extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    final accentColor = ref.watch(
+    final accentColor =
+        ref.watch(
           planGeneratorNotifierProvider.select(
             (s) => s.value?.selectedCategory?.color,
           ),
@@ -48,76 +49,38 @@ class QuestionContent extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
+                      NeuChip(
+                        icon: Icons.info_outline_rounded,
+                        label: S.current.optional,
+                        color: theme.hintColor,
+                      ),
+                      NeuSurface(
+                        onTap: () => ref
+                            .read(planGeneratorNotifierProvider.notifier)
+                            .next(),
+                        borderRadius: AppRadius.pillRadius,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius: AppRadius.smRadius,
-                          boxShadow: AppShadows.subtleCard(isDark: isDark),
-                          border: Border.all(
-                            color: colorScheme.outline.withValues(alpha: 0.12),
-                          ),
+                          horizontal: 12,
+                          vertical: 6,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.info_outline_rounded,
-                              size: 13,
-                              color: theme.hintColor,
-                            ),
-                            const SizedBox(width: 5),
                             Text(
-                              S.current.optional,
+                              S.current.skipNow,
                               style: TextStyle(
-                                fontSize: 11,
-                                color: theme.hintColor,
+                                fontSize: 11.5,
+                                color: accentColor,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 14,
+                              color: accentColor,
+                            ),
                           ],
-                        ),
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => ref
-                              .read(planGeneratorNotifierProvider.notifier)
-                              .next(),
-                          borderRadius: AppRadius.smRadius,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surface,
-                              borderRadius: AppRadius.smRadius,
-                              boxShadow: AppShadows.subtleCard(isDark: isDark),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  S.current.skipNow,
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    color: accentColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.arrow_forward_rounded,
-                                  size: 14,
-                                  color: accentColor,
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
                       ),
                     ],
@@ -141,22 +104,12 @@ class QuestionContent extends ConsumerWidget {
                 if (question.subtitle != null &&
                     question.subtitle!.trim().isNotEmpty) ...[
                   const SizedBox(height: 10),
-                  Container(
+                  NeuSurface(
+                    depth: NeuDepth.inset,
+                    borderRadius: AppRadius.mdRadius,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: accentColor.withValues(
-                        alpha: isDark ? 0.10 : 0.06,
-                      ),
-                      borderRadius: AppRadius.mdRadius,
-                      border: Border.all(
-                        color: accentColor.withValues(
-                          alpha: isDark ? 0.25 : 0.18,
-                        ),
-                        width: 1,
-                      ),
+                      vertical: 12,
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,16 +151,15 @@ class QuestionContent extends ConsumerWidget {
             index: 1,
             child: switch (question.type) {
               QuestionType.text => QuestionTextInput(
-                  question: question,
-                ),
+                question: question,
+              ),
               QuestionType.number => QuestionNumberInput(
-                  question: question,
-                ),
+                question: question,
+              ),
               QuestionType.singleChoice ||
-              QuestionType.multipleChoice =>
-                QuestionChoiceInput(
-                  question: question,
-                ),
+              QuestionType.multipleChoice => QuestionChoiceInput(
+                question: question,
+              ),
             },
           ),
 
