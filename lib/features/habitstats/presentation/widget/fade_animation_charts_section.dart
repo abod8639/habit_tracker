@@ -14,7 +14,7 @@ class FadeAnimationChartsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return PageEntranceTransition(
       animationController: _animationController,
-      index: 1,
+      index: 4,
       child: const ChartsSection(),
     );
   }
