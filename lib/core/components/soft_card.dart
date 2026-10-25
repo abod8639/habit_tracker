@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/core/theme/app_radius.dart';
-import 'package:habit_tracker/core/theme/app_shadows.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 
 class SoftCard extends StatelessWidget {
   final Widget child;
@@ -33,21 +32,17 @@ class SoftCard extends StatelessWidget {
 
     final baseColor = color ?? theme.cardColor;
 
-    final Color surfaceGradientStart = isDark
-        ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-        : (Color.lerp(baseColor, Colors.white, 0.25) ?? baseColor);
+    final Color surfaceGradientStart =
+        ThemeUtils.surfaceGradientStart(baseColor, isDark);
 
-    final Color surfaceGradientEnd = isDark
-        ? (Color.lerp(baseColor, Colors.black, 0.15) ?? baseColor)
-        : (Color.lerp(baseColor, const Color(0xFFA3B1C6), 0.09) ?? baseColor);
+    final Color surfaceGradientEnd =
+        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     final effectiveAccent = accentColor ?? theme.colorScheme.primary;
 
     final Color borderColor = isSelected
         ? effectiveAccent.withValues(alpha: isDark ? 0.60 : 0.45)
-        : (isDark
-              ? Colors.white.withValues(alpha: 0.06)
-              : Colors.white.withValues(alpha: 0.85));
+        : ThemeUtils.subtleBorderColor(isDark);
 
     final effectiveShadows =
         customShadows ??
