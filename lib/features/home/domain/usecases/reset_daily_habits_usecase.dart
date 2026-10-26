@@ -53,17 +53,17 @@ class ResetDailyHabitsUseCase {
                     ),
                   ),
                 );
-              }
 
-              // 4. Reset completion status for today
-              final resetResult = await repository.resetHabitsCompletion();
-              if (resetResult.isLeft()) {
-                return Left(
-                  resetResult.fold(
-                    (failure) => failure,
-                    (_) => throw StateError('Unreachable'),
-                  ),
-                );
+                // 4. Reset completion status for today
+                final resetResult = await repository.resetHabitsCompletion();
+                if (resetResult.isLeft()) {
+                  return Left(
+                    resetResult.fold(
+                      (failure) => failure,
+                      (_) => throw StateError('Unreachable'),
+                    ),
+                  );
+                }
               }
 
               // 5. Increment day count by actual days elapsed
