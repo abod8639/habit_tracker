@@ -135,10 +135,12 @@ extension AsyncValueAuthStateX on AsyncValue<AuthState> {
 class AuthNotifier extends AsyncNotifier<AuthState> {
   StreamSubscription<AuthEntity?>? _authSubscription;
   bool _isDisposed = false;
+  bool _isSyncing = false;
 
   @override
   FutureOr<AuthState> build() async {
     _isDisposed = false;
+    _isSyncing = false;
     ref.onDispose(() {
       _isDisposed = true;
       _authSubscription?.cancel();
@@ -188,7 +190,8 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   }
 
   Future<void> _syncUserDataAfterAuth() async {
-    if (_isDisposed) return;
+    if (_isDisposed || _isSyncing) return;
+    _isSyncing = true;
     final fcm = ref.read(fcmServiceProvider);
     fcm?.syncTokenToFirestore();
 
@@ -203,6 +206,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     } catch (e) {
       debugPrint('[AuthNotifier] Auto sync after authentication failed: $e');
     } finally {
+      _isSyncing = false;
       if (!_isDisposed) {
         try {
           await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
