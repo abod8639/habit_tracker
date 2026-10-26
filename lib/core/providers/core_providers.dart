@@ -44,11 +44,12 @@ final keyValueStorageProvider = Provider<KeyValueStorage>((ref) {
 });
 
 /// Theme storage service provider
-final themeStorageServiceProvider = Provider<ThemeStorageService?>((ref) {
+final themeStorageServiceProvider = Provider<ThemeStorageService>((ref) {
   try {
     return AppInitializer.themeStorage;
   } catch (_) {
-    return null;
+    final storage = ref.watch(keyValueStorageProvider);
+    return ThemeStorageService(storage);
   }
 });
 
