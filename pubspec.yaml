@@ -43,6 +43,7 @@ dependencies:
   path: ^1.9.1
   sqlite3_flutter_libs: ^0.6.0+eol
   showcaseview: ^5.1.0
+  flutter_secure_storage: ^11.2.0
 
 dev_dependencies:
   build_runner: ^2.4.13
