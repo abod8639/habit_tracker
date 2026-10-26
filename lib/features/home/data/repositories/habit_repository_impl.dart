@@ -26,11 +26,25 @@ class HabitRepositoryImpl implements HabitRepository {
   });
 
   static const Duration _cloudTimeout = Duration(seconds: 15);
+  Timer? _uploadHabitsDebounceTimer;
+
+  void _debounceUploadHabits(List<HabitModel> models) {
+    _uploadHabitsDebounceTimer?.cancel();
+    _uploadHabitsDebounceTimer = Timer(const Duration(milliseconds: 1500), () async {
+      if (firestoreService.isUserLoggedIn) {
+        try {
+          await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
+        } catch (e) {
+          debugPrint('Debounced cloud sync error on toggle: $e');
+        }
+      }
+    });
+  }
 
   @override
   Future<Either<Failure, List<HabitEntity>>> getHabits() async {
     return NetworkErrorHandler.guard(() async {
-      final models = localDataSource.loadHabits();
+      final models = await localDataSource.fetchHabitsFromDb();
       return await HabitPayloadProcessor.modelsToEntities(models);
     });
   }
@@ -191,7 +205,6 @@ class HabitRepositoryImpl implements HabitRepository {
 
         if (firestoreService.isUserLoggedIn) {
           try {
-            await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
             await firestoreService.uploadHabitCompletion(
               m.id,
               todaysDateFormatted(),
@@ -201,6 +214,7 @@ class HabitRepositoryImpl implements HabitRepository {
           } catch (e) {
             debugPrint('Cloud sync error on toggle: $e');
           }
+          _debounceUploadHabits(models);
         }
       }
     });
@@ -391,7 +405,9 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<Either<Failure, void>> resetHabitsCompletion() async {
     return NetworkErrorHandler.guard(() async {
-      final habits = localDataSource.loadHabits();
+      final habits = await localDataSource.fetchHabitsFromDb();
+      if (habits.isEmpty) return;
+
       final resetHabits = habits
           .map(
             (h) => HabitModel(
