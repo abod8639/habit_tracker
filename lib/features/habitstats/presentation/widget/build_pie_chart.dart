@@ -24,7 +24,9 @@ class CompletionPieChartCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stats = ref.watch(habitStatsNotifierProvider).value?.stats;
+    final stats = ref.watch(
+      habitStatsNotifierProvider.select((s) => s.value?.stats),
+    );
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
