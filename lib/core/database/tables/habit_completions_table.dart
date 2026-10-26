@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 @DataClassName('HabitCompletionRecord')
 @TableIndex(name: 'idx_completions_date', columns: {#dateStr})
+@TableIndex(name: 'idx_completions_habit', columns: {#habitId})
 class HabitCompletions extends Table {
   TextColumn get habitId => text()();
   TextColumn get dateStr => text()(); // e.g. 'YYYYMMDD'
