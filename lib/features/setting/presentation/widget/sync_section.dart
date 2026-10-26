@@ -43,7 +43,6 @@ class SyncSection extends ConsumerWidget {
     });
 
     final syncState = ref.watch(syncNotifierProvider);
-    final syncNotifier = ref.watch(syncNotifierProvider.notifier);
     final isError = syncState.syncStatus == SyncStatus.error;
 
     return Column(
@@ -61,7 +60,7 @@ class SyncSection extends ConsumerWidget {
           textColor: isError ? Theme.of(context).colorScheme.error : null,
           onTap: syncState.syncStatus == SyncStatus.syncing
               ? null
-              : () => syncNotifier.syncHabits(),
+              : () => ref.read(syncNotifierProvider.notifier).syncHabits(),
         ),
       ],
     );
