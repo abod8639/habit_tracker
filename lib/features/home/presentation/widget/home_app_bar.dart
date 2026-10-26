@@ -25,7 +25,6 @@ class HomeAppBar extends ConsumerWidget {
     final selectedCount = ref.watch(
       habitNotifierProvider.select((s) => s.selectedHabitIds.length),
     );
-    final habitNotifier = ref.watch(habitNotifierProvider.notifier);
 
     if (isSelectionMode) {
       final theme = Theme.of(context);
@@ -75,7 +74,8 @@ class HomeAppBar extends ConsumerWidget {
               size: 46,
               icon: Icons.close_rounded,
               tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              onPressed: () => habitNotifier.clearSelection(),
+              onPressed: () =>
+                  ref.read(habitNotifierProvider.notifier).clearSelection(),
             ),
           ),
         ),
@@ -125,7 +125,10 @@ class HomeAppBar extends ConsumerWidget {
               icon: Icons.palette_outlined,
               iconColor: colorScheme.primary,
               tooltip: S.of(context).chooseColor,
-              onPressed: () => _showColorPicker(context, habitNotifier),
+              onPressed: () => _showColorPicker(
+                context,
+                ref.read(habitNotifierProvider.notifier),
+              ),
             ),
           ),
           const SizedBox(width: 10),
@@ -139,7 +142,7 @@ class HomeAppBar extends ConsumerWidget {
                 tooltip: S.of(context).delete,
                 onPressed: () => _showBatchDeleteConfirm(
                   context,
-                  habitNotifier,
+                  ref.read(habitNotifierProvider.notifier),
                   selectedCount,
                 ),
               ),
