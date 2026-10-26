@@ -56,6 +56,7 @@ class FcmService {
       );
 
       // 3. Get FCM token
+      // ignore: deprecated_member_use
       final token = await _messaging.getToken();
       if (token != null) {
         fcmToken = token;
@@ -64,6 +65,7 @@ class FcmService {
       }
 
       // 4. Listen for token refresh
+      // ignore: deprecated_member_use
       _messaging.onTokenRefresh.listen((newToken) async {
         fcmToken = newToken;
         debugPrint('FCM Token refreshed: $newToken');
