@@ -195,7 +195,7 @@ class _MonthlySummaryState extends ConsumerState<MonthlySummary>
     DateTime startDateTime;
     try {
       startDateTime = createDateTimeObject(
-        ref.watch(habitNotifierProvider.notifier).getStartDay(),
+        ref.watch(habitStartDayProvider),
       );
     } catch (_) {
       startDateTime = DateTime(today.year, today.month, today.day - 49);
