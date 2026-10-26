@@ -45,6 +45,18 @@ class FirestoreService {
     }
   }
 
+  // Get user start day from cloud
+  Future<String?> getUserStartDay() async {
+    if (!isUserLoggedIn || _userDoc == null) return null;
+    try {
+      final userDoc = await _userDoc!.get();
+      final userData = userDoc.data() as Map<String, dynamic>?;
+      return userData?['startDay'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   // Get user document reference
   DocumentReference? get _userDoc {
     if (_userId == null) return null;
