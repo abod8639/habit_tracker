@@ -32,23 +32,39 @@ class TrendChartCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final state =
-        ref.watch(habitStatsNotifierProvider).value ?? const HabitStatsState();
+    final showAllHabits = ref.watch(
+      habitStatsNotifierProvider
+          .select((s) => s.value?.showAllHabits ?? false),
+    );
+    final isWeeklyView = ref.watch(
+      habitStatsNotifierProvider
+          .select((s) => s.value?.isWeeklyView ?? true),
+    );
+    final isLoading = ref.watch(
+      habitStatsNotifierProvider
+          .select((s) => s.value?.isLoading ?? false),
+    );
+    final trendSpots = ref.watch(
+      habitStatsNotifierProvider
+          .select((s) => s.value?.overallTrend ?? const []),
+    );
+    final hasIndividualData = ref.watch(
+      habitStatsNotifierProvider
+          .select((s) => s.value?.individualTrends.isNotEmpty ?? false),
+    );
     final notifier = ref.read(habitStatsNotifierProvider.notifier);
 
-    final List<FlSpot> trendSpots = state.overallTrend;
     final bool hasOverallData =
         trendSpots.isNotEmpty &&
         !(trendSpots.length <= 1 && trendSpots[0] == const FlSpot(0, 0));
-    final bool hasIndividualData = state.individualTrends.isNotEmpty;
 
-    final bool isEmpty = state.showAllHabits
+    final bool isEmpty = showAllHabits
         ? !hasOverallData
         : !hasIndividualData;
 
     final colorScheme = Theme.of(context).colorScheme;
 
-    if (isEmpty && state.isLoading) {
+    if (isEmpty && isLoading) {
       return SoftCard(
         child: SizedBox(
           height: 240,
@@ -62,7 +78,7 @@ class TrendChartCard extends ConsumerWidget {
       );
     }
 
-    if (isEmpty && !state.isLoading) {
+    if (isEmpty && !isLoading) {
       return SoftCard(
         child: NeumorphicEmptyState(
           icon: Icons.trending_up_rounded,
@@ -82,10 +98,10 @@ class TrendChartCard extends ConsumerWidget {
               children: [
                 NeumorphicPillToggle(
                   options: [S.current.weekly, S.current.monthly],
-                  selectedIndex: state.isWeeklyView ? 0 : 1,
+                  selectedIndex: isWeeklyView ? 0 : 1,
                   onSelect: (index) {
-                    if ((index == 0 && !state.isWeeklyView) ||
-                        (index == 1 && state.isWeeklyView)) {
+                    if ((index == 0 && !isWeeklyView) ||
+                        (index == 1 && isWeeklyView)) {
                       notifier.togglePeriod();
                     }
                   },
@@ -94,11 +110,11 @@ class TrendChartCard extends ConsumerWidget {
                 NeumorphicIconButton(
                   customShadows: AppShadows.softCard(isDark: isDark),
                   size: 36,
-                  icon: state.showAllHabits
+                  icon: showAllHabits
                       ? Icons.stacked_line_chart_rounded
                       : Icons.view_list_rounded,
                   accentColor: colorScheme.primary,
-                  tooltip: state.showAllHabits
+                  tooltip: showAllHabits
                       ? 'Show individual habits'
                       : 'Show overall trend',
                   onPressed: () => notifier.toggleShowAllHabits(),
@@ -108,7 +124,7 @@ class TrendChartCard extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           const LineChartBox(),
-          if (state.showAllHabits) ...[
+          if (showAllHabits) ...[
             const SizedBox(height: 16),
             const WarpHabitNames(),
           ],
