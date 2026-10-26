@@ -76,7 +76,7 @@ void main() {
           PlanCategory.sports,
         );
         expect(arQuestions.isNotEmpty, true);
-        expect(arQuestions.first.text, 'كم عمرك؟');
+        expect(arQuestions.first.text, 'كم عمرك الحالي؟');
 
         // Test English
         Intl.defaultLocale = 'en';
