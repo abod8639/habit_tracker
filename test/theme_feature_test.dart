@@ -45,12 +45,18 @@ void main() {
       final modelHex = ThemeModel.fromJson({
         'customBgColor': '#FF00FF',
       });
-      expect(modelHex.customBackgroundColor?.toARGB32(), const Color(0xFFFF00FF).toARGB32());
+      expect(
+        modelHex.customBackgroundColor?.toARGB32(),
+        const Color(0xFFFF00FF).toARGB32(),
+      );
 
       final modelInt = ThemeModel.fromJson({
         'customBgColor': 0xFF123456,
       });
-      expect(modelInt.customBackgroundColor?.toARGB32(), const Color(0xFF123456).toARGB32());
+      expect(
+        modelInt.customBackgroundColor?.toARGB32(),
+        const Color(0xFF123456).toARGB32(),
+      );
     });
 
     test('round-trips toJsonString and fromJsonString', () {

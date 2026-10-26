@@ -154,7 +154,9 @@ class HabitState {
       selectedHabitIds: selectedHabitIds ?? this.selectedHabitIds,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
-      activeFailure: clearActiveFailure ? null : (activeFailure ?? this.activeFailure),
+      activeFailure: clearActiveFailure
+          ? null
+          : (activeFailure ?? this.activeFailure),
       isInitialized: isInitialized ?? this.isInitialized,
     );
   }

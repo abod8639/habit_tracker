@@ -41,7 +41,9 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
 
   /// Default fallback instance when no extension is found in current theme context.
   factory AppThemeColors.fallback(bool isDark) {
-    final surfaceColor = isDark ? const Color(0xFF1E2228) : const Color(0xFFE8EEF5);
+    final surfaceColor = isDark
+        ? const Color(0xFF1E2228)
+        : const Color(0xFFE8EEF5);
     return AppThemeColors.fromTheme(isDark: isDark, surfaceColor: surfaceColor);
   }
 
@@ -79,7 +81,11 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       drawerScanIcon: Color.lerp(drawerScanIcon, other.drawerScanIcon, t)!,
       drawerStatsIcon: Color.lerp(drawerStatsIcon, other.drawerStatsIcon, t)!,
       drawerAiIcon: Color.lerp(drawerAiIcon, other.drawerAiIcon, t)!,
-      drawerSettingsIcon: Color.lerp(drawerSettingsIcon, other.drawerSettingsIcon, t)!,
+      drawerSettingsIcon: Color.lerp(
+        drawerSettingsIcon,
+        other.drawerSettingsIcon,
+        t,
+      )!,
     );
   }
 }

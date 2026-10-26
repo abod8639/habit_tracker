@@ -49,7 +49,10 @@ class AiEmptyState extends StatelessWidget {
             PageEntranceTransition(
               index: 0,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 28,
+                ),
                 decoration: BoxDecoration(
                   color: surface,
                   borderRadius: AppRadius.dialogRadius,
@@ -98,7 +101,10 @@ class AiEmptyState extends StatelessWidget {
               child: Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 6, bottom: 12),
+                  padding: const EdgeInsetsDirectional.only(
+                    start: 6,
+                    bottom: 12,
+                  ),
                   child: Text(
                     Localizations.localeOf(context).languageCode == 'ar'
                         ? 'اقتراحات للبدء:'

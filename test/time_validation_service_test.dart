@@ -24,110 +24,155 @@ void main() {
   });
 
   group('TimeValidationService Tests', () {
-    test('Detects synchronous rollback when last valid timestamp is in the future', () async {
-      final futureTimestamp = DateTime.now().toUtc().add(const Duration(hours: 2)).millisecondsSinceEpoch;
-      await storage.setInt(TimeValidationService.keyLastValidTimestampMs, futureTimestamp);
+    test(
+      'Detects synchronous rollback when last valid timestamp is in the future',
+      () async {
+        final futureTimestamp = DateTime.now()
+            .toUtc()
+            .add(const Duration(hours: 2))
+            .millisecondsSinceEpoch;
+        await storage.setInt(
+          TimeValidationService.keyLastValidTimestampMs,
+          futureTimestamp,
+        );
 
-      final service = TimeValidationService(
-        storage: storage,
-        db: db,
-      );
+        final service = TimeValidationService(
+          storage: storage,
+          db: db,
+        );
 
-      expect(service.isClockRolledBackSynchronously(), isTrue);
-    });
+        expect(service.isClockRolledBackSynchronously(), isTrue);
+      },
+    );
 
-    test('Passes synchronous check when last valid timestamp is reasonable', () async {
-      final pastTimestamp = DateTime.now().toUtc().subtract(const Duration(minutes: 10)).millisecondsSinceEpoch;
-      await storage.setInt(TimeValidationService.keyLastValidTimestampMs, pastTimestamp);
+    test(
+      'Passes synchronous check when last valid timestamp is reasonable',
+      () async {
+        final pastTimestamp = DateTime.now()
+            .toUtc()
+            .subtract(const Duration(minutes: 10))
+            .millisecondsSinceEpoch;
+        await storage.setInt(
+          TimeValidationService.keyLastValidTimestampMs,
+          pastTimestamp,
+        );
 
-      final service = TimeValidationService(
-        storage: storage,
-        db: db,
-      );
+        final service = TimeValidationService(
+          storage: storage,
+          db: db,
+        );
 
-      expect(service.isClockRolledBackSynchronously(), isFalse);
-    });
+        expect(service.isClockRolledBackSynchronously(), isFalse);
+      },
+    );
 
-    test('Detects tampering when device date is earlier than existing recorded completions', () async {
-      // Record a completion with date 20991231 (in the far future relative to today)
-      await db.habitHistoryDao.recordCompletion('h1', '20991231', true);
+    test(
+      'Detects tampering when device date is earlier than existing recorded completions',
+      () async {
+        // Record a completion with date 20991231 (in the far future relative to today)
+        await db.habitHistoryDao.recordCompletion('h1', '20991231', true);
 
-      final service = TimeValidationService(
-        storage: storage,
-        db: db,
-      );
+        final service = TimeValidationService(
+          storage: storage,
+          db: db,
+        );
 
-      final result = await service.validateTime();
-      expect(result.isTampered, isTrue);
-      expect(result.reason, contains('Device date is earlier than existing habit completions'));
-    });
+        final result = await service.validateTime();
+        expect(result.isTampered, isTrue);
+        expect(
+          result.reason,
+          contains('Device date is earlier than existing habit completions'),
+        );
+      },
+    );
 
-    test('Detects tampering when network time differs by more than 30 minutes', () async {
-      // Mock HTTP client that returns a server time 3 hours ahead of device
-      final serverUtc = DateTime.now().toUtc().add(const Duration(hours: 3));
-      final rfc1123Date = HttpDate.format(serverUtc);
+    test(
+      'Detects tampering when network time differs by more than 30 minutes',
+      () async {
+        // Mock HTTP client that returns a server time 3 hours ahead of device
+        final serverUtc = DateTime.now().toUtc().add(const Duration(hours: 3));
+        final rfc1123Date = HttpDate.format(serverUtc);
 
-      final mockClient = MockClient((request) async {
-        return http.Response('', 200, headers: {'date': rfc1123Date});
-      });
+        final mockClient = MockClient((request) async {
+          return http.Response('', 200, headers: {'date': rfc1123Date});
+        });
 
-      final service = TimeValidationService(
-        storage: storage,
-        db: db,
-        httpClient: mockClient,
-      );
+        final service = TimeValidationService(
+          storage: storage,
+          db: db,
+          httpClient: mockClient,
+        );
 
-      final result = await service.validateTime();
-      expect(result.isTampered, isTrue);
-      expect(result.reason, contains('Device clock does not match network time'));
-    });
+        final result = await service.validateTime();
+        expect(result.isTampered, isTrue);
+        expect(
+          result.reason,
+          contains('Device clock does not match network time'),
+        );
+      },
+    );
 
-    test('Passes validation when device time matches network time within tolerance', () async {
-      // Server time matches device within 1 minute
-      final serverUtc = DateTime.now().toUtc();
-      final rfc1123Date = HttpDate.format(serverUtc);
+    test(
+      'Passes validation when device time matches network time within tolerance',
+      () async {
+        // Server time matches device within 1 minute
+        final serverUtc = DateTime.now().toUtc();
+        final rfc1123Date = HttpDate.format(serverUtc);
 
-      final mockClient = MockClient((request) async {
-        return http.Response('', 200, headers: {'date': rfc1123Date});
-      });
+        final mockClient = MockClient((request) async {
+          return http.Response('', 200, headers: {'date': rfc1123Date});
+        });
 
-      final service = TimeValidationService(
-        storage: storage,
-        db: db,
-        httpClient: mockClient,
-      );
+        final service = TimeValidationService(
+          storage: storage,
+          db: db,
+          httpClient: mockClient,
+        );
 
-      final result = await service.validateTime();
-      expect(result.isTampered, isFalse);
-      expect(result.trustedTime, isNotNull);
-    });
+        final result = await service.validateTime();
+        expect(result.isTampered, isFalse);
+        expect(result.trustedTime, isNotNull);
+      },
+    );
 
-    test('Heals poisoned future timestamp when network confirms current time is real', () async {
-      // Simulate stored timestamp set to year 2099 from an earlier forward jump
-      final futureTimestamp = DateTime(2099, 1, 1).toUtc().millisecondsSinceEpoch;
-      await storage.setInt(TimeValidationService.keyLastValidTimestampMs, futureTimestamp);
+    test(
+      'Heals poisoned future timestamp when network confirms current time is real',
+      () async {
+        // Simulate stored timestamp set to year 2099 from an earlier forward jump
+        final futureTimestamp = DateTime(
+          2099,
+          1,
+          1,
+        ).toUtc().millisecondsSinceEpoch;
+        await storage.setInt(
+          TimeValidationService.keyLastValidTimestampMs,
+          futureTimestamp,
+        );
 
-      // Real network time matches current device time
-      final serverUtc = DateTime.now().toUtc();
-      final rfc1123Date = HttpDate.format(serverUtc);
-      final parsedServerUtc = HttpDate.parse(rfc1123Date);
+        // Real network time matches current device time
+        final serverUtc = DateTime.now().toUtc();
+        final rfc1123Date = HttpDate.format(serverUtc);
+        final parsedServerUtc = HttpDate.parse(rfc1123Date);
 
-      final mockClient = MockClient((request) async {
-        return http.Response('', 200, headers: {'date': rfc1123Date});
-      });
+        final mockClient = MockClient((request) async {
+          return http.Response('', 200, headers: {'date': rfc1123Date});
+        });
 
-      final service = TimeValidationService(
-        storage: storage,
-        db: db,
-        httpClient: mockClient,
-      );
+        final service = TimeValidationService(
+          storage: storage,
+          db: db,
+          httpClient: mockClient,
+        );
 
-      final result = await service.validateTime();
-      expect(result.isTampered, isFalse);
+        final result = await service.validateTime();
+        expect(result.isTampered, isFalse);
 
-      // Verify that the poisoned future timestamp was healed in storage
-      final healedMs = storage.getInt(TimeValidationService.keyLastValidTimestampMs);
-      expect(healedMs, equals(parsedServerUtc.millisecondsSinceEpoch));
-    });
+        // Verify that the poisoned future timestamp was healed in storage
+        final healedMs = storage.getInt(
+          TimeValidationService.keyLastValidTimestampMs,
+        );
+        expect(healedMs, equals(parsedServerUtc.millisecondsSinceEpoch));
+      },
+    );
   });
 }

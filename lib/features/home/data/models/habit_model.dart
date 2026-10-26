@@ -101,12 +101,12 @@ class HabitModel {
       name: _parseString(map['name'], fallback: 'Unnamed Habit'),
       isCompleted: _parseBool(map['isCompleted'], fallback: false),
       createdAt: _parseDate(map['createdAt']),
-      completedAt:
-          map['completedAt'] != null ? _parseDate(map['completedAt']) : null,
+      completedAt: map['completedAt'] != null
+          ? _parseDate(map['completedAt'])
+          : null,
       colorValue: _parseInt(map['colorValue']),
       index: _parseInt(map['index'], fallback: 0) ?? 0,
-      updatedAt:
-          map['updatedAt'] != null ? _parseDate(map['updatedAt']) : null,
+      updatedAt: map['updatedAt'] != null ? _parseDate(map['updatedAt']) : null,
     );
   }
 
@@ -166,8 +166,12 @@ class HabitModel {
 
   // Deprecated: Used for migration from old list format with safety bounds
   factory HabitModel.fromLocalFormat(List<dynamic> data) {
-    final name = data.isNotEmpty ? data[0]?.toString() ?? 'Unnamed Habit' : 'Unnamed Habit';
-    final isCompleted = data.length > 1 ? _parseBool(data[1], fallback: false) : false;
+    final name = data.isNotEmpty
+        ? data[0]?.toString() ?? 'Unnamed Habit'
+        : 'Unnamed Habit';
+    final isCompleted = data.length > 1
+        ? _parseBool(data[1], fallback: false)
+        : false;
 
     return HabitModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),

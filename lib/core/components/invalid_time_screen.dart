@@ -29,8 +29,9 @@ class _InvalidTimeScreenState extends ConsumerState<InvalidTimeScreen> {
     setState(() => _isRetrying = true);
 
     try {
-      final result =
-          await ref.read(timeValidationNotifierProvider.notifier).validate();
+      final result = await ref
+          .read(timeValidationNotifierProvider.notifier)
+          .validate();
 
       if (!mounted) return;
 
@@ -78,9 +79,13 @@ class _InvalidTimeScreenState extends ConsumerState<InvalidTimeScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final validationState = ref.watch(timeValidationNotifierProvider);
-    final currentTime = validationState.deviceTime ?? widget.deviceTime ?? DateTime.now();
+    final currentTime =
+        validationState.deviceTime ?? widget.deviceTime ?? DateTime.now();
 
-    final formattedDeviceTime = DateFormat('yyyy-MM-dd • hh:mm a', 'en').format(currentTime);
+    final formattedDeviceTime = DateFormat(
+      'yyyy-MM-dd • hh:mm a',
+      'en',
+    ).format(currentTime);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -106,7 +111,9 @@ class _InvalidTimeScreenState extends ConsumerState<InvalidTimeScreen> {
                         shape: BoxShape.circle,
                         boxShadow: AppShadows.softCard(isDark: isDark),
                         border: Border.all(
-                          color: theme.colorScheme.error.withValues(alpha: 0.35),
+                          color: theme.colorScheme.error.withValues(
+                            alpha: 0.35,
+                          ),
                           width: 2,
                         ),
                       ),
@@ -161,7 +168,9 @@ class _InvalidTimeScreenState extends ConsumerState<InvalidTimeScreen> {
                     child: Text(
                       S.of(context).invalidTimeDesc,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.72,
+                        ),
                         height: 1.6,
                       ),
                       textAlign: TextAlign.center,
@@ -182,7 +191,9 @@ class _InvalidTimeScreenState extends ConsumerState<InvalidTimeScreen> {
                         borderRadius: AppRadius.mdRadius,
                         boxShadow: AppShadows.softCard(isDark: isDark),
                         border: Border.all(
-                          color: theme.colorScheme.outline.withValues(alpha: 0.15),
+                          color: theme.colorScheme.outline.withValues(
+                            alpha: 0.15,
+                          ),
                         ),
                       ),
                       child: Row(
@@ -196,10 +207,14 @@ class _InvalidTimeScreenState extends ConsumerState<InvalidTimeScreen> {
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
-                              S.of(context).invalidTimeDeviceTime(formattedDeviceTime),
+                              S
+                                  .of(context)
+                                  .invalidTimeDeviceTime(formattedDeviceTime),
                               style: theme.textTheme.labelMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.85,
+                                ),
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),

@@ -64,9 +64,12 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
     }).timeout(_batchTimeout);
   }
 
-  Future<Map<String, Map<String, bool>>> getAllCompletionsGroupedByDate() async {
+  Future<Map<String, Map<String, bool>>>
+  getAllCompletionsGroupedByDate() async {
     try {
-      final records = await select(habitCompletions).get().timeout(_batchTimeout);
+      final records = await select(
+        habitCompletions,
+      ).get().timeout(_batchTimeout);
       final Map<String, Map<String, bool>> result = {};
       for (final r in records) {
         result.putIfAbsent(r.dateStr, () => {})[r.habitId] = r.isCompleted;
@@ -127,7 +130,9 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
     return _processHeatmapRows(rawRows);
   }
 
-  static Map<DateTime, int> _processHeatmapRows(List<Map<String, dynamic>> rows) {
+  static Map<DateTime, int> _processHeatmapRows(
+    List<Map<String, dynamic>> rows,
+  ) {
     final Map<DateTime, int> heatmap = {};
 
     for (final row in rows) {
@@ -173,11 +178,15 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
 
     final records = await query.get().timeout(_batchTimeout);
 
-    final rawRecords = records.map((r) => {
-      'habitId': r.habitId,
-      'dateStr': r.dateStr,
-      'isCompleted': r.isCompleted,
-    }).toList();
+    final rawRecords = records
+        .map(
+          (r) => {
+            'habitId': r.habitId,
+            'dateStr': r.dateStr,
+            'isCompleted': r.isCompleted,
+          },
+        )
+        .toList();
 
     final input = HistoryMapInput(
       records: rawRecords,
@@ -192,7 +201,9 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
     return _processHistoryRecords(input);
   }
 
-  static Map<String, Map<DateTime, bool>> _processHistoryRecords(HistoryMapInput input) {
+  static Map<String, Map<DateTime, bool>> _processHistoryRecords(
+    HistoryMapInput input,
+  ) {
     final Map<String, Map<DateTime, bool>> historyMap = {};
 
     for (final rec in input.records) {
@@ -260,9 +271,12 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
 
   Future<String?> getMetadata(String key) async {
     try {
-      final record = await (select(
-        appMetadata,
-      )..where((t) => t.key.equals(key))).getSingleOrNull().timeout(_defaultTimeout);
+      final record =
+          await (select(
+            appMetadata,
+          )..where((t) => t.key.equals(key))).getSingleOrNull().timeout(
+            _defaultTimeout,
+          );
       return record?.value;
     } catch (_) {
       return null;
@@ -282,11 +296,14 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
 
   Future<Map<String, String>> getAllStrengthMetadata() async {
     try {
-      final records = await (select(
-        appMetadata,
-      )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%')))
-          .get()
-          .timeout(_defaultTimeout);
+      final records =
+          await (select(
+                appMetadata,
+              )..where(
+                (t) => t.key.like('${HabitStorage.habitStrengthPrefix}%'),
+              ))
+              .get()
+              .timeout(_defaultTimeout);
 
       final Map<String, String> results = {};
       for (final r in records) {
@@ -305,8 +322,8 @@ class HabitHistoryDao extends DatabaseAccessor<AppDatabase>
   Future<void> clearAllHistory() async {
     await delete(habitCompletions).go().timeout(_defaultTimeout);
     await (delete(
-      appMetadata,
-    )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%')))
+          appMetadata,
+        )..where((t) => t.key.like('${HabitStorage.habitStrengthPrefix}%')))
         .go()
         .timeout(_defaultTimeout);
   }

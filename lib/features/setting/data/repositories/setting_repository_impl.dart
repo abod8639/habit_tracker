@@ -48,7 +48,9 @@ class SettingRepositoryImpl implements SettingRepository {
   @override
   Future<Either<Failure, void>> setNotificationEnabled(bool enabled) {
     return NetworkErrorHandler.guard(() async {
-      await localDataSource.setNotificationEnabled(enabled).timeout(_localTimeout);
+      await localDataSource
+          .setNotificationEnabled(enabled)
+          .timeout(_localTimeout);
     });
   }
 
@@ -99,22 +101,22 @@ class SettingRepositoryImpl implements SettingRepository {
       // 4. Sync and persist history (Heatmap data)
       if (remoteDataSource.isUserLoggedIn) {
         // Find if there's a cloud start day to update locally
-        final cloudStartDay = await remoteDataSource
-            .getUserStartDay()
-            .timeout(
-              _remoteTimeout,
-              onTimeout: () {
-                throw const TimeoutAppException('Fetching user cloud metadata timed out');
-              },
+        final cloudStartDay = await remoteDataSource.getUserStartDay().timeout(
+          _remoteTimeout,
+          onTimeout: () {
+            throw const TimeoutAppException(
+              'Fetching user cloud metadata timed out',
             );
+          },
+        );
 
         if (cloudStartDay != null && cloudStartDay != effectiveStartDay) {
           habitLocalDataSource.updateStartDate(cloudStartDay);
         }
 
         final localHistory = await habitLocalDataSource.getAllHabitStrengths();
-        final localCompletions =
-            await habitLocalDataSource.getAllHabitCompletions();
+        final localCompletions = await habitLocalDataSource
+            .getAllHabitCompletions();
 
         final historyBundle = await remoteDataSource
             .syncHabitHistoryWithCompletions(
@@ -140,9 +142,9 @@ class SettingRepositoryImpl implements SettingRepository {
 
         // 5. Sync AI API key
         final localKey = localDataSource.getCustomGeminiApiKey();
-        final remoteKey = await remoteDataSource
-            .downloadCustomApiKey()
-            .timeout(_remoteTimeout);
+        final remoteKey = await remoteDataSource.downloadCustomApiKey().timeout(
+          _remoteTimeout,
+        );
 
         if ((localKey == null || localKey.trim().isEmpty) &&
             remoteKey != null &&
@@ -175,9 +177,9 @@ class SettingRepositoryImpl implements SettingRepository {
     return NetworkErrorHandler.guard(() async {
       var key = localDataSource.getCustomGeminiApiKey();
       if (key == null || key.trim().isEmpty) {
-        final remoteKey = await remoteDataSource
-            .downloadCustomApiKey()
-            .timeout(_remoteTimeout);
+        final remoteKey = await remoteDataSource.downloadCustomApiKey().timeout(
+          _remoteTimeout,
+        );
         if (remoteKey != null && remoteKey.trim().isNotEmpty) {
           key = remoteKey.trim();
           await localDataSource

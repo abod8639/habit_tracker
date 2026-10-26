@@ -27,11 +27,15 @@ class NeumorphicCardHeader extends StatelessWidget {
     final effectiveIconColor = iconColor ?? colorScheme.primary;
 
     final baseColor = theme.cardColor;
-    final Color surfaceGradientStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceGradientStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
 
-    final Color surfaceGradientEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceGradientEnd = ThemeUtils.surfaceGradientEnd(
+      baseColor,
+      isDark,
+    );
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14.0),

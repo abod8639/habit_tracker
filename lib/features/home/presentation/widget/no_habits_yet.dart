@@ -18,4 +18,3 @@ class NoHabitsYet extends StatelessWidget {
     );
   }
 }
-

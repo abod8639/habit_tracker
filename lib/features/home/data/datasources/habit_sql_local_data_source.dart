@@ -160,7 +160,8 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
           final rate = double.tryParse(entry.value) ?? 0.0;
           int strength = (rate * 10).toInt();
           if (strength == 0 && rate > 0) strength = 1;
-          if (!heatmap.containsKey(date) || (heatmap[date] == 0 && strength > 0)) {
+          if (!heatmap.containsKey(date) ||
+              (heatmap[date] == 0 && strength > 0)) {
             heatmap[date] = strength;
           }
         } catch (_) {}

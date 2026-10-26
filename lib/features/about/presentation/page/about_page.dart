@@ -212,7 +212,11 @@ class _AboutPageState extends State<AboutPage> {
                           runSpacing: 6,
                           children: [
                             _buildTechChip(context, 'Flutter', isDark),
-                            _buildTechChip(context, 'Clean Architecture', isDark),
+                            _buildTechChip(
+                              context,
+                              'Clean Architecture',
+                              isDark,
+                            ),
                             _buildTechChip(context, 'Riverpod', isDark),
                             _buildTechChip(context, 'Drift / SQLite', isDark),
                             _buildTechChip(context, 'Firebase', isDark),

@@ -146,11 +146,15 @@ class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
     final is24Hour = MediaQuery.of(context).alwaysUse24HourFormat;
     final localizations = MaterialLocalizations.of(context);
 
-    final Color surfaceGradientStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceGradientStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
 
-    final Color surfaceGradientEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceGradientEnd = ThemeUtils.surfaceGradientEnd(
+      baseColor,
+      isDark,
+    );
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -375,7 +379,10 @@ class _NeumorphicTimePickerDialogState extends State<NeumorphicTimePickerDialog>
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: ThemeUtils.debossedSurfaceColor(Theme.of(context).cardColor, isDark),
+        color: ThemeUtils.debossedSurfaceColor(
+          Theme.of(context).cardColor,
+          isDark,
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: ThemeUtils.subtleBorderColor(isDark),
@@ -533,11 +540,12 @@ class _TimeStepperColumn extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = theme.cardColor;
 
-    final Color surfaceStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
 
-    final Color surfaceEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -608,11 +616,12 @@ class _StepperButtonState extends State<_StepperButton> {
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = theme.cardColor;
 
-    final Color surfaceStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
 
-    final Color surfaceEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),

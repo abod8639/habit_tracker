@@ -13,7 +13,7 @@ class AppUpdateRemoteDataSourceImpl implements AppUpdateRemoteDataSource {
   final http.Client client;
 
   AppUpdateRemoteDataSourceImpl({http.Client? client})
-      : client = client ?? http.Client();
+    : client = client ?? http.Client();
 
   static const Duration _requestTimeout = Duration(seconds: 10);
   static const Duration _isolateTimeout = Duration(seconds: 5);
@@ -36,13 +36,18 @@ class AppUpdateRemoteDataSourceImpl implements AppUpdateRemoteDataSource {
           .timeout(
             _requestTimeout,
             onTimeout: () {
-              throw const TimeoutAppException('GitHub update request timed out');
+              throw const TimeoutAppException(
+                'GitHub update request timed out',
+              );
             },
           );
 
       if (response.statusCode == 200) {
         // Offload large JSON payload and markdown release body parsing to an Isolate
-        return await compute(_isolateParseReleasePayload, response.body).timeout(
+        return await compute(
+          _isolateParseReleasePayload,
+          response.body,
+        ).timeout(
           _isolateTimeout,
           onTimeout: () {
             throw const TimeoutAppException(

@@ -120,27 +120,30 @@ void main() {
       expect(repo.saveCompletionCalls, 0);
     });
 
-    test('Initial launch (null lastResetDate) marks benchmark and returns Right(false)', () async {
-      final now = DateTime.now();
-      final repo = MockHabitRepository(
-        lastResetDate: null,
-        habits: [
-          HabitEntity(
-            id: 'h1',
-            name: 'Habit 1',
-            isCompleted: true,
-            createdAt: now,
-          ),
-        ],
-      );
+    test(
+      'Initial launch (null lastResetDate) marks benchmark and returns Right(false)',
+      () async {
+        final now = DateTime.now();
+        final repo = MockHabitRepository(
+          lastResetDate: null,
+          habits: [
+            HabitEntity(
+              id: 'h1',
+              name: 'Habit 1',
+              isCompleted: true,
+              createdAt: now,
+            ),
+          ],
+        );
 
-      final useCase = ResetDailyHabitsUseCase(repo);
-      final result = await useCase();
+        final useCase = ResetDailyHabitsUseCase(repo);
+        final result = await useCase();
 
-      expect(result.isRight(), true);
-      expect(result.getOrElse(() => true), false);
-      expect(repo.habitsResetCalled, false);
-      expect(repo.lastResetDate?.day, now.day);
-    });
+        expect(result.isRight(), true);
+        expect(result.getOrElse(() => true), false);
+        expect(repo.habitsResetCalled, false);
+        expect(repo.lastResetDate?.day, now.day);
+      },
+    );
   });
 }

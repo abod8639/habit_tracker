@@ -4,5 +4,7 @@ import 'package:habit_tracker/features/setting/domain/entities/app_update_info.d
 
 abstract class AppUpdateRepository {
   /// Checks GitHub for the latest release and compares with the installed version.
-  Future<Either<Failure, AppUpdateInfo>> checkForUpdate({String? currentVersion});
+  Future<Either<Failure, AppUpdateInfo>> checkForUpdate({
+    String? currentVersion,
+  });
 }

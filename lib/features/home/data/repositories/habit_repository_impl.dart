@@ -30,15 +30,18 @@ class HabitRepositoryImpl implements HabitRepository {
 
   void _debounceUploadHabits(List<HabitModel> models) {
     _uploadHabitsDebounceTimer?.cancel();
-    _uploadHabitsDebounceTimer = Timer(const Duration(milliseconds: 1500), () async {
-      if (firestoreService.isUserLoggedIn) {
-        try {
-          await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
-        } catch (e) {
-          debugPrint('Debounced cloud sync error on toggle: $e');
+    _uploadHabitsDebounceTimer = Timer(
+      const Duration(milliseconds: 1500),
+      () async {
+        if (firestoreService.isUserLoggedIn) {
+          try {
+            await firestoreService.uploadHabits(models).timeout(_cloudTimeout);
+          } catch (e) {
+            debugPrint('Debounced cloud sync error on toggle: $e');
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   @override
@@ -205,12 +208,14 @@ class HabitRepositoryImpl implements HabitRepository {
 
         if (firestoreService.isUserLoggedIn) {
           try {
-            await firestoreService.uploadHabitCompletion(
-              m.id,
-              todaysDateFormatted(),
-              isCompleted,
-              completionRate: completionRate.toString(),
-            ).timeout(_cloudTimeout);
+            await firestoreService
+                .uploadHabitCompletion(
+                  m.id,
+                  todaysDateFormatted(),
+                  isCompleted,
+                  completionRate: completionRate.toString(),
+                )
+                .timeout(_cloudTimeout);
           } catch (e) {
             debugPrint('Cloud sync error on toggle: $e');
           }
@@ -331,7 +336,9 @@ class HabitRepositoryImpl implements HabitRepository {
 
       if (firestoreService.isUserLoggedIn) {
         try {
-          await firestoreService.uploadHabits(reorderedModels).timeout(_cloudTimeout);
+          await firestoreService
+              .uploadHabits(reorderedModels)
+              .timeout(_cloudTimeout);
         } catch (e) {
           debugPrint('Cloud sync error on updateHabitOrder: $e');
         }
@@ -428,7 +435,9 @@ class HabitRepositoryImpl implements HabitRepository {
 
       if (firestoreService.isUserLoggedIn) {
         try {
-          await firestoreService.uploadHabits(resetHabits).timeout(_cloudTimeout);
+          await firestoreService
+              .uploadHabits(resetHabits)
+              .timeout(_cloudTimeout);
         } catch (e) {
           debugPrint('Cloud sync error on reset: $e');
         }

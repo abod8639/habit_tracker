@@ -217,7 +217,11 @@ class HabitNotifier extends Notifier<HabitState> {
 
   Future<void> _initialize() async {
     try {
-      state = state.copyWith(isLoading: true, errorMessage: '', clearActiveFailure: true);
+      state = state.copyWith(
+        isLoading: true,
+        errorMessage: '',
+        clearActiveFailure: true,
+      );
       final resetDaily = ref.read(resetDailyHabitsUseCaseProvider);
       await resetDaily();
       if (!ref.mounted) return;
@@ -287,9 +291,9 @@ class HabitNotifier extends Notifier<HabitState> {
     if (!firestore.isUserLoggedIn) return;
 
     try {
-      final remoteData = await firestore
-          .downloadHabitHistory()
-          .timeout(const Duration(seconds: 5));
+      final remoteData = await firestore.downloadHabitHistory().timeout(
+        const Duration(seconds: 5),
+      );
       if (!ref.mounted) return;
       final Map<DateTime, int> parsed = {};
 
@@ -650,7 +654,9 @@ final asyncHabitProvider = Provider<AsyncValue<HabitState>>((ref) {
   if (!state.isInitialized && state.activeFailure == null) {
     return const AsyncValue.loading();
   }
-  if (state.activeFailure != null && !state.isInitialized && state.habits.isEmpty) {
+  if (state.activeFailure != null &&
+      !state.isInitialized &&
+      state.habits.isEmpty) {
     return AsyncValue.error(state.activeFailure!, StackTrace.current);
   }
   return AsyncValue.data(state);

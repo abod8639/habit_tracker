@@ -42,4 +42,3 @@ class ParsingException implements Exception {
   @override
   String toString() => message;
 }
-

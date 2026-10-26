@@ -15,8 +15,8 @@ class HomeAppWidgetCard extends ConsumerWidget {
   const HomeAppWidgetCard({
     super.key,
     this.showSnackBarOnError = false,
-  })  : asSliver = false,
-        sliverPadding = null;
+  }) : asSliver = false,
+       sliverPadding = null;
 
   const HomeAppWidgetCard.sliver({
     super.key,
@@ -76,7 +76,8 @@ class HomeAppWidgetCard extends ConsumerWidget {
     if (asSliver) {
       return SliverToBoxAdapter(
         child: Padding(
-          padding: sliverPadding ??
+          padding:
+              sliverPadding ??
               const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Center(child: content),
         ),

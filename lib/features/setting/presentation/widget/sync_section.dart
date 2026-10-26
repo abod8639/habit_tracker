@@ -52,7 +52,9 @@ class SyncSection extends ConsumerWidget {
           index: 3,
           icon: syncState.syncStatus == SyncStatus.syncing
               ? Icons.sync_rounded
-              : (isError ? Icons.sync_problem_rounded : Icons.cloud_upload_outlined),
+              : (isError
+                    ? Icons.sync_problem_rounded
+                    : Icons.cloud_upload_outlined),
           title: S.current.syncNow,
           subtitle: isError && syncState.activeFailure != null
               ? syncState.activeFailure!.toMessage()

@@ -95,7 +95,9 @@ void main() {
       () async {
         final container = ProviderContainer(
           overrides: [
-            saveLanguageUseCaseProvider.overrideWithValue(FakeSaveLanguageUseCase()),
+            saveLanguageUseCaseProvider.overrideWithValue(
+              FakeSaveLanguageUseCase(),
+            ),
             langStorageServiceProvider.overrideWithValue(FakeLangStorage()),
           ],
         );
@@ -106,14 +108,19 @@ void main() {
 
         expect(container.read(langNotifierProvider).languageCode, 'ar');
         expect(container.read(langNotifierProvider).isArabic, true);
-        expect(container.read(langNotifierProvider).effectiveLocale, const Locale('ar'));
+        expect(
+          container.read(langNotifierProvider).effectiveLocale,
+          const Locale('ar'),
+        );
 
         await notifier.changeLanguage('en');
         expect(container.read(langNotifierProvider).languageCode, 'en');
         expect(container.read(langNotifierProvider).isArabic, false);
-        expect(container.read(langNotifierProvider).effectiveLocale, const Locale('en'));
+        expect(
+          container.read(langNotifierProvider).effectiveLocale,
+          const Locale('en'),
+        );
       },
     );
   });
 }
-

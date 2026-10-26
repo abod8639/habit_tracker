@@ -46,8 +46,11 @@ void main() {
       expect(model.completedCount, 0);
     });
 
-    test('parses JSON string safely and handles malformed JSON without crash', () {
-      final jsonStr = '''
+    test(
+      'parses JSON string safely and handles malformed JSON without crash',
+      () {
+        final jsonStr =
+            '''
       {
         "uncompletedHabits": [],
         "heatmapDatasets": {},
@@ -57,14 +60,15 @@ void main() {
       }
       ''';
 
-      final model = HomeAppWidgetSnapshotModel.fromJson(jsonStr);
-      expect(model.totalCount, 2);
-      expect(model.completedCount, 1);
+        final model = HomeAppWidgetSnapshotModel.fromJson(jsonStr);
+        expect(model.totalCount, 2);
+        expect(model.completedCount, 1);
 
-      // tryParseJson on malformed JSON
-      final malformed = HomeAppWidgetSnapshotModel.tryParseJson('{ bad json');
-      expect(malformed, isNull);
-    });
+        // tryParseJson on malformed JSON
+        final malformed = HomeAppWidgetSnapshotModel.tryParseJson('{ bad json');
+        expect(malformed, isNull);
+      },
+    );
 
     test('converts cleanly to and from domain entity', () {
       final entity = HomeAppWidgetDataEntity(
@@ -132,7 +136,8 @@ void main() {
     });
 
     test('parses large JSON payload via compute safely', () async {
-      final jsonStr = '''
+      final jsonStr =
+          '''
       {
         "uncompletedHabits": [],
         "heatmapDatasets": {},
@@ -142,8 +147,9 @@ void main() {
       }
       ''';
 
-      final model =
-          await HomeAppWidgetPayloadProcessor.computeParseJsonPayload(jsonStr);
+      final model = await HomeAppWidgetPayloadProcessor.computeParseJsonPayload(
+        jsonStr,
+      );
       expect(model.totalCount, 10);
       expect(model.completedCount, 8);
     });

@@ -76,8 +76,8 @@ class HabitList extends ConsumerWidget {
             onLongPress: isSelectionMode
                 ? null
                 : () => ref
-                    .read(habitNotifierProvider.notifier)
-                    .toggleHabitSelection(habit.id),
+                      .read(habitNotifierProvider.notifier)
+                      .toggleHabitSelection(habit.id),
           ),
         );
       },

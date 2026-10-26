@@ -129,9 +129,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                   const SizedBox(height: 24),
 
                   ElevatedButton(
-                    onPressed: isLoading
-                        ? null
-                        : _handleResetPassword,
+                    onPressed: isLoading ? null : _handleResetPassword,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(

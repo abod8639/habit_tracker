@@ -57,7 +57,8 @@ class _PageEntranceTransitionState extends State<PageEntranceTransition>
         curve: widget.curve,
       );
 
-      final calculatedDelay = widget.delay ??
+      final calculatedDelay =
+          widget.delay ??
           Duration(milliseconds: math.min(widget.index * 50, 300));
 
       if (calculatedDelay == Duration.zero) {

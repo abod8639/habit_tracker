@@ -235,33 +235,41 @@ class HabitStatsNotifier extends AsyncNotifier<HabitStatsState> {
       bestStreak: habitState.bestStreak,
     );
 
-    final updatedWeeklyInd =
-        Map<String, List<FlSpot>>.from(_weeklyIndividualTrends);
-    final updatedMonthlyInd =
-        Map<String, List<FlSpot>>.from(_monthlyIndividualTrends);
+    final updatedWeeklyInd = Map<String, List<FlSpot>>.from(
+      _weeklyIndividualTrends,
+    );
+    final updatedMonthlyInd = Map<String, List<FlSpot>>.from(
+      _monthlyIndividualTrends,
+    );
 
     for (var habit in habits) {
       final wSpots = updatedWeeklyInd[habit.name];
       if (wSpots != null && wSpots.isNotEmpty) {
         final lastIdx = wSpots.length - 1;
-        wSpots[lastIdx] =
-            FlSpot(lastIdx.toDouble(), habit.isCompleted ? 1.0 : 0.0);
+        wSpots[lastIdx] = FlSpot(
+          lastIdx.toDouble(),
+          habit.isCompleted ? 1.0 : 0.0,
+        );
       } else {
         updatedWeeklyInd[habit.name] = List.generate(
           7,
-          (i) => FlSpot(i.toDouble(), (i == 6 && habit.isCompleted) ? 1.0 : 0.0),
+          (i) =>
+              FlSpot(i.toDouble(), (i == 6 && habit.isCompleted) ? 1.0 : 0.0),
         );
       }
 
       final mSpots = updatedMonthlyInd[habit.name];
       if (mSpots != null && mSpots.isNotEmpty) {
         final lastIdx = mSpots.length - 1;
-        mSpots[lastIdx] =
-            FlSpot(lastIdx.toDouble(), habit.isCompleted ? 1.0 : 0.0);
+        mSpots[lastIdx] = FlSpot(
+          lastIdx.toDouble(),
+          habit.isCompleted ? 1.0 : 0.0,
+        );
       } else {
         updatedMonthlyInd[habit.name] = List.generate(
           30,
-          (i) => FlSpot(i.toDouble(), (i == 29 && habit.isCompleted) ? 1.0 : 0.0),
+          (i) =>
+              FlSpot(i.toDouble(), (i == 29 && habit.isCompleted) ? 1.0 : 0.0),
         );
       }
     }
@@ -278,8 +286,9 @@ class HabitStatsNotifier extends AsyncNotifier<HabitStatsState> {
       _monthlyOverallTrend[lastIdx] = FlSpot(lastIdx.toDouble(), rate);
     }
 
-    final activeOverall =
-        current.isWeeklyView ? _weeklyOverallTrend : _monthlyOverallTrend;
+    final activeOverall = current.isWeeklyView
+        ? _weeklyOverallTrend
+        : _monthlyOverallTrend;
     final activeInd = current.isWeeklyView
         ? _weeklyIndividualTrends
         : _monthlyIndividualTrends;
@@ -372,11 +381,13 @@ class HabitStatsNotifier extends AsyncNotifier<HabitStatsState> {
           );
 
           _weeklyOverallTrend = _extractWeeklyTrend(_monthlyOverallTrend);
-          _weeklyIndividualTrends =
-              _extractWeeklyIndividualTrends(_monthlyIndividualTrends);
+          _weeklyIndividualTrends = _extractWeeklyIndividualTrends(
+            _monthlyIndividualTrends,
+          );
 
-          final activeOverall =
-              current.isWeeklyView ? _weeklyOverallTrend : _monthlyOverallTrend;
+          final activeOverall = current.isWeeklyView
+              ? _weeklyOverallTrend
+              : _monthlyOverallTrend;
           final activeInd = current.isWeeklyView
               ? _weeklyIndividualTrends
               : _monthlyIndividualTrends;
@@ -413,10 +424,12 @@ class HabitStatsNotifier extends AsyncNotifier<HabitStatsState> {
     final newIsWeekly = !current.isWeeklyView;
     final newDays = newIsWeekly ? 7 : 30;
 
-    final targetOverallTrend =
-        newIsWeekly ? _weeklyOverallTrend : _monthlyOverallTrend;
-    final targetIndividualTrends =
-        newIsWeekly ? _weeklyIndividualTrends : _monthlyIndividualTrends;
+    final targetOverallTrend = newIsWeekly
+        ? _weeklyOverallTrend
+        : _monthlyOverallTrend;
+    final targetIndividualTrends = newIsWeekly
+        ? _weeklyIndividualTrends
+        : _monthlyIndividualTrends;
 
     state = AsyncValue.data(
       current.copyWith(
@@ -458,5 +471,5 @@ class HabitStatsNotifier extends AsyncNotifier<HabitStatsState> {
 
 final habitStatsNotifierProvider =
     AsyncNotifierProvider<HabitStatsNotifier, HabitStatsState>(() {
-  return HabitStatsNotifier();
-});
+      return HabitStatsNotifier();
+    });

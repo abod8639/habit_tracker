@@ -31,8 +31,8 @@ class HomeAppWidgetView extends StatelessWidget {
     required this.heatmapDatasets,
     required this.isDark,
     required this.primaryColor,
-  })  : asSliver = false,
-        sliverPadding = null;
+  }) : asSliver = false,
+       sliverPadding = null;
 
   const HomeAppWidgetView.sliver({
     super.key,
@@ -235,7 +235,8 @@ class HomeAppWidgetView extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      s?.allHabitsCompletedToday ?? 'All habits completed today',
+                      s?.allHabitsCompletedToday ??
+                          'All habits completed today',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -278,7 +279,8 @@ class HomeAppWidgetView extends StatelessWidget {
     if (asSliver) {
       return SliverToBoxAdapter(
         child: Padding(
-          padding: sliverPadding ??
+          padding:
+              sliverPadding ??
               const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Center(child: content),
         ),

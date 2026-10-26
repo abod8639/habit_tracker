@@ -81,7 +81,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .timeout(authTimeout);
 
       if (result.user == null) {
-        throw const AuthException('Failed to retrieve authenticated user profile');
+        throw const AuthException(
+          'Failed to retrieve authenticated user profile',
+        );
       }
 
       return AuthModel.fromFirebaseUser(result.user!);
@@ -119,7 +121,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final user = _auth.currentUser ?? result.user;
       if (user == null) {
-        throw const AuthException('User account created but profile is unavailable');
+        throw const AuthException(
+          'User account created but profile is unavailable',
+        );
       }
 
       return AuthModel.fromFirebaseUser(user);

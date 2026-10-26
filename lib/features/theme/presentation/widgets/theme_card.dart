@@ -103,7 +103,8 @@ class _ThemeCardState extends State<ThemeCard>
     final pageIsDark = pageTheme.brightness == Brightness.dark;
 
     final primary = widget.colors['primary'] ?? const Color(0xFF6750A4);
-    final surface = widget.colors['surface'] ??
+    final surface =
+        widget.colors['surface'] ??
         (pageIsDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFFFF));
     final isCardDark = surface.computeLuminance() < 0.35;
 

@@ -83,7 +83,8 @@ class _ThemePageState extends ConsumerState<ThemePage> {
                     const SizedBox(height: 20),
                 itemBuilder: (context, index) {
                   final themeName = availableThemes[index];
-                  final colors = themeColors[themeName] ??
+                  final colors =
+                      themeColors[themeName] ??
                       themeColors[ThemeNotifier.defaultTheme]!;
                   final isSelected = currentTheme == themeName;
 

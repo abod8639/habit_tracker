@@ -15,15 +15,15 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   Future<List<HabitRecord>> getAllHabits() {
     return (select(
       habits,
-    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
-        .get()
-        .timeout(_defaultTimeout);
+    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)])).get().timeout(
+      _defaultTimeout,
+    );
   }
 
   Stream<List<HabitRecord>> watchAllHabits() {
     return (select(
-      habits,
-    )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
+          habits,
+        )..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
         .watch()
         .handleError((error, stackTrace) {
           // Prevent stream controller crash by emitting safe empty list
@@ -55,7 +55,9 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
         return;
       }
       await (delete(habits)..where((t) => t.id.isNotIn(activeIds))).go();
-      await (delete(habitCompletions)..where((t) => t.habitId.isNotIn(activeIds))).go();
+      await (delete(
+        habitCompletions,
+      )..where((t) => t.habitId.isNotIn(activeIds))).go();
       await batch((b) {
         b.insertAllOnConflictUpdate(habits, habitList);
       });
@@ -64,8 +66,8 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
 
   Future<void> updateHabit(HabitsCompanion habit) {
     return (update(
-      habits,
-    )..where((t) => t.id.equals(habit.id.value)))
+          habits,
+        )..where((t) => t.id.equals(habit.id.value)))
         .write(habit)
         .timeout(_defaultTimeout);
   }

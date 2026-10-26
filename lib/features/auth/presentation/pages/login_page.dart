@@ -51,7 +51,10 @@ class LoginPage extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       failure.toMessage(),
-                      style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.5,
+                      ),
                     ),
                   ),
                 ],

@@ -128,8 +128,10 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
     final effectiveRadius =
         widget.borderRadius ?? const BorderRadius.all(Radius.circular(30));
 
-    final Color backgroundColor =
-        ThemeUtils.debossedSurfaceColor(scaffoldBg, isDark);
+    final Color backgroundColor = ThemeUtils.debossedSurfaceColor(
+      scaffoldBg,
+      isDark,
+    );
 
     final Color borderColor = _isFocused
         ? effectiveAccent.withValues(alpha: isDark ? 0.70 : 0.50)
@@ -145,7 +147,7 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
           color: borderColor,
           width: _isFocused ? 1.4 : 1.0,
         ),
-        boxShadow:AppShadows.softCard(isDark: isDark)
+        boxShadow: AppShadows.softCard(isDark: isDark),
       ),
       child: ClipRRect(
         borderRadius: effectiveRadius,
@@ -255,7 +257,10 @@ class _NeumorphicInputState extends State<NeumorphicInput> {
                   decoration: BoxDecoration(
                     color: isDark
                         ? ThemeUtils.debossedSurfaceColor(scaffoldBg, isDark)
-                        : ThemeUtils.surfaceGradientStart(theme.cardColor, isDark),
+                        : ThemeUtils.surfaceGradientStart(
+                            theme.cardColor,
+                            isDark,
+                          ),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: ThemeUtils.subtleBorderColor(isDark),

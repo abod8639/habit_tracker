@@ -8,7 +8,9 @@ import 'package:habit_tracker/generated/l10n.dart';
 
 void main() {
   group('Emoji & Length Validation Tests', () {
-    testWidgets('MyTextTaile renders 99+ emojis without crashing', (tester) async {
+    testWidgets('MyTextTaile renders 99+ emojis without crashing', (
+      tester,
+    ) async {
       final emojis = '😀' * 99 + ' Walking';
 
       await tester.pumpWidget(
@@ -85,4 +87,3 @@ void main() {
     });
   });
 }
-

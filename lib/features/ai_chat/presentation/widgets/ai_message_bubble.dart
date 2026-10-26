@@ -155,7 +155,7 @@ class AiMessageBubble extends StatelessWidget {
                               : Colors.white.withValues(alpha: 0.85)),
                     width: 1.0,
                   ),
-                  boxShadow: AppShadows.softCard(isDark: isDark)
+                  boxShadow: AppShadows.softCard(isDark: isDark),
                 ),
                 child: Column(
                   crossAxisAlignment: isUser

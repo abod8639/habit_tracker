@@ -17,10 +17,11 @@ class SettingsStorage {
   SettingsStorage(
     this._storage, {
     FlutterSecureStorage? secureStorage,
-  }) : _secureStorage = secureStorage ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(resetOnError: true),
-            ) {
+  }) : _secureStorage =
+           secureStorage ??
+           const FlutterSecureStorage(
+             aOptions: AndroidOptions(resetOnError: true),
+           ) {
     _initSecureStorage();
   }
 

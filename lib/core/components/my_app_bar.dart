@@ -72,14 +72,16 @@ class MySliverAppBar extends StatelessWidget {
       effectiveLeading = Center(
         child: Padding(
           padding: const EdgeInsetsDirectional.only(start: 16),
-          child: leading ??
+          child:
+              leading ??
               NeumorphicIconButton.square(
                 customShadows: AppShadows.softCard(isDark: isDark),
                 size: 46,
                 iconSize: 22,
                 icon: Icons.arrow_back_ios_new_rounded,
                 accentColor: theme.colorScheme.onSurface,
-                onPressed: onBack ??
+                onPressed:
+                    onBack ??
                     () {
                       if (Navigator.of(context).canPop()) {
                         Navigator.of(context).pop();
@@ -93,7 +95,7 @@ class MySliverAppBar extends StatelessWidget {
     return SliverAppBar(
       backgroundColor: effectiveBgColor,
       elevation: 0,
-      
+
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
       pinned: pinned,
@@ -165,14 +167,16 @@ PreferredSizeWidget myAppBar({
         ? Center(
             child: Padding(
               padding: const EdgeInsetsDirectional.only(start: 16),
-              child: leading ??
+              child:
+                  leading ??
                   NeumorphicIconButton.square(
                     customShadows: AppShadows.softCard(isDark: isDark),
                     size: 40,
                     iconSize: 18,
                     icon: Icons.arrow_back_ios_new_rounded,
                     accentColor: theme.colorScheme.onSurface,
-                    onPressed: onBack ??
+                    onPressed:
+                        onBack ??
                         () {
                           if (Navigator.of(context).canPop()) {
                             Navigator.of(context).pop();

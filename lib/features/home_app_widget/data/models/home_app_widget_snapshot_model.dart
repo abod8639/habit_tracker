@@ -161,7 +161,9 @@ class HomeAppWidgetSnapshotModel {
 
   String toJson() => jsonEncode(toMap());
 
-  factory HomeAppWidgetSnapshotModel.fromEntity(HomeAppWidgetDataEntity entity) {
+  factory HomeAppWidgetSnapshotModel.fromEntity(
+    HomeAppWidgetDataEntity entity,
+  ) {
     return HomeAppWidgetSnapshotModel(
       uncompletedHabits: entity.uncompletedHabits
           .map((e) => HabitModel.fromEntity(e))

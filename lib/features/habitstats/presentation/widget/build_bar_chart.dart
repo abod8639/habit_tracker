@@ -13,12 +13,12 @@ class TodayBarChartCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chartData = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.todaySummary ?? const []),
+      habitStatsNotifierProvider.select(
+        (s) => s.value?.todaySummary ?? const [],
+      ),
     );
     final streak = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.stats?.streak ?? 1),
+      habitStatsNotifierProvider.select((s) => s.value?.stats?.streak ?? 1),
     );
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;

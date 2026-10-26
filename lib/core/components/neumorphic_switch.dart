@@ -43,10 +43,11 @@ class NeumorphicSwitch extends StatelessWidget {
         : wellBase;
 
     // Convex surface for inactive thumb
-    final Color surfaceStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
-    final Color surfaceEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
+    final Color surfaceEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     final double thumbSize = height - 6.0;
 
@@ -97,7 +98,9 @@ class NeumorphicSwitch extends StatelessWidget {
                       ),
                 border: Border.all(
                   color: value
-                      ? colorScheme.onPrimary.withValues(alpha: isDark ? 0.35 : 0.85)
+                      ? colorScheme.onPrimary.withValues(
+                          alpha: isDark ? 0.35 : 0.85,
+                        )
                       : ThemeUtils.subtleBorderColor(isDark),
                   width: 1.0,
                 ),
@@ -107,7 +110,6 @@ class NeumorphicSwitch extends StatelessWidget {
               ),
               child: Center(
                 child: AnimatedSwitcher(
-                  
                   duration: const Duration(milliseconds: 180),
                   transitionBuilder: (child, animation) =>
                       ScaleTransition(scale: animation, child: child),

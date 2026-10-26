@@ -77,7 +77,9 @@ class _PhoneState extends ConsumerState<Phone> {
         child: asyncHabit.when(
           loading: () => buildLoadingScreen(),
           error: (error, stackTrace) => ErrorView(
-            errorMessage: error is Failure ? error.toMessage() : error.toString(),
+            errorMessage: error is Failure
+                ? error.toMessage()
+                : error.toString(),
             onRetry: () => ref.read(habitNotifierProvider.notifier).retry(),
           ),
           data: (habitState) => CustomScrollView(

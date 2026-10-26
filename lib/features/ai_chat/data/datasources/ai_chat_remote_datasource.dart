@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:google_generative_ai/google_generative_ai.dart' hide ServerException;
+import 'package:google_generative_ai/google_generative_ai.dart'
+    hide ServerException;
 import 'package:habit_tracker/core/error/exceptions.dart';
 import 'package:habit_tracker/core/services/gemini_service.dart';
 import '../../domain/entities/chat_message_entity.dart';
@@ -59,9 +60,10 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
     }
 
     if (_chatSession == null) {
-      throw const ServerException('Chat session is not initialized. Please check API key.');
+      throw const ServerException(
+        'Chat session is not initialized. Please check API key.',
+      );
     }
-
 
     try {
       final responseStream = _chatSession!
@@ -80,7 +82,9 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
       await for (final chunk in responseStream) {
         final chunkText = chunk.text;
         if (chunkText != null && chunkText.isNotEmpty) {
-          final processed = await AiChatPayloadProcessor.processMarkdown(chunkText);
+          final processed = await AiChatPayloadProcessor.processMarkdown(
+            chunkText,
+          );
           if (processed.isNotEmpty) {
             yield processed;
           }
@@ -110,7 +114,9 @@ class AiChatRemoteDataSourceImpl implements AiChatRemoteDataSource {
           await for (final chunk in retryStream) {
             final chunkText = chunk.text;
             if (chunkText != null && chunkText.isNotEmpty) {
-              final processed = await AiChatPayloadProcessor.processMarkdown(chunkText);
+              final processed = await AiChatPayloadProcessor.processMarkdown(
+                chunkText,
+              );
               if (processed.isNotEmpty) {
                 yield processed;
               }

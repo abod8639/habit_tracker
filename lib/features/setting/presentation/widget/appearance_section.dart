@@ -43,7 +43,9 @@ class AppearanceSection extends ConsumerWidget {
           ],
           onChanged: (value) async {
             if (value != null) {
-              await ref.read(langNotifierProvider.notifier).changeLanguage(value);
+              await ref
+                  .read(langNotifierProvider.notifier)
+                  .changeLanguage(value);
             }
           },
           textColor: Theme.of(context).colorScheme.onSurface,

@@ -160,7 +160,9 @@ class SyncState {
       isAutoSyncEnabled: isAutoSyncEnabled ?? this.isAutoSyncEnabled,
       lastSyncTime: lastSyncTime ?? this.lastSyncTime,
       errorMessage: errorMessage ?? this.errorMessage,
-      activeFailure: clearFailure ? null : (activeFailure ?? this.activeFailure),
+      activeFailure: clearFailure
+          ? null
+          : (activeFailure ?? this.activeFailure),
     );
   }
 
@@ -175,9 +177,7 @@ class SyncState {
       case SyncStatus.success:
         return S.current.syncSuccess;
       case SyncStatus.error:
-        return errorMessage.isNotEmpty
-            ? errorMessage
-            : S.current.syncFailed;
+        return errorMessage.isNotEmpty ? errorMessage : S.current.syncFailed;
     }
   }
 
@@ -600,7 +600,9 @@ class AiSettingsState {
       isLoading: isLoading ?? this.isLoading,
       isValidating: isValidating ?? this.isValidating,
       apiKeyStatus: apiKeyStatus ?? this.apiKeyStatus,
-      activeFailure: clearFailure ? null : (activeFailure ?? this.activeFailure),
+      activeFailure: clearFailure
+          ? null
+          : (activeFailure ?? this.activeFailure),
     );
   }
 }

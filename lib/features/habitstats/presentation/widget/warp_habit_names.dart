@@ -24,16 +24,15 @@ class WarpHabitNames extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitNames = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.habitNames ?? const []),
+      habitStatsNotifierProvider.select((s) => s.value?.habitNames ?? const []),
     );
     final habits = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.todaySummary ?? const []),
+      habitStatsNotifierProvider.select(
+        (s) => s.value?.todaySummary ?? const [],
+      ),
     );
     final selectedHabit = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.selectedHabitName),
+      habitStatsNotifierProvider.select((s) => s.value?.selectedHabitName),
     );
     final notifier = ref.read(habitStatsNotifierProvider.notifier);
 

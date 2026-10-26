@@ -66,8 +66,8 @@ class AppDatabase extends _$AppDatabase {
   Future<bool> ping() async {
     try {
       final res = await customSelect('SELECT 1').getSingle().timeout(
-            const Duration(seconds: 3),
-          );
+        const Duration(seconds: 3),
+      );
       return res.data.isNotEmpty;
     } catch (_) {
       return false;

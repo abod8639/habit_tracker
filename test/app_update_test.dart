@@ -58,71 +58,85 @@ void main() {
   });
 
   group('AppUpdateRepositoryImpl', () {
-    test('returns AppUpdateInfo with hasUpdate = true when release is newer', () async {
-      final mockDataSource = MockAppUpdateRemoteDataSource(
-        mockResponse: {
-          'tag_name': 'V1.5.0',
-          'html_url': 'https://github.com/abod8639/habit_tracker/releases/tag/V1.5.0',
-          'body': 'Exciting new features and fixes',
-          'assets': [
-            {
-              'name': 'app-release.apk',
-              'browser_download_url':
-                  'https://github.com/abod8639/habit_tracker/releases/download/V1.5.0/app-release.apk',
-            }
-          ],
-        },
-      );
+    test(
+      'returns AppUpdateInfo with hasUpdate = true when release is newer',
+      () async {
+        final mockDataSource = MockAppUpdateRemoteDataSource(
+          mockResponse: {
+            'tag_name': 'V1.5.0',
+            'html_url':
+                'https://github.com/abod8639/habit_tracker/releases/tag/V1.5.0',
+            'body': 'Exciting new features and fixes',
+            'assets': [
+              {
+                'name': 'app-release.apk',
+                'browser_download_url':
+                    'https://github.com/abod8639/habit_tracker/releases/download/V1.5.0/app-release.apk',
+              },
+            ],
+          },
+        );
 
-      final repository = AppUpdateRepositoryImpl(remoteDataSource: mockDataSource);
-      final result = await repository.checkForUpdate(currentVersion: '1.4.0');
+        final repository = AppUpdateRepositoryImpl(
+          remoteDataSource: mockDataSource,
+        );
+        final result = await repository.checkForUpdate(currentVersion: '1.4.0');
 
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should succeed'),
-        (info) {
-          expect(info.hasUpdate, isTrue);
-          expect(info.latestVersion, equals('1.5.0'));
-          expect(info.currentVersion, equals('1.4.0'));
-          expect(
-            info.downloadUrl,
-            equals(
-              'https://github.com/abod8639/habit_tracker/releases/download/V1.5.0/app-release.apk',
-            ),
-          );
-        },
-      );
-    });
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (failure) => fail('Should succeed'),
+          (info) {
+            expect(info.hasUpdate, isTrue);
+            expect(info.latestVersion, equals('1.5.0'));
+            expect(info.currentVersion, equals('1.4.0'));
+            expect(
+              info.downloadUrl,
+              equals(
+                'https://github.com/abod8639/habit_tracker/releases/download/V1.5.0/app-release.apk',
+              ),
+            );
+          },
+        );
+      },
+    );
 
-    test('returns AppUpdateInfo with hasUpdate = false when release is equal', () async {
-      final mockDataSource = MockAppUpdateRemoteDataSource(
-        mockResponse: {
-          'tag_name': 'V1.4.0',
-          'html_url': 'https://github.com/abod8639/habit_tracker/releases/tag/V1.4.0',
-          'body': 'Current release',
-          'assets': [],
-        },
-      );
+    test(
+      'returns AppUpdateInfo with hasUpdate = false when release is equal',
+      () async {
+        final mockDataSource = MockAppUpdateRemoteDataSource(
+          mockResponse: {
+            'tag_name': 'V1.4.0',
+            'html_url':
+                'https://github.com/abod8639/habit_tracker/releases/tag/V1.4.0',
+            'body': 'Current release',
+            'assets': [],
+          },
+        );
 
-      final repository = AppUpdateRepositoryImpl(remoteDataSource: mockDataSource);
-      final result = await repository.checkForUpdate(currentVersion: '1.4.0');
+        final repository = AppUpdateRepositoryImpl(
+          remoteDataSource: mockDataSource,
+        );
+        final result = await repository.checkForUpdate(currentVersion: '1.4.0');
 
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should succeed'),
-        (info) {
-          expect(info.hasUpdate, isFalse);
-          expect(info.latestVersion, equals('1.4.0'));
-        },
-      );
-    });
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (failure) => fail('Should succeed'),
+          (info) {
+            expect(info.hasUpdate, isFalse);
+            expect(info.latestVersion, equals('1.4.0'));
+          },
+        );
+      },
+    );
 
     test('returns NetworkFailure on NetworkException', () async {
       final mockDataSource = MockAppUpdateRemoteDataSource(
         exceptionToThrow: const NetworkException('Connection failed'),
       );
 
-      final repository = AppUpdateRepositoryImpl(remoteDataSource: mockDataSource);
+      final repository = AppUpdateRepositoryImpl(
+        remoteDataSource: mockDataSource,
+      );
       final result = await repository.checkForUpdate(currentVersion: '1.4.0');
 
       expect(result.isLeft(), isTrue);
@@ -142,7 +156,9 @@ void main() {
           'assets': [],
         },
       );
-      final repository = AppUpdateRepositoryImpl(remoteDataSource: mockDataSource);
+      final repository = AppUpdateRepositoryImpl(
+        remoteDataSource: mockDataSource,
+      );
       final useCase = CheckAppUpdateUseCase(repository);
 
       final result = await useCase(currentVersion: '1.4.0');

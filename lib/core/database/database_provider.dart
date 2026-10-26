@@ -85,5 +85,5 @@ class DatabaseStatusNotifier extends AsyncNotifier<bool> {
 
 final databaseStatusProvider =
     AsyncNotifierProvider<DatabaseStatusNotifier, bool>(
-  DatabaseStatusNotifier.new,
-);
+      DatabaseStatusNotifier.new,
+    );

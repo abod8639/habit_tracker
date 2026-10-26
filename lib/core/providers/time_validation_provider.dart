@@ -80,5 +80,5 @@ class TimeValidationNotifier extends Notifier<TimeValidationState> {
 
 final timeValidationNotifierProvider =
     NotifierProvider<TimeValidationNotifier, TimeValidationState>(
-  TimeValidationNotifier.new,
-);
+      TimeValidationNotifier.new,
+    );

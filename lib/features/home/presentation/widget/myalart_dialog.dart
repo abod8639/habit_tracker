@@ -314,9 +314,19 @@ class _MyalartdState extends State<MyalartDialog>
                           if (HardwareKeyboard.instance.isControlPressed) {
                             final currentText = widget.controller.text;
                             final selection = widget.controller.selection;
-                            final start = selection.start.clamp(0, currentText.length);
-                            final end = selection.end.clamp(0, currentText.length);
-                            final newText = currentText.replaceRange(start, end, '\n');
+                            final start = selection.start.clamp(
+                              0,
+                              currentText.length,
+                            );
+                            final end = selection.end.clamp(
+                              0,
+                              currentText.length,
+                            );
+                            final newText = currentText.replaceRange(
+                              start,
+                              end,
+                              '\n',
+                            );
                             widget.controller.value = TextEditingValue(
                               text: newText,
                               selection: TextSelection.collapsed(

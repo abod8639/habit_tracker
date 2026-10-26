@@ -33,7 +33,9 @@ class AiChatLocalDataSourceImpl implements AiChatLocalDataSource {
   @override
   Future<void> saveChatHistory(List<ChatMessageModel> messages) async {
     try {
-      final listToSave = await AiChatPayloadProcessor.serializeMessages(messages);
+      final listToSave = await AiChatPayloadProcessor.serializeMessages(
+        messages,
+      );
       final jsonStr = jsonEncode(listToSave);
       await _storage.setRawMetadata(historyKey, jsonStr);
     } catch (e) {

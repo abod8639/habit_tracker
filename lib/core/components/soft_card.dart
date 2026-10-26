@@ -32,11 +32,15 @@ class SoftCard extends StatelessWidget {
 
     final baseColor = color ?? theme.cardColor;
 
-    final Color surfaceGradientStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceGradientStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
 
-    final Color surfaceGradientEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceGradientEnd = ThemeUtils.surfaceGradientEnd(
+      baseColor,
+      isDark,
+    );
 
     final effectiveAccent = accentColor ?? theme.colorScheme.primary;
 

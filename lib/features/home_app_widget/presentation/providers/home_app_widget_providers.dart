@@ -10,13 +10,17 @@ import '../../domain/usecases/process_home_app_widget_usecase.dart';
 import '../../domain/usecases/sync_home_app_widget_usecase.dart';
 
 /// Repository Provider for HomeAppWidget
-final homeAppWidgetRepositoryProvider = Provider<HomeAppWidgetRepository>((ref) {
+final homeAppWidgetRepositoryProvider = Provider<HomeAppWidgetRepository>((
+  ref,
+) {
   final homeWidgetService = ref.watch(homeWidgetServiceProvider);
   return HomeAppWidgetRepositoryImpl(homeWidgetService: homeWidgetService);
 });
 
 /// Use Case Provider for triggering OS widget sync
-final syncHomeAppWidgetUseCaseProvider = Provider<SyncHomeAppWidgetUseCase>((ref) {
+final syncHomeAppWidgetUseCaseProvider = Provider<SyncHomeAppWidgetUseCase>((
+  ref,
+) {
   final repository = ref.watch(homeAppWidgetRepositoryProvider);
   return SyncHomeAppWidgetUseCase(repository);
 });
@@ -24,9 +28,9 @@ final syncHomeAppWidgetUseCaseProvider = Provider<SyncHomeAppWidgetUseCase>((ref
 /// Use Case Provider for background snapshot calculation
 final processHomeAppWidgetUseCaseProvider =
     Provider<ProcessHomeAppWidgetUseCase>((ref) {
-  final repository = ref.watch(homeAppWidgetRepositoryProvider);
-  return ProcessHomeAppWidgetUseCase(repository);
-});
+      final repository = ref.watch(homeAppWidgetRepositoryProvider);
+      return ProcessHomeAppWidgetUseCase(repository);
+    });
 
 /// AsyncNotifier managing the Home App Widget lifecycle, data preparation,
 /// and OS snapshot synchronization with full AsyncValue and cancellation handling.
@@ -117,8 +121,8 @@ class HomeAppWidgetNotifier extends AsyncNotifier<HomeAppWidgetDataEntity> {
 /// Provider for the HomeAppWidget AsyncNotifier
 final homeAppWidgetNotifierProvider =
     AsyncNotifierProvider<HomeAppWidgetNotifier, HomeAppWidgetDataEntity>(() {
-  return HomeAppWidgetNotifier();
-});
+      return HomeAppWidgetNotifier();
+    });
 
 /// Exposes active [Failure] from the notifier for SnackBar or banner notifications.
 final homeAppWidgetFailureProvider = Provider<Failure?>((ref) {

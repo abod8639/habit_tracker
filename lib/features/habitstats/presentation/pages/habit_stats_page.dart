@@ -204,8 +204,9 @@ class _HabitStatsPageState extends ConsumerState<HabitStatsPage>
                                   .withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: theme.colorScheme.error
-                                    .withValues(alpha: 0.4),
+                                color: theme.colorScheme.error.withValues(
+                                  alpha: 0.4,
+                                ),
                               ),
                             ),
                             child: Row(

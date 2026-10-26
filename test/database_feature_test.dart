@@ -22,32 +22,40 @@ void main() {
       'getCompletionStatusForDate handles non-existent date gracefully without NullCheck/Type crash',
       () async {
         // Querying a date with no records previously produced DriftTypeException due to SUM returning null
-        final status =
-            await db.habitHistoryDao.getCompletionStatusForDate('20261022');
+        final status = await db.habitHistoryDao.getCompletionStatusForDate(
+          '20261022',
+        );
         expect(status['total'], equals(0));
         expect(status['completed'], equals(0));
       },
     );
 
-    test('getCompletionStatusForDate computes counts accurately when data exists', () async {
-      await db.habitHistoryDao.recordCompletion('h1', '20261022', true);
-      await db.habitHistoryDao.recordCompletion('h2', '20261022', false);
+    test(
+      'getCompletionStatusForDate computes counts accurately when data exists',
+      () async {
+        await db.habitHistoryDao.recordCompletion('h1', '20261022', true);
+        await db.habitHistoryDao.recordCompletion('h2', '20261022', false);
 
-      final status =
-          await db.habitHistoryDao.getCompletionStatusForDate('20261022');
-      expect(status['total'], equals(2));
-      expect(status['completed'], equals(1));
-    });
+        final status = await db.habitHistoryDao.getCompletionStatusForDate(
+          '20261022',
+        );
+        expect(status['total'], equals(2));
+        expect(status['completed'], equals(1));
+      },
+    );
 
-    test('getHeatmapData calculates accurately without throwing on zero/null aggregates', () async {
-      await db.habitHistoryDao.recordCompletion('h1', '20261020', false);
-      await db.habitHistoryDao.recordCompletion('h2', '20261020', false);
+    test(
+      'getHeatmapData calculates accurately without throwing on zero/null aggregates',
+      () async {
+        await db.habitHistoryDao.recordCompletion('h1', '20261020', false);
+        await db.habitHistoryDao.recordCompletion('h2', '20261020', false);
 
-      final heatmap = await db.habitHistoryDao.getHeatmapData();
-      final date = DateTime(2026, 10, 20);
-      expect(heatmap.containsKey(date), isTrue);
-      expect(heatmap[date], equals(0));
-    });
+        final heatmap = await db.habitHistoryDao.getHeatmapData();
+        final date = DateTime(2026, 10, 20);
+        expect(heatmap.containsKey(date), isTrue);
+        expect(heatmap[date], equals(0));
+      },
+    );
 
     test('getHabitHistoryMap aggregates completion histories safely', () async {
       final now = DateTime.now();
@@ -65,7 +73,10 @@ void main() {
 
       final historyMap = await db.habitHistoryDao.getHabitHistoryMap(7);
       expect(historyMap.containsKey('h_test'), isTrue);
-      expect(historyMap['h_test']![DateTime(now.year, now.month, now.day)], isTrue);
+      expect(
+        historyMap['h_test']![DateTime(now.year, now.month, now.day)],
+        isTrue,
+      );
     });
   });
 
@@ -110,22 +121,25 @@ void main() {
       expect(isHealthy, isTrue);
     });
 
-    test('DatabaseStatusNotifier checks health successfully via Riverpod', () async {
-      final container = ProviderContainer(
-        overrides: [
-          appDatabaseProvider.overrideWithValue(db),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'DatabaseStatusNotifier checks health successfully via Riverpod',
+      () async {
+        final container = ProviderContainer(
+          overrides: [
+            appDatabaseProvider.overrideWithValue(db),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final notifier = container.read(databaseStatusProvider.notifier);
-      final either = await notifier.checkHealth();
+        final notifier = container.read(databaseStatusProvider.notifier);
+        final either = await notifier.checkHealth();
 
-      expect(either.isRight(), isTrue);
-      either.fold(
-        (failure) => fail('Expected health check to succeed'),
-        (healthy) => expect(healthy, isTrue),
-      );
-    });
+        expect(either.isRight(), isTrue);
+        either.fold(
+          (failure) => fail('Expected health check to succeed'),
+          (healthy) => expect(healthy, isTrue),
+        );
+      },
+    );
   });
 }

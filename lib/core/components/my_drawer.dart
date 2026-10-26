@@ -147,7 +147,6 @@ class _DrawerListState extends State<DrawerList> {
         //   },
         //   title: S.current.generatePlan,
         // ),
-
         MyDrawerListTile(
           icon: Icon(color: colors.drawerAiIcon, Icons.psychology),
           onTap: () {

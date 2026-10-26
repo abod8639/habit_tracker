@@ -61,7 +61,9 @@ class _SettingsPageState extends State<SettingsPage>
                   AccountSection(animationController: _animationController),
                   SyncSection(animationController: _animationController),
                   AppearanceSection(animationController: _animationController),
-                  NotificationsSection(animationController: _animationController),
+                  NotificationsSection(
+                    animationController: _animationController,
+                  ),
                   AiSection(animationController: _animationController),
                   AboutSection(animationController: _animationController),
                   DataSection(animationController: _animationController),

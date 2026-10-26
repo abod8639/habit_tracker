@@ -44,7 +44,9 @@ class ThemeRepositoryImpl implements ThemeRepository {
     return NetworkErrorHandler.guard(() async {
       final cloudSettings = await remoteDataSource.syncWithCloud();
       if (cloudSettings != null) {
-        await localDataSource.saveThemeSettings(cloudSettings).timeout(_localTimeout);
+        await localDataSource
+            .saveThemeSettings(cloudSettings)
+            .timeout(_localTimeout);
       }
       return cloudSettings;
     });

@@ -74,16 +74,21 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
     final effectiveRadius = widget.borderRadius ?? AppRadius.lgRadius;
 
     // ── Primary Gradient Tokens (Convex Curved Sheen) ────────────────────────
-    final Color primaryStart =
-        ThemeUtils.accentGradientStart(effectiveAccent, isDark);
-    final Color primaryEnd =
-        ThemeUtils.accentGradientEnd(effectiveAccent, isDark);
+    final Color primaryStart = ThemeUtils.accentGradientStart(
+      effectiveAccent,
+      isDark,
+    );
+    final Color primaryEnd = ThemeUtils.accentGradientEnd(
+      effectiveAccent,
+      isDark,
+    );
 
     // ── Secondary / Surface Gradient Tokens ──────────────────────────────────
-    final Color surfaceStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
-    final Color surfaceEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
+    final Color surfaceEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     // ── Background Gradients ─────────────────────────────────────────────────
     final Gradient? backgroundGradient = !_isEnabled
@@ -234,8 +239,10 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                                 shadows: widget.isPrimary && _isEnabled
                                     ? [
                                         Shadow(
-                                          color: AppShadows.darkShadowColor(isDark)
-                                              .withValues(
+                                          color:
+                                              AppShadows.darkShadowColor(
+                                                isDark,
+                                              ).withValues(
                                                 alpha: isDark ? 0.35 : 0.20,
                                               ),
                                           offset: const Offset(0, 1),
@@ -259,11 +266,14 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                                       shadows: widget.isPrimary && _isEnabled
                                           ? [
                                               Shadow(
-                                                color: AppShadows.darkShadowColor(
-                                                  isDark,
-                                                ).withValues(
-                                                  alpha: isDark ? 0.35 : 0.20,
-                                                ),
+                                                color:
+                                                    AppShadows.darkShadowColor(
+                                                      isDark,
+                                                    ).withValues(
+                                                      alpha: isDark
+                                                          ? 0.35
+                                                          : 0.20,
+                                                    ),
                                                 offset: const Offset(0, 1),
                                                 blurRadius: 2,
                                               ),
@@ -283,11 +293,12 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
                                 shadows: widget.isPrimary && _isEnabled
                                     ? [
                                         Shadow(
-                                          color: AppShadows.darkShadowColor(
-                                            isDark,
-                                          ).withValues(
-                                            alpha: isDark ? 0.35 : 0.20,
-                                          ),
+                                          color:
+                                              AppShadows.darkShadowColor(
+                                                isDark,
+                                              ).withValues(
+                                                alpha: isDark ? 0.35 : 0.20,
+                                              ),
                                           offset: const Offset(0, 1),
                                           blurRadius: 2,
                                         ),

@@ -33,24 +33,23 @@ class TrendChartCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showAllHabits = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.showAllHabits ?? false),
+      habitStatsNotifierProvider.select((s) => s.value?.showAllHabits ?? false),
     );
     final isWeeklyView = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.isWeeklyView ?? true),
+      habitStatsNotifierProvider.select((s) => s.value?.isWeeklyView ?? true),
     );
     final isLoading = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.isLoading ?? false),
+      habitStatsNotifierProvider.select((s) => s.value?.isLoading ?? false),
     );
     final trendSpots = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.overallTrend ?? const []),
+      habitStatsNotifierProvider.select(
+        (s) => s.value?.overallTrend ?? const [],
+      ),
     );
     final hasIndividualData = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.individualTrends.isNotEmpty ?? false),
+      habitStatsNotifierProvider.select(
+        (s) => s.value?.individualTrends.isNotEmpty ?? false,
+      ),
     );
     final notifier = ref.read(habitStatsNotifierProvider.notifier);
 
@@ -58,9 +57,7 @@ class TrendChartCard extends ConsumerWidget {
         trendSpots.isNotEmpty &&
         !(trendSpots.length <= 1 && trendSpots[0] == const FlSpot(0, 0));
 
-    final bool isEmpty = showAllHabits
-        ? !hasOverallData
-        : !hasIndividualData;
+    final bool isEmpty = showAllHabits ? !hasOverallData : !hasIndividualData;
 
     final colorScheme = Theme.of(context).colorScheme;
 

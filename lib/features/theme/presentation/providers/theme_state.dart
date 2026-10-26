@@ -42,7 +42,9 @@ class ThemeState extends Equatable {
           customBackgroundColor ?? this.customBackgroundColor,
       lightTheme: lightTheme ?? this.lightTheme,
       darkTheme: darkTheme ?? this.darkTheme,
-      activeFailure: clearFailure ? null : (activeFailure ?? this.activeFailure),
+      activeFailure: clearFailure
+          ? null
+          : (activeFailure ?? this.activeFailure),
       isSyncing: isSyncing ?? this.isSyncing,
     );
   }

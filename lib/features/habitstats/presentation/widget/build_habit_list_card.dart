@@ -14,8 +14,9 @@ class HabitListCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chartData = ref.watch(
-      habitStatsNotifierProvider
-          .select((s) => s.value?.todaySummary ?? const []),
+      habitStatsNotifierProvider.select(
+        (s) => s.value?.todaySummary ?? const [],
+      ),
     );
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;

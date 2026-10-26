@@ -61,7 +61,6 @@ class _NeuSurfaceState extends State<NeuSurface> {
 
     final shadows = AppShadows.softCard(isDark: isDark);
 
-
     Widget surface = AnimatedContainer(
       duration: const Duration(milliseconds: 160),
       curve: Curves.easeOutCubic,
@@ -202,4 +201,3 @@ class NeuOrb extends StatelessWidget {
     );
   }
 }
-

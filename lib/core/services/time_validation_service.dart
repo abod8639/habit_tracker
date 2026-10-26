@@ -63,9 +63,9 @@ class TimeValidationService {
     required KeyValueStorage storage,
     required AppDatabase db,
     http.Client? httpClient,
-  })  : _storage = storage,
-        _db = db,
-        _httpClient = httpClient;
+  }) : _storage = storage,
+       _db = db,
+       _httpClient = httpClient;
 
   /// Fast check for offline rollback detection.
   bool isClockRolledBackSynchronously() {
@@ -111,7 +111,9 @@ class TimeValidationService {
         final currentDateStr = _formatDateStr(networkUtc.toLocal());
         await _cleanupFutureCompletions(currentDateStr);
       } catch (e) {
-        debugPrint('TimeValidationService: Error cleaning up future records: $e');
+        debugPrint(
+          'TimeValidationService: Error cleaning up future records: $e',
+        );
       }
 
       return TimeValidationResult.valid(
@@ -177,9 +179,9 @@ class TimeValidationService {
 
   /// Removes any habit completions recorded in future dates beyond today.
   Future<void> _cleanupFutureCompletions(String todayStr) async {
-    await (_db.delete(_db.habitCompletions)
-          ..where((t) => t.dateStr.isBiggerThanValue(todayStr)))
-        .go();
+    await (_db.delete(
+      _db.habitCompletions,
+    )..where((t) => t.dateStr.isBiggerThanValue(todayStr))).go();
   }
 
   /// Query the maximum completion date recorded in the database.

@@ -113,11 +113,15 @@ class _AppConfirmationDialogState extends State<AppConfirmationDialog>
         ? themeColors.error
         : themeColors.primary;
 
-    final Color surfaceGradientStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceGradientStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
 
-    final Color surfaceGradientEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceGradientEnd = ThemeUtils.surfaceGradientEnd(
+      baseColor,
+      isDark,
+    );
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -294,8 +298,8 @@ class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
 
     final Color textColor = widget.isPrimary
         ? (primaryColor == colorScheme.error
-            ? colorScheme.onError
-            : colorScheme.onPrimary)
+              ? colorScheme.onError
+              : colorScheme.onPrimary)
         : colorScheme.onSurfaceVariant;
 
     final Color iconColor = widget.isPrimary

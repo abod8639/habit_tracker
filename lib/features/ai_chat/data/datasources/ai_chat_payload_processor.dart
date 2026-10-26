@@ -17,7 +17,9 @@ List<ChatMessageModel> _parseMessagesWorker(List<dynamic> rawList) {
   return results;
 }
 
-List<Map<String, dynamic>> _serializeMessagesWorker(List<ChatMessageModel> messages) {
+List<Map<String, dynamic>> _serializeMessagesWorker(
+  List<ChatMessageModel> messages,
+) {
   // Retain the most recent 20 messages to preserve memory and context window
   final start = messages.length > 20 ? messages.length - 20 : 0;
   return messages.sublist(start).map((m) => m.toJson()).toList();

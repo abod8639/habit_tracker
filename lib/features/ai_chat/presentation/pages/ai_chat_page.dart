@@ -106,7 +106,10 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                   Expanded(
                     child: Text(
                       errorMessage,
-                      style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.5,
+                      ),
                     ),
                   ),
                 ],
@@ -134,7 +137,6 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
       },
     );
 
-
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AiChatAppBar(
@@ -143,7 +145,9 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
       body: asyncChatState.when(
         loading: () => Center(
           child: CircularProgressIndicator.adaptive(
-            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              theme.colorScheme.primary,
+            ),
           ),
         ),
         error: (error, _) => AiChatErrorView(
@@ -167,7 +171,8 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                           itemCount: chatState.messages.length,
                           itemBuilder: (context, index) {
                             final message = chatState.messages[index];
-                            final isLast = index == chatState.messages.length - 1;
+                            final isLast =
+                                index == chatState.messages.length - 1;
 
                             return AiMessageBubble(
                               message: message,

@@ -169,7 +169,7 @@ class _HabitConfirmationDialogState
                   color: isDark
                       ? (Color.lerp(baseColor, Colors.black, 0.22) ?? baseColor)
                       : (Color.lerp(baseColor, const Color(0xFFDCE2EC), 0.30) ??
-                          baseColor),
+                            baseColor),
                   borderRadius: AppRadius.cardRadius,
                   boxShadow: AppShadows.wellDual(isDark: isDark),
                 ),
@@ -258,4 +258,3 @@ class _HabitConfirmationDialogState
     );
   }
 }
-

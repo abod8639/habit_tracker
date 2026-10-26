@@ -61,7 +61,8 @@ class _NeuSurfaceState extends State<NeuSurface> {
     final isInset = widget.depth == NeuDepth.inset || _isPressed;
     final isCircle = widget.shape == BoxShape.circle;
 
-    final List<BoxShadow> shadows = widget.shadows ?? AppShadows.softCard(isDark: isDark);
+    final List<BoxShadow> shadows =
+        widget.shadows ?? AppShadows.softCard(isDark: isDark);
 
     Widget surface = AnimatedContainer(
       duration: const Duration(milliseconds: 160),
@@ -188,7 +189,6 @@ class NeuOrb extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveColor = color ?? Theme.of(context).colorScheme.primary;
     return NeuSurface(
-
       shape: BoxShape.circle,
       depth: depth,
       width: size,

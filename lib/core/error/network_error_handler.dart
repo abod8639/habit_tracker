@@ -24,11 +24,15 @@ class NetworkErrorHandler {
     }
 
     if (error is SocketException) {
-      return const NetworkFailure('No Internet Connection. Please check your network.');
+      return const NetworkFailure(
+        'No Internet Connection. Please check your network.',
+      );
     }
 
     if (error is TimeoutException || error is TimeoutAppException) {
-      return const TimeoutFailure('Request timed out. Please check your connection and try again.');
+      return const TimeoutFailure(
+        'Request timed out. Please check your connection and try again.',
+      );
     }
 
     if (error is FormatException || error is ParsingException) {
@@ -60,7 +64,8 @@ class NetworkErrorHandler {
     if (errorStr.contains('user-not-found')) {
       return AuthFailure(S.current.authErrorUserNotFound);
     }
-    if (errorStr.contains('wrong-password') || errorStr.contains('invalid-credential')) {
+    if (errorStr.contains('wrong-password') ||
+        errorStr.contains('invalid-credential')) {
       return AuthFailure(S.current.authErrorWrongPassword);
     }
     if (errorStr.contains('email-already-in-use')) {
@@ -79,7 +84,6 @@ class NetworkErrorHandler {
       return AuthFailure(S.current.authErrorNetworkFailed);
     }
 
-
     if (error is ServerException) {
       return ServerFailure(error.message);
     }
@@ -93,7 +97,9 @@ class NetworkErrorHandler {
         errorStr.contains('connection refused') ||
         errorStr.contains('failed host lookup') ||
         errorStr.contains('clientexception')) {
-      return const NetworkFailure('Unable to connect to server. Please check your connection.');
+      return const NetworkFailure(
+        'Unable to connect to server. Please check your connection.',
+      );
     }
 
     if (errorStr.contains('timeout') || errorStr.contains('timed out')) {
@@ -104,7 +110,9 @@ class NetworkErrorHandler {
         errorStr.contains('limit') ||
         errorStr.contains('429') ||
         errorStr.contains('resource exhausted')) {
-      return const ServerFailure('Service rate limit reached. Please wait a moment and try again.');
+      return const ServerFailure(
+        'Service rate limit reached. Please wait a moment and try again.',
+      );
     }
 
     return ServerFailure(GeminiService.getErrorMessage(error));

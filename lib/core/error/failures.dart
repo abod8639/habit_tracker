@@ -21,7 +21,9 @@ class NetworkFailure extends Failure {
 }
 
 class TimeoutFailure extends Failure {
-  const TimeoutFailure([super.message = 'Connection timed out. Please try again.']);
+  const TimeoutFailure([
+    super.message = 'Connection timed out. Please try again.',
+  ]);
 }
 
 class ParsingFailure extends Failure {
@@ -31,4 +33,3 @@ class ParsingFailure extends Failure {
 class AuthFailure extends Failure {
   const AuthFailure(super.message);
 }
-

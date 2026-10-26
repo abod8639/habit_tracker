@@ -45,7 +45,9 @@ class ErrorView extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           title ??
-              (isArabic ? 'حدث خطأ غير متوقع' : S.of(context).somethingWentWrong),
+              (isArabic
+                  ? 'حدث خطأ غير متوقع'
+                  : S.of(context).somethingWentWrong),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             letterSpacing: -0.2,
@@ -113,4 +115,3 @@ Widget buildErrorScreen({String? errorMessage, VoidCallback? onRetry}) {
     onRetry: onRetry,
   );
 }
-

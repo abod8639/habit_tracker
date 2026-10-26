@@ -56,10 +56,11 @@ class _NeumorphicSelectionTileState extends State<NeumorphicSelectionTile> {
     final effectiveAccent = widget.accentColor ?? colorScheme.primary;
     final effectiveRadius = widget.borderRadius ?? AppRadius.mdRadius;
 
-    final Color surfaceStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
-    final Color surfaceEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
+    final Color surfaceEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     final Color borderColor = widget.isSelected
         ? effectiveAccent.withValues(alpha: isDark ? 0.65 : 0.45)

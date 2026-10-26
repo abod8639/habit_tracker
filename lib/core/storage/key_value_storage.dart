@@ -16,15 +16,15 @@ class KeyValueStorage {
   Future<void> init() async {
     if (_isInitialized) return;
     try {
-      final records = await (_db.select(_db.appMetadata)
-            ..where(
-              (t) =>
-                  t.key.like('${HabitStorage.habitStrengthPrefix}%').not() &
-                  t.key.like('HABIT_STRENGTH_%').not() &
-                  t.key.like('vault_data_%').not() &
-                  t.key.equals('ai_chat_history').not(),
-            ))
-          .get();
+      final records =
+          await (_db.select(_db.appMetadata)..where(
+                (t) =>
+                    t.key.like('${HabitStorage.habitStrengthPrefix}%').not() &
+                    t.key.like('HABIT_STRENGTH_%').not() &
+                    t.key.like('vault_data_%').not() &
+                    t.key.equals('ai_chat_history').not(),
+              ))
+              .get();
       for (final r in records) {
         _cache[r.key] = r.value;
       }
@@ -115,9 +115,9 @@ class KeyValueStorage {
   /// without polluting the in-memory cache.
   Future<String?> getRawMetadata(String key) async {
     try {
-      final record = await (_db.select(_db.appMetadata)
-            ..where((t) => t.key.equals(key)))
-          .getSingleOrNull();
+      final record = await (_db.select(
+        _db.appMetadata,
+      )..where((t) => t.key.equals(key))).getSingleOrNull();
       return record?.value;
     } catch (_) {
       return null;
@@ -126,7 +126,9 @@ class KeyValueStorage {
 
   /// Sets raw metadata directly in SQLite without keeping it in RAM cache.
   Future<void> setRawMetadata(String key, String value) async {
-    await _db.into(_db.appMetadata).insertOnConflictUpdate(
+    await _db
+        .into(_db.appMetadata)
+        .insertOnConflictUpdate(
           AppMetadataCompanion(
             key: Value(key),
             value: Value(value),
@@ -138,13 +140,12 @@ class KeyValueStorage {
   /// preserving historical habit strengths and vault backups.
   Future<void> clear() async {
     _cache.clear();
-    await (_db.delete(_db.appMetadata)
-          ..where(
-            (t) =>
-                t.key.like('${HabitStorage.habitStrengthPrefix}%').not() &
-                t.key.like('HABIT_STRENGTH_%').not() &
-                t.key.like('vault_data_%').not(),
-          ))
+    await (_db.delete(_db.appMetadata)..where(
+          (t) =>
+              t.key.like('${HabitStorage.habitStrengthPrefix}%').not() &
+              t.key.like('HABIT_STRENGTH_%').not() &
+              t.key.like('vault_data_%').not(),
+        ))
         .go();
   }
 }

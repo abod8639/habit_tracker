@@ -172,7 +172,9 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     final skipResult = await getSkipStatus();
     final bool hasSkipped = skipResult.fold(
       (failure) {
-        debugPrint('[AuthNotifier] Failed to load skip login status: ${failure.toMessage()}');
+        debugPrint(
+          '[AuthNotifier] Failed to load skip login status: ${failure.toMessage()}',
+        );
         return false;
       },
       (status) => status,
@@ -211,7 +213,9 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         try {
           await ref.read(habitStatsNotifierProvider.notifier).refreshStats();
         } catch (e) {
-          debugPrint('[AuthNotifier] Failed to refresh habit stats after authentication: $e');
+          debugPrint(
+            '[AuthNotifier] Failed to refresh habit stats after authentication: $e',
+          );
         }
       }
     }
@@ -450,5 +454,6 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   }
 }
 
-final authNotifierProvider =
-    AsyncNotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new);
+final authNotifierProvider = AsyncNotifierProvider<AuthNotifier, AuthState>(
+  AuthNotifier.new,
+);

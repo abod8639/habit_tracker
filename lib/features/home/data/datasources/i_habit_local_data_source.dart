@@ -36,7 +36,9 @@ abstract class IHabitLocalDataSource {
   Future<Map<String, int>> getCompletionStatusForDate(DateTime date);
   Future<Map<String, Map<DateTime, bool>>> getHabitHistoryMap(int days);
   Future<Map<String, Map<String, bool>>> getAllHabitCompletions();
-  Future<void> saveAllHabitCompletions(Map<String, Map<String, bool>> completions);
+  Future<void> saveAllHabitCompletions(
+    Map<String, Map<String, bool>> completions,
+  );
   String getStartDate();
   void updateStartDate(String date);
   Future<void> clearAllData({

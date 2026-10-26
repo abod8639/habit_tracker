@@ -6,7 +6,8 @@ import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 
 class HabitHistoryCloudBundle {
   final Map<String, String> rates; // dateStr -> completionRate
-  final Map<String, Map<String, bool>> completions; // dateStr -> {habitId: isCompleted}
+  final Map<String, Map<String, bool>>
+  completions; // dateStr -> {habitId: isCompleted}
 
   const HabitHistoryCloudBundle({
     this.rates = const {},
@@ -317,10 +318,13 @@ class FirestoreService {
       if (completions != null && completions.isNotEmpty) {
         data['completions'] = completions;
       }
-      await _userDoc!.collection('habitHistory').doc(date).set(
-        data,
-        SetOptions(merge: true),
-      );
+      await _userDoc!
+          .collection('habitHistory')
+          .doc(date)
+          .set(
+            data,
+            SetOptions(merge: true),
+          );
     } catch (e) {
       // Ignored
     }
@@ -469,7 +473,9 @@ class FirestoreService {
       final mergedCompletions = <String, Map<String, bool>>{};
       // 1. Seed with cloud completions
       for (var dateEntry in cloudBundle.completions.entries) {
-        mergedCompletions[dateEntry.key] = Map<String, bool>.from(dateEntry.value);
+        mergedCompletions[dateEntry.key] = Map<String, bool>.from(
+          dateEntry.value,
+        );
       }
       // 2. Merge local completions
       for (var dateEntry in localCompletions.entries) {
@@ -587,9 +593,7 @@ class FirestoreService {
     }
 
     return _habitsCollection!.snapshots().map((snapshot) {
-      return snapshot.docs
-          .map((doc) => HabitModel.fromFirestore(doc))
-          .toList();
+      return snapshot.docs.map((doc) => HabitModel.fromFirestore(doc)).toList();
     });
   }
 

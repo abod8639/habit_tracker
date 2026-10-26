@@ -79,11 +79,12 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
     final baseColor = theme.cardColor;
     final colorScheme = theme.colorScheme;
 
-    final Color surfaceStart =
-        ThemeUtils.surfaceGradientStart(baseColor, isDark);
+    final Color surfaceStart = ThemeUtils.surfaceGradientStart(
+      baseColor,
+      isDark,
+    );
 
-    final Color surfaceEnd =
-        ThemeUtils.surfaceGradientEnd(baseColor, isDark);
+    final Color surfaceEnd = ThemeUtils.surfaceGradientEnd(baseColor, isDark);
 
     final Color effectiveIconColor =
         widget.iconColor ?? widget.accentColor ?? colorScheme.onSurface;
@@ -161,7 +162,7 @@ class _NeumorphicIconButtonState extends State<NeumorphicIconButton> {
           child: Center(
             child: Icon(
               widget.icon,
-              size:  22,
+              size: 22,
               color: effectiveIconColor,
               shadows: AppShadows.buttonResting(isDark: isDark),
             ),
