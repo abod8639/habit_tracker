@@ -47,7 +47,7 @@ final settingLocalDataSourceProvider = Provider<SettingLocalDataSource>((ref) {
   return SettingLocalDataSourceImpl(
     langStorage: langStorage,
     settingsStorage: settingsStorage,
-    themeStorage: themeStorage!,
+    themeStorage: themeStorage,
   );
 });
 
