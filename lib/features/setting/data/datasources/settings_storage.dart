@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:habit_tracker/core/storage/key_value_storage.dart';
 
 class SettingsStorage {
@@ -10,8 +11,38 @@ class SettingsStorage {
   static const String _customGeminiModelKey = 'custom_gemini_model';
 
   final KeyValueStorage _storage;
+  final FlutterSecureStorage _secureStorage;
+  String? _cachedApiKey;
 
-  SettingsStorage(this._storage);
+  SettingsStorage(
+    this._storage, {
+    FlutterSecureStorage? secureStorage,
+  }) : _secureStorage = secureStorage ??
+            const FlutterSecureStorage(
+              aOptions: AndroidOptions(resetOnError: true),
+            ) {
+    _initSecureStorage();
+  }
+
+  Future<void> _initSecureStorage() async {
+    try {
+      _cachedApiKey = await _secureStorage.read(key: _customGeminiApiKeyKey);
+      // Migration: If not found in secure storage, check legacy storage and migrate
+      if (_cachedApiKey == null) {
+        final legacyKey = _storage.getString(_customGeminiApiKeyKey);
+        if (legacyKey != null && legacyKey.trim().isNotEmpty) {
+          _cachedApiKey = legacyKey.trim();
+          await _secureStorage.write(
+            key: _customGeminiApiKeyKey,
+            value: _cachedApiKey,
+          );
+          await _storage.remove(_customGeminiApiKeyKey);
+        }
+      }
+    } catch (_) {
+      _cachedApiKey = _storage.getString(_customGeminiApiKeyKey);
+    }
+  }
 
   bool get isNotificationEnabled =>
       _storage.getBool(_isNotificationEnabledKey, defaultValue: false);
@@ -46,18 +77,33 @@ class SettingsStorage {
     await _storage.setBool(_hasSkippedLoginKey, skipped);
   }
 
-  String? get customGeminiApiKey => _storage.getString(_customGeminiApiKeyKey);
+  String? get customGeminiApiKey =>
+      _cachedApiKey ?? _storage.getString(_customGeminiApiKeyKey);
 
   Future<void> setCustomGeminiApiKey(String? key) async {
     if (key == null || key.trim().isEmpty) {
+      _cachedApiKey = null;
+      try {
+        await _secureStorage.delete(key: _customGeminiApiKeyKey);
+      } catch (_) {}
       await _storage.remove(_customGeminiApiKeyKey);
       await _storage.remove(_customGeminiModelKey);
     } else {
-      await _storage.setString(_customGeminiApiKeyKey, key.trim());
+      final trimmed = key.trim();
+      _cachedApiKey = trimmed;
+      try {
+        await _secureStorage.write(key: _customGeminiApiKeyKey, value: trimmed);
+      } catch (_) {}
+      // Remove from unencrypted storage to protect privacy
+      await _storage.remove(_customGeminiApiKeyKey);
     }
   }
 
   Future<void> clearCustomGeminiApiKey() async {
+    _cachedApiKey = null;
+    try {
+      await _secureStorage.delete(key: _customGeminiApiKeyKey);
+    } catch (_) {}
     await _storage.remove(_customGeminiApiKeyKey);
     await _storage.remove(_customGeminiModelKey);
   }
@@ -87,7 +133,6 @@ class SettingsStorage {
     await _storage.remove(_isNotificationEnabledKey);
     await _storage.remove(_notificationTimeKey);
     await _storage.remove(_hasSkippedLoginKey);
-    await _storage.remove(_customGeminiApiKeyKey);
-    await _storage.remove(_customGeminiModelKey);
+    await clearCustomGeminiApiKey();
   }
 }
