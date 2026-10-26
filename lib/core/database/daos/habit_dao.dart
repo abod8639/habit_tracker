@@ -1,10 +1,11 @@
 import 'package:drift/drift.dart';
 import '../app_database.dart';
 import '../tables/habits_table.dart';
+import '../tables/habit_completions_table.dart';
 
 part 'habit_dao.g.dart';
 
-@DriftAccessor(tables: [Habits])
+@DriftAccessor(tables: [Habits, HabitCompletions])
 class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   HabitDao(super.db);
 
@@ -50,13 +51,14 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
     await transaction(() async {
       final activeIds = habitList.map((h) => h.id.value).toSet();
       if (activeIds.isEmpty) {
-        await delete(habits).go();
-      } else {
-        await (delete(habits)..where((t) => t.id.isNotIn(activeIds))).go();
-        await batch((b) {
-          b.insertAllOnConflictUpdate(habits, habitList);
-        });
+        // Prevent accidental table wipeout when an uninitialized/empty list is passed
+        return;
       }
+      await (delete(habits)..where((t) => t.id.isNotIn(activeIds))).go();
+      await (delete(habitCompletions)..where((t) => t.habitId.isNotIn(activeIds))).go();
+      await batch((b) {
+        b.insertAllOnConflictUpdate(habits, habitList);
+      });
     }).timeout(_batchTimeout);
   }
 
@@ -68,16 +70,19 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
         .timeout(_defaultTimeout);
   }
 
-  Future<void> deleteHabitById(String id) {
-    return (delete(habits)..where((t) => t.id.equals(id)))
-        .go()
-        .timeout(_defaultTimeout);
+  Future<void> deleteHabitById(String id) async {
+    await transaction(() async {
+      await (delete(habits)..where((t) => t.id.equals(id))).go();
+      await (delete(habitCompletions)..where((t) => t.habitId.equals(id))).go();
+    }).timeout(_defaultTimeout);
   }
 
-  Future<void> deleteMultipleHabits(List<String> ids) {
-    return (delete(habits)..where((t) => t.id.isIn(ids)))
-        .go()
-        .timeout(_defaultTimeout);
+  Future<void> deleteMultipleHabits(List<String> ids) async {
+    if (ids.isEmpty) return;
+    await transaction(() async {
+      await (delete(habits)..where((t) => t.id.isIn(ids))).go();
+      await (delete(habitCompletions)..where((t) => t.habitId.isIn(ids))).go();
+    }).timeout(_defaultTimeout);
   }
 
   Future<void> updateHabitOrder(List<String> ids) async {
@@ -121,7 +126,10 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
         .timeout(_defaultTimeout);
   }
 
-  Future<void> clearAllHabits() {
-    return delete(habits).go().timeout(_defaultTimeout);
+  Future<void> clearAllHabits() async {
+    await transaction(() async {
+      await delete(habits).go();
+      await delete(habitCompletions).go();
+    }).timeout(_defaultTimeout);
   }
 }
