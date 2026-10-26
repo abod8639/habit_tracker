@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:habit_tracker/core/error/exceptions.dart';
 import 'package:habit_tracker/core/storage/key_value_storage.dart';
 import '../models/chat_message_model.dart';
@@ -19,9 +20,11 @@ class AiChatLocalDataSourceImpl implements AiChatLocalDataSource {
   @override
   Future<List<ChatMessageModel>> getChatHistory() async {
     try {
-      final storedList = _storage.getJsonList(historyKey);
-      if (storedList == null || storedList.isEmpty) return [];
-      return await AiChatPayloadProcessor.parseMessages(storedList);
+      final raw = await _storage.getRawMetadata(historyKey);
+      if (raw == null || raw.trim().isEmpty) return [];
+      final decoded = jsonDecode(raw);
+      if (decoded is! List || decoded.isEmpty) return [];
+      return await AiChatPayloadProcessor.parseMessages(decoded);
     } catch (e) {
       throw CacheException('Failed to read chat history from storage: $e');
     }
@@ -31,7 +34,8 @@ class AiChatLocalDataSourceImpl implements AiChatLocalDataSource {
   Future<void> saveChatHistory(List<ChatMessageModel> messages) async {
     try {
       final listToSave = await AiChatPayloadProcessor.serializeMessages(messages);
-      await _storage.setJson(historyKey, listToSave);
+      final jsonStr = jsonEncode(listToSave);
+      await _storage.setRawMetadata(historyKey, jsonStr);
     } catch (e) {
       throw CacheException('Failed to write chat history to storage: $e');
     }
