@@ -12,7 +12,6 @@ class CheckboxList extends ConsumerWidget {
     final habits = ref.watch(
       habitNotifierProvider.select((s) => s.habits),
     );
-    final habitNotifier = ref.watch(habitNotifierProvider.notifier);
 
     return Padding(
       padding: const EdgeInsets.only(top: 40.0),
@@ -26,17 +25,20 @@ class CheckboxList extends ConsumerWidget {
             habitId: habit.id,
             habitName: habit.name,
             habitCompleted: habit.isCompleted,
-            onTap: () =>
-                habitNotifier.toggleHabit(habit.id, !habit.isCompleted),
-            onDelete: (_) => habitNotifier.deleteHabit(habit.id),
+            onTap: () => ref
+                .read(habitNotifierProvider.notifier)
+                .toggleHabit(habit.id, !habit.isCompleted),
+            onDelete: (_) =>
+                ref.read(habitNotifierProvider.notifier).deleteHabit(habit.id),
             onEdit: (_) => HabitDialogs.showEdit(
               context,
               id: habit.id,
               currentName: habit.name,
               ref: ref,
             ),
-            onChanged: (value) =>
-                habitNotifier.toggleHabit(habit.id, value ?? false),
+            onChanged: (value) => ref
+                .read(habitNotifierProvider.notifier)
+                .toggleHabit(habit.id, value ?? false),
           );
         },
       ),
