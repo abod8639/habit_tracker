@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
-import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/habitstats_providers.dart';
 import 'build_habit_list.dart';
@@ -14,14 +13,13 @@ class HabitListCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state =
-        ref.watch(habitStatsNotifierProvider).value ??
-        const HabitStatsState();
+    final chartData = ref.watch(
+      habitStatsNotifierProvider
+          .select((s) => s.value?.todaySummary ?? const []),
+    );
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-
-    final List<HabitEntity> chartData = state.todaySummary;
     final completedHabits = chartData
         .where((habit) => habit.isCompleted)
         .toList();
