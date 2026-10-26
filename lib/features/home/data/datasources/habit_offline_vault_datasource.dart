@@ -20,12 +20,18 @@ class HabitOfflineVaultDataSource {
     await _storage.setJson(key, data.toMap());
     await _storage.setString(_latestUserKey, data.userId);
 
-    // Track list of users with pending data
+    // Track list of users with pending data and prune old entries to avoid unbounded growth
     final List<String> pendingUsers = getPendingUserIds();
     if (!pendingUsers.contains(data.userId)) {
       pendingUsers.add(data.userId);
-      await _storage.setJson(_pendingListKey, pendingUsers);
     }
+    while (pendingUsers.length > 2) {
+      final oldUserId = pendingUsers.removeAt(0);
+      if (oldUserId != data.userId) {
+        await _storage.remove(_getKey(oldUserId));
+      }
+    }
+    await _storage.setJson(_pendingListKey, pendingUsers);
   }
 
   /// Retrieves the saved snapshot for a specific user ID.
