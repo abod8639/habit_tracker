@@ -22,9 +22,16 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
     init();
   }
 
+  bool _isInitialized = false;
+  Future<void>? _initFuture;
   List<HabitModel> _cachedHabits = [];
 
   Future<void> init() async {
+    if (_isInitialized) return;
+    return _initFuture ??= _doInit();
+  }
+
+  Future<void> _doInit() async {
     await fetchHabitsFromDb();
     final startDay = await db.habitHistoryDao.getMetadata(
       HabitStorage.startDayKey,
@@ -45,11 +52,14 @@ class HabitSqlLocalDataSource implements IHabitLocalDataSource {
         }
       }
     } catch (_) {}
+    _isInitialized = true;
   }
 
+  @override
   Future<List<HabitModel>> fetchHabitsFromDb() async {
     final records = await db.habitDao.getAllHabits();
     _cachedHabits = records.map((r) => _recordToModel(r)).toList();
+    _isInitialized = true;
     return List<HabitModel>.from(_cachedHabits);
   }
 
