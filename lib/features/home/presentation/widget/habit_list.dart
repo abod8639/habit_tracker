@@ -17,7 +17,6 @@ class HabitList extends ConsumerWidget {
       habitNotifierProvider.select((s) => s.selectedHabitIds),
     );
     final isSelectionMode = selectedHabitIds.isNotEmpty;
-    final habitNotifier = ref.watch(habitNotifierProvider.notifier);
 
     if (habits.isEmpty) {
       return const SliverFillRemaining(
@@ -28,8 +27,9 @@ class HabitList extends ConsumerWidget {
 
     return SliverReorderableList(
       itemCount: habits.length,
-      onReorderItem: (oldIndex, newIndex) =>
-          habitNotifier.reorderHabits(oldIndex, newIndex, isAdjusted: true),
+      onReorderItem: (oldIndex, newIndex) => ref
+          .read(habitNotifierProvider.notifier)
+          .reorderHabits(oldIndex, newIndex, isAdjusted: true),
       proxyDecorator: (child, index, animation) {
         return Material(
           color: Colors.transparent,
@@ -53,23 +53,31 @@ class HabitList extends ConsumerWidget {
             colorValue: habit.colorValue,
             onTap: () {
               if (isSelectionMode) {
-                habitNotifier.toggleHabitSelection(habit.id);
+                ref
+                    .read(habitNotifierProvider.notifier)
+                    .toggleHabitSelection(habit.id);
               } else {
-                habitNotifier.toggleHabit(habit.id, !habit.isCompleted);
+                ref
+                    .read(habitNotifierProvider.notifier)
+                    .toggleHabit(habit.id, !habit.isCompleted);
               }
             },
-            onDelete: (_) => habitNotifier.deleteHabit(habit.id),
+            onDelete: (_) =>
+                ref.read(habitNotifierProvider.notifier).deleteHabit(habit.id),
             onEdit: (_) => HabitDialogs.showEdit(
               context,
               id: habit.id,
               currentName: habit.name,
               ref: ref,
             ),
-            onChanged: (value) =>
-                habitNotifier.toggleHabit(habit.id, value ?? false),
+            onChanged: (value) => ref
+                .read(habitNotifierProvider.notifier)
+                .toggleHabit(habit.id, value ?? false),
             onLongPress: isSelectionMode
                 ? null
-                : () => habitNotifier.toggleHabitSelection(habit.id),
+                : () => ref
+                    .read(habitNotifierProvider.notifier)
+                    .toggleHabitSelection(habit.id),
           ),
         );
       },
