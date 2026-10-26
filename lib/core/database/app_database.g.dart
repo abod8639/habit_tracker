@@ -1023,6 +1023,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_completions_date',
     'CREATE INDEX idx_completions_date ON habit_completions (date_str)',
   );
+  late final Index idxCompletionsHabit = Index(
+    'idx_completions_habit',
+    'CREATE INDEX idx_completions_habit ON habit_completions (habit_id)',
+  );
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
   late final HabitHistoryDao habitHistoryDao = HabitHistoryDao(
     this as AppDatabase,
@@ -1036,6 +1040,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     habitCompletions,
     appMetadata,
     idxCompletionsDate,
+    idxCompletionsHabit,
   ];
 }
 
