@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:dartz/dartz.dart';
 import 'package:habit_tracker/core/error/exceptions.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/error/network_error_handler.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
-import 'package:habit_tracker/core/services/firestore_service.dart';
 import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_source.dart';
 import '../../domain/repositories/setting_repository.dart';
 import '../datasources/setting_local_datasource.dart';
@@ -100,14 +97,10 @@ class SettingRepositoryImpl implements SettingRepository {
           .timeout(_localTimeout);
 
       // 4. Sync and persist history (Heatmap data)
-      final firestoreService = FirestoreService();
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (firestoreService.isUserLoggedIn && currentUser != null) {
+      if (remoteDataSource.isUserLoggedIn) {
         // Find if there's a cloud start day to update locally
-        final userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser.uid)
-            .get()
+        final cloudStartDay = await remoteDataSource
+            .getUserStartDay()
             .timeout(
               _remoteTimeout,
               onTimeout: () {
@@ -115,7 +108,6 @@ class SettingRepositoryImpl implements SettingRepository {
               },
             );
 
-        final cloudStartDay = userDoc.data()?['startDay'] as String?;
         if (cloudStartDay != null && cloudStartDay != effectiveStartDay) {
           habitLocalDataSource.updateStartDate(cloudStartDay);
         }
@@ -124,7 +116,7 @@ class SettingRepositoryImpl implements SettingRepository {
         final localCompletions =
             await habitLocalDataSource.getAllHabitCompletions();
 
-        final historyBundle = await firestoreService
+        final historyBundle = await remoteDataSource
             .syncHabitHistoryWithCompletions(
               localRates: localHistory,
               localCompletions: localCompletions,
@@ -217,9 +209,8 @@ class SettingRepositoryImpl implements SettingRepository {
   Future<Either<Failure, void>> clearAllData() {
     return NetworkErrorHandler.guard(() async {
       // 1. Clear Remote Data if logged in
-      final firestoreService = FirestoreService();
-      if (firestoreService.isUserLoggedIn) {
-        await firestoreService.deleteAllUserData().timeout(_remoteTimeout);
+      if (remoteDataSource.isUserLoggedIn) {
+        await remoteDataSource.deleteAllUserData().timeout(_remoteTimeout);
       }
 
       // 2. Clear Local Data
