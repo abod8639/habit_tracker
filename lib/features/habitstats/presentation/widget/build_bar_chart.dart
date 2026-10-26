@@ -2,7 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
-import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/habitstats_providers.dart';
 import 'my_bar_touch_data.dart';
@@ -13,15 +12,17 @@ class TodayBarChartCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state =
-        ref.watch(habitStatsNotifierProvider).value ??
-        const HabitStatsState();
+    final chartData = ref.watch(
+      habitStatsNotifierProvider
+          .select((s) => s.value?.todaySummary ?? const []),
+    );
+    final streak = ref.watch(
+      habitStatsNotifierProvider
+          .select((s) => s.value?.stats?.streak ?? 1),
+    );
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-
-    final List<HabitEntity> chartData = state.todaySummary;
-    final int streak = state.stats?.streak ?? 1;
 
     if (chartData.isEmpty) {
       return SoftCard(
