@@ -65,9 +65,10 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final langState = ref.watch(langNotifierProvider);
     final themeState = ref.watch(themeNotifierProvider);
+    final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      routerConfig: AppRouter.router,
+      routerConfig: router,
       locale: langState.effectiveLocale,
       localizationsDelegates: const [
         S.delegate,
