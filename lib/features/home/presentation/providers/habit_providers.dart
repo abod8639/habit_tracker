@@ -634,11 +634,20 @@ final habitNotifierProvider = NotifierProvider<HabitNotifier, HabitState>(() {
   return HabitNotifier();
 });
 
+/// Computed start day string based on user's earliest completion and stored start day.
+final habitStartDayProvider = Provider<String>((ref) {
+  final getStart = ref.watch(getStartDateUseCaseProvider);
+  final storedStartDay = getStart();
+  return ref.watch(
+    habitNotifierProvider.select((s) => s.getStartDay(storedStartDay)),
+  );
+});
+
 /// Exposes the habit state as an [AsyncValue<HabitState>] for safe, declarative UI rendering
 /// and crash prevention with fallback UI support.
 final asyncHabitProvider = Provider<AsyncValue<HabitState>>((ref) {
   final state = ref.watch(habitNotifierProvider);
-  if (state.isLoading && !state.isInitialized) {
+  if (!state.isInitialized && state.activeFailure == null) {
     return const AsyncValue.loading();
   }
   if (state.activeFailure != null && !state.isInitialized && state.habits.isEmpty) {
