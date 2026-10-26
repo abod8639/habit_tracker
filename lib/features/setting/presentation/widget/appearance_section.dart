@@ -17,7 +17,6 @@ class AppearanceSection extends ConsumerWidget {
     final languageCode = ref.watch(
       langNotifierProvider.select((state) => state.languageCode),
     );
-    final langNotifier = ref.watch(langNotifierProvider.notifier);
     final s = S.of(context);
 
     return Column(
@@ -44,7 +43,7 @@ class AppearanceSection extends ConsumerWidget {
           ],
           onChanged: (value) async {
             if (value != null) {
-              await langNotifier.changeLanguage(value);
+              await ref.read(langNotifierProvider.notifier).changeLanguage(value);
             }
           },
           textColor: Theme.of(context).colorScheme.onSurface,
