@@ -5,6 +5,7 @@ import 'package:habit_tracker/features/home/data/models/habit_vault_data.dart';
 abstract class IHabitLocalDataSource {
   HabitOfflineVaultDataSource? get vaultDataSource;
   List<HabitModel> loadHabits();
+  Future<List<HabitModel>> fetchHabitsFromDb();
   Future<void> saveHabits(List<HabitModel> habits);
   Future<void> saveHabitCompletionHistory(
     String habitId,
