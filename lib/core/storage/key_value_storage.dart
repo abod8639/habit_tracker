@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:habit_tracker/core/database/app_database.dart';
+import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 
 /// Fast, in-memory cached Key-Value storage backed by SQLite (AppDatabase/AppMetadata).
 /// Replaces Hive boxes with zero external dependencies and instant O(1) synchronous reads.
@@ -18,8 +19,10 @@ class KeyValueStorage {
       final records = await (_db.select(_db.appMetadata)
             ..where(
               (t) =>
+                  t.key.like('${HabitStorage.habitStrengthPrefix}%').not() &
                   t.key.like('HABIT_STRENGTH_%').not() &
-                  t.key.like('vault_data_%').not(),
+                  t.key.like('vault_data_%').not() &
+                  t.key.equals('ai_chat_history').not(),
             ))
           .get();
       for (final r in records) {
@@ -108,6 +111,29 @@ class KeyValueStorage {
     await (_db.delete(_db.appMetadata)..where((t) => t.key.equals(key))).go();
   }
 
+  /// Direct on-demand lookup for large metadata strings (e.g. AI chat history)
+  /// without polluting the in-memory cache.
+  Future<String?> getRawMetadata(String key) async {
+    try {
+      final record = await (_db.select(_db.appMetadata)
+            ..where((t) => t.key.equals(key)))
+          .getSingleOrNull();
+      return record?.value;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Sets raw metadata directly in SQLite without keeping it in RAM cache.
+  Future<void> setRawMetadata(String key, String value) async {
+    await _db.into(_db.appMetadata).insertOnConflictUpdate(
+          AppMetadataCompanion(
+            key: Value(key),
+            value: Value(value),
+          ),
+        );
+  }
+
   /// Clears all application preference keys from memory and SQLite storage,
   /// preserving historical habit strengths and vault backups.
   Future<void> clear() async {
@@ -115,6 +141,7 @@ class KeyValueStorage {
     await (_db.delete(_db.appMetadata)
           ..where(
             (t) =>
+                t.key.like('${HabitStorage.habitStrengthPrefix}%').not() &
                 t.key.like('HABIT_STRENGTH_%').not() &
                 t.key.like('vault_data_%').not(),
           ))
