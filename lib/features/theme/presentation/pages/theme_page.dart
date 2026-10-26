@@ -53,7 +53,6 @@ class _ThemePageState extends ConsumerState<ThemePage> {
     final currentTheme = ref.watch(
       themeNotifierProvider.select((state) => state.currentTheme),
     );
-    final themeNotifier = ref.watch(themeNotifierProvider.notifier);
     final availableThemes = themeColors.keys.toList();
 
     return KeyboardListener(
@@ -95,7 +94,9 @@ class _ThemePageState extends ConsumerState<ThemePage> {
                       themeName: themeName,
                       colors: colors,
                       isSelected: isSelected,
-                      onTap: () => themeNotifier.changeCustomTheme(themeName),
+                      onTap: () => ref
+                          .read(themeNotifierProvider.notifier)
+                          .changeCustomTheme(themeName),
                     ),
                   );
                 },
