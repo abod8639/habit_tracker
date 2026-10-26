@@ -45,7 +45,6 @@ class Tablet extends ConsumerWidget {
     );
 
     final asyncHabit = ref.watch(asyncHabitProvider);
-    final habitNotifier = ref.watch(habitNotifierProvider.notifier);
 
     return Scaffold(
       drawer: const MyDrawer(),
@@ -61,11 +60,11 @@ class Tablet extends ConsumerWidget {
         loading: () => buildLoadingScreen(),
         error: (error, stackTrace) => ErrorView(
           errorMessage: error is Failure ? error.toMessage() : error.toString(),
-          onRetry: habitNotifier.retry,
+          onRetry: () => ref.read(habitNotifierProvider.notifier).retry(),
         ),
         data: (habitState) {
           final datasets = habitState.heatmapDateSet;
-          final startDay = habitNotifier.getStartDay();
+          final startDay = ref.watch(habitStartDayProvider);
 
           return Stack(
             children: [
