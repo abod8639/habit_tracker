@@ -4,7 +4,7 @@ import 'package:habit_tracker/core/database/app_database.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_storage.dart';
 
 /// Fast, in-memory cached Key-Value storage backed by SQLite (AppDatabase/AppMetadata).
-/// Replaces Hive boxes with zero external dependencies and instant O(1) synchronous reads.
+/// Zero external storage dependencies and instant O(1) synchronous reads.
 class KeyValueStorage {
   final AppDatabase _db;
   final Map<String, String> _cache = {};
