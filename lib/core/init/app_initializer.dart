@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -51,29 +52,13 @@ class AppInitializer {
         // .env is optional
       }
 
-      // 6. Initialize independent infrastructure services
+      // 6. Initialize independent infrastructure services immediately as singletons
       firestoreService = FirestoreService();
+      notificationService = NotificationService();
+      fcmService = FcmService();
 
-      await Future.wait([
-        () async {
-          try {
-            final notif = NotificationService();
-            await notif.init();
-            notificationService = notif;
-          } catch (e) {
-            debugPrint('NotificationService initialization error: $e');
-          }
-        }(),
-        () async {
-          try {
-            final fcm = FcmService();
-            await fcm.init();
-            fcmService = fcm;
-          } catch (e) {
-            debugPrint('FcmService initialization error: $e');
-          }
-        }(),
-      ]);
+      // Launch async platform services in background without blocking runApp() or delaying first frame render
+      unawaited(_initBackgroundServices());
 
       // 7. Initialize Localization so S.current is never null on startup or hot restart
       try {
@@ -95,6 +80,31 @@ class AppInitializer {
       }
     } catch (e) {
       throw Exception('FATAL initialization error: $e');
+    }
+  }
+
+  /// Initializes background services (Notifications, FCM) asynchronously
+  /// without blocking the UI main thread during app bootstrap.
+  static Future<void> _initBackgroundServices() async {
+    try {
+      await Future.wait([
+        () async {
+          try {
+            await notificationService?.init();
+          } catch (e) {
+            debugPrint('NotificationService initialization error: $e');
+          }
+        }(),
+        () async {
+          try {
+            await fcmService?.init();
+          } catch (e) {
+            debugPrint('FcmService initialization error: $e');
+          }
+        }(),
+      ]);
+    } catch (e) {
+      debugPrint('Background services initialization error: $e');
     }
   }
 }
