@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/app_confirmation_dialog.dart';
 import 'package:habit_tracker/core/components/neumorphic_icon_button.dart';
-import 'package:habit_tracker/core/guards/ai_guard.dart';
-import 'package:go_router/go_router.dart';
-import 'package:habit_tracker/core/routes/app_routes.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
@@ -203,25 +200,25 @@ class HomeAppBar extends ConsumerWidget {
           ),
         ),
       ),
-      actions: [
-        Center(
-          child: Padding(
-            padding: const EdgeInsetsDirectional.only(end: 16),
-            child: NeumorphicIconButton.square(
-              customShadows: AppShadows.softCard(isDark: isDark),
-              size: 46,
-              icon: Icons.auto_awesome_rounded,
-              iconColor: Theme.of(context).colorScheme.primary,
-              iconSize: 22,
-              tooltip: S.current.generatePlan,
-              onPressed: () => AiGuard.protect(
-                context,
-                onValid: () => context.push(AppRoutes.categorySelection),
-              ),
-            ),
-          ),
-        ),
-      ],
+      // actions: [
+      //   Center(
+      //     child: Padding(
+      //       padding: const EdgeInsetsDirectional.only(end: 16),
+      //       child: NeumorphicIconButton.square(
+      //         customShadows: AppShadows.softCard(isDark: isDark),
+      //         size: 46,
+      //         icon: Icons.auto_awesome_rounded,
+      //         iconColor: Theme.of(context).colorScheme.primary,
+      //         iconSize: 22,
+      //         tooltip: S.current.generatePlan,
+      //         onPressed: () => AiGuard.protect(
+      //           context,
+      //           onValid: () => context.push(AppRoutes.categorySelection),
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ],
     );
   }
 
