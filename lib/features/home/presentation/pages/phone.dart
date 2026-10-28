@@ -7,9 +7,9 @@ import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
+import 'package:habit_tracker/features/home/presentation/widget/curved_bottom_nav_bar.dart';
 import 'package:habit_tracker/features/home/presentation/widget/habit_list.dart';
 import 'package:habit_tracker/features/home/presentation/widget/home_app_bar.dart';
-import 'package:habit_tracker/features/home/presentation/widget/my_fab.dart';
 import 'package:habit_tracker/features/home/presentation/widget/sliver_monthly_summary.dart';
 
 /// Clean Architecture Phone layout for the Habit Tracker Home screen.
@@ -64,16 +64,23 @@ class _PhoneState extends ConsumerState<Phone> {
     return Scaffold(
       drawer: const MyDrawer(),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: isSelectionMode
-          ? const SizedBox.shrink()
-          : Hero(
-              tag: 'ai_button',
-              child: MyfloatingActionButton(
-                onPressed: () => HabitDialogs.showAdd(context, ref: ref),
-              ),
-            ),
+      extendBody: true,
+      bottomNavigationBar: AnimatedSlide(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOutCubic,
+        offset: isSelectionMode ? const Offset(0, 1.2) : Offset.zero,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          opacity: isSelectionMode ? 0.0 : 1.0,
+          child: isSelectionMode
+              ? const SizedBox.shrink()
+              : CurvedBottomNavBar(
+                  onAddHabit: () => HabitDialogs.showAdd(context, ref: ref),
+                ),
+        ),
+      ),
       body: SafeArea(
+        bottom: false,
         child: asyncHabit.when(
           loading: () => buildLoadingScreen(),
           error: (error, stackTrace) => ErrorView(
@@ -90,7 +97,7 @@ class _PhoneState extends ConsumerState<Phone> {
               SliverMonthlySummary(),
               HabitList(),
               SliverToBoxAdapter(
-                child: SizedBox(height: 85),
+                child: SizedBox(height: 115),
               ),
             ],
           ),
