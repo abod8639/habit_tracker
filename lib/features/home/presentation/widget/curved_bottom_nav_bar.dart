@@ -4,18 +4,21 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit_tracker/core/guards/ai_guard.dart';
 import 'package:habit_tracker/core/routes/app_routes.dart';
+import 'package:habit_tracker/core/theme/app_theme.dart';
 import 'package:habit_tracker/features/ai_chat/presentation/pages/ai_chat_page.dart';
+import 'package:habit_tracker/features/habitstats/presentation/pages/habit_stats_page.dart';
 import 'package:habit_tracker/features/setting/presentation/pages/settings_page.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
-/// A modern, curved floating Bottom Navigation Bar matching the reference design.
+/// A modern, curved floating Bottom Navigation Bar fully wired to the application's
+/// design system and theme tokens in `/core/theme/`.
 ///
 /// Features:
 /// - Smooth organic curved scoop cutout for the central Floating Action Button.
-/// - Left button: Navigates to [SettingsPage].
-/// - Center FloatingActionButton: Triggers new habit creation dialog.
-/// - Right button: Navigates to [AiChatPage] (protected by [AiGuard]).
-/// - Polished light & dark theme styling with soft shadows and micro-interactions.
+/// - Left button: Navigates to [SettingsPage] using [AppThemeColors.drawerSettingsIcon].
+/// - Center FloatingActionButton: Triggers new habit creation dialog using [ThemeUtils.accentGradient].
+/// - Right button: Navigates to [AiChatPage] using [AppThemeColors.drawerAiIcon] and protected by [AiGuard].
+/// - Dynamic Neumorphic surface, lighting, and shadows derived directly from [ThemeData], [ThemeUtils], and [AppShadows].
 class CurvedBottomNavBar extends StatelessWidget {
   /// Callback when the central Floating Action Button is tapped.
   final VoidCallback onAddHabit;
@@ -30,13 +33,13 @@ class CurvedBottomNavBar extends StatelessWidget {
   static const double _totalHeight = _barHeight + _fabOverflow;
   static const double _fabSize = 54.0;
 
-  void _navigateToSettings(BuildContext context) {
+  void _navigateToStats(BuildContext context) {
     HapticFeedback.lightImpact();
     try {
-      context.push(AppRoutes.settings);
+      context.push(AppRoutes.stats);
     } catch (_) {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const SettingsPage()),
+        MaterialPageRoute(builder: (_) => const HabitStatsPage()),
       );
     }
   }
@@ -59,8 +62,10 @@ class CurvedBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final theme = context.theme;
+    final isDark = context.isDark;
+    final appColors = context.appColors;
+    final primaryColor = context.colorScheme.primary;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Padding(
@@ -84,7 +89,7 @@ class CurvedBottomNavBar extends StatelessWidget {
               child: CustomPaint(
                 painter: _CurvedBarPainter(
                   isDark: isDark,
-                  theme: theme,
+                  baseColor: theme.cardColor,
                   yTop: _fabOverflow,
                   barHeight: _barHeight,
                 ),
@@ -105,11 +110,13 @@ class CurvedBottomNavBar extends StatelessWidget {
                     Expanded(
                       child: Center(
                         child: _NavBarItem(
-                          icon: Icons.settings_outlined,
-                          activeIcon: Icons.settings_rounded,
+                          icon: Icons.auto_graph_sharp,
+                          activeIcon: Icons.auto_graph_rounded,
                           tooltip: S.of(context).drawerSetting,
                           isDark: isDark,
-                          onTap: () => _navigateToSettings(context),
+                          accentColor: appColors.drawerStatsIcon,
+                          surfaceColor: theme.cardColor,
+                          onTap: () => _navigateToStats(context),
                         ),
                       ),
                     ),
@@ -121,10 +128,12 @@ class CurvedBottomNavBar extends StatelessWidget {
                     Expanded(
                       child: Center(
                         child: _NavBarItem(
-                          icon: Icons.chat_bubble_outline_rounded,
-                          activeIcon: Icons.chat_bubble_rounded,
+                          icon: Icons.psychology,
+                          activeIcon: Icons.psychology_outlined,
                           tooltip: S.of(context).aiCoach,
                           isDark: isDark,
+                          accentColor: appColors.drawerAiIcon,
+                          surfaceColor: theme.cardColor,
                           hasSparkleBadge: true,
                           onTap: () => _navigateToAiChat(context),
                         ),
@@ -137,9 +146,11 @@ class CurvedBottomNavBar extends StatelessWidget {
 
             // ── Central Floating Action Button (Add Habit) ────────────────
             Positioned(
-              top: 0,
+              top: 3,
               child: _CenterAddButton(
                 size: _fabSize,
+                primaryColor: primaryColor,
+                isDark: isDark,
                 onPressed: onAddHabit,
               ),
             ),
@@ -150,16 +161,17 @@ class CurvedBottomNavBar extends StatelessWidget {
   }
 }
 
-/// Custom painter that draws the smooth curved notch and rounded floating bar.
+/// Custom painter that draws the smooth curved notch and rounded floating bar
+/// driven dynamically by [AppRadius], [AppShadows], and [ThemeUtils].
 class _CurvedBarPainter extends CustomPainter {
   final bool isDark;
-  final ThemeData theme;
+  final Color baseColor;
   final double yTop;
   final double barHeight;
 
   const _CurvedBarPainter({
     required this.isDark,
-    required this.theme,
+    required this.baseColor,
     required this.yTop,
     required this.barHeight,
   });
@@ -169,7 +181,7 @@ class _CurvedBarPainter extends CustomPainter {
     final double w = size.width;
     final double yBot = yTop + barHeight;
     final double cx = w / 2;
-    const double r = 28.0; // Outer corner radius
+    final double r = AppRadius.dialog; // 28.0 from AppRadius design tokens
     const double notchSpread = 48.0; // Half width of scoop
     const double notchDepth = 34.0; // Depth of notch scoop
 
@@ -198,80 +210,63 @@ class _CurvedBarPainter extends CustomPainter {
       // Top right straight line
       ..lineTo(w - r, yTop)
       // Top right corner
-      ..arcToPoint(Offset(w, yTop + r), radius: const Radius.circular(r))
+      ..arcToPoint(Offset(w, yTop + r), radius: Radius.circular(r))
       // Right vertical edge
       ..lineTo(w, yBot - r)
       // Bottom right corner
-      ..arcToPoint(Offset(w - r, yBot), radius: const Radius.circular(r))
+      ..arcToPoint(Offset(w - r, yBot), radius: Radius.circular(r))
       // Bottom horizontal line
       ..lineTo(r, yBot)
       // Bottom left corner
-      ..arcToPoint(Offset(0, yBot - r), radius: const Radius.circular(r))
+      ..arcToPoint(Offset(0, yBot - r), radius: Radius.circular(r))
       // Left vertical edge
       ..lineTo(0, yTop + r)
       // Top left corner
-      ..arcToPoint(Offset(r, yTop), radius: const Radius.circular(r))
+      ..arcToPoint(Offset(r, yTop), radius: Radius.circular(r))
       ..close();
 
-    // ── Drop Shadows ────────────────────────────────────────────────────────
-    if (isDark) {
-      // Dark mode ambient & contact shadows
-      final shadowPaint1 = Paint()
-        ..color = Colors.black.withValues(alpha: 0.45)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16);
-      canvas.drawPath(path.shift(const Offset(0, 6)), shadowPaint1);
+    // ── Drop Shadows from AppShadows Engine ──────────────────────────────────
+    final darkShadow = AppShadows.darkShadowColor(isDark);
+    final lightShadow = AppShadows.lightShadowColor(isDark);
 
-      final shadowPaint2 = Paint()
-        ..color = Colors.black.withValues(alpha: 0.30)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
-      canvas.drawPath(path.shift(const Offset(0, 2)), shadowPaint2);
-    } else {
-      // Light mode soft multi-layer neumorphic/elevation shadows
-      final shadowPaint1 = Paint()
-        ..color = const Color(0xFF64748B).withValues(alpha: 0.12)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
-      canvas.drawPath(path.shift(const Offset(0, 6)), shadowPaint1);
+    // Primary ambient depth shadow
+    final shadowPaint1 = Paint()
+      ..color = darkShadow.withValues(alpha: isDark ? 0.65 : 0.20)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, isDark ? 16 : 18);
+    canvas.drawPath(path.shift(const Offset(0, 6)), shadowPaint1);
 
-      final shadowPaint2 = Paint()
-        ..color = const Color(0xFF0F172A).withValues(alpha: 0.06)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
-      canvas.drawPath(path.shift(const Offset(0, 2)), shadowPaint2);
-    }
+    // Secondary contact/light shadow
+    final shadowPaint2 = Paint()
+      ..color = isDark
+          ? darkShadow.withValues(alpha: 0.35)
+          : lightShadow.withValues(alpha: 0.60)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
+    canvas.drawPath(path.shift(const Offset(0, 2)), shadowPaint2);
 
-    // ── Surface Fill Gradient ──────────────────────────────────────────────
+    // ── Surface Fill Gradient using ThemeUtils ──────────────────────────────
     final surfaceRect = Rect.fromLTWH(0, yTop, w, barHeight);
     final surfacePaint = Paint()
-      ..shader = LinearGradient(
+      ..shader = ThemeUtils.softGradient(
+        baseColor: baseColor,
+        isDark: isDark,
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: isDark
-            ? [
-                const Color(0xFF22242A),
-                const Color(0xFF191A1E),
-              ]
-            : [
-                Colors.white,
-                const Color(0xFFF6F8FA),
-              ],
       ).createShader(surfaceRect);
     canvas.drawPath(path, surfacePaint);
 
-    // ── Subtle Glass/Neumorphic Outer Stroke ────────────────────────────────
+    // ── Subtle Glass/Neumorphic Outer Stroke using ThemeUtils ────────────────
+    final borderStartColor = ThemeUtils.subtleBorderColor(isDark);
+    final borderEndColor = borderStartColor.withValues(
+      alpha: isDark ? 0.03 : 0.20,
+    );
+
     final borderPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: isDark
-            ? [
-                Colors.white.withValues(alpha: 0.14),
-                Colors.white.withValues(alpha: 0.04),
-              ]
-            : [
-                Colors.white,
-                Colors.black.withValues(alpha: 0.06),
-              ],
+        colors: [borderStartColor, borderEndColor],
       ).createShader(surfaceRect);
     canvas.drawPath(path, borderPaint);
   }
@@ -279,19 +274,24 @@ class _CurvedBarPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _CurvedBarPainter oldDelegate) {
     return oldDelegate.isDark != isDark ||
-        oldDelegate.theme != theme ||
+        oldDelegate.baseColor != baseColor ||
         oldDelegate.yTop != yTop ||
         oldDelegate.barHeight != barHeight;
   }
 }
 
-/// The central Floating Action Button nested into the scoop cutout.
+/// The central Floating Action Button nested into the scoop cutout,
+/// styled with [ThemeUtils.accentGradient] and [AppShadows].
 class _CenterAddButton extends StatefulWidget {
   final double size;
+  final Color primaryColor;
+  final bool isDark;
   final VoidCallback onPressed;
 
   const _CenterAddButton({
     required this.size,
+    required this.primaryColor,
+    required this.isDark,
     required this.onPressed,
   });
 
@@ -316,7 +316,6 @@ class _CenterAddButtonState extends State<_CenterAddButton>
       CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
   }
-
 
   @override
   void dispose() {
@@ -343,23 +342,15 @@ class _CenterAddButtonState extends State<_CenterAddButton>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = widget.isDark;
+    final primaryColor = widget.primaryColor;
 
-    // Vibrant violet/purple matching the reference image
-    final Color purplePrimary = theme.colorScheme.primary;
-    final Color purpleGradientStart = Color.lerp(
-          purplePrimary,
-          Colors.white,
-          0.16,
-        ) ??
-        const Color(0xFF7E57C2);
-    final Color purpleGradientEnd = Color.lerp(
-          purplePrimary,
-          const Color(0xFF4527A0),
-          0.45,
-        ) ??
-        const Color(0xFF5E35B1);
+    // Derived gradients directly from ThemeUtils design tokens
+    final gradientStart = ThemeUtils.accentGradientStart(primaryColor, isDark);
+    final gradientEnd = ThemeUtils.accentGradientEnd(primaryColor, isDark);
+
+    // Icon contrast color matching ThemeUtils engine
+    final iconColor = ThemeUtils.getContrastColor(primaryColor);
 
     return ScaleTransition(
       scale: _scaleAnimation,
@@ -378,33 +369,25 @@ class _CenterAddButtonState extends State<_CenterAddButton>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: _isPressed
-                    ? [purpleGradientEnd, purpleGradientStart]
-                    : [purpleGradientStart, purpleGradientEnd],
+                    ? [gradientEnd, gradientStart]
+                    : [gradientStart, gradientEnd],
               ),
               border: Border.all(
-                color: Colors.white.withValues(alpha: isDark ? 0.35 : 0.65),
+                color: ThemeUtils.subtleBorderColor(
+                  isDark,
+                  isPressed: _isPressed,
+                ),
                 width: 1.5,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: purplePrimary.withValues(alpha: isDark ? 0.45 : 0.35),
-                  blurRadius: 14,
-                  offset: const Offset(0, 5),
-                  spreadRadius: 1,
-                ),
-                if (!isDark)
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-              ],
+              boxShadow: _isPressed
+                  ? AppShadows.buttonPressed(isDark: isDark)
+                  : AppShadows.buttonResting(isDark: isDark),
             ),
-            child: const Center(
+            child: Center(
               child: Icon(
                 Icons.add_rounded,
                 size: 28,
-                color: Colors.white,
+                color: iconColor,
               ),
             ),
           ),
@@ -414,12 +397,15 @@ class _CenterAddButtonState extends State<_CenterAddButton>
   }
 }
 
-/// An interactive navigation item in the bottom bar with tactile feedback and active indicator.
+/// An interactive navigation item in the bottom bar with tactile feedback and active indicator,
+/// styled with [ThemeUtils] and [AppRadius].
 class _NavBarItem extends StatefulWidget {
   final IconData icon;
   final IconData activeIcon;
   final String tooltip;
   final bool isDark;
+  final Color accentColor;
+  final Color surfaceColor;
   final bool hasSparkleBadge;
   final VoidCallback onTap;
 
@@ -428,6 +414,8 @@ class _NavBarItem extends StatefulWidget {
     required this.activeIcon,
     required this.tooltip,
     required this.isDark,
+    required this.accentColor,
+    required this.surfaceColor,
     this.hasSparkleBadge = false,
     required this.onTap,
   });
@@ -478,14 +466,12 @@ class _NavBarItemState extends State<_NavBarItem>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.colorScheme.primary;
+    final isDark = widget.isDark;
+    final accentColor = widget.accentColor;
 
-    final Color normalIconColor = widget.isDark
-        ? Colors.white.withValues(alpha: 0.70)
-        : Colors.black.withValues(alpha: 0.60);
-
-    final Color activeIconColor = primaryColor;
+    // Inactive tone computed using ThemeUtils contrast against surface color
+    final textColor = ThemeUtils.getContrastColor(widget.surfaceColor);
+    final normalIconColor = textColor.withValues(alpha: isDark ? 0.65 : 0.55);
 
     return Tooltip(
       message: widget.tooltip,
@@ -510,30 +496,29 @@ class _NavBarItemState extends State<_NavBarItem>
                   children: [
                     Icon(
                       _isPressed ? widget.activeIcon : widget.icon,
-                      size: 24,
-                      color: _isPressed ? activeIconColor : normalIconColor,
+                      size: 30,
+                      color: _isPressed ? accentColor : normalIconColor,
                     ),
 
                     // Subtle AI sparkle badge on the chat bubble
-                    if (widget.hasSparkleBadge)
-                      Positioned(
-                        top: -2,
-                        right: -4,
-                        child: Container(
-                          width: 7,
-                          height: 7,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: primaryColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: primaryColor.withValues(alpha: 0.6),
-                                blurRadius: 4,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    // if (widget.hasSparkleBadge)
+                    //   Positioned(
+                    //     top: -2,
+                    //     right: -4,
+                    //     child: Container(
+                    //       width: 7,
+                    //       height: 7,
+                    //       decoration: BoxDecoration(
+                    //         shape: BoxShape.circle,
+                    //         color: accentColor,
+                    //         boxShadow: AppShadows.bloom(
+                    //           color: accentColor,
+                    //           isDark: isDark,
+                    //           blur: 4.0,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -545,8 +530,8 @@ class _NavBarItemState extends State<_NavBarItem>
                   width: _isPressed ? 14 : 0,
                   height: 2.5,
                   decoration: BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.circular(2),
+                    color: accentColor,
+                    borderRadius: AppRadius.xsRadius,
                   ),
                 ),
               ],
