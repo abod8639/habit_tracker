@@ -3,7 +3,7 @@ import 'package:habit_tracker/features/home/data/models/habit_vault_data.dart';
 
 /// Persistent offline vault datasource that safeguards habit data, streaks,
 /// and completion history across sessions, logouts, token expiries, and offline usage.
-/// Backed by SQLite (via KeyValueStorage) with zero Hive dependencies.
+/// Backed purely by SQLite (via KeyValueStorage).
 class HabitOfflineVaultDataSource {
   final KeyValueStorage _storage;
 
