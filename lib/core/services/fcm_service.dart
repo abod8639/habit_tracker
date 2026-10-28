@@ -55,13 +55,19 @@ class FcmService {
         sound: true,
       );
 
-      // 3. Get FCM token
-      // ignore: deprecated_member_use
-      final token = await _messaging.getToken();
-      if (token != null) {
-        fcmToken = token;
-        debugPrint('FCM Token: $token');
-        await syncTokenToFirestore(token);
+      // 3. Get FCM token with timeout to prevent hanging on flaky networks
+      try {
+        final token = await _messaging
+            // ignore: deprecated_member_use
+            .getToken()
+            .timeout(const Duration(seconds: 4));
+        if (token != null) {
+          fcmToken = token;
+          debugPrint('FCM Token: $token');
+          await syncTokenToFirestore(token);
+        }
+      } catch (e) {
+        debugPrint('FCM Token retrieval skipped or timed out: $e');
       }
 
       // 4. Listen for token refresh
@@ -72,10 +78,16 @@ class FcmService {
         await syncTokenToFirestore(newToken);
       });
 
-      // 5. Subscribe to broadcast topics
+      // 5. Subscribe to broadcast topics with timeout
       try {
-        await _messaging.subscribeToTopic('all_users');
-        await _messaging.subscribeToTopic('habits');
+        await Future.wait([
+          _messaging
+              .subscribeToTopic('all_users')
+              .timeout(const Duration(seconds: 4)),
+          _messaging
+              .subscribeToTopic('habits')
+              .timeout(const Duration(seconds: 4)),
+        ]);
       } catch (e) {
         debugPrint('Failed to subscribe to topics: $e');
       }
