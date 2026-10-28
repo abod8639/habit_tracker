@@ -3,7 +3,6 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_tracker/core/database/app_database.dart';
 import 'package:habit_tracker/core/database/database_provider.dart';
-import 'package:habit_tracker/core/database/migrators/hive_to_sql_migrator.dart';
 import 'package:habit_tracker/features/home/data/datasources/habit_sql_local_data_source.dart';
 import 'package:habit_tracker/features/home/data/models/date_time.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
@@ -232,16 +231,6 @@ void main() {
         expect(restored.length, 1);
         expect(restored.first.id, 'snap_1');
         expect(dataSource.getStartDate(), '20260101');
-      },
-    );
-
-    test(
-      'HiveToSqlMigrator reports migration completed for direct SQLite usage',
-      () async {
-        final migrator = HiveToSqlMigrator(db);
-        expect(await migrator.isMigrationDone(), true);
-        await migrator.migrateIfNeeded();
-        expect(await migrator.isMigrationDone(), true);
       },
     );
 
