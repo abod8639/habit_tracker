@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/providers/core_providers.dart';
 import 'package:habit_tracker/core/theme/theme_utils.dart';
-import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
+import 'package:habit_tracker/core/theme/theme_list.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_local_datasource.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_remote_datasource.dart';
 import 'package:habit_tracker/features/theme/data/repositories/theme_repository_impl.dart';

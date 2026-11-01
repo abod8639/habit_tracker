@@ -5,7 +5,7 @@ import 'package:habit_tracker/core/components/page_entrance_transition.dart';
 import 'package:habit_tracker/core/components/section_title.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/utils/keyboard_shortcuts.dart';
-import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
+import 'package:habit_tracker/core/theme/theme_list.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 import '../providers/theme_providers.dart';
 import '../widgets/theme_card.dart';

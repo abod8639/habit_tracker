@@ -7,7 +7,7 @@ import 'package:habit_tracker/features/home/domain/entities/habit_entity.dart';
 import 'package:habit_tracker/features/home_app_widget/home_app_widget_view.dart';
 import 'package:habit_tracker/core/init/app_initializer.dart';
 import 'package:habit_tracker/core/theme/theme_utils.dart';
-import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
+import 'package:habit_tracker/core/theme/theme_list.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class _WidgetRenderRequest {

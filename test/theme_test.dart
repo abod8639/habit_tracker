@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habit_tracker/features/theme/data/datasources/theme_list.dart';
+import 'package:habit_tracker/core/theme/theme_list.dart';
 import 'package:habit_tracker/features/theme/data/datasources/theme_utils.dart';
 
 void main() {

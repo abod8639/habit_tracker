@@ -96,11 +96,10 @@ const Map<String, Map<String, Color>> themeColors = {
     'onSecondary': Color(0xFFCAD3F5),
   },
 
-  // --- الثيمات الداكنة المتخصصة (Dark Neumorphism) ---
   'dracula': {
     'primary': Color.fromARGB(255, 176, 120, 255),
     'secondary': Color.fromARGB(255, 255, 110, 192),
-    'background': Color(0xFF282A36), // لون دراكولا الشهير ممتاز للظلال
+    'background': Color(0xFF282A36), 
     'surface': Color(0xFF282A36),
     'error': Color(0xFFFF5555),
     'onPrimary': Color(0xFF21222C),
@@ -112,7 +111,7 @@ const Map<String, Map<String, Color>> themeColors = {
     'secondary': Color.fromARGB(255, 138, 14, 233),
     'background': Color(
       0xFF1A2234,
-    ), // أزرق كحلي ناعم بدلاً من الأسود الداكن جداً
+    ), 
     'surface': Color(0xFF1A2234),
     'error': Color(0xFFFB7185),
     'onPrimary': Color(0xFF0F172A),
@@ -122,10 +121,19 @@ const Map<String, Map<String, Color>> themeColors = {
   'neon_circuit': {
     'primary': Color(0xFF00E599),
     'secondary': Color.fromARGB(255, 5, 106, 150),
-    'background': Color(0xFF192329), // زيتي داكن يسمح بظهور الحواف المنحوتة
+    'background': Color(0xFF192329), 
     'surface': Color(0xFF192329),
     'error': Color(0xFFF43F5E),
     'onPrimary': Color(0xFF0A1014),
     'onSecondary': Color(0xFFE0F2FE),
+  },
+  'halloween_pumpkin': {
+    'primary': Color(0xFFFF7518), 
+    'secondary': Color.fromARGB(255, 157, 78, 221), 
+    'background': Color(0xFF18131A), 
+    'surface': Color(0xFF18131A),
+    'error': Color(0xFFFF3838), 
+    'onPrimary': Color(0xFF1A0A00), 
+    'onSecondary': Color(0xFFF9F5FF), 
   },
 };
