@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/features/home/presentation/providers/habit_providers.dart';
+import 'package:habit_tracker/features/home/presentation/widget/habit_list_skeleton.dart';
 import 'package:habit_tracker/features/home/presentation/widget/no_habits_yet.dart';
 import 'package:habit_tracker/features/home/presentation/widget/my_text_taile.dart';
 import 'package:habit_tracker/features/home/presentation/dialogs/habit_dialogs.dart';
@@ -10,6 +11,14 @@ class HabitList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isInitialized = ref.watch(
+      habitNotifierProvider.select((s) => s.isInitialized),
+    );
+
+    if (!isInitialized) {
+      return const SliverHabitListSkeleton();
+    }
+
     final habits = ref.watch(
       habitNotifierProvider.select((s) => s.habits),
     );
