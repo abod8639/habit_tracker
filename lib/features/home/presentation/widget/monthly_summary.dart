@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/core/components/shimmer_effect.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/core/components/soft_card.dart';
@@ -14,8 +15,13 @@ import 'package:habit_tracker/generated/l10n.dart';
 /// for inactive days and glowing gradient pills for completed days tailored to the active theme.
 class MonthlySummary extends ConsumerStatefulWidget {
   final Map<DateTime, int> datasets;
+  final bool isLoading;
 
-  const MonthlySummary({super.key, required this.datasets});
+  const MonthlySummary({
+    super.key,
+    required this.datasets,
+    this.isLoading = false,
+  });
 
   @override
   ConsumerState<MonthlySummary> createState() => _MonthlySummaryState();
@@ -106,6 +112,7 @@ class _MonthlySummaryState extends ConsumerState<MonthlySummary>
     BuildContext context,
     DateTime normalizedDate,
   ) async {
+    if (widget.isLoading) return;
     final messenger = ScaffoldMessenger.of(context);
     final themeColors = Theme.of(context).colorScheme;
     final status = await ref
@@ -269,132 +276,138 @@ class _MonthlySummaryState extends ConsumerState<MonthlySummary>
           margin: EdgeInsets.zero,
           padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
           // Force LTR directionality so calendar consistently flows from past (left) to present (right)
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Pinned Weekday Labels Column (Sun, Mon, Tue, Wed, Thu, Fri, Sat)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: _headerHeight + _headerGap),
-                  ...List.generate(7, (index) {
-                    return Container(
-                      height: _tileSize,
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.only(
-                        bottom: index < 6 ? _tileGap : 0,
-                      ),
-                      child: Text(
-                        weekdayLabels[index],
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.w500,
-                          color: labelColor,
+          child: ShimmerEffect(
+            enabled: widget.isLoading,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Pinned Weekday Labels Column (Sun, Mon, Tue, Wed, Thu, Fri, Sat)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: _headerHeight + _headerGap),
+                    ...List.generate(7, (index) {
+                      return Container(
+                        height: _tileSize,
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(
+                          bottom: index < 6 ? _tileGap : 0,
                         ),
-                      ),
-                    );
-                  }),
-                ],
-              ),
-              const SizedBox(width: 8),
-              // Horizontally Scrollable Matrix Grid anchored to the present/future weeks
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  reverse:
-                      true, // Natively anchors scroll to the latest weeks/today!
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Month Headers Row (Mar, Apr, May...)
-                      Row(
-                        children: List.generate(weekSundays.length, (colIdx) {
-                          return Container(
-                            width: _tileSize,
-                            height: _headerHeight,
-                            margin: EdgeInsets.only(
-                              right: colIdx < weekSundays.length - 1
-                                  ? _tileGap
-                                  : 0,
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              monthLabels[colIdx],
-                              maxLines: 1,
-                              overflow: TextOverflow.visible,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w600,
-                                color: labelColor,
+                        child: Text(
+                          weekdayLabels[index],
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.w500,
+                            color: labelColor,
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+                const SizedBox(width: 8),
+                // Horizontally Scrollable Matrix Grid anchored to the present/future weeks
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    reverse:
+                        true, // Natively anchors scroll to the latest weeks/today!
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Month Headers Row (Mar, Apr, May...)
+                        Row(
+                          children: List.generate(weekSundays.length, (colIdx) {
+                            return Container(
+                              width: _tileSize,
+                              height: _headerHeight,
+                              margin: EdgeInsets.only(
+                                right: colIdx < weekSundays.length - 1
+                                    ? _tileGap
+                                    : 0,
                               ),
-                            ),
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: _headerGap),
-                      // Day Tile Matrix
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(weekSundays.length, (colIdx) {
-                          final weekSunday = weekSundays[colIdx];
-                          return Container(
-                            margin: EdgeInsets.only(
-                              right: colIdx < weekSundays.length - 1
-                                  ? _tileGap
-                                  : 0,
-                            ),
-                            child: Column(
-                              children: List.generate(7, (rowIdx) {
-                                final dayDate = DateTime(
-                                  weekSunday.year,
-                                  weekSunday.month,
-                                  weekSunday.day + rowIdx,
-                                );
-                                final normalizedDay = DateTime(
-                                  dayDate.year,
-                                  dayDate.month,
-                                  dayDate.day,
-                                );
-                                final isToday =
-                                    normalizedDay.year == today.year &&
-                                    normalizedDay.month == today.month &&
-                                    normalizedDay.day == today.day;
-                                final isFuture = normalizedDay.isAfter(today);
-                                final strength = _getStrength(
-                                  normalizedDay,
-                                  today,
-                                  habits,
-                                );
+                              alignment: Alignment.center,
+                              child: Text(
+                                monthLabels[colIdx],
+                                maxLines: 1,
+                                overflow: TextOverflow.visible,
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: labelColor,
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: _headerGap),
+                        // Day Tile Matrix
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: List.generate(weekSundays.length, (colIdx) {
+                            final weekSunday = weekSundays[colIdx];
+                            return Container(
+                              margin: EdgeInsets.only(
+                                right: colIdx < weekSundays.length - 1
+                                    ? _tileGap
+                                    : 0,
+                              ),
+                              child: Column(
+                                children: List.generate(7, (rowIdx) {
+                                  final dayDate = DateTime(
+                                    weekSunday.year,
+                                    weekSunday.month,
+                                    weekSunday.day + rowIdx,
+                                  );
+                                  final normalizedDay = DateTime(
+                                    dayDate.year,
+                                    dayDate.month,
+                                    dayDate.day,
+                                  );
+                                  final isToday =
+                                      normalizedDay.year == today.year &&
+                                      normalizedDay.month == today.month &&
+                                      normalizedDay.day == today.day;
+                                  final isFuture = normalizedDay.isAfter(today);
+                                  final strength = _getStrength(
+                                    normalizedDay,
+                                    today,
+                                    habits,
+                                  );
 
-                                return Container(
-                                  margin: EdgeInsets.only(
-                                    bottom: rowIdx < 6 ? _tileGap : 0,
-                                  ),
-                                  child: _NeumorphicDayTile(
-                                    date: dayDate,
-                                    strength: strength,
-                                    isToday: isToday,
-                                    isFuture: isFuture,
-                                    size: _tileSize,
-                                    onTap: () => _handleDayClick(
-                                      context,
-                                      normalizedDay,
+                                  return Container(
+                                    margin: EdgeInsets.only(
+                                      bottom: rowIdx < 6 ? _tileGap : 0,
                                     ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          );
-                        }),
-                      ),
-                      SizedBox(height: _tileGap * 1.5),
-                    ],
+                                    child: _NeumorphicDayTile(
+                                      date: dayDate,
+                                      strength: strength,
+                                      isToday: isToday,
+                                      isFuture: isFuture,
+                                      size: _tileSize,
+                                      isLoading: widget.isLoading,
+                                      onTap: widget.isLoading
+                                          ? null
+                                          : () => _handleDayClick(
+                                              context,
+                                              normalizedDay,
+                                            ),
+                                    ),
+                                  );
+                                }),
+                              ),
+                            );
+                          }),
+                        ),
+                        SizedBox(height: _tileGap * 1.5),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -414,6 +427,7 @@ class _NeumorphicDayTile extends StatefulWidget {
   final bool isFuture;
   final double size;
   final VoidCallback? onTap;
+  final bool isLoading;
 
   const _NeumorphicDayTile({
     required this.date,
@@ -422,6 +436,7 @@ class _NeumorphicDayTile extends StatefulWidget {
     required this.isFuture,
     required this.size,
     this.onTap,
+    this.isLoading = false,
   });
 
   @override
@@ -453,7 +468,7 @@ class _NeumorphicDayTileState extends State<_NeumorphicDayTile> {
     BoxDecoration decoration;
     TextStyle textStyle;
 
-    final bool isCompleted = widget.strength > 0;
+    final bool isCompleted = !widget.isLoading && widget.strength > 0;
 
     if (isCompleted) {
       // Progress ratio from 0.1 to 1.0 based on completion strength (1 to 10)
