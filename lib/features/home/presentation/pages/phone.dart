@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/core/components/build_error_screen.dart';
-import 'package:habit_tracker/core/components/build_loading_screen.dart';
 import 'package:habit_tracker/core/components/my_drawer.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/generated/l10n.dart';
@@ -82,27 +81,32 @@ class _PhoneState extends ConsumerState<Phone> {
       body: SafeArea(
         bottom: false,
         child: asyncHabit.when(
-          loading: () => buildLoadingScreen(),
+          loading: () => _buildHomeScrollView(),
           error: (error, stackTrace) => ErrorView(
             errorMessage: error is Failure
                 ? error.toMessage()
                 : error.toString(),
             onRetry: () => ref.read(habitNotifierProvider.notifier).retry(),
           ),
-          data: (habitState) => CustomScrollView(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(),
-            slivers: const [
-              HomeAppBar(),
-              SliverMonthlySummary(),
-              HabitList(),
-              SliverToBoxAdapter(
-                child: SizedBox(height: 115),
-              ),
-            ],
-          ),
+          data: (habitState) => _buildHomeScrollView(),
         ),
       ),
+    );
+  }
+
+  Widget _buildHomeScrollView() {
+    return CustomScrollView(
+      key: const PageStorageKey('phone_home_scroll_view'),
+      controller: _scrollController,
+      physics: const BouncingScrollPhysics(),
+      slivers: const [
+        HomeAppBar(),
+        SliverMonthlySummary(),
+        HabitList(),
+        SliverToBoxAdapter(
+          child: SizedBox(height: 115),
+        ),
+      ],
     );
   }
 }
