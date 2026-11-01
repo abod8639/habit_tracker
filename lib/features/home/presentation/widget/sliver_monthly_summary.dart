@@ -13,14 +13,21 @@ class SliverMonthlySummary extends ConsumerWidget {
     final datasets = ref.watch(
       habitNotifierProvider.select((s) => s.heatmapDateSet),
     );
-    final startDay = ref.watch(habitStartDayProvider);
+    final isInitialized = ref.watch(
+      habitNotifierProvider.select((s) => s.isInitialized),
+    );
+    final isLoading = ref.watch(
+      habitNotifierProvider.select((s) => s.isLoading),
+    );
+
+    final isHeatmapLoading = !isInitialized || (isLoading && datasets.isEmpty);
 
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: MonthlySummary(
-          key: ValueKey(startDay),
           datasets: Map<DateTime, int>.from(datasets),
+          isLoading: isHeatmapLoading,
         ),
       ),
     );
