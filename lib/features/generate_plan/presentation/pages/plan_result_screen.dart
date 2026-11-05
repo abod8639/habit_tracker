@@ -233,8 +233,10 @@ class PlanResultScreen extends ConsumerWidget {
                               children: [
                                 NeuOrb(
                                   size: 44,
-                                  emoji: category?.badgeEmoji ?? '🎯',
+                                  svgPath: category?.badgeSvg ??
+                                      'assets/svg/target.svg',
                                   depth: NeuDepth.inset,
+                                  color: category?.color,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
