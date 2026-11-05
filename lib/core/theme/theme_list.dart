@@ -128,7 +128,7 @@ const Map<String, Map<String, Color>> themeColors = {
     'onSecondary': Color(0xFFE0F2FE),
   },
   'halloween_pumpkin': {
-    'primary': Color(0xFFFF7518), 
+    'primary': Color.fromARGB(255, 255, 102, 0), 
     'secondary': Color.fromARGB(255, 157, 78, 221), 
     'background': Color(0xFF18131A), 
     'surface': Color(0xFF18131A),
