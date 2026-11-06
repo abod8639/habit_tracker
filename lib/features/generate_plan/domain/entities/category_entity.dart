@@ -108,17 +108,31 @@ enum PlanCategory {
     }
   }
 
-  /// Visual badge emoji for quick motivation
-  String get badgeEmoji {
+  /// Visual badge SVG asset path
+  String get badgeSvg {
     switch (this) {
       case PlanCategory.sports:
-        return '⚡';
+        return 'assets/svg/lightning.svg';
       case PlanCategory.nutrition:
-        return '🌱';
+        return 'assets/svg/sprout.svg';
       case PlanCategory.study:
-        return '🎯';
+        return 'assets/svg/target.svg';
       case PlanCategory.learning:
-        return '💡';
+        return 'assets/svg/lightbulb.svg';
     }
   }
+
+  /// Visual badge emoji for quick motivation / fallback
+  // String get badgeEmoji {
+  //   switch (this) {
+  //     case PlanCategory.sports:
+  //       return '⚡';
+  //     case PlanCategory.nutrition:
+  //       return '🌱';
+  //     case PlanCategory.study:
+  //       return '🎯';
+  //     case PlanCategory.learning:
+  //       return '💡';
+  //   }
+  // }
 }
