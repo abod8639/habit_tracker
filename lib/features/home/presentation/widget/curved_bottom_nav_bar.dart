@@ -470,8 +470,9 @@ class _NavBarItemState extends State<_NavBarItem>
     final accentColor = widget.accentColor;
 
     // Inactive tone computed using ThemeUtils contrast against surface color
-    final textColor = ThemeUtils.getContrastColor(widget.surfaceColor);
-    final normalIconColor = textColor.withValues(alpha: isDark ? 0.65 : 0.55);
+    // final textColor = ThemeUtils.getContrastColor(widget.surfaceColor);
+    final normalIconColor = accentColor.
+    withValues(alpha: isDark ? 0.65 : 0.55);
 
     return Tooltip(
       message: widget.tooltip,
@@ -499,26 +500,6 @@ class _NavBarItemState extends State<_NavBarItem>
                       size: 30,
                       color: _isPressed ? accentColor : normalIconColor,
                     ),
-
-                    // Subtle AI sparkle badge on the chat bubble
-                    // if (widget.hasSparkleBadge)
-                    //   Positioned(
-                    //     top: -2,
-                    //     right: -4,
-                    //     child: Container(
-                    //       width: 7,
-                    //       height: 7,
-                    //       decoration: BoxDecoration(
-                    //         shape: BoxShape.circle,
-                    //         color: accentColor,
-                    //         boxShadow: AppShadows.bloom(
-                    //           color: accentColor,
-                    //           isDark: isDark,
-                    //           blur: 4.0,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ),
                   ],
                 ),
                 const SizedBox(height: 4),
