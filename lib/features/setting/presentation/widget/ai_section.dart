@@ -5,6 +5,7 @@ import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/features/setting/presentation/providers/setting_providers.dart';
 import 'package:habit_tracker/features/setting/presentation/widget/ai_api_key_dialog.dart';
+import 'package:habit_tracker/features/setting/presentation/widget/ai_model_selection_dialog.dart';
 import 'package:habit_tracker/generated/l10n.dart';
 
 class AiSection extends ConsumerWidget {
@@ -119,8 +120,80 @@ class AiSection extends ConsumerWidget {
           ),
           onTap: () => AiApiKeyDialog.show(context),
         ),
+        AnimatedSettingTile(
+          animationController: animationController,
+          index: 8,
+          icon: Icons.psychology_rounded,
+          title: s.aiModelTitle,
+          subtitle: aiState.selectedModel,
+          trailing: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 5,
+            ),
+            decoration: BoxDecoration(
+              color: Color.alphaBlend(
+                theme.primaryColor.withValues(alpha: isDark ? 0.18 : 0.10),
+                baseSurface,
+              ),
+              borderRadius: AppRadius.badgeRadius,
+              boxShadow: AppShadows.dotIndicator(isDark: isDark),
+              border: Border.all(
+                color: theme.primaryColor.withValues(
+                  alpha: isDark ? 0.35 : 0.25,
+                ),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.tune_rounded,
+                  size: 14,
+                  color: theme.primaryColor,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  _formatModelBadge(aiState.selectedModel),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          onTap: () => AiModelSelectionDialog.show(context),
+        ),
       ],
     );
+  }
+
+  String _formatModelBadge(String modelId) {
+    switch (modelId) {
+      case 'gemini-3.5-flash-lite':
+        return '3.5 Flash Lite';
+      case 'gemini-3.5-flash':
+        return '3.5 Flash';
+      case 'gemini-3.8-flash':
+        return '3.8 Flash';
+      case 'gemini-3.7-flash':
+        return '3.7 Flash';
+      case 'gemini-3.6-flash':
+        return '3.6 Flash';
+      case 'gemini-flash-lite-latest':
+        return 'Flash Lite';
+      case 'gemini-flash-latest':
+        return 'Flash Latest';
+      default:
+        if (modelId.startsWith('gemini-')) {
+          return modelId.replaceFirst('gemini-', '');
+        }
+        return modelId.isEmpty ? 'Default' : modelId;
+    }
   }
 }
 
