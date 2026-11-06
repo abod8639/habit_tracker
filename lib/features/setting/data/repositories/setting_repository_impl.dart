@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:habit_tracker/core/error/exceptions.dart';
 import 'package:habit_tracker/core/error/failures.dart';
 import 'package:habit_tracker/core/error/network_error_handler.dart';
+import 'package:habit_tracker/core/services/gemini_service.dart';
 import 'package:habit_tracker/features/home/data/models/habit_model.dart';
 import 'package:habit_tracker/features/home/data/datasources/i_habit_local_data_source.dart';
 import '../../domain/repositories/setting_repository.dart';
@@ -204,6 +205,22 @@ class SettingRepositoryImpl implements SettingRepository {
     return NetworkErrorHandler.guard(() async {
       await localDataSource.clearCustomGeminiApiKey().timeout(_localTimeout);
       await remoteDataSource.deleteCustomApiKey().timeout(_remoteTimeout);
+    });
+  }
+
+  @override
+  Future<Either<Failure, String>> getCustomModel() {
+    return NetworkErrorHandler.guard(() async {
+      final model = localDataSource.getCustomGeminiModel();
+      return model ?? GeminiService.effectiveModelName;
+    });
+  }
+
+  @override
+  Future<Either<Failure, void>> saveCustomModel(String? model) {
+    return NetworkErrorHandler.guard(() async {
+      await localDataSource.saveCustomGeminiModel(model).timeout(_localTimeout);
+      GeminiService.setCustomModel(model);
     });
   }
 
