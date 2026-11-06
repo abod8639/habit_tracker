@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:habit_tracker/core/theme/app_radius.dart';
 import 'package:habit_tracker/core/theme/app_shadows.dart';
 import 'package:habit_tracker/core/theme/theme_utils.dart';
@@ -114,6 +115,7 @@ class NeuChip extends StatelessWidget {
   final String label;
   final IconData? icon;
   final String? emoji;
+  final String? svgPath;
   final Color color;
   final NeuDepth depth;
   final double fontSize;
@@ -125,6 +127,7 @@ class NeuChip extends StatelessWidget {
     required this.color,
     this.icon,
     this.emoji,
+    this.svgPath,
     this.depth = NeuDepth.inset,
     this.fontSize = 11,
     this.trailing,
@@ -139,11 +142,19 @@ class NeuChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (emoji != null)
+          if (svgPath != null)
+            SvgPicture.asset(
+              svgPath!,
+              width: fontSize + 3,
+              height: fontSize + 3,
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+            )
+          else if (emoji != null)
             Text(emoji!, style: TextStyle(fontSize: fontSize))
           else if (icon != null)
             Icon(icon, size: fontSize + 2, color: color),
-          if (emoji != null || icon != null) const SizedBox(width: 5),
+          if (svgPath != null || emoji != null || icon != null)
+            const SizedBox(width: 5),
           Flexible(
             child: Text(
               label,
@@ -168,6 +179,7 @@ class NeuOrb extends StatelessWidget {
   final double size;
   final IconData? icon;
   final String? emoji;
+  final String? svgPath;
   final Color? color;
   final NeuDepth depth;
   final bool glow;
@@ -177,6 +189,7 @@ class NeuOrb extends StatelessWidget {
     this.size = 44,
     this.icon,
     this.emoji,
+    this.svgPath,
     this.color,
     this.depth = NeuDepth.raised,
     this.glow = false,
@@ -194,9 +207,16 @@ class NeuOrb extends StatelessWidget {
       accentColor: effectiveColor,
       highlighted: glow,
       child: Center(
-        child: emoji != null
-            ? Text(emoji!, style: TextStyle(fontSize: size * 0.42))
-            : Icon(icon, size: size * 0.46, color: effectiveColor),
+        child: svgPath != null
+            ? SvgPicture.asset(
+                svgPath!,
+                width: size * 0.46,
+                height: size * 0.46,
+                colorFilter: ColorFilter.mode(effectiveColor, BlendMode.srcIn),
+              )
+            : emoji != null
+                ? Text(emoji!, style: TextStyle(fontSize: size * 0.42))
+                : Icon(icon, size: size * 0.46, color: effectiveColor),
       ),
     );
   }
