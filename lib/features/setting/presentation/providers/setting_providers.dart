@@ -13,12 +13,15 @@ import 'package:habit_tracker/features/setting/data/repositories/setting_reposit
 import 'package:habit_tracker/features/setting/domain/repositories/setting_repository.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/clear_all_data_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/clear_custom_api_key_usecase.dart';
+import 'package:habit_tracker/features/setting/domain/usecases/clear_custom_model_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/get_custom_api_key_usecase.dart';
+import 'package:habit_tracker/features/setting/domain/usecases/get_custom_model_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/get_language_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/get_last_sync_time_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/get_notification_time_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/is_notification_enabled_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/save_custom_api_key_usecase.dart';
+import 'package:habit_tracker/features/setting/domain/usecases/save_custom_model_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/save_language_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/set_notification_enabled_usecase.dart';
 import 'package:habit_tracker/features/setting/domain/usecases/set_notification_time_usecase.dart';
@@ -129,6 +132,20 @@ final clearCustomApiKeyUseCaseProvider = Provider<ClearCustomApiKeyUseCase>((
   ref,
 ) {
   return ClearCustomApiKeyUseCase(ref.watch(settingRepositoryProvider));
+});
+
+final getCustomModelUseCaseProvider = Provider<GetCustomModelUseCase>((ref) {
+  return GetCustomModelUseCase(ref.watch(settingRepositoryProvider));
+});
+
+final saveCustomModelUseCaseProvider = Provider<SaveCustomModelUseCase>((ref) {
+  return SaveCustomModelUseCase(ref.watch(settingRepositoryProvider));
+});
+
+final clearCustomModelUseCaseProvider = Provider<ClearCustomModelUseCase>((
+  ref,
+) {
+  return ClearCustomModelUseCase(ref.watch(settingRepositoryProvider));
 });
 
 // ── SYNC STATE & NOTIFIER ──────────────────────────────────────────────────
@@ -564,6 +581,8 @@ class AiSettingsState {
   final bool isValidating;
   final ApiKeyStatus apiKeyStatus;
   final Failure? activeFailure;
+  final String selectedModel;
+  final bool isModelUpdating;
 
   const AiSettingsState({
     this.customApiKey = '',
@@ -573,6 +592,8 @@ class AiSettingsState {
     this.isValidating = false,
     this.apiKeyStatus = ApiKeyStatus.unknown,
     this.activeFailure,
+    this.selectedModel = GeminiService.defaultModelName,
+    this.isModelUpdating = false,
   });
 
   bool get isKeyWorking => apiKeyStatus == ApiKeyStatus.valid;
@@ -591,6 +612,8 @@ class AiSettingsState {
     bool? isValidating,
     ApiKeyStatus? apiKeyStatus,
     Failure? activeFailure,
+    String? selectedModel,
+    bool? isModelUpdating,
     bool clearFailure = false,
   }) {
     return AiSettingsState(
@@ -603,6 +626,8 @@ class AiSettingsState {
       activeFailure: clearFailure
           ? null
           : (activeFailure ?? this.activeFailure),
+      selectedModel: selectedModel ?? this.selectedModel,
+      isModelUpdating: isModelUpdating ?? this.isModelUpdating,
     );
   }
 }
@@ -617,8 +642,67 @@ class AiSettingsNotifier extends Notifier<AiSettingsState> {
       _isDisposed = true;
     });
 
-    Future.microtask(() => loadApiKey());
-    return const AiSettingsState();
+    Future.microtask(() async {
+      await loadApiKey();
+      await loadSelectedModel();
+    });
+    return AiSettingsState(
+      selectedModel: GeminiService.effectiveModelName,
+    );
+  }
+
+  Future<void> loadSelectedModel() async {
+    final getModelUseCase = ref.read(getCustomModelUseCaseProvider);
+    final result = await getModelUseCase();
+    if (_isDisposed) return;
+
+    result.fold(
+      (_) => null,
+      (model) {
+        if (!_isDisposed) {
+          state = state.copyWith(selectedModel: model);
+        }
+      },
+    );
+  }
+
+  Future<bool> saveModel(String? model) async {
+    if (_isDisposed) return false;
+    state = state.copyWith(isModelUpdating: true, clearFailure: true);
+
+    final saveModelUseCase = ref.read(saveCustomModelUseCaseProvider);
+    final effectiveModel = (model == null || model.trim().isEmpty)
+        ? GeminiService.defaultModelName
+        : model.trim();
+
+    final result = await saveModelUseCase(model);
+    if (_isDisposed) return false;
+
+    return result.fold(
+      (failure) {
+        if (!_isDisposed) {
+          state = state.copyWith(
+            isModelUpdating: false,
+            activeFailure: failure,
+          );
+        }
+        return false;
+      },
+      (_) {
+        if (!_isDisposed) {
+          state = state.copyWith(
+            selectedModel: effectiveModel,
+            isModelUpdating: false,
+            clearFailure: true,
+          );
+        }
+        return true;
+      },
+    );
+  }
+
+  Future<bool> resetModelToDefault() async {
+    return saveModel(null);
   }
 
   Future<void> loadApiKey() async {
@@ -730,6 +814,7 @@ class AiSettingsNotifier extends Notifier<AiSettingsState> {
         isCustom: false,
         isLoading: false,
         apiKeyStatus: ApiKeyStatus.unknown,
+        selectedModel: GeminiService.defaultModelName,
         clearFailure: true,
       );
     }
