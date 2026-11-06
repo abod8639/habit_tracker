@@ -22,6 +22,8 @@ abstract class SettingRepository {
   Future<Either<Failure, String?>> getCustomApiKey();
   Future<Either<Failure, void>> saveCustomApiKey(String key);
   Future<Either<Failure, void>> clearCustomApiKey();
+  Future<Either<Failure, String>> getCustomModel();
+  Future<Either<Failure, void>> saveCustomModel(String? model);
 
   Future<Either<Failure, void>> clearAllData();
 }
