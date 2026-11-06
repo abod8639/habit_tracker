@@ -133,10 +133,11 @@ class CategorySelectionScreen extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      const NeuOrb(
+                      NeuOrb(
                         size: 40,
-                        emoji: '🎲',
+                        svgPath: 'assets/svg/dice.svg',
                         depth: NeuDepth.inset,
+                        color: colorScheme.primary,
                       ),
                       const SizedBox(width: 14),
                       Expanded(
