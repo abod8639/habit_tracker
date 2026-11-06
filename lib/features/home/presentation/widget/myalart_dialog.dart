@@ -216,61 +216,29 @@ class _MyalartdState extends State<MyalartDialog>
                 children: [
                   // Header: Icon + Title + Action buttons (Scan / Close)
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.alphaBlend(
-                                colorScheme.primary.withValues(
-                                  alpha: isDark ? 0.16 : 0.10,
-                                ),
-                                baseColor,
-                              ),
-                              border: Border.all(
-                                color: isDark
-                                    ? Colors.white.withValues(alpha: 0.08)
-                                    : Colors.white.withValues(alpha: 0.90),
-                                width: 1.0,
-                              ),
-                              boxShadow: AppShadows.badge(isDark: isDark),
-                            ),
-                            child: Icon(
-                              widget.isEditing
-                                  ? Icons.edit_rounded
-                                  : Icons.add_task_rounded,
-                              color: colorScheme.primary,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Text(
-                            dialogTitle,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.2,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        dialogTitle,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.2,
+                          color: colorScheme.onSurface,
+                        ),
                       ),
+                    const SizedBox(width: 1),
+
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (_isScanning)
                             Container(
-                              width: 36,
-                              height: 36,
+                              width: 50,
+                              height: 50,
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                boxShadow: AppShadows.dotIndicator(
-                                  isDark: isDark,
-                                ),
+                                boxShadow:  AppShadows.buttonResting(isDark: isDark)
                               ),
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
@@ -279,16 +247,19 @@ class _MyalartdState extends State<MyalartDialog>
                             )
                           else if (!widget.isEditing)
                             NeumorphicIconButton(
-                              size: 40,
+                              size: 50,
+                              borderRadius: AppRadius.mdRadius,
                               icon: Icons.document_scanner_rounded,
                               accentColor: colorScheme.primary,
                               tooltip: S.of(context).scanHabitsTitle,
                               onPressed: _handleScanImage,
                             ),
+                          // SizedBox(width: 30),
                         ],
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 22),
 
                   // Neumorphic Debossed Well for Text Input
@@ -393,22 +364,28 @@ class _MyalartdState extends State<MyalartDialog>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _NeumorphicDialogButton(
-                        label: S.current.cancel,
+                      NeumorphicIconButton(
+                        size: 50,
+                        iconColor: colorScheme.error,
+                        borderRadius: AppRadius.mdRadius,
                         icon: Icons.close_rounded,
-                        isPrimary: false,
+                        accentColor: colorScheme.primary,
+                        tooltip: S.current.cancel,
                         onPressed: () {
                           Navigator.of(context).pop();
                           widget.controller.clear();
                         },
                       ),
+
                       const SizedBox(width: 12),
-                      _NeumorphicDialogButton(
-                        label: buttonLabel,
-                        icon: widget.isEditing
-                            ? Icons.edit_rounded
-                            : Icons.check_rounded,
-                        isPrimary: true,
+
+                      NeumorphicIconButton(
+                        size: 50,
+                        iconColor: colorScheme.primary,
+                        borderRadius: AppRadius.mdRadius,
+                        icon: Icons.check_rounded,
+                        accentColor: colorScheme.primary,
+                        tooltip: buttonLabel,
                         onPressed: _handleSave,
                       ),
                     ],
@@ -417,126 +394,6 @@ class _MyalartdState extends State<MyalartDialog>
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Tactile Neumorphic Button with press physical depth feedback.
-class _NeumorphicDialogButton extends StatefulWidget {
-  final String label;
-  final IconData icon;
-  final bool isPrimary;
-  final VoidCallback onPressed;
-
-  const _NeumorphicDialogButton({
-    required this.label,
-    required this.icon,
-    required this.isPrimary,
-    required this.onPressed,
-  });
-
-  @override
-  State<_NeumorphicDialogButton> createState() =>
-      _NeumorphicDialogButtonState();
-}
-
-class _NeumorphicDialogButtonState extends State<_NeumorphicDialogButton> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-    final baseColor = theme.cardColor;
-
-    final Color primaryColor = colorScheme.primary;
-
-    final Color surfaceColor;
-    if (widget.isPrimary) {
-      surfaceColor = primaryColor;
-    } else {
-      surfaceColor = isDark
-          ? (Color.lerp(baseColor, Colors.white, 0.04) ?? baseColor)
-          : (Color.lerp(baseColor, Colors.white, 0.50) ?? baseColor);
-    }
-
-    final Color textColor = widget.isPrimary
-        ? colorScheme.onPrimary
-        : colorScheme.onSurfaceVariant;
-
-    final Color iconColor = widget.isPrimary
-        ? colorScheme.onPrimary
-        : colorScheme.error.withValues(alpha: 0.85);
-
-    final List<BoxShadow> shadows;
-    if (_isPressed) {
-      shadows = AppShadows.buttonPressed(isDark: isDark);
-    } else {
-      shadows = AppShadows.buttonResting(isDark: isDark);
-    }
-
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onPressed();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 130),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
-        decoration: BoxDecoration(
-          color: surfaceColor,
-          borderRadius: AppRadius.mdRadius,
-          gradient: widget.isPrimary
-              ? LinearGradient(
-                  colors: [
-                    primaryColor,
-                    Color.lerp(
-                          primaryColor,
-                          Colors.black,
-                          isDark ? 0.20 : 0.10,
-                        ) ??
-                        primaryColor,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          border: Border.all(
-            color: widget.isPrimary
-                ? Colors.white.withValues(alpha: isDark ? 0.15 : 0.40)
-                : (isDark
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.white.withValues(alpha: 0.85)),
-            width: 1.0,
-          ),
-          boxShadow: shadows,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              widget.icon,
-              size: 20,
-              color: iconColor,
-              shadows: AppShadows.buttonPressed(isDark: isDark),
-            ),
-            const SizedBox(width: 7),
-            Text(
-              widget.label,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13.5,
-                color: textColor,
-                letterSpacing: 0.2,
-              ),
-            ),
-          ],
         ),
       ),
     );
