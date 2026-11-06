@@ -19,6 +19,9 @@ abstract class SettingLocalDataSource {
   Future<void> saveCustomGeminiApiKey(String? key);
   Future<void> clearCustomGeminiApiKey();
 
+  String? getCustomGeminiModel();
+  Future<void> saveCustomGeminiModel(String? model);
+
   Future<void> clearAllData();
 }
 
@@ -83,6 +86,16 @@ class SettingLocalDataSourceImpl implements SettingLocalDataSource {
   @override
   Future<void> clearCustomGeminiApiKey() async {
     await _settingsStorage.clearCustomGeminiApiKey();
+  }
+
+  @override
+  String? getCustomGeminiModel() {
+    return _settingsStorage.customGeminiModel;
+  }
+
+  @override
+  Future<void> saveCustomGeminiModel(String? model) async {
+    await _settingsStorage.setCustomGeminiModel(model);
   }
 
   @override
