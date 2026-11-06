@@ -35,7 +35,7 @@ class CategoryCard extends StatelessWidget {
         children: [
           // ── Top: Engraved archetype identity pill ──────────────────────
           NeuChip(
-            emoji: category.badgeEmoji,
+            svgPath: category.badgeSvg,
             label: category.archetypeTitle,
             color: color,
             fontSize: 9.5,
