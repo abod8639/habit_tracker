@@ -43,23 +43,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m9(hours) => "منذ ${hours} ساعة";
 
-  static String m10(count) => "${count} محدد";
+  static String m10(time) => "وقت الجهاز: ${time}";
 
-  static String m11(minutes) => "منذ ${minutes} دقيقة";
+  static String m11(count) => "${count} محدد";
 
-  static String m12(count) => "+${count} عادات أخرى...";
+  static String m12(minutes) => "منذ ${minutes} دقيقة";
 
-  static String m13(count) => "تمت إضافة ${count} عادات إلى متتبعك بنجاح.";
+  static String m13(count) => "+${count} عادات أخرى...";
 
-  static String m14(time) => "تم ضبط التذكير في ${time}";
+  static String m14(count) => "تمت إضافة ${count} عادات إلى متتبعك بنجاح.";
 
-  static String m15(current, total) => "خطوة ${current} من ${total}";
+  static String m15(time) => "تم ضبط التذكير في ${time}";
 
-  static String m16(streak) => "يوم ${streak}";
+  static String m16(current, total) => "خطوة ${current} من ${total}";
 
-  static String m17(category) => "خطتك في ${category}";
+  static String m17(streak) => "يوم ${streak}";
 
-  static String m18(time) => "وقت الجهاز: ${time}";
+  static String m18(category) => "خطتك في ${category}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -83,6 +83,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "aiCoach": MessageLookupByLibrary.simpleMessage("المدرب الذكي"),
     "aiGreeting": MessageLookupByLibrary.simpleMessage(
       "أنا هنا لدعمك في رحلتك نحو أهدافك.",
+    ),
+    "aiModelDialogDesc": MessageLookupByLibrary.simpleMessage(
+      "اختر موديل Gemini المستخدم للمساعد الذكي، توليد الخطط، ومسح العادات.",
+    ),
+    "aiModelDialogTitle": MessageLookupByLibrary.simpleMessage(
+      "اختيار موديل الذكاء الاصطناعي",
+    ),
+    "aiModelSubtitle": MessageLookupByLibrary.simpleMessage(
+      "تحديد موديل Gemini المستخدم لميزات الذكاء الاصطناعي",
+    ),
+    "aiModelTitle": MessageLookupByLibrary.simpleMessage(
+      "موديل الذكاء الاصطناعي",
     ),
     "aiServiceUnavailableTitle": MessageLookupByLibrary.simpleMessage(
       "خدمة الذكاء الاصطناعي",
@@ -168,6 +180,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "backToLogin": MessageLookupByLibrary.simpleMessage("العودة لتسجيل الدخول"),
     "backupData": MessageLookupByLibrary.simpleMessage("نسخ احتياطي"),
+    "balancedModel": MessageLookupByLibrary.simpleMessage(
+      "متوازن • سرعة عالية",
+    ),
     "barChartIsEmpty": MessageLookupByLibrary.simpleMessage(
       "لا توجد بيانات متاحة",
     ),
@@ -246,6 +261,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "customApiKeyDialogTitle": MessageLookupByLibrary.simpleMessage(
       "مفتاح Gemini API",
     ),
+    "customModel": MessageLookupByLibrary.simpleMessage("موديل مخصص"),
+    "customModelDesc": MessageLookupByLibrary.simpleMessage(
+      "أدخل أي معرّف موديل Gemini متاح لحسابك",
+    ),
+    "customModelHint": MessageLookupByLibrary.simpleMessage(
+      "أدخل معرّف الموديل (مثل: gemini-3.5-flash)",
+    ),
     "dailyReminder": MessageLookupByLibrary.simpleMessage("التذكير اليومي"),
     "dailyReminderAllCompleted": MessageLookupByLibrary.simpleMessage(
       "رائع جداً! لقد أكملت جميع مهامك اليوم بنجاح.",
@@ -298,6 +320,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "تصدير بيانات العادات",
     ),
     "failedToClearData": m7,
+    "fastestModel": MessageLookupByLibrary.simpleMessage("الأسرع • الافتراضي"),
     "forgotPassword": MessageLookupByLibrary.simpleMessage("نسيت كلمة المرور؟"),
     "gallery": MessageLookupByLibrary.simpleMessage("المعرض"),
     "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
@@ -339,15 +362,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "invalidTimeDesc": MessageLookupByLibrary.simpleMessage(
       "تم اكتشاف عدم تطابق أو تلاعب في تاريخ أو وقت جهازك. لضمان دقة العادات والإحصائيات، يرجى تفعيل ضبط التاريخ والوقت تلقائياً من إعدادات الهاتف ثم إعادة المحاولة.",
     ),
-    "invalidTimeDeviceTime": m18,
+    "invalidTimeDeviceTime": m10,
     "invalidTimeStillIncorrect": MessageLookupByLibrary.simpleMessage(
       "التاريخ والوقت لا يزالان غير متطابقين، يرجى ضبطهما من الإعدادات.",
     ),
-    "invalidTimeTitle": MessageLookupByLibrary.simpleMessage(
-      "الوقت غير صحيح",
-    ),
+    "invalidTimeTitle": MessageLookupByLibrary.simpleMessage("الوقت غير صحيح"),
     "isEmpty": MessageLookupByLibrary.simpleMessage("لا توجد عادات مسجلة بعد"),
-    "itemsSelected": m10,
+    "itemsSelected": m11,
     "joinUs": MessageLookupByLibrary.simpleMessage("انضم إلينا"),
     "justAMoment": MessageLookupByLibrary.simpleMessage("لحظة واحدة"),
     "justNow": MessageLookupByLibrary.simpleMessage("الآن"),
@@ -372,9 +393,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "logoutFromAccount": MessageLookupByLibrary.simpleMessage(
       "الخروج من حسابك",
     ),
-    "minutesAgo": m11,
+    "minutesAgo": m12,
+    "modelResetSuccess": MessageLookupByLibrary.simpleMessage(
+      "تمت استعادة الموديل الافتراضي",
+    ),
+    "modelSavedSuccess": MessageLookupByLibrary.simpleMessage(
+      "تم تحديث موديل الذكاء الاصطناعي بنجاح",
+    ),
     "monthly": MessageLookupByLibrary.simpleMessage("تقدم الشهري"),
-    "moreHabitsCount": m12,
+    "moreHabitsCount": m13,
     "name": MessageLookupByLibrary.simpleMessage("الاسم"),
     "nameRequired": MessageLookupByLibrary.simpleMessage("يرجى إدخال الاسم"),
     "noHabitsDetected": MessageLookupByLibrary.simpleMessage(
@@ -413,7 +440,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pieChartIsEmpty": MessageLookupByLibrary.simpleMessage(
       "لا توجد عادات لعرضها",
     ),
-    "planActivatedDesc": m13,
+    "planActivatedDesc": m14,
     "planActivatedTitle": MessageLookupByLibrary.simpleMessage(
       "🎉 تم تفعيل الخطة!",
     ),
@@ -427,10 +454,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "quickHabitWalking": MessageLookupByLibrary.simpleMessage("مشي 20 دقيقة"),
     "quickHabitWater": MessageLookupByLibrary.simpleMessage("شرب 2 لتر ماء"),
     "ratepagetitle": MessageLookupByLibrary.simpleMessage("إحصائيات العادات"),
+    "reasoningModel": MessageLookupByLibrary.simpleMessage("تفكير منطقي عميق"),
     "reliableAlarmsActive": MessageLookupByLibrary.simpleMessage(
       "التنبيهات الدقيقة مفعلة بنجاح",
     ),
-    "reminderSetFor": m14,
+    "reminderSetFor": m15,
     "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
       "ستصلك إشعارات متابعة عاداتك اليومية.",
     ),
@@ -521,7 +549,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "إعادة الترتيب بالضغط المطول",
     ),
     "showcaseSkip": MessageLookupByLibrary.simpleMessage("تخطي"),
-    "showcaseStepIndicator": m15,
+    "showcaseStepIndicator": m16,
     "showcaseTutorial": MessageLookupByLibrary.simpleMessage(
       "دليل استخدام التطبيق",
     ),
@@ -533,9 +561,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "signup": MessageLookupByLibrary.simpleMessage("إنشاء حساب"),
     "skipNow": MessageLookupByLibrary.simpleMessage("تخطي الآن"),
+    "smartestModel": MessageLookupByLibrary.simpleMessage("ذكاء متقدم"),
     "somethingWentWrong": MessageLookupByLibrary.simpleMessage("حدث خطأ ما"),
     "streak": MessageLookupByLibrary.simpleMessage("الاستمرارية"),
-    "streakDay": m16,
+    "streakDay": m17,
     "success": MessageLookupByLibrary.simpleMessage("معدل النجاح"),
     "summary": MessageLookupByLibrary.simpleMessage("ملخص العادات"),
     "syncError": MessageLookupByLibrary.simpleMessage("فشلت المزامنة"),
@@ -570,6 +599,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "user": MessageLookupByLibrary.simpleMessage("مستخدم"),
     "weekly": MessageLookupByLibrary.simpleMessage("تقدم الأسبوعي"),
-    "yourPlanTitle": m17,
+    "yourPlanTitle": m18,
   };
 }

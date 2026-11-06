@@ -43,23 +43,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m9(hours) => "${hours} hours ago";
 
-  static String m10(count) => "${count} Selected";
+  static String m10(time) => "Device Time: ${time}";
 
-  static String m11(minutes) => "${minutes} minutes ago";
+  static String m11(count) => "${count} Selected";
 
-  static String m12(count) => "+${count} more habits...";
+  static String m12(minutes) => "${minutes} minutes ago";
 
-  static String m13(count) => "${count} habits added to your tracker.";
+  static String m13(count) => "+${count} more habits...";
 
-  static String m14(time) => "Reminder set for ${time}";
+  static String m14(count) => "${count} habits added to your tracker.";
 
-  static String m15(current, total) => "Step ${current} of ${total}";
+  static String m15(time) => "Reminder set for ${time}";
 
-  static String m16(streak) => "Day ${streak}";
+  static String m16(current, total) => "Step ${current} of ${total}";
 
-  static String m17(category) => "Your ${category} Plan";
+  static String m17(streak) => "Day ${streak}";
 
-  static String m18(time) => "Device Time: ${time}";
+  static String m18(category) => "Your ${category} Plan";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -82,6 +82,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "aiGreeting": MessageLookupByLibrary.simpleMessage(
       "I\'m here to support you in your journey towards your goals.",
     ),
+    "aiModelDialogDesc": MessageLookupByLibrary.simpleMessage(
+      "Select the Gemini AI model to use for habit coaching, plan generation, and AI chat.",
+    ),
+    "aiModelDialogTitle": MessageLookupByLibrary.simpleMessage(
+      "Choose AI Model",
+    ),
+    "aiModelSubtitle": MessageLookupByLibrary.simpleMessage(
+      "Select Gemini model for AI features",
+    ),
+    "aiModelTitle": MessageLookupByLibrary.simpleMessage("AI Model"),
     "aiServiceUnavailableTitle": MessageLookupByLibrary.simpleMessage(
       "AI Service Unavailable",
     ),
@@ -164,6 +174,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "backToLogin": MessageLookupByLibrary.simpleMessage("Back to Login"),
     "backupData": MessageLookupByLibrary.simpleMessage("Backup Data"),
+    "balancedModel": MessageLookupByLibrary.simpleMessage(
+      "Balanced • High Speed",
+    ),
     "barChartIsEmpty": MessageLookupByLibrary.simpleMessage(
       "No habit data available",
     ),
@@ -238,6 +251,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "customApiKeyDialogTitle": MessageLookupByLibrary.simpleMessage(
       "Gemini API Key",
     ),
+    "customModel": MessageLookupByLibrary.simpleMessage("Custom Model"),
+    "customModelDesc": MessageLookupByLibrary.simpleMessage(
+      "Specify any other accessible Gemini model ID",
+    ),
+    "customModelHint": MessageLookupByLibrary.simpleMessage(
+      "Enter model ID (e.g. gemini-3.5-flash)",
+    ),
     "dailyReminder": MessageLookupByLibrary.simpleMessage("Daily Reminder"),
     "dailyReminderAllCompleted": MessageLookupByLibrary.simpleMessage(
       "Awesome! You have completed all your tasks for today.",
@@ -292,6 +312,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Export your habit data",
     ),
     "failedToClearData": m7,
+    "fastestModel": MessageLookupByLibrary.simpleMessage("Fastest • Default"),
     "forgotPassword": MessageLookupByLibrary.simpleMessage("Forgot Password?"),
     "gallery": MessageLookupByLibrary.simpleMessage("Gallery"),
     "geminiApiKeyError": MessageLookupByLibrary.simpleMessage(
@@ -335,7 +356,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "invalidTimeDesc": MessageLookupByLibrary.simpleMessage(
       "A date or time discrepancy was detected on your device. Please enable automatic date & time in your device settings, then try again.",
     ),
-    "invalidTimeDeviceTime": m18,
+    "invalidTimeDeviceTime": m10,
     "invalidTimeStillIncorrect": MessageLookupByLibrary.simpleMessage(
       "Date and time are still not synchronized. Please adjust them in Settings.",
     ),
@@ -343,7 +364,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Incorrect Date & Time",
     ),
     "isEmpty": MessageLookupByLibrary.simpleMessage("No habits tracked yet"),
-    "itemsSelected": m10,
+    "itemsSelected": m11,
     "joinUs": MessageLookupByLibrary.simpleMessage("Join Us"),
     "justAMoment": MessageLookupByLibrary.simpleMessage("Just a moment"),
     "justNow": MessageLookupByLibrary.simpleMessage("Just now"),
@@ -366,9 +387,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "logoutFromAccount": MessageLookupByLibrary.simpleMessage(
       "Logout from your account",
     ),
-    "minutesAgo": m11,
+    "minutesAgo": m12,
+    "modelResetSuccess": MessageLookupByLibrary.simpleMessage(
+      "Reset to default AI model",
+    ),
+    "modelSavedSuccess": MessageLookupByLibrary.simpleMessage(
+      "AI model updated successfully",
+    ),
     "monthly": MessageLookupByLibrary.simpleMessage("Monthly Progress"),
-    "moreHabitsCount": m12,
+    "moreHabitsCount": m13,
     "name": MessageLookupByLibrary.simpleMessage("Name"),
     "nameRequired": MessageLookupByLibrary.simpleMessage(
       "Please enter your name",
@@ -409,7 +436,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pieChartIsEmpty": MessageLookupByLibrary.simpleMessage(
       "No habits to display",
     ),
-    "planActivatedDesc": m13,
+    "planActivatedDesc": m14,
     "planActivatedTitle": MessageLookupByLibrary.simpleMessage(
       "🎉 Plan activated!",
     ),
@@ -427,10 +454,13 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "quickHabitWater": MessageLookupByLibrary.simpleMessage("Drink 2L water"),
     "ratepagetitle": MessageLookupByLibrary.simpleMessage("Habit Statistics"),
+    "reasoningModel": MessageLookupByLibrary.simpleMessage(
+      "Advanced Reasoning",
+    ),
     "reliableAlarmsActive": MessageLookupByLibrary.simpleMessage(
       "Reliable alarms active",
     ),
-    "reminderSetFor": m14,
+    "reminderSetFor": m15,
     "remindersEnabledBody": MessageLookupByLibrary.simpleMessage(
       "You will receive daily habit checks.",
     ),
@@ -515,7 +545,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Long Press to Reorder",
     ),
     "showcaseSkip": MessageLookupByLibrary.simpleMessage("Skip"),
-    "showcaseStepIndicator": m15,
+    "showcaseStepIndicator": m16,
     "showcaseTutorial": MessageLookupByLibrary.simpleMessage("App Tour"),
     "signInWithGoogle": MessageLookupByLibrary.simpleMessage(
       "Sign in with Google",
@@ -525,11 +555,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "signup": MessageLookupByLibrary.simpleMessage("Sign Up"),
     "skipNow": MessageLookupByLibrary.simpleMessage("Skip Now"),
+    "smartestModel": MessageLookupByLibrary.simpleMessage("High Intelligence"),
     "somethingWentWrong": MessageLookupByLibrary.simpleMessage(
       "Something went wrong",
     ),
     "streak": MessageLookupByLibrary.simpleMessage("Streak"),
-    "streakDay": m16,
+    "streakDay": m17,
     "success": MessageLookupByLibrary.simpleMessage("Habit Success"),
     "summary": MessageLookupByLibrary.simpleMessage("Habit Summary"),
     "syncError": MessageLookupByLibrary.simpleMessage("Sync failed"),
@@ -566,6 +597,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "user": MessageLookupByLibrary.simpleMessage("User"),
     "weekly": MessageLookupByLibrary.simpleMessage("weekly Progress"),
-    "yourPlanTitle": m17,
+    "yourPlanTitle": m18,
   };
 }

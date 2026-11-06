@@ -1120,6 +1120,131 @@ class S {
     );
   }
 
+  /// `AI Model`
+  String get aiModelTitle {
+    return Intl.message('AI Model', name: 'aiModelTitle', desc: '', args: []);
+  }
+
+  /// `Select Gemini model for AI features`
+  String get aiModelSubtitle {
+    return Intl.message(
+      'Select Gemini model for AI features',
+      name: 'aiModelSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose AI Model`
+  String get aiModelDialogTitle {
+    return Intl.message(
+      'Choose AI Model',
+      name: 'aiModelDialogTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select the Gemini AI model to use for habit coaching, plan generation, and AI chat.`
+  String get aiModelDialogDesc {
+    return Intl.message(
+      'Select the Gemini AI model to use for habit coaching, plan generation, and AI chat.',
+      name: 'aiModelDialogDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom Model`
+  String get customModel {
+    return Intl.message(
+      'Custom Model',
+      name: 'customModel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter model ID (e.g. gemini-3.5-flash)`
+  String get customModelHint {
+    return Intl.message(
+      'Enter model ID (e.g. gemini-3.5-flash)',
+      name: 'customModelHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Specify any other accessible Gemini model ID`
+  String get customModelDesc {
+    return Intl.message(
+      'Specify any other accessible Gemini model ID',
+      name: 'customModelDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI model updated successfully`
+  String get modelSavedSuccess {
+    return Intl.message(
+      'AI model updated successfully',
+      name: 'modelSavedSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset to default AI model`
+  String get modelResetSuccess {
+    return Intl.message(
+      'Reset to default AI model',
+      name: 'modelResetSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fastest • Default`
+  String get fastestModel {
+    return Intl.message(
+      'Fastest • Default',
+      name: 'fastestModel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Balanced • High Speed`
+  String get balancedModel {
+    return Intl.message(
+      'Balanced • High Speed',
+      name: 'balancedModel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `High Intelligence`
+  String get smartestModel {
+    return Intl.message(
+      'High Intelligence',
+      name: 'smartestModel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Advanced Reasoning`
+  String get reasoningModel {
+    return Intl.message(
+      'Advanced Reasoning',
+      name: 'reasoningModel',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Custom key active`
   String get customApiKeyActive {
     return Intl.message(
