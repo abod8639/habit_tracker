@@ -45,12 +45,12 @@ class GeminiService {
   String? _lastApiKey;
   String? _lastModelName;
 
-  static const String defaultModelName = 'gemini-flash-lite-latest';
+  static const String defaultModelName = 'gemini-3.5-flash-lite';
 
   /// Ordered strictly by response speed (fastest, lowest latency models first)
   static const List<String> supportedCandidateModels = [
-    'gemini-flash-lite-latest',
     'gemini-3.5-flash-lite',
+    'gemini-flash-lite-latest',
     'gemini-3-flash-preview',
     'gemini-3.5-flash',
     'gemini-3.8-flash',
@@ -157,6 +157,16 @@ class GeminiService {
     try {
       AppInitializer.settingsStorage.setCustomGeminiModel(null);
     } catch (_) {}
+  }
+
+  /// Sets user-selected custom model and persists it to storage
+  static void setCustomModel(String? model) {
+    if (model == null || model.trim().isEmpty) {
+      clearCustomModel();
+    } else {
+      _resolvedModelName = model.trim();
+      _saveResolvedModel(model.trim());
+    }
   }
 
   /// Validates whether an API key is valid and working with Gemini models.
