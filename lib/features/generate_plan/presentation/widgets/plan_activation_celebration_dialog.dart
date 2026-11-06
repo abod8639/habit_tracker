@@ -94,7 +94,7 @@ Will you check in on me or join me? 🤝''';
               // ── Glowing extruded trophy orb ─────────────────────────────
               NeuOrb(
                 size: 84,
-                emoji: category?.badgeEmoji ?? '🏆',
+                svgPath: category?.badgeSvg ?? 'assets/svg/trophy.svg',
                 color: color,
                 glow: true,
               ),
