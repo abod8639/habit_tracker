@@ -7,6 +7,7 @@ LineChartBarData myLineChartBarData({
   required Color color1,
   required Color color2,
   String? label,
+  bool showBelowBar = true,
 }) {
   return LineChartBarData(
     show: true,
@@ -18,7 +19,7 @@ LineChartBarData myLineChartBarData({
     isStrokeCapRound: true,
     dotData: const FlDotData(show: false),
     belowBarData: BarAreaData(
-      show: true,
+      show: showBelowBar,
       gradient: LinearGradient(
         colors: [
           color1,
