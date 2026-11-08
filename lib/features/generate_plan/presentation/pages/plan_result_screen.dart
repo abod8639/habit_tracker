@@ -233,7 +233,8 @@ class PlanResultScreen extends ConsumerWidget {
                               children: [
                                 NeuOrb(
                                   size: 44,
-                                  svgPath: category?.badgeSvg ??
+                                  svgPath:
+                                      category?.badgeSvg ??
                                       'assets/svg/target.svg',
                                   depth: NeuDepth.inset,
                                   color: category?.color,

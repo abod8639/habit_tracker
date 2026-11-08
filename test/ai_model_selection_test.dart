@@ -115,86 +115,100 @@ void main() {
       expect(GeminiService.effectiveModelName, GeminiService.defaultModelName);
     });
 
-    test('AiSettingsNotifier loads and saves model via ProviderContainer', () async {
-      final container = ProviderContainer(
-        overrides: [
-          settingRepositoryProvider.overrideWithValue(repository),
-          getCustomModelUseCaseProvider.overrideWithValue(getCustomModelUseCase),
-          saveCustomModelUseCaseProvider.overrideWithValue(saveCustomModelUseCase),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'AiSettingsNotifier loads and saves model via ProviderContainer',
+      () async {
+        final container = ProviderContainer(
+          overrides: [
+            settingRepositoryProvider.overrideWithValue(repository),
+            getCustomModelUseCaseProvider.overrideWithValue(
+              getCustomModelUseCase,
+            ),
+            saveCustomModelUseCaseProvider.overrideWithValue(
+              saveCustomModelUseCase,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final notifier = container.read(aiSettingsNotifierProvider.notifier);
+        final notifier = container.read(aiSettingsNotifierProvider.notifier);
 
-      expect(
-        container.read(aiSettingsNotifierProvider).selectedModel,
-        GeminiService.defaultModelName,
-      );
+        expect(
+          container.read(aiSettingsNotifierProvider).selectedModel,
+          GeminiService.defaultModelName,
+        );
 
-      final success = await notifier.saveModel('gemini-3.8-flash');
-      expect(success, isTrue);
-      expect(
-        container.read(aiSettingsNotifierProvider).selectedModel,
-        'gemini-3.8-flash',
-      );
+        final success = await notifier.saveModel('gemini-3.8-flash');
+        expect(success, isTrue);
+        expect(
+          container.read(aiSettingsNotifierProvider).selectedModel,
+          'gemini-3.8-flash',
+        );
 
-      final resetSuccess = await notifier.resetModelToDefault();
-      expect(resetSuccess, isTrue);
-      expect(
-        container.read(aiSettingsNotifierProvider).selectedModel,
-        GeminiService.defaultModelName,
-      );
-    });
+        final resetSuccess = await notifier.resetModelToDefault();
+        expect(resetSuccess, isTrue);
+        expect(
+          container.read(aiSettingsNotifierProvider).selectedModel,
+          GeminiService.defaultModelName,
+        );
+      },
+    );
   });
 
   group('AI Model Selection - Widget Tests', () {
-    testWidgets('AiModelSelectionDialog renders preset models and handles selection', (
-      tester,
-    ) async {
-      final container = ProviderContainer(
-        overrides: [
-          settingRepositoryProvider.overrideWithValue(repository),
-          getCustomModelUseCaseProvider.overrideWithValue(getCustomModelUseCase),
-          saveCustomModelUseCaseProvider.overrideWithValue(saveCustomModelUseCase),
-        ],
-      );
-      addTearDown(container.dispose);
+    testWidgets(
+      'AiModelSelectionDialog renders preset models and handles selection',
+      (
+        tester,
+      ) async {
+        final container = ProviderContainer(
+          overrides: [
+            settingRepositoryProvider.overrideWithValue(repository),
+            getCustomModelUseCaseProvider.overrideWithValue(
+              getCustomModelUseCase,
+            ),
+            saveCustomModelUseCaseProvider.overrideWithValue(
+              saveCustomModelUseCase,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            localizationsDelegates: const [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            home: const Scaffold(body: AiModelSelectionDialog()),
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              localizationsDelegates: const [
+                S.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: S.delegate.supportedLocales,
+              home: const Scaffold(body: AiModelSelectionDialog()),
+            ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // Verify header and options render
-      expect(find.text('Gemini 3.5 Flash Lite'), findsOneWidget);
-      expect(find.text('Gemini 3.5 Flash'), findsOneWidget);
-      expect(find.text('Gemini 3.8 Flash'), findsOneWidget);
+        // Verify header and options render
+        expect(find.text('Gemini 3.5 Flash Lite'), findsOneWidget);
+        expect(find.text('Gemini 3.5 Flash'), findsOneWidget);
+        expect(find.text('Gemini 3.8 Flash'), findsOneWidget);
 
-      // Tap on Gemini 3.8 Flash
-      await tester.tap(find.text('Gemini 3.8 Flash'));
-      await tester.pumpAndSettle();
+        // Tap on Gemini 3.8 Flash
+        await tester.tap(find.text('Gemini 3.8 Flash'));
+        await tester.pumpAndSettle();
 
-      // Tap Save button
-      await tester.tap(find.text('Save'));
-      await tester.pumpAndSettle();
+        // Tap Save button
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
 
-      expect(
-        container.read(aiSettingsNotifierProvider).selectedModel,
-        'gemini-3.8-flash',
-      );
-    });
+        expect(
+          container.read(aiSettingsNotifierProvider).selectedModel,
+          'gemini-3.8-flash',
+        );
+      },
+    );
   });
 }

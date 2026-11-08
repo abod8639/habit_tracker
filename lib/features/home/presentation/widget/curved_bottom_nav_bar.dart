@@ -471,8 +471,7 @@ class _NavBarItemState extends State<_NavBarItem>
 
     // Inactive tone computed using ThemeUtils contrast against surface color
     // final textColor = ThemeUtils.getContrastColor(widget.surfaceColor);
-    final normalIconColor = accentColor.
-    withValues(alpha: isDark ? 0.65 : 0.55);
+    final normalIconColor = accentColor.withValues(alpha: isDark ? 0.65 : 0.55);
 
     return Tooltip(
       message: widget.tooltip,

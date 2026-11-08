@@ -226,7 +226,7 @@ class _MyalartdState extends State<MyalartDialog>
                           color: colorScheme.onSurface,
                         ),
                       ),
-                    const SizedBox(width: 1),
+                      const SizedBox(width: 1),
 
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -238,7 +238,9 @@ class _MyalartdState extends State<MyalartDialog>
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                boxShadow:  AppShadows.buttonResting(isDark: isDark)
+                                boxShadow: AppShadows.buttonResting(
+                                  isDark: isDark,
+                                ),
                               ),
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,

@@ -24,31 +24,33 @@ void main() {
     );
   }
 
-  testWidgets('CurvedBottomNavBar renders 3 items: Settings, Add Habit FAB, AI Chat',
-      (WidgetTester tester) async {
-    bool addHabitCalled = false;
+  testWidgets(
+    'CurvedBottomNavBar renders 3 items: Settings, Add Habit FAB, AI Chat',
+    (WidgetTester tester) async {
+      bool addHabitCalled = false;
 
-    await tester.pumpWidget(
-      createWidgetUnderTest(
-        onAddHabit: () {
-          addHabitCalled = true;
-        },
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          onAddHabit: () {
+            addHabitCalled = true;
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    // Verify Settings button exists on left
-    expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+      // Verify Settings button exists on left
+      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
 
-    // Verify Add button exists in center with add icon
-    expect(find.byIcon(Icons.add_rounded), findsOneWidget);
+      // Verify Add button exists in center with add icon
+      expect(find.byIcon(Icons.add_rounded), findsOneWidget);
 
-    // Verify AI Chat button exists on right
-    expect(find.byIcon(Icons.chat_bubble_outline_rounded), findsOneWidget);
+      // Verify AI Chat button exists on right
+      expect(find.byIcon(Icons.chat_bubble_outline_rounded), findsOneWidget);
 
-    // Tap Center FAB and verify callback
-    await tester.tap(find.byIcon(Icons.add_rounded));
-    await tester.pumpAndSettle();
-    expect(addHabitCalled, isTrue);
-  });
+      // Tap Center FAB and verify callback
+      await tester.tap(find.byIcon(Icons.add_rounded));
+      await tester.pumpAndSettle();
+      expect(addHabitCalled, isTrue);
+    },
+  );
 }

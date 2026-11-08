@@ -117,8 +117,8 @@ class Tablet extends ConsumerWidget {
                       child: HabitListSkeleton(),
                     )
                   : habitState.habits.isEmpty
-                      ? const NoHabitsYet()
-                      : const CheckboxList(),
+                  ? const NoHabitsYet()
+                  : const CheckboxList(),
             ),
           ],
         ),

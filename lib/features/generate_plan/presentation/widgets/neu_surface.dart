@@ -218,8 +218,8 @@ class NeuOrb extends StatelessWidget {
                 colorFilter: ColorFilter.mode(effectiveColor, BlendMode.srcIn),
               )
             : emoji != null
-                ? Text(emoji!, style: TextStyle(fontSize: size * 0.42))
-                : Icon(icon, size: size * 0.46, color: effectiveColor),
+            ? Text(emoji!, style: TextStyle(fontSize: size * 0.42))
+            : Icon(icon, size: size * 0.46, color: effectiveColor),
       ),
     );
   }

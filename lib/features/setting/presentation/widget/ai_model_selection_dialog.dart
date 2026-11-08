@@ -294,7 +294,8 @@ class _AiModelSelectionDialogState
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ..._presetModels.map((item) {
-                      final isSelected = !_isCustom && _selectedModel == item.id;
+                      final isSelected =
+                          !_isCustom && _selectedModel == item.id;
                       return NeumorphicSelectionTile(
                         key: ValueKey(item.id),
                         isSelected: isSelected,

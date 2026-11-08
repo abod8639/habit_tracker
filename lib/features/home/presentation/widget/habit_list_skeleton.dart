@@ -113,4 +113,3 @@ class HabitListSkeleton extends StatelessWidget {
     );
   }
 }
-

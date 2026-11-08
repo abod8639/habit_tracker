@@ -23,8 +23,18 @@ void main() {
         selectedHabitName: null,
         habitNames: const ['Workout', 'Reading'],
         todaySummary: [
-          HabitEntity(id: '1', name: 'Workout', isCompleted: true, createdAt: DateTime(2024, 1, 1)),
-          HabitEntity(id: '2', name: 'Reading', isCompleted: true, createdAt: DateTime(2024, 1, 1)),
+          HabitEntity(
+            id: '1',
+            name: 'Workout',
+            isCompleted: true,
+            createdAt: DateTime(2024, 1, 1),
+          ),
+          HabitEntity(
+            id: '2',
+            name: 'Reading',
+            isCompleted: true,
+            createdAt: DateTime(2024, 1, 1),
+          ),
         ],
         individualTrends: {
           'Workout': [const FlSpot(0, 1.0), const FlSpot(1, 1.0)],
@@ -72,8 +82,18 @@ void main() {
         selectedHabitName: 'Workout',
         habitNames: const ['Workout', 'Reading'],
         todaySummary: [
-          HabitEntity(id: '1', name: 'Workout', isCompleted: true, createdAt: DateTime(2024, 1, 1)),
-          HabitEntity(id: '2', name: 'Reading', isCompleted: true, createdAt: DateTime(2024, 1, 1)),
+          HabitEntity(
+            id: '1',
+            name: 'Workout',
+            isCompleted: true,
+            createdAt: DateTime(2024, 1, 1),
+          ),
+          HabitEntity(
+            id: '2',
+            name: 'Reading',
+            isCompleted: true,
+            createdAt: DateTime(2024, 1, 1),
+          ),
         ],
         individualTrends: {
           'Workout': [const FlSpot(0, 1.0), const FlSpot(1, 1.0)],

@@ -163,7 +163,7 @@ class _DrawerListState extends State<DrawerList> {
           title: S.current.aiCoach,
         ),
         MyDrawerListTile(
-          icon: Icon(color: colors.drawerAiIcon, Icons.auto_awesome_outlined ),
+          icon: Icon(color: colors.drawerAiIcon, Icons.auto_awesome_outlined),
           onTap: () {
             final navigator = Navigator.of(context);
             final router = GoRouter.of(context);
@@ -175,7 +175,9 @@ class _DrawerListState extends State<DrawerList> {
               },
             );
           },
-          title: Localizations.localeOf(context).languageCode == "ar" ? "الخطة" : "Plan",
+          title: Localizations.localeOf(context).languageCode == "ar"
+              ? "الخطة"
+              : "Plan",
         ),
         MyDrawerListTile(
           icon: Icon(color: colors.drawerSettingsIcon, Icons.settings),
